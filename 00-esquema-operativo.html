@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metodología — Manual Dev SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .role-box { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+  .role-card { flex: 1; min-width: 250px; background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); border-radius: 8px; padding: 20px; }
+  .role-name { font-size: 14px; font-weight: 700; color: var(--pjev-verde-oscuro); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .role-name::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--pjev-dorado); }
+  .role-list { list-style: none; padding: 0; margin: 0; font-size: 12px; color: var(--pjev-texto-muted); line-height: 1.6; }
+  .role-list li { margin-bottom: 6px; padding-left: 14px; position: relative; }
+  .role-list li::before { content: '→'; position: absolute; left: 0; color: var(--pjev-dorado-dim); }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Metodología</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-01</div>
+      <h1 class="elem-title">Metodología y Esquema Operativo</h1>
+      <p class="elem-desc">Herramientas, reglas de colaboración, manejo de ramas, rutinas diarias y despliegue del proyecto SIAF-PJEV.</p>
+    </div>
+  </div>
+
+  <!-- 1. ENTORNO DE DESARROLLO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Entorno de Desarrollo y Stack Tecnológico</div>
+    <div class="callout info" style="margin-bottom: 16px;">
+      <span class="callout-icon">ℹ</span>
+      <div>El objetivo es mantener el flujo lo más simple posible: <strong>Equipos locales de desarrollo, 1 Base de Datos en Nube, 1 Servidor de Pruebas.</strong></div>
+    </div>
+    
+    <p>El entorno técnico para construir el sistema opera sobre sistemas operativos <strong>Windows / Unix / Linux</strong> y el código se administra mediante el repositorio <strong>GitHub</strong> con una configuración de ramas básica. La herramienta oficial de desarrollo es el IDE <strong>Visual Studio Code</strong>. Todo el ecosistema está basado en el lenguaje JavaScript/TypeScript.</p>
+    
+    <table class="props-table" style="margin-top: 16px;">
+      <thead><tr><th>Capa</th><th>Tecnologías Oficiales</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Base / Lenguaje</strong></td><td>TypeScript, HTML, CSS</td></tr>
+        <tr><td><strong>Frontend</strong></td><td>Next.js, Tailwind.UI</td></tr>
+        <tr><td><strong>Backend (Servicios REST)</strong></td><td>Node.js, Nest.js</td></tr>
+        <tr><td><strong>Persistencia</strong></td><td>PostgreSQL, Prisma.js</td></tr>
+        <tr><td><strong>Generación de Reportes</strong></td><td>React/JS (Reportes Simples), JasperReports (Reportes Complejos)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. INTELIGENCIA ARTIFICIAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Utilización de la IA Generativa</div>
+    <p>El equipo promueve y recomienda el uso de asistentes de Inteligencia Artificial como herramienta de desarrollo generativa. Las opciones principales (preferentemente integradas como plug-ins en Visual Studio Code) son:</p>
+    <ul class="role-list" style="margin-left: 20px;">
+      <li><strong>Claude</strong> (Recomendado)</li>
+      <li><strong>Codex</strong></li>
+      <li><strong>Antigravity</strong></li>
+    </ul>
+  </div>
+
+  <!-- 3. ROLES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Roles y Responsabilidades</div>
+    <p>El equipo se organiza en base a los siguientes roles funcionales. Una sola persona puede asumir uno o múltiples roles:</p>
+    <div class="role-box">
+      <div class="role-card">
+        <div class="role-name">Análisis y Diseño Funcional</div>
+        <ul class="role-list">
+          <li>Levantamiento de requerimientos y reglas de negocio.</li>
+          <li>Elaboración de manuales de desarrollo.</li>
+          <li>Actualizar este sitio web de documentación.</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Administrador de Base de Datos</div>
+        <ul class="role-list">
+          <li>Gestión de la estructura en la base de datos centralizada.</li>
+          <li>Asegurar integridad, esquemas y aplicar migraciones SQL.</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Desarrollo de Aplicación</div>
+        <ul class="role-list">
+          <li>Programación en las capas de frontend, backend y persistencia.</li>
+          <li>Trabajo diario en su rama individual <code>dev-usuario</code>.</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Revisión e Integración</div>
+        <ul class="role-list">
+          <li>Revisión de Pull Requests (Code Review y QA).</li>
+          <li>Responsable autorizado de hacer los <em>merge</em> hacia las ramas de integración (ej. <code>development</code> y producción).</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Actualización en Producción</div>
+        <ul class="role-list">
+          <li>Responsable de desplegar el código aprobado hacia los servidores finales.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. FORMA DE TRABAJO Y RUTINAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Flujo de Trabajo Diario (Rutinas en GitHub)</div>
+    <p>La forma de trabajo principal consiste en que cada desarrollador tiene su rama de trabajo individual (<code>dev-usuario</code>) para actualizar el repositorio. Para evitar conflictos, se debe cumplir con las siguientes rutinas de control de versiones:</p>
+    
+    <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">🌅 Rutina de Mañana (09:00 hrs) — Sincronización</h3>
+    <div class="code-wrap">
+      <div class="code-block" style="padding: 16px;">
+        <pre><span class="cm"># 1. Traer el mapa remoto actualizado</span>
+<span class="kw">git fetch origin</span>
+
+<span class="cm"># 2. Actualizar tu copia local de la rama principal</span>
+<span class="kw">git checkout</span> development
+<span class="kw">git pull origin</span> development
+
+<span class="cm"># 3. Llevar las nuevas actualizaciones a tu rama personal</span>
+<span class="kw">git checkout</span> dev-usuario
+<span class="kw">git merge</span> development
+
+<span class="cm"># 4. Refrescar el monorepo técnico</span>
+<span class="kw">npm install</span>
+<span class="kw">npx prisma generate</span> <span class="str">--schema=packages/database/prisma/schema.prisma</span></pre>
+      </div>
+    </div>
+
+    <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">🌇 Rutina de Tarde — Respaldo y Entrega</h3>
+    <div class="code-wrap">
+      <div class="code-block" style="padding: 16px;">
+        <pre><span class="cm"># 1. Preparar archivos modificados</span>
+<span class="kw">git add .</span>
+
+<span class="cm"># 2. Documentar avance (usando el estándar semántico feat: o fix:)</span>
+<span class="kw">git commit -m</span> <span class="str">"feat: (modulo) descripción clara del avance hoy"</span>
+
+<span class="cm"># 3. Subir los cambios a la nube en tu rama</span>
+<span class="kw">git push origin</span> dev-usuario</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. CRITERIOS DE ACEPTACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> ¿Cuándo está listo un cambio?</div>
+    <p>Según la metodología oficial del equipo, todo cambio o módulo nuevo debe cumplir con el siguiente <em>Checklist de Terminado (Definition of Done)</em>:</p>
+    
+    <table class="props-table">
+      <thead><tr><th>Estado</th><th>Criterio a cumplir rigurosamente</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="badge-req">Requerido</span></td>
+          <td><strong>Todo el código es TypeScript.</strong> Está estrictamente prohibido utilizar o enviar archivos <code>.js</code>.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-req">Requerido</span></td>
+          <td><strong>Bitácora de BD:</strong> Los cambios en la base de datos (tablas, funciones) están trazados mediante un script <code>.sql</code>. No se modifican tablas directamente en el editor de Supabase sin actualizar el esquema de Prisma.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-req">Requerido</span></td>
+          <td>Se ha generado el Pull Request (PR) en GitHub solicitando fusionar <code>dev-usuario</code> con la rama principal.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-req">Requerido</span></td>
+          <td>El responsable de "Revisión" ha aprobado el PR y ha ejecutado la fusión (merge) hacia <code>development</code> o producción.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-req">Requerido</span></td>
+          <td>El responsable de "Actualización en producción" ha desplegado los cambios y la funcionalidad se probó exitosamente.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav">
+      <span class="foot-nav-label">← Volver</span>
+      <a class="foot-nav-link" href="guia-maestra.html">Guía Maestra</a>
+    </div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+    <div class="foot-nav" style="align-items:flex-end;">
+      <span class="foot-nav-label">Siguiente →</span>
+      <a class="foot-nav-link" href="00-estandares-sp.html">Estándares de SP</a>
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

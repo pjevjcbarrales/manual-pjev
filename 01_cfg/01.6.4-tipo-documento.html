@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>01.6.4 Tipos de Documento</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.patch  { background:#fff8e1; color:#795548; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; }
+  .flujo-box { background:var(--code-bg); border-radius:8px; padding:20px; font-family:var(--font-mono); font-size:12px; color:var(--code-text); line-height:1.8; overflow-x:auto; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:#fff3e0; color:#e65100; border:1px solid #ffcc80; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Manual Dev</a> ›
+      <span>Configuración Inicial</span> ›
+      <span>Operativos</span> ›
+      <span>Tipos de Documento</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">01.6.4</div>
+        <h1 class="elem-title">Tipos de Documento</h1>
+        <p class="elem-desc">Clasificador de tipos de pólizas y documentos operativos.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-p">Modo B — Especificación para DB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Clasificador de tipos de pólizas y documentos operativos. Forma parte de la configuración base.</p>
+    </div>
+
+    <!-- 4. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos (<code>catalogo_tipo_doc</code>)</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+
+        <tr><td><code>td_id</code> <span class="badge-req">REQ</span></td><td><code>INT PK</code></td><td>ID.</td></tr>
+        <tr><td><code>td_clave</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(10)</code></td><td>Clave del documento.</td></tr>
+        <tr><td><code>td_nombre</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(100)</code></td><td>Nombre del documento.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. STORED PROCEDURES (ESPECIFICACIÓN) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (Especificación)</div>
+      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">Procedimientos de lectura y escritura</h4>
+      <p>Procedimientos estandarizados <code>fn_leer_</code> y <code>fn_abc_</code> para gestionar los registros.</p>
+    </div>
+
+    <!-- 6. SERVICIOS REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code class="method get">GET</code></td><td><code>/configuracion/...</code></td><td><code>?q=busqueda</code></td><td>Listado</td></tr>
+        <tr><td><code class="method post">POST</code></td><td><code>/configuracion/...</code></td><td>{...}</td><td>Guardar nuevo.</td></tr>
+        <tr><td><code class="method put">PUT</code></td><td><code>/configuracion/.../:id</code></td><td>{...}</td><td>Modificar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. PANTALLAS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Diseño de Interfaces (UI)</div>
+      <p>Uso del componente genérico "Pantalla de Catálogo Simple" con grid de datos y formulario de ABC.</p>
+    </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

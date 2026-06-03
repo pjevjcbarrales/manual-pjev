@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estándar de Prisma ORM — Manual Dev SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap { background: #1e1e1e; border-radius: 8px; padding: 16px; margin: 16px 0; overflow-x: auto; }
+  .code-block pre { margin: 0; color: #d4d4d4; font-family: monospace; font-size: 13px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Estándar de Prisma ORM</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-05</div>
+      <h1 class="elem-title">Estándar de Prisma ORM</h1>
+      <p class="elem-desc">Lineamientos oficiales para el modelado, mapeo de esquemas y conexión con la base de datos utilizando Prisma como nuestro ORM en Nest.js.</p>
+    </div>
+  </div>
+
+  <!-- 1. PRISMA COMO PUENTE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Prisma en la Arquitectura</div>
+    <p>En nuestra arquitectura, <strong>Prisma ORM</strong> no se encarga de definir migraciones estructurales complejas (como el particionamiento de tablas), sino que funge como el puente tipado entre la base de datos PostgreSQL y nuestra API en Nest.js.</p>
+    <ul class="role-list" style="margin-left: 20px;">
+      <li><strong>Lectura y Tipado:</strong> Todos los modelos en Prisma existen para que TypeScript conozca la estructura de los catálogos y tablas operativas.</li>
+      <li><strong>Ejecución de Lógica:</strong> Debido a que nuestra lógica de negocio reside en PostgreSQL (vía Stored Procedures), Prisma se utiliza intensivamente a través de <code>$queryRaw</code> para ejecutar las funciones <code>fn_leer</code> y <code>fn_abc</code>.</li>
+    </ul>
+  </div>
+
+  <!-- 2. REGLAS DE MODELADO (SCHEMA.PRISMA) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Reglas para el archivo schema.prisma</div>
+    <p>Para respetar los estándares de base de datos definidos en nuestra arquitectura técnica, la declaración de los modelos en Prisma debe apegarse estrictamente a las siguientes reglas:</p>
+    
+    <div class="callout warning" style="margin-bottom: 16px;">
+      <span class="callout-icon">⚠</span>
+      <div><strong>Soporte Multi-esquema:</strong> Dado que PostgreSQL divide la base de datos en 9 esquemas (nav, config, contabilidad, etc.), el archivo <code>schema.prisma</code> debe tener habilitado el feature <code>multiSchema</code> y cada modelo debe especificar a qué esquema pertenece usando <code>@@schema("nombre")</code>.</div>
+    </div>
+
+    <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">Convenciones de Nomenclatura en Prisma</h3>
+    <ul class="role-list" style="margin-left: 20px;">
+      <li><strong>Nombres de Modelos (PascalCase):</strong> Los modelos se declaran en singular y PascalCase (ej. <code>CatalogoProveedores</code>, <code>PolizaMovto</code>).</li>
+      <li><strong>Mapeo de Tablas (snake_case plural):</strong> Se debe usar la directiva <code>@@map("nombre_tabla")</code> para vincular el modelo con el nombre real físico de la tabla en PostgreSQL.</li>
+      <li><strong>Campos idénticos a SQL:</strong> Los nombres de los campos en Prisma deben conservar la nomenclatura de la base de datos (con su prefijo correspondiente, ej. <code>cp_id</code>, <code>cp_rfc</code>) a menos que se mapeen explícitamente con <code>@map()</code>.</li>
+    </ul>
+  </div>
+
+  <!-- 3. EJEMPLO DE MODELADO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Ejemplo Oficial de un Modelo en Prisma</div>
+    
+    <div class="code-wrap">
+      <div class="code-block">
+        <pre><span style="color:#c678dd;">model</span> <span style="color:#e5c07b;">CatalogoProveedores</span> {
+  cp_id               <span style="color:#56b6c2;">Int</span>                <span style="color:#d1d5db;">@id @default(autoincrement())</span>
+  cp_numpro           <span style="color:#56b6c2;">String</span>             <span style="color:#d1d5db;">@db.VarChar(5)</span>
+  cp_razonsocial      <span style="color:#56b6c2;">String</span>             <span style="color:#d1d5db;">@db.VarChar(150)</span>
+  cp_rfc              <span style="color:#56b6c2;">String</span>             <span style="color:#d1d5db;">@unique(map: "uq_prov_rfc") @db.VarChar(14)</span>
+  cp_banco_id         <span style="color:#56b6c2;">Int?</span>
+  estatus_registro    <span style="color:#56b6c2;">Int</span>                <span style="color:#d1d5db;">@default(1) @db.SmallInt</span>
+  usuario_c           <span style="color:#56b6c2;">String</span>             <span style="color:#d1d5db;">@db.VarChar(20)</span>
+  fecha_c             <span style="color:#56b6c2;">DateTime</span>           <span style="color:#d1d5db;">@default(now()) @db.Timestamptz(6)</span>
+  
+  <span style="color:#5c6370;">// Relaciones</span>
+  banco               CatalogoBancos?    <span style="color:#d1d5db;">@relation(fields: [cp_banco_id], references: [ban_id])</span>
+
+  <span style="color:#5c6370;">// Mapeo Físico</span>
+  <span style="color:#d1d5db;">@@map("catalogo_proveedores")</span>
+  <span style="color:#d1d5db;">@@schema("config")</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. FLUJO DE ACTUALIZACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Flujo de Trabajo (DB Pull vs Migrations)</div>
+    <p>Debido a que el DBA se encarga de crear las estructuras complejas y los Stored Procedures directamente en SQL (Supabase), los desarrolladores backend deben usar el comando <code>prisma generate</code> para reflejar los cambios tras descargar el código de Supabase. Prisma actúa predominantemente en <strong>modo DB First</strong> para este proyecto.</p>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav">
+      <span class="foot-nav-label">← Volver</span>
+      <a class="foot-nav-link" href="00-estandares-sp.html">Lógica de Negocios</a>
+    </div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+    <div class="foot-nav" style="align-items:flex-end;">
+      <span class="foot-nav-label">Siguiente →</span>
+      <a class="foot-nav-link" href="00-estandares-rest.html">Servicios REST</a>
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

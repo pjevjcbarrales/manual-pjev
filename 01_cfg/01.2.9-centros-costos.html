@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>01.2.9 Centros de Costos</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.patch  { background:#fff8e1; color:#795548; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; }
+  .flujo-box { background:var(--code-bg); border-radius:8px; padding:20px; font-family:var(--font-mono); font-size:12px; color:var(--code-text); line-height:1.8; overflow-x:auto; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:#fff3e0; color:#e65100; border:1px solid #ffcc80; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Manual Dev</a> ›
+      <span>Configuración Inicial</span> ›
+      <span>Catálogos Base</span> ›
+      <span>Centros de Costos</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">01.2.9</div>
+        <h1 class="elem-title">Centros de Costos</h1>
+        <p class="elem-desc">Catálogo de agrupación financiera. Permite determinar el costo contable integral de una o varias unidades orgánicas.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-p">Modo B — Especificación para DB</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">cfg / catalogos / centros-costos</code></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Mientras que las <strong>Unidades Administrativas</strong> definen la jerarquía institucional (quién gasta), los <strong>Centros de Costos</strong> son una agrupación para la Contabilidad Patrimonial. Varias Unidades Administrativas pequeñas pueden pertenecer al mismo Centro de Costos para prorratear gastos de luz, agua o papelería a nivel regional o de edificio.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>CONAC</td><td>Manual de Contabilidad</td><td>El sistema debe permitir conocer el costo de los programas y actividades mediante la acumulación de gastos por centro de costos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. ROLES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Administrador Contable</strong></td><td>CRUD</td><td>No puede modificar la clave si ya existen activos fijos ligados a este centro.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>cc_id</code> <span class="badge-req">REQ</span></td><td><code>INT PK</code></td><td>ID Autoincrementable.</td></tr>
+        <tr><td><code>cc_clave</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(20)</code></td><td>Clave contable del centro. Unique.</td></tr>
+        <tr><td><code>cc_nombre</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(150)</code></td><td>Nombre del centro de costos.</td></tr>
+        <tr><td><code>cc_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>Descripción de las áreas que engloba.</td></tr>
+        <tr><td><code>cc_estatus_registro</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>1=Activo, 0=Baja.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. STORED PROCEDURES (ESPECIFICACIÓN) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (Especificación)</div>
+      
+      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.1. Procedimiento LEER (<code>fn_leer_catalogo_centros_costos</code>)</h4>
+      <table class="props-table" style="margin-bottom:20px;">
+        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>ID o NULL</td></tr>
+        <tr><td><code>@p_busqueda</code></td><td><code>VARCHAR</code></td><td>Filtro cc_clave, cc_nombre</td></tr>
+        </tbody>
+      </table>
+
+      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.2. Procedimiento ABC (<code>fn_abc_catalogo_centros_costos</code>)</h4>
+      <table class="props-table" style="margin-bottom:20px;">
+        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>ID o NULL</td></tr>
+        <tr><td><code>@p_clave</code></td><td><code>VARCHAR</code></td><td>Clave del centro</td></tr>
+        <tr><td><code>@p_nombre</code></td><td><code>VARCHAR</code></td><td>Nombre</td></tr>
+        <tr><td><code>@p_accion</code></td><td><code>SMALLINT</code></td><td>2=Alta, 3=Cambio, 4=Baja</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. SERVICIOS REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code class="method get">GET</code></td><td><code>/configuracion/centros-costos</code></td><td><code>?q=...</code></td><td>Invoca fn_leer.</td></tr>
+        <tr><td><code class="method post">POST</code></td><td><code>/configuracion/centros-costos</code></td><td>{ ... }</td><td>Alta (accion=2)</td></tr>
+        <tr><td><code class="method put">PUT</code></td><td><code>/configuracion/centros-costos/:id</code></td><td>{ ... }</td><td>Modificación (accion=3)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 8. REGLAS DE NEGOCIO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa / Técnica)</th></tr></thead>
+        <tbody>
+        <tr><td><strong>RN-01</strong></td><td>Restricción de Borrado. No borrar si una Unidad Administrativa lo tiene referenciado.</td><td>Falla FK.</td><td>SP</td><td>Técnica</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 9. FLUJO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Flujos de Integración</div>
+      <div class="flujo-box">[Catálogo Centros Costos] ← (Es referenciado por) ← [Catálogo Unidades Administrativas]
+[Catálogo Centros Costos] ← (Es referenciado por) ← [Módulo de Activos Fijos]</div>
+    </div>
+
+    <div class="doc-footer">
+      <div class="foot-center">Manual de Desarrollo SIAF-PJEV<br><span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026</div>
+    </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

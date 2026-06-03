@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .hero {
+    background: var(--pjev-verde-oscuro);
+    border-radius: 10px; padding: 36px 40px; margin-bottom: 36px;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: 'DEV';
+    position: absolute; right: -10px; top: -20px;
+    font-size: 140px; font-weight: 900; color: rgba(222,172,80,0.05);
+    line-height: 1; pointer-events: none; user-select: none;
+  }
+  .hero-tag   { font-size: 11px; font-weight: 700; color: var(--pjev-dorado); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .hero-title { font-size: 30px; font-weight: 700; color: #fff; line-height: 1.15; margin-bottom: 10px; }
+  .hero-desc  { font-size: 14px; color: rgba(255,255,255,0.7); max-width: 580px; line-height: 1.6; margin-bottom: 24px; }
+  .hero-meta  { display: flex; gap: 28px; flex-wrap: wrap; }
+  .hero-stat  { display: flex; flex-direction: column; gap: 2px; }
+  .hero-stat-num   { font-size: 22px; font-weight: 700; color: var(--pjev-dorado); }
+  .hero-stat-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  .section-h2  { font-size: 17px; font-weight: 700; color: var(--pjev-verde-oscuro); margin-bottom: 6px; }
+  .section-sub { font-size: 13px; color: var(--pjev-texto-muted); margin-bottom: 20px; line-height: 1.5; }
+
+  /* Tarjetas de módulo */
+  .mod-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 40px; }
+  .mod-card {
+    background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); border-radius: 8px;
+    overflow: hidden; text-decoration: none; color: inherit;
+    transition: box-shadow 0.15s, transform 0.15s;
+    display: flex; flex-direction: column;
+  }
+  .mod-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); transform: translateY(-2px); }
+  .mod-card-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--pjev-borde);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .mod-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--pjev-verde-oscuro);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0; color: var(--pjev-dorado); font-weight: 700;
+    font-family: var(--font-mono);
+  }
+  .mod-name  { font-size: 14px; font-weight: 700; color: var(--pjev-verde-oscuro); }
+  .mod-count { font-size: 11px; color: var(--pjev-texto-muted); margin-top: 2px; }
+  .mod-links { padding: 10px 18px; display: flex; flex-direction: column; gap: 1px; flex: 1; }
+  .mod-link {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 5px 8px; border-radius: 5px; font-size: 12px; color: var(--pjev-texto);
+    text-decoration: none; transition: background 0.1s;
+  }
+  .mod-link:hover { background: var(--pjev-crema); color: var(--pjev-verde-oscuro); }
+  .mod-link-id { font-size: 10px; font-family: var(--font-mono); color: var(--pjev-texto-muted); }
+  .mod-link-badge {
+    font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 8px; margin-left: 6px;
+  }
+  .badge-a  { background: var(--pjev-success-bg); color: var(--pjev-success-text); border: 1px solid var(--pjev-success-borde); }
+  .badge-b  { background: var(--pjev-warning-bg); color: var(--pjev-warning-text); border: 1px solid var(--pjev-warning-borde); }
+  .badge-s  { background: var(--pjev-info-bg);    color: var(--pjev-info-text);    border: 1px solid var(--pjev-info-borde); }
+  .badge-c  { background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
+
+  /* Tabla de estándares */
+  .std-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+  .std-card {
+    background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); border-radius: 8px;
+    padding: 16px; text-decoration: none; color: inherit;
+    transition: box-shadow 0.15s;
+  }
+  .std-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+  .std-card-id   { font-size: 10px; font-family: var(--font-mono); color: var(--pjev-texto-muted); margin-bottom: 4px; }
+  .std-card-name { font-size: 13px; font-weight: 700; color: var(--pjev-verde-oscuro); margin-bottom: 4px; }
+  .std-card-desc { font-size: 11px; color: var(--pjev-texto-muted); line-height: 1.5; }
+
+  /* Leyenda modos */
+  .leyenda { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .ley-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--pjev-texto-muted); }
+
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-tag">Manual de Desarrollo · SIAF-PJEV</div>
+      <h1 class="hero-title">Sistema de Información de<br>Administración Financiera</h1>
+      <p class="hero-desc">Documentación técnica de referencia para el equipo de desarrollo. Cubre arquitectura, estándares de SP, modelo de datos, servicios REST y pantallas de referencia para cada módulo del sistema financiero del Poder Judicial del Estado de Veracruz.</p>
+      <div class="hero-meta">
+        <div class="hero-stat">
+          <span class="hero-stat-num">56</span>
+          <span class="hero-stat-label">Módulos documentados</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">7</span>
+          <span class="hero-stat-label">Sistemas financieros</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">v1.0</span>
+          <span class="hero-stat-label">Versión del manual</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">2026</span>
+          <span class="hero-stat-label">OAJ · DGA · PJEV</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTÁNDARES -->
+    <div class="section-h2">Estándares de desarrollo</div>
+    <p class="section-sub">Antes de trabajar en cualquier módulo, el equipo debe conocer estos tres documentos. Definen las reglas que aplican a todo el sistema sin excepción.</p>
+
+    <div class="std-grid">
+      <a class="std-card" href="00-estandares-sp.html">
+        <div class="std-card-id">STD-01</div>
+        <div class="std-card-name">Contrato de Stored Procedures</div>
+        <div class="std-card-desc">Nomenclatura fn_leer / fn_crud, envelope estándar, acciones 0/1/2/3, alias camelCase, softdelete y auditoría.</div>
+      </a>
+      <a class="std-card" href="00-arquitectura.html">
+        <div class="std-card-id">STD-02</div>
+        <div class="std-card-name">Arquitectura Técnica</div>
+        <div class="std-card-desc">Stack Next.js 15 / NestJS / Prisma / PostgreSQL, particionamiento por ejercicio, esquemas de BD, despliegue.</div>
+      </a>
+      <div class="std-card" style="opacity:0.5;cursor:default;">
+        <div class="std-card-id">STD-03</div>
+        <div class="std-card-name">Marco Normativo LGCG / CONAC</div>
+        <div class="std-card-desc">Normas de armonización contable aplicables. En construcción.</div>
+      </div>
+    </div>
+
+    <!-- MÓDULOS -->
+    <div class="section-h2">Módulos del sistema</div>
+
+    <div class="leyenda">
+      <div class="ley-item"><span class="mod-link-badge badge-a">A</span> Modo A — existe en código</div>
+      <div class="ley-item"><span class="mod-link-badge badge-b">B</span> Modo B — por desarrollar</div>
+      <div class="ley-item"><span class="mod-link-badge badge-s">Simple</span> Formulario simple</div>
+      <div class="ley-item"><span class="mod-link-badge badge-c">Compuesto</span> Encabezado + movimientos</div>
+    </div>
+
+    <div class="mod-grid">
+
+      <!-- 01 Configuración -->
+      <div class="mod-card">
+        <div class="mod-card-header">
+          <div class="mod-icon">01</div>
+          <div>
+            <div class="mod-name">Configuración Inicial</div>
+            <div class="mod-count">4 subsistemas · 26 módulos</div>
+          </div>
+        </div>
+        <div class="mod-links">
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:4px 8px 2px;">Subsistema: Entidad</div>
+          <a class="mod-link" href="01.1.1-entidad.html">Entidad <span><span class="mod-link-badge badge-a">A</span><span class="mod-link-badge badge-s">Simple</span><span class="mod-link-id">01.1.1</span></span></a>
+          <a class="mod-link" href="01.1.2-ejercicios.html">Ejercicios Fiscales <span><span class="mod-link-badge badge-a">A</span><span class="mod-link-badge badge-s">Simple</span><span class="mod-link-id">01.1.2</span></span></a>
+          <a class="mod-link" href="01.1.3-periodos.html">Períodos Contables <span><span class="mod-link-badge badge-a">A</span><span class="mod-link-badge badge-s">Simple</span><span class="mod-link-id">01.1.3</span></span></a>
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:6px 8px 2px;">Subsistema: Clasificadores</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Centros de Costo <span class="mod-link-id">01.2.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">COG / CRI / CUCOP <span class="mod-link-id">01.2.2</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Fuentes de Financiamiento <span class="mod-link-id">01.2.5</span></a>
+        </div>
+      </div>
+
+      <!-- 02 Presupuesto -->
+      <div class="mod-card">
+        <div class="mod-card-header">
+          <div class="mod-icon">02</div>
+          <div>
+            <div class="mod-name">Presupuesto</div>
+            <div class="mod-count">3 subsistemas · 7 módulos</div>
+          </div>
+        </div>
+        <div class="mod-links">
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:4px 8px 2px;">Subsistema: Registro</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Clave Presupuestal <span class="mod-link-id">02.1.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Presupuesto Autorizado Egresos <span class="mod-link-id">02.2.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Transferencias <span class="mod-link-id">02.3.1</span></a>
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:6px 8px 2px;">Subsistema: Proceso</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Calendarización Mensual <span class="mod-link-id">02.4.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Calendarización Quincenal <span class="mod-link-id">02.4.3</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Techo Presupuestal <span class="mod-link-id">02.5.1</span></a>
+        </div>
+      </div>
+
+      <!-- 03 Contabilidad -->
+      <div class="mod-card">
+        <div class="mod-card-header">
+          <div class="mod-icon">03</div>
+          <div>
+            <div class="mod-name">Contabilidad</div>
+            <div class="mod-count">4 subsistemas · 5 módulos</div>
+          </div>
+        </div>
+        <div class="mod-links">
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:4px 8px 2px;">Subsistema: Registro</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Catálogo de Cuentas SCG <span class="mod-link-id">03.1.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Pólizas Manuales <span class="mod-link-id">03.2.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Pólizas Automáticas <span class="mod-link-id">03.3.1</span></a>
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:6px 8px 2px;">Subsistema: Reportes</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Auxiliar Contable <span class="mod-link-id">03.4.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Libro Diario <span class="mod-link-id">03.4.2</span></a>
+        </div>
+      </div>
+
+      <!-- 04 CxC -->
+      <div class="mod-card">
+        <div class="mod-card-header">
+          <div class="mod-icon">04</div>
+          <div>
+            <div class="mod-name">Cuentas por Cobrar</div>
+            <div class="mod-count">2 subsistemas · 4 módulos</div>
+          </div>
+        </div>
+        <div class="mod-links">
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:4px 8px 2px;">Subsistema: Catálogos</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Tipos de Movimiento <span class="mod-link-id">04.1.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Conceptos de Ingreso <span class="mod-link-id">04.1.2</span></a>
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:6px 8px 2px;">Subsistema: Registro</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Ingresos por Recurso <span class="mod-link-id">04.2.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Cuentas de Cobro <span class="mod-link-id">04.2.2</span></a>
+        </div>
+      </div>
+
+      <!-- 05 CxP -->
+      <div class="mod-card">
+        <div class="mod-card-header">
+          <div class="mod-icon">05</div>
+          <div>
+            <div class="mod-name">Cuentas por Pagar</div>
+            <div class="mod-count">1 subsistema · 2 módulos</div>
+          </div>
+        </div>
+        <div class="mod-links">
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:4px 8px 2px;">Subsistema: Registro</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Afect. Servicios Personales <span><span class="mod-link-badge badge-a">A</span><span class="mod-link-badge badge-c">Compuesto</span><span class="mod-link-id">05.1.1</span></span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Afect. Recursos Materiales <span><span class="mod-link-badge badge-a">A</span><span class="mod-link-badge badge-c">Compuesto</span><span class="mod-link-id">05.1.2</span></span></a>
+          <div class="callout warning" style="margin-top:10px;font-size:11px;">
+            <span class="callout-icon">⚠</span>
+            <div>SPs de este módulo tienen deuda técnica — pendientes de refactorización al estándar.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 06 Tesorería -->
+      <div class="mod-card">
+        <div class="mod-card-header">
+          <div class="mod-icon">06</div>
+          <div>
+            <div class="mod-name">Tesorería</div>
+            <div class="mod-count">3 subsistemas · 5 módulos</div>
+          </div>
+        </div>
+        <div class="mod-links">
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:4px 8px 2px;">Subsistema: Registro</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Movimientos de Caja <span><span class="mod-link-badge badge-b">B</span><span class="mod-link-badge badge-c">Compuesto</span><span class="mod-link-id">06.1.1</span></span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Cuentas Bancarias Op. <span><span class="mod-link-badge badge-b">B</span><span class="mod-link-badge badge-s">Simple</span><span class="mod-link-id">06.1.2</span></span></a>
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:6px 8px 2px;">Subsistema: Proceso</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Conciliación Bancaria <span><span class="mod-link-badge badge-b">B</span><span class="mod-link-badge badge-c">Compuesto</span><span class="mod-link-id">06.2.1</span></span></a>
+          <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:6px 8px 2px;">Subsistema: Reportes</div>
+          <a class="mod-link" href="#" style="opacity:0.45;">Saldos <span class="mod-link-id">06.3.1</span></a>
+          <a class="mod-link" href="#" style="opacity:0.45;">Estado de Cuenta <span class="mod-link-id">06.3.2</span></a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 07 Adquisiciones aparte por tamaño -->
+    <div class="mod-grid" style="grid-template-columns:1fr;">
+      <div class="mod-card">
+        <div class="mod-card-header">
+          <div class="mod-icon">07</div>
+          <div>
+            <div class="mod-name">Adquisiciones</div>
+            <div class="mod-count">3 subsistemas · 6 módulos · Modo B — por desarrollar</div>
+          </div>
+        </div>
+        <div class="mod-links" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:4px 8px 2px;">Compras</div>
+            <a class="mod-link" href="#" style="opacity:0.45;">Adjudicación Directa <span class="mod-link-id">07.1.1</span></a>
+            <a class="mod-link" href="#" style="opacity:0.45;">Invitación a Tres <span class="mod-link-id">07.1.2</span></a>
+            <a class="mod-link" href="#" style="opacity:0.45;">Licitación Pública <span class="mod-link-id">07.1.3</span></a>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:4px 8px 2px;">Instrumentos Jurídicos</div>
+            <a class="mod-link" href="#" style="opacity:0.45;">Contratos <span class="mod-link-id">07.2.1</span></a>
+            <a class="mod-link" href="#" style="opacity:0.45;">Pedidos <span class="mod-link-id">07.2.2</span></a>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;color:var(--pjev-texto-muted);text-transform:uppercase;letter-spacing:0.8px;padding:4px 8px 2px;">Afectaciones Contables</div>
+            <a class="mod-link" href="#" style="opacity:0.45;">Afect. Gasto Adquisiciones <span class="mod-link-id">07.3.1</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-footer">
+      <div class="foot-nav"></div>
+      <div class="foot-center">
+        Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+        <span class="foot-gold">Dix Consultoría</span> · 2026
+      </div>
+      <div class="foot-nav"></div>
+    </div>
+
+  
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

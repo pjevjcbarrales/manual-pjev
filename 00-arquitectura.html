@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arquitectura Técnica — Manual Dev SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .schema-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .schema-card { background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); border-radius: 8px; padding: 16px; border-left: 4px solid var(--pjev-dorado); }
+  .schema-card.core { border-left-color: var(--pjev-verde-oscuro); }
+  .schema-name { font-family: monospace; font-size: 14px; font-weight: bold; color: var(--pjev-texto); margin-bottom: 6px; }
+  .schema-desc { font-size: 12px; color: var(--pjev-texto-muted); line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Arquitectura Técnica</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-02</div>
+      <h1 class="elem-title">Arquitectura Técnica y Persistencia</h1>
+      <p class="elem-desc">Estándares de la base de datos PostgreSQL, compartimentación por esquemas y reglas de diseño para el almacenamiento masivo (particionamiento).</p>
+    </div>
+  </div>
+
+  <!-- 1. ESQUEMAS DE BASE DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Esquemas por Sistema</div>
+    <p>Para evitar la saturación del esquema público y mantener la arquitectura modular, el sistema divide sus tablas y funciones lógicamente en **9 esquemas**. Cada módulo de la aplicación debe mapearse al esquema correspondiente en el ORM (Prisma).</p>
+    
+    <div class="schema-grid">
+      <div class="schema-card core">
+        <div class="schema-name">nav</div>
+        <div class="schema-desc">Seguridad, control de acceso basado en roles (RBAC), usuarios y menús dinámicos de navegación.</div>
+      </div>
+      <div class="schema-card core">
+        <div class="schema-name">config</div>
+        <div class="schema-desc">Catálogos transversales y maestros (proveedores, empleados, bancos, ejercicios, centros de costo).</div>
+      </div>
+      <div class="schema-card core">
+        <div class="schema-name">auditoria</div>
+        <div class="schema-desc">Bitácora forense de cambios transaccionales (<em>Append-Only</em>). Registra el valor anterior y nuevo en formato JSON.</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-name">contabilidad</div>
+        <div class="schema-desc">Sistema de Contabilidad Gubernamental (SCG). Alberga el catálogo de cuentas, pólizas y movimientos.</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-name">presupuesto</div>
+        <div class="schema-desc">Capa de control presupuestal y <em>Stored Procedures</em> encargados de procesar egresos e ingresos.</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-name">cxc</div>
+        <div class="schema-desc">Módulo de Cuentas por Cobrar (Ingresos, facturación, recaudación).</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-name">cxp</div>
+        <div class="schema-desc">Módulo de Cuentas por Pagar (Afectaciones, órdenes de pago, comprobaciones).</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-name">pbr</div>
+        <div class="schema-desc">Presupuesto Basado en Resultados (Programas, subprogramas, proyectos e indicadores).</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-name">pm</div>
+        <div class="schema-desc">Programas Municipales y estructuras de metadata de programas de gobierno.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ESPECIFICACIONES PARA PERSISTENCIA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Especificaciones para Persistencia</div>
+    <div class="callout warning" style="margin-bottom: 16px;">
+      <span class="callout-icon">⚠</span>
+      <div>Las tablas operativas que generan millones de registros <strong>deben ser particionadas</strong> por rango de fechas o ejercicio fiscal para mantener el rendimiento a lo largo de los años.</div>
+    </div>
+    
+    <p>El estándar de persistencia define que el almacenamiento masivo debe optimizarse nativamente en la base de datos, mientras que Prisma ORM se encarga del modelado en la capa de aplicación.</p>
+
+    <h3 style="font-size: 14px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">Regla Oficial: Particionamiento de Tablas (Table Partitioning)</h3>
+    <p>Toda tabla clasificada como "Operativa Transaccional" que prevea un crecimiento descontrolado debe implementarse usando <code>PARTITION BY RANGE</code> nativo de PostgreSQL. Prisma ORM permite leer estas tablas normalmente como si fueran una sola.</p>
+    
+    <table class="props-table" style="margin-bottom: 16px;">
+      <thead><tr><th>Tabla Operativa</th><th>Esquema</th><th>Criterio de Partición</th><th>Motivo</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>poliza</code> y <code>poliza_movtos</code></td>
+          <td>contabilidad</td>
+          <td><code>p_ejercicio</code> (Anual)</td>
+          <td>Facilita el cierre de ejercicios fiscales, permitiendo archivar datos de años anteriores y acelerar reportes como la Balanza de Comprobación del año en curso.</td>
+        </tr>
+        <tr>
+          <td><code>bitacora_auditoria</code></td>
+          <td>auditoria</td>
+          <td><code>bit_fecha</code> (Mensual o Trimestral)</td>
+          <td>Evita el colapso del disco, ya que registra cada pequeño cambio de cualquier usuario en el sistema.</td>
+        </tr>
+        <tr>
+          <td><code>afectaciones_gasto</code></td>
+          <td>cxp / presupuesto</td>
+          <td><code>ejercicio_fiscal</code> (Anual)</td>
+          <td>Garantiza la rapidez de lectura al validar el techo financiero (disponibilidad) del año actual sin leer el histórico.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size: 14px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">Restricciones de Implementación</h3>
+    <ul class="role-list" style="margin-left: 20px;">
+      <li><strong>Auditoría Obligatoria:</strong> Todas las tablas del sistema (catálogos y operativas) deben contener forzosamente los campos <code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code> y <code>estatus_registro</code> (para <em>soft-delete</em>).</li>
+      <li><strong>Migrations en SQL Raw:</strong> Prisma no soporta la creación de particiones nativas en su sintaxis de <code>schema.prisma</code>. Por lo tanto, el DBA debe crear la tabla particionada ejecutando un script de migración SQL crudo en Supabase, y luego mapearla en Prisma ignorando la partición estructural.</li>
+      <li><strong>Soft-delete (Baja lógica):</strong> Nunca se debe ejecutar la instrucción <code>DELETE</code> en las aplicaciones. Todo borrado se maneja asignando <code>estatus_registro = 0</code>.</li>
+    </ul>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav">
+      <span class="foot-nav-label">← Volver</span>
+      <a class="foot-nav-link" href="00-esquema-operativo.html">Metodología</a>
+    </div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+    <div class="foot-nav" style="align-items:flex-end;">
+      <span class="foot-nav-label">Siguiente →</span>
+      <a class="foot-nav-link" href="home.html">Dashboard</a>
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía Maestra — Manual Dev SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Guía Maestra</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-00</div>
+      <h1 class="elem-title">Guía Maestra del Manual</h1>
+      <p class="elem-desc">Cómo leer, interpretar y utilizar el Manual de Desarrollo del SIAF-PJEV. Esta página explica la estructura de la documentación, las secciones de cada módulo y la nomenclatura utilizada en los wireframes.</p>
+    </div>
+  </div>
+
+  <!-- 1. PROPÓSITO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Propósito del Manual</div>
+    <p>El <strong>Manual de Desarrollo del SIAF-PJEV</strong> es la fuente única de verdad para el equipo técnico. Su objetivo es unificar los criterios de desarrollo entre Backend, Frontend y Base de Datos, proporcionando una referencia clara sobre el modelo de datos, los Stored Procedures y las reglas de negocio de cada módulo del sistema.</p>
+  </div>
+
+  <!-- 2. CLASIFICACIÓN DE MÓDULOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Clasificación de Módulos</div>
+    <p>Cada módulo documentado en este sitio cuenta con insignias (badges) que indican su estado y tipo de complejidad.</p>
+    
+    <table class="props-table" style="margin-bottom: 20px;">
+      <thead><tr><th>Insignia</th><th>Criterio</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="status-badge nuevo">Modo A</span></td>
+          <td>Estado del código</td>
+          <td>El módulo ya <strong>existe en el código fuente actual</strong>. La documentación se extrajo haciendo ingeniería inversa de las tablas y Stored Procedures en la base de datos.</td>
+        </tr>
+        <tr>
+          <td><span class="status-badge migrar">Modo B</span></td>
+          <td>Estado del código</td>
+          <td>El módulo está <strong>por desarrollar</strong>. La documentación sirve como especificación funcional y técnica para que el equipo comience a programarlo.</td>
+        </tr>
+        <tr>
+          <td><span class="status-badge existe">Simple</span></td>
+          <td>Complejidad UI</td>
+          <td>Módulos que consisten únicamente en un grid de consulta y un formulario de <strong>encabezado simple</strong> (ej. Catálogos, Entidad).</td>
+        </tr>
+        <tr>
+          <td><span style="font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 10px; background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe;">Compuesto</span></td>
+          <td>Complejidad UI</td>
+          <td>Módulos que requieren una vista <strong>Maestro-Detalle</strong> (encabezado + líneas de movimiento o partidas, ej. Afectaciones de Gasto, Pólizas).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. PLANTILLA DE DOCUMENTACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Estructura de un Módulo (10 Secciones)</div>
+    <p>Todas las páginas de módulos siguen estrictamente la misma plantilla de 10 secciones para garantizar homogeneidad:</p>
+    
+    <table class="props-table">
+      <thead><tr><th>#</th><th>Sección</th><th>Qué contiene</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><strong>Descripción General</strong></td><td>Resumen del objetivo del módulo y su lugar en el sistema.</td></tr>
+        <tr><td>2</td><td><strong>Marco Normativo</strong></td><td>Artículos de la LGCG o acuerdos del CONAC que justifican la existencia y reglas del módulo.</td></tr>
+        <tr><td>3</td><td><strong>Roles que intervienen</strong></td><td>Qué tipos de usuarios (ej. Capturista, Autorizador, Administrador) interactúan con esta pantalla y qué permisos tienen.</td></tr>
+        <tr><td>4</td><td><strong>Modelo de Datos</strong></td><td>Diccionario de la tabla principal. Identifica PK, tipos de dato y si los campos son requeridos <span class="badge-req">REQ</span> u opcionales <span class="badge-opt">OPC</span>.</td></tr>
+        <tr><td>5</td><td><strong>Stored Procedures</strong></td><td>Detalle de los parámetros de entrada <code>@param</code> y la salida esperada en formato JSON, incluyendo bloques de código SQL para copiar.</td></tr>
+        <tr><td>6</td><td><strong>Servicios REST</strong></td><td>Mapeo de los endpoints de la API (NestJS) que exponen las funcionalidades del módulo hacia el frontend (Next.js).</td></tr>
+        <tr><td>7</td><td><strong>Pantallas (Wireframes)</strong></td><td>4 vistas SVG interactuables (P1/P2/P3/P4) que explican el diseño de la interfaz y su enlace con los datos.</td></tr>
+        <tr><td>8</td><td><strong>Reglas de Negocio</strong></td><td>Tabla con las validaciones críticas (ej. "RN-01") y en qué capa deben verificarse (Frontend, Backend, o BD).</td></tr>
+        <tr><td>9</td><td><strong>Flujos de Integración</strong></td><td>Diagramas o listas que explican cómo los datos de este módulo afectan o alimentan a otros subsistemas.</td></tr>
+        <tr><td>10</td><td><strong>Historial de Cambios</strong></td><td>Registro de control de versiones de la documentación del módulo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. LEYENDO LOS WIREFRAMES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Cómo leer los Wireframes SVG</div>
+    <p>La sección 7 de cada módulo incluye un visor con 4 pestañas de wireframes interactivos. El objetivo de estas pantallas no es ser el diseño final (pixel-perfect), sino <strong>explicar el mapeo de datos entre el Frontend y el Backend</strong>.</p>
+    
+    <div class="do-dont" style="margin-top: 16px;">
+      <div class="do-card">
+        <div class="do-head">Pantallas Técnicas (P1 y P3)</div>
+        <div class="do-body">
+          <p style="font-size: 12px; margin: 0;">Usan variables en lugar de texto real:</p>
+          <ul style="font-size: 12px; margin-left: 20px; color: var(--pjev-texto-muted);">
+            <li><strong style="color: #2E5FA3;">@parametro</strong> (Azul): Representa un dato que el usuario captura o selecciona en el Frontend y que se envía como entrada al Stored Procedure (IN).</li>
+            <li><strong style="color: #1A7A3C;">{campo}</strong> (Verde): Representa un dato que la base de datos devuelve (OUT) y que el Frontend debe pintar en la pantalla (ej. en un grid).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="dont-card" style="border-color: var(--pjev-info-borde);">
+        <div class="dont-head" style="background: var(--pjev-info-bg); color: var(--pjev-info-text);">Pantallas de Ejemplo (P2 y P4)</div>
+        <div class="dont-body">
+          <p style="font-size: 12px; margin: 0;">Muestran la interfaz con datos reales "mockeados" para dar contexto visual al equipo de QA y UX.</p>
+          <ul style="font-size: 12px; margin-left: 20px; color: var(--pjev-texto-muted);">
+            <li>Incluyen ejemplos de <strong>toasts de error o éxito</strong>.</li>
+            <li>Muestran cómo se renderiza el "envelope" JSON de respuesta real del SP.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav">
+      <span class="foot-nav-label">← Volver</span>
+      <a class="foot-nav-link" href="home.html">Inicio</a>
+    </div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+    <div class="foot-nav" style="align-items:flex-end;">
+      <span class="foot-nav-label">Siguiente →</span>
+      <a class="foot-nav-link" href="00-estandares-sp.html">Estándares de SP</a>
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

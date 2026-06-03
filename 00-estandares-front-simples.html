@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estándar Frontend: Catálogos — Manual Dev SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap { background: #1e1e1e; border-radius: 8px; padding: 16px; margin: 16px 0; overflow-x: auto; }
+  .code-block pre { margin: 0; color: #d4d4d4; font-family: monospace; font-size: 13px; line-height: 1.5; }
+  .ui-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; margin-right: 8px; }
+  .ui-success { background: var(--pjev-success-bg); color: var(--pjev-success-text); border: 1px solid var(--pjev-success-borde); }
+  .ui-warning { background: var(--pjev-warning-bg); color: var(--pjev-warning-text); border: 1px solid var(--pjev-warning-borde); }
+  .ui-danger-real { background: #fef2f2; color: #991b1b; border: 1px solid #f87171; }
+  
+  .flow-card { background: #fff; border: 1px solid var(--pjev-borde); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+  .flow-title { font-size: 15px; font-weight: 700; color: var(--pjev-verde-oscuro); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .flow-title::before { content: ''; width: 12px; height: 12px; border-radius: 2px; background: var(--pjev-dorado); }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Estándar Frontend: Catálogos</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-06</div>
+      <h1 class="elem-title">Estándar Frontend: Formularios Simples</h1>
+      <p class="elem-desc">Arquitectura oficial para la construcción de interfaces de catálogos. Define la relación estricta entre las vistas de Next.js y los procedimientos almacenados (Leer y ABC).</p>
+    </div>
+  </div>
+
+  <!-- 1. INTRODUCCIÓN Y FLUJO DE PROCEDIMIENTOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> La Anatomía de un Catálogo (2 Fases)</div>
+    <p>Todos los módulos catalográficos del SIAF-PJEV deben estructurarse de manera uniforme utilizando un flujo de dos fases, donde la Interfaz de Usuario se acopla directamente a los procedimientos almacenados de base de datos.</p>
+    
+    <div class="flow-card">
+      <div class="flow-title">Fase 1: Grid de Datos (Procedimiento <code>LEER</code>)</div>
+      <p style="font-size: 13px; line-height: 1.6; color: #475569; margin-bottom: 12px;">
+        La pantalla inicial del módulo tiene como propósito presentar el universo de registros. Esta vista <strong>siempre debe incluir</strong>:
+      </p>
+      <ul class="role-list" style="margin-left: 20px;">
+        <li><strong>Filtros Superiores:</strong> Un buscador por texto o parámetros relevantes (ej. buscar por nombre o RFC).</li>
+        <li><strong>Botones de Acción Global:</strong> En la parte superior derecha se sitúa el botón principal <code>+ Nuevo registro</code>. A su vez, se deben incluir opciones para <code>Imprimir resultados</code>, <code>Exportar</code> y (cuando aplique al módulo) <code>Importar información</code>.</li>
+        <li><strong>Carga de Información:</strong> Al renderizar la tabla o aplicar filtros, el Frontend invoca al procedimiento <code>SP_[Modulo]_Leer</code> pasando los parámetros de búsqueda. Lo que devuelve este <em>SP</em> es lo que se imprime directamente en el Grid.</li>
+      </ul>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-title">Fase 2: Ventana de Registro y Actualización (Procedimientos <code>LEER</code> y <code>ABC</code>)</div>
+      <p style="font-size: 13px; line-height: 1.6; color: #475569; margin-bottom: 12px;">
+        Al hacer click en "Nuevo registro" o "Editar", se debe mostrar una ventana dedicada donde el usuario captura la información de manera ordenada.
+      </p>
+      <ul class="role-list" style="margin-left: 20px;">
+        <li><strong>Agrupación Visual:</strong> El formulario nunca debe ser una lista plana interminable de inputs. Se deben crear "tarjetas" o bloques semánticos (ej. "Datos Personales", "Documentos", "Contacto") para facilitar la lectura.</li>
+        <li><strong>Inicialización (El Procedimiento LEER):</strong> Cuando la ventana de "Nuevo Registro" se abre, el sistema ejecuta el procedimiento <code>SP_[Modulo]_Leer</code> (enviando el modo 'NUEVO' o pasando un ID nulo) para que la base de datos devuelva la estructura vacía, valores por defecto, o listas desplegables necesarias para pintar el formulario.</li>
+        <li><strong>Guardado (El Procedimiento ABC):</strong> Cuando el usuario presiona "Guardar", toda la información recabada en el formulario se envía al backend, el cual invoca <code>SP_[Modulo]_ABC</code>.
+          <br><br>
+          Si es un registro nuevo, se envía con la operación <code>'I' (Insert)</code>. Si es edición, se envía con <code>'U' (Update)</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2. MOCKUP VISUAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Mockup Visual del Estándar</div>
+    <p>A continuación se ilustra de manera exacta cómo debe lucir este flujo de dos fases en la aplicación real. Navega entre el <strong>Grid de Datos</strong> y la <strong>Ventana de Registro</strong>.</p>
+    
+    <div style="border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-top: 20px; background: #fff;">
+      <div style="display: flex; background: #f8fafc; border-bottom: 1px solid var(--pjev-borde);">
+        <button id="btn-grid" onclick="switchTab('grid')" style="padding: 12px 24px; font-size: 12px; font-weight: bold; background: #fff; border: none; border-bottom: 2px solid var(--pjev-verde-oscuro); color: var(--pjev-verde-oscuro); cursor: pointer; outline: none; transition: all 0.2s;">Fase 1: Grid de Datos</button>
+        <button id="btn-form" onclick="switchTab('form')" style="padding: 12px 24px; font-size: 12px; font-weight: bold; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--pjev-texto-muted); cursor: pointer; outline: none; transition: all 0.2s;">Fase 2: Ventana de Registro</button>
+      </div>
+
+      <!-- Tab Content: GRID -->
+      <div id="tab-grid" style="padding: 24px; text-align: center;">
+        <svg viewBox="0 0 800 400" width="100%" height="auto" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;">
+          <rect width="800" height="400" fill="#f8ebdf" />
+          
+          <!-- Header -->
+          <text x="20" y="30" font-size="16" font-weight="bold" fill="#1b3a2d">Empleados</text>
+          <text x="20" y="48" font-size="11" fill="#64748b">2931 empleados · CFG / Cat</text>
+
+          <rect x="520" y="15" width="120" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+          <text x="580" y="33" font-size="11" font-weight="bold" fill="#475569" text-anchor="middle">🖨 Imprimir / Exportar</text>
+
+          <rect x="650" y="15" width="130" height="28" fill="#1b3a2d" rx="4" />
+          <text x="715" y="33" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nuevo empleado</text>
+
+          <!-- Search Filter -->
+          <rect x="20" y="65" width="760" height="36" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+          <text x="35" y="87" font-size="12" fill="#94a3b8">Buscar por nombre, RFC, puesto o unidad...</text>
+
+          <!-- Table -->
+          <rect x="20" y="115" width="760" height="265" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+          
+          <!-- Table Head -->
+          <rect x="20" y="115" width="760" height="30" fill="#f8fafc" />
+          <text x="35" y="135" font-size="10" font-weight="bold" fill="#64748b">NOMBRE</text>
+          <text x="300" y="135" font-size="10" font-weight="bold" fill="#64748b">PUESTOS</text>
+          <text x="500" y="135" font-size="10" font-weight="bold" fill="#64748b">UNIDAD</text>
+          <text x="600" y="135" font-size="10" font-weight="bold" fill="#64748b">RFC</text>
+          <text x="710" y="135" font-size="10" font-weight="bold" fill="#64748b">ESTATUS</text>
+          <line x1="20" y1="145" x2="780" y2="145" stroke="#cbd5e1" />
+
+          <!-- Table Rows -->
+          <!-- Row 1 -->
+          <text x="35" y="165" font-size="11" font-weight="bold" fill="#475569">ABAD PASTRANA LINA</text>
+          <text x="300" y="165" font-size="11" fill="#64748b">OFICIAL JUDICIAL</text>
+          <text x="500" y="165" font-size="11" fill="#94a3b8">—</text>
+          <text x="600" y="165" font-size="11" fill="#64748b">AAPL730906UQ9</text>
+          <rect x="705" y="153" width="50" height="16" fill="#dcfce7" rx="8" />
+          <text x="730" y="164" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">Activo</text>
+          <line x1="20" y1="175" x2="780" y2="175" stroke="#f1f5f9" />
+
+          <!-- Row 2 -->
+          <text x="35" y="195" font-size="11" font-weight="bold" fill="#475569">ABARCA RUIZ YADIRA</text>
+          <text x="300" y="195" font-size="11" fill="#64748b">ACTUARIO(A)</text>
+          <text x="500" y="195" font-size="11" fill="#94a3b8">—</text>
+          <text x="600" y="195" font-size="11" fill="#64748b">AARY840411913</text>
+          <rect x="705" y="183" width="50" height="16" fill="#dcfce7" rx="8" />
+          <text x="730" y="194" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">Activo</text>
+          <line x1="20" y1="205" x2="780" y2="205" stroke="#f1f5f9" />
+
+          <!-- Row 3 -->
+          <text x="35" y="225" font-size="11" font-weight="bold" fill="#475569">ABURTO CORDOBA PATRICIA</text>
+          <text x="300" y="225" font-size="11" fill="#64748b">JUEZ(A) DE PRIMERA INSTANCIA</text>
+          <text x="500" y="225" font-size="11" fill="#94a3b8">—</text>
+          <text x="600" y="225" font-size="11" fill="#64748b">AUCP700213NW1</text>
+          <rect x="705" y="213" width="50" height="16" fill="#dcfce7" rx="8" />
+          <text x="730" y="224" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">Activo</text>
+        </svg>
+      </div>
+
+      <!-- Tab Content: FORMULARIO -->
+      <div id="tab-form" style="display: none; padding: 24px; text-align: center;">
+        <svg viewBox="0 0 800 600" width="100%" height="auto" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;">
+          <rect width="800" height="600" fill="#f8ebdf" />
+          
+          <!-- Back button / Breadcrumb -->
+          <text x="20" y="30" font-size="12" fill="#64748b">← Empleados</text>
+          <text x="20" y="55" font-size="18" font-weight="bold" fill="#1b3a2d">Nuevo empleado</text>
+
+          <!-- Group 1: DATOS PERSONALES -->
+          <rect x="20" y="80" width="760" height="180" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+          <text x="35" y="105" font-size="11" font-weight="bold" fill="#1b3a2d">DATOS PERSONALES</text>
+
+          <text x="35" y="135" font-size="10" font-weight="bold" fill="#475569">APELLIDO PATERNO</text>
+          <rect x="35" y="140" width="350" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+          <text x="410" y="135" font-size="10" font-weight="bold" fill="#475569">APELLIDO MATERNO</text>
+          <rect x="410" y="140" width="350" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+
+          <text x="35" y="195" font-size="10" font-weight="bold" fill="#475569">NOMBRE(S) *</text>
+          <rect x="35" y="200" width="725" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+
+          <!-- Group 2: DOCUMENTOS E IDENTIFICADORES -->
+          <rect x="20" y="280" width="760" height="140" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+          <text x="35" y="305" font-size="11" font-weight="bold" fill="#1b3a2d">DOCUMENTOS E IDENTIFICADORES</text>
+
+          <text x="35" y="335" font-size="10" font-weight="bold" fill="#475569">RFC</text>
+          <rect x="35" y="340" width="350" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+          <text x="45" y="360" font-size="11" fill="#94a3b8">XAXX010101000</text>
+          
+          <text x="410" y="335" font-size="10" font-weight="bold" fill="#475569">CURP</text>
+          <rect x="410" y="340" width="350" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+
+          <!-- Action Buttons -->
+          <rect x="520" y="440" width="100" height="36" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+          <text x="570" y="462" font-size="12" font-weight="bold" fill="#475569" text-anchor="middle">Cancelar</text>
+
+          <rect x="630" y="440" width="150" height="36" fill="#1b3a2d" rx="4" />
+          <text x="705" y="462" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Crear empleado</text>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      document.getElementById('tab-grid').style.display = tabId === 'grid' ? 'block' : 'none';
+      document.getElementById('tab-form').style.display = tabId === 'form' ? 'block' : 'none';
+      
+      const btnGrid = document.getElementById('btn-grid');
+      const btnForm = document.getElementById('btn-form');
+      
+      if (tabId === 'grid') {
+        btnGrid.style.background = '#fff';
+        btnGrid.style.borderBottomColor = 'var(--pjev-verde-oscuro)';
+        btnGrid.style.color = 'var(--pjev-verde-oscuro)';
+        
+        btnForm.style.background = 'transparent';
+        btnForm.style.borderBottomColor = 'transparent';
+        btnForm.style.color = 'var(--pjev-texto-muted)';
+      } else {
+        btnForm.style.background = '#fff';
+        btnForm.style.borderBottomColor = 'var(--pjev-verde-oscuro)';
+        btnForm.style.color = 'var(--pjev-verde-oscuro)';
+        
+        btnGrid.style.background = 'transparent';
+        btnGrid.style.borderBottomColor = 'transparent';
+        btnGrid.style.color = 'var(--pjev-texto-muted)';
+      }
+    }
+  </script>
+
+  <!-- 3. IMPLEMENTACIÓN EN REACT Y NEXT.JS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Traducción a Código (Consumo de la API REST)</div>
+    <p>A nivel de React (Frontend), este flujo se traduce en invocaciones de estado y llamadas a los endpoints REST que conectan a la base de datos.</p>
+    
+    <div class="code-wrap">
+      <div class="code-block" style="padding: 16px;">
+        <pre><span style="color:#5c6370;">// ----------------------------------------------------</span>
+<span style="color:#5c6370;">// FASE 1: GRID (Inicialización y Búsqueda)</span>
+<span style="color:#5c6370;">// ----------------------------------------------------</span>
+<span style="color:#c678dd;">const</span> <span style="color:#61afef;">cargarGrid</span> = <span style="color:#c678dd;">async</span> (filtros) => {
+  <span style="color:#5c6370;">// Llama internamente al SP_Modulo_Leer</span>
+  <span style="color:#c678dd;">const</span> res = <span style="color:#c678dd;">await</span> <span style="color:#61afef;">fetch</span>(<span style="color:#98c379;">`/api/modulo/leer?busqueda=${filtros}`</span>);
+  <span style="color:#c678dd;">const</span> datos = <span style="color:#c678dd;">await</span> res.<span style="color:#61afef;">json</span>();
+  <span style="color:#56b6c2;">setFilasDelGrid</span>(datos);
+};
+
+<span style="color:#5c6370;">// ----------------------------------------------------</span>
+<span style="color:#5c6370;">// FASE 2: VENTANA DE REGISTRO (Inicializar Nuevo)</span>
+<span style="color:#5c6370;">// ----------------------------------------------------</span>
+<span style="color:#c678dd;">const</span> <span style="color:#61afef;">abrirNuevoRegistro</span> = <span style="color:#c678dd;">async</span> () => {
+  <span style="color:#5c6370;">// Llama internamente al SP_Modulo_Leer en modo inicialización (ID=null)</span>
+  <span style="color:#c678dd;">const</span> res = <span style="color:#c678dd;">await</span> <span style="color:#61afef;">fetch</span>(<span style="color:#98c379;">`/api/modulo/leer/nuevo`</span>);
+  <span style="color:#c678dd;">const</span> defaults = <span style="color:#c678dd;">await</span> res.<span style="color:#61afef;">json</span>();
+  <span style="color:#56b6c2;">setCatalogosDesplegables</span>(defaults.catalogos);
+  <span style="color:#56b6c2;">abrirVentana</span>();
+};
+
+<span style="color:#5c6370;">// ----------------------------------------------------</span>
+<span style="color:#5c6370;">// FASE 2: VENTANA DE REGISTRO (Al hacer click en Guardar)</span>
+<span style="color:#5c6370;">// ----------------------------------------------------</span>
+<span style="color:#c678dd;">const</span> <span style="color:#61afef;">guardarRegistro</span> = <span style="color:#c678dd;">async</span> (formData) => {
+  <span style="color:#c678dd;">const</span> operacion = esEdicion ? <span style="color:#98c379;">'PUT'</span> : <span style="color:#98c379;">'POST'</span>;
+  
+  <span style="color:#5c6370;">// Llama internamente al SP_Modulo_ABC ('U' o 'I')</span>
+  <span style="color:#c678dd;">const</span> res = <span style="color:#c678dd;">await</span> <span style="color:#61afef;">fetch</span>(<span style="color:#98c379;">`/api/modulo/abc`</span>, {
+    method: operacion,
+    body: JSON.<span style="color:#61afef;">stringify</span>(formData)
+  });
+  
+  <span style="color:#5c6370;">// El frontend lee la respuesta de base de datos para mostrar la notificación.</span>
+  <span style="color:#61afef;">mostrarNotificacion</span>(res);
+};</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. TRADUCCIÓN VISUAL DE ERRORES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Reglas de Notificación (Toasts) de la Base de Datos</div>
+    <p>En el último paso del código anterior (<code>mostrarNotificacion</code>), el Frontend es responsable de interpretar los Códigos HTTP devueltos por el <strong>Procedimiento ABC</strong> y convertirlos en notificaciones visuales:</p>
+    
+    <table class="props-table" style="margin-top: 16px;">
+      <thead><tr><th>Respuesta HTTP</th><th>Código devuelto por <code>SP_ABC</code></th><th>Acción Visual Requerida</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong style="color: var(--pjev-verde-oscuro);">200 OK / 201 Created</strong></td>
+          <td><code>0</code> (Éxito)</td>
+          <td><span class="ui-badge ui-success">Notificación Verde</span> <em>"Registro guardado exitosamente."</em> Cierra la ventana y regresa al Grid principal, actualizando la tabla.</td>
+        </tr>
+        <tr>
+          <td><strong style="color: var(--pjev-dorado);">400 Bad Request</strong></td>
+          <td><code>-1</code> (Regla de negocio)</td>
+          <td><span class="ui-badge ui-warning">Notificación Amarilla</span> Muestra el <code>msg_resultado</code> exacto devuelto por la Base de Datos (Ej. <em>"El RFC ya existe"</em>). <strong>No cierra el formulario</strong> para que el usuario pueda corregir el error.</td>
+        </tr>
+        <tr>
+          <td><strong style="color: #dc2626;">500 Internal Error</strong></td>
+          <td><code>-2</code> (Excepción de SQL)</td>
+          <td><span class="ui-badge ui-danger-real">Notificación Roja</span> Muestra un mensaje técnico de falla.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav">
+      <span class="foot-nav-label">← Volver</span>
+      <a class="foot-nav-link" href="00-estandares-rest.html">Servicios REST</a>
+    </div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+    <div class="foot-nav" style="align-items:flex-end;">
+      <span class="foot-nav-label">Siguiente →</span>
+      <a class="foot-nav-link" href="00-estandares-front-compuestos.html">Frontend Compuestos</a>
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

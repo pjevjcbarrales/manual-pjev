@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estándar de la Lógica de Negocios — Manual Dev SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap { background: #1e1e1e; border-radius: 8px; padding: 16px; margin: 16px 0; overflow-x: auto; }
+  .code-block pre { margin: 0; color: #d4d4d4; font-family: monospace; font-size: 13px; line-height: 1.5; }
+  .sp-card { background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); border-radius: 8px; padding: 20px; margin-bottom: 20px; border-top: 4px solid var(--pjev-dorado); }
+  .sp-title { font-size: 16px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 12px; }
+  .badge-code { background: #f1f5f9; color: #334155; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; border: 1px solid #cbd5e1; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Estándar de la Lógica de negocios</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-03</div>
+      <h1 class="elem-title">Estándar de la Lógica de Negocios</h1>
+      <p class="elem-desc">Reglas oficiales para estructurar las funciones y procedimientos almacenados (Stored Procedures) en la base de datos PostgreSQL, abarcando formularios simples y compuestos.</p>
+    </div>
+  </div>
+
+  <!-- 1. INTRODUCCIÓN Y TIPOS DE FORMULARIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Arquitectura de Formularios</div>
+    <p>Toda la lógica de negocio, validaciones y permisos residen directamente en la base de datos a través de funciones (Stored Procedures). Para estandarizar el desarrollo, dividimos las pantallas en dos grandes categorías:</p>
+    
+    <div class="do-dont" style="margin-top: 16px;">
+      <div class="do-card">
+        <div class="do-head">Formularios Simples (Catálogos)</div>
+        <div class="do-body">
+          <p style="font-size: 12px; margin: 0;">Tablas maestras y catálogos de un solo nivel. Operan usando exclusivamente un par de funciones:</p>
+          <ul style="font-size: 12px; margin-left: 20px; margin-top: 8px; color: var(--pjev-texto-muted);">
+            <li><span class="badge-code">fn_leer_catalogo</span> (Lectura)</li>
+            <li><span class="badge-code">fn_abc_catalogo</span> (Escritura)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="do-card" style="border-left-color: var(--pjev-dorado);">
+        <div class="do-head" style="background: var(--pjev-dorado-dim); color: var(--pjev-texto);">Formularios Compuestos (Maestro-Detalle)</div>
+        <div class="do-body">
+          <p style="font-size: 12px; margin: 0;">Módulos operativos que usan un encabezado y sus líneas de movimientos (ej. Pólizas). Requieren 4 funciones:</p>
+          <ul style="font-size: 12px; margin-left: 20px; margin-top: 8px; color: var(--pjev-texto-muted);">
+            <li><span class="badge-code">fn_leer_encabezado</span> y <span class="badge-code">fn_abc_encabezado</span></li>
+            <li><span class="badge-code">fn_leer_movtos</span> y <span class="badge-code">fn_abc_movtos</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. FUNCIONES LEER -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Reglas para Funciones LEER</div>
+    <p>Las funciones de lectura <code>fn_leer_*</code> son el motor de consulta. Se controlan enviando un parámetro clave llamado <code>@id</code> y otros filtros de búsqueda opcionales. El comportamiento cambia drásticamente según el valor de <code>@id</code>:</p>
+    
+    <div class="sp-card">
+      <div class="sp-title">Comportamiento según @id</div>
+      <table class="props-table">
+        <thead><tr><th>Valor de <code>@id</code></th><th>Acción que realiza el SP</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Nulo (<code>IS NULL</code>)</strong></td>
+            <td><strong>Listado:</strong> Ejecuta un <code>SELECT</code> aplicando los filtros enviados por parámetro para devolver el listado general de la tabla.</td>
+          </tr>
+          <tr>
+            <td><strong>Mayor a Cero (<code>> 0</code>)</strong></td>
+            <td><strong>Detalle:</strong> Busca y devuelve un único registro existente filtrando por ese ID exacto. Ideal para editar o consultar a fondo.</td>
+          </tr>
+          <tr>
+            <td><strong>Menor a Cero (<code>< 0</code>)</strong></td>
+            <td><strong>Objeto Nuevo:</strong> Devuelve un <code>SELECT</code> con valores por default. El Frontend lo utiliza para inicializar un formulario en blanco listo para crear un nuevo registro.</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <p style="font-size: 13px; color: var(--pjev-texto); margin-top: 16px;"><strong>Responsabilidades adicionales del LEER:</strong></p>
+      <ul class="role-list" style="margin-left: 20px;">
+        <li><strong>Unión de Datos (JOINs):</strong> Es aquí donde vinculamos tablas auxiliares para hacer las descripciones legibles. Ejemplo: Si la tabla trae <code>idunidadadmva</code>, el SP debe hacer un JOIN con <code>config.catalogo_ua</code> para devolver adicionalmente la <code>claveua</code> y la <code>descripcion</code>, evitando que el Frontend haga esa lógica.</li>
+        <li><strong>Permisos de Consulta:</strong> En esta función se deben aplicar los filtros restrictivos dependiendo del rol del usuario (ej. si el usuario solo puede ver los registros de su dependencia).</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3. FUNCIONES ABC -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Reglas para Funciones ABC (Escritura)</div>
+    <p>Las funciones <code>fn_abc_*</code> manejan todo el CRUD excepto la lectura. Se rigen enviando todos los datos del formulario más un parámetro vital que indica la acción a realizar:</p>
+
+    <div class="sp-card">
+      <div class="sp-title">Operaciones de Escritura</div>
+      <ul class="role-list" style="margin-left: 20px;">
+        <li><span class="badge-code">Acción 1</span> <strong>(Alta):</strong> Inserta un nuevo registro en la tabla tras validar las reglas de negocio y campos obligatorios.</li>
+        <li><span class="badge-code">Acción 2</span> <strong>(Cambio):</strong> Hace un <code>UPDATE</code> del registro. Modifica únicamente los campos permitidos y actualiza los campos de auditoría (<code>usuario_m</code>, <code>fecha_m</code>). Requiere el <code>@id</code>.</li>
+        <li><span class="badge-code">Acción 3</span> <strong>(Baja Lógica):</strong> No se utiliza <code>DELETE</code> físico. Hace un <code>UPDATE</code> estableciendo <code>estatus_registro = 0</code> para conservar la auditoría.</li>
+      </ul>
+      <p style="font-size: 12px; color: var(--pjev-texto-muted); margin-top: 12px; font-style: italic;">Nota: En algunos módulos legados por homologar (según el doc GUIA.md), los valores mapean a Acción 2=Alta, 3=Cambio, 4=Baja. El estándar unificado actual debe alinearse con 1=Alta, 2=Cambio, 3=Baja para el desarrollo de nuevos módulos.</p>
+    </div>
+  </div>
+
+  <!-- 4. RESPUESTA ESTANDARIZADA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Envelope de Respuesta (JSON)</div>
+    <p>Tanto las funciones de LEER como de ABC deben devolver invariablemente un solo objeto JSON con un contrato unificado, para que el Frontend y la API en Nest.js puedan leerlo homogéneamente.</p>
+    
+    <table class="props-table">
+      <thead><tr><th>Código devuelto</th><th>Nivel de Error</th><th>Significado</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong style="color: var(--pjev-verde-oscuro);">0</strong></td>
+          <td><strong>Éxito (No hay error)</strong></td>
+          <td>Operación completada satisfactoriamente. Se anexa la descripción ("Registro guardado" o "OK") y la información en el nodo <code>data</code>.</td>
+        </tr>
+        <tr>
+          <td><strong style="color: var(--pjev-dorado);">-1</strong></td>
+          <td><strong>Warning (Regla de negocio)</strong></td>
+          <td>Advertencia o violación a una regla de negocio capturada (Ej. "El RFC ya existe" o "Presupuesto insuficiente").</td>
+        </tr>
+        <tr>
+          <td><strong style="color: #dc2626;">-2</strong></td>
+          <td><strong>Danger (Error técnico)</strong></td>
+          <td>Excepción controlada del motor de base de datos (Ej. "Fallo en constraint" o error <code>WHEN OTHERS</code>).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px; margin-top: 16px;">Estructura JSON Esperada</h3>
+    <div class="code-wrap" style="margin-top: 0;">
+      <div class="code-block">
+        <pre><span style="color:#d1d5db;">{</span>
+  <span style="color:#93c5fd;">"cod_resultado"</span><span style="color:#d1d5db;">: </span><span style="color:#fcd34d;">0</span><span style="color:#d1d5db;">,</span>
+  <span style="color:#93c5fd;">"msg_resultado"</span><span style="color:#d1d5db;">: </span><span style="color:#a7f3d0;">"Descripción de éxito o error"</span><span style="color:#d1d5db;">,</span>
+  <span style="color:#93c5fd;">"data"</span><span style="color:#d1d5db;">: {</span>
+    <span style="color:#6b7280;">// Para ABC: "id": 123</span>
+    <span style="color:#6b7280;">// Para LEER: "registros": [...], "meta": {"total": 5}</span>
+  <span style="color:#d1d5db;">}</span>
+<span style="color:#d1d5db;">}</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. EJEMPLO DE CÓDIGO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Ejemplo de Implementación (PostgreSQL)</div>
+    <p>A continuación se muestra un esqueleto estructural de cómo debe programarse la función <code>fn_leer</code> aplicando la lógica del parámetro <code>p_id</code> y manejando el JSON de respuesta:</p>
+    
+    <div class="code-wrap" style="margin-top: 12px;">
+      <div class="code-block">
+        <pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">config.fn_leer_ejemplo</span>(
+    p_id <span style="color:#c678dd;">INT</span>,
+    p_filtro <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>
+)
+<span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span>
+<span style="color:#c678dd;">LANGUAGE</span> plpgsql
+<span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span>
+    v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#5c6370;">-- 1. OBJETO NUEVO (p_id < 0)</span>
+    <span style="color:#c678dd;">IF</span> p_id < <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">jsonb_build_object</span>(
+            <span style="color:#98c379;">'id'</span>, <span style="color:#d19a66;">0</span>,
+            <span style="color:#98c379;">'descripcion'</span>, <span style="color:#98c379;">''</span>,
+            <span style="color:#98c379;">'activo'</span>, <span style="color:#d19a66;">1</span>
+        ) <span style="color:#c678dd;">INTO</span> v_resultado;
+
+    <span style="color:#5c6370;">-- 2. DETALLE DE REGISTRO (p_id > 0)</span>
+    <span style="color:#c678dd;">ELSIF</span> p_id > <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">jsonb_build_object</span>(
+            <span style="color:#98c379;">'id'</span>, e.id,
+            <span style="color:#98c379;">'descripcion'</span>, e.descripcion,
+            <span style="color:#98c379;">'unidad_nombre'</span>, u.nombre <span style="color:#5c6370;">-- JOIN auxiliar</span>
+        ) <span style="color:#c678dd;">INTO</span> v_resultado
+        <span style="color:#c678dd;">FROM</span> tabla_ejemplo e
+        <span style="color:#c678dd;">LEFT JOIN</span> catalogo_ua u <span style="color:#c678dd;">ON</span> e.idunidadadmva = u.id
+        <span style="color:#c678dd;">WHERE</span> e.id = p_id;
+
+    <span style="color:#5c6370;">-- 3. LISTADO GENERAL (p_id IS NULL)</span>
+    <span style="color:#c678dd;">ELSE</span>
+        <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">jsonb_build_object</span>(
+            <span style="color:#98c379;">'registros'</span>, <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>)
+        ) <span style="color:#c678dd;">INTO</span> v_resultado
+        <span style="color:#c678dd;">FROM</span> (
+            <span style="color:#c678dd;">SELECT</span> id, descripcion 
+            <span style="color:#c678dd;">FROM</span> tabla_ejemplo
+            <span style="color:#c678dd;">WHERE</span> (p_filtro <span style="color:#c678dd;">IS NULL OR</span> descripcion <span style="color:#c678dd;">ILIKE</span> <span style="color:#98c379;">'%'</span> || p_filtro || <span style="color:#98c379;">'%'</span>)
+            <span style="color:#c678dd;">AND</span> estatus_registro = <span style="color:#d19a66;">1</span>
+        ) t;
+    <span style="color:#c678dd;">END IF</span>;
+
+    <span style="color:#5c6370;">-- ENVELOPE DE ÉXITO</span>
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(
+        <span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>,
+        <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>,
+        <span style="color:#98c379;">'data'</span>, v_resultado
+    );
+
+<span style="color:#c678dd;">EXCEPTION WHEN OTHERS THEN</span>
+    <span style="color:#5c6370;">-- ENVELOPE DE ERROR TÉCNICO</span>
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(
+        <span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">-2</span>,
+        <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#56b6c2;">SQLERRM</span>,
+        <span style="color:#98c379;">'data'</span>, <span style="color:#d19a66;">NULL</span>
+    );
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav">
+      <span class="foot-nav-label">← Volver</span>
+      <a class="foot-nav-link" href="00-arquitectura.html">Arquitectura</a>
+    </div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+    <div class="foot-nav" style="align-items:flex-end;">
+      <span class="foot-nav-label">Siguiente →</span>
+      <a class="foot-nav-link" href="01_cfg/01.1.1-entidad.html">Módulo: Entidad</a>
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

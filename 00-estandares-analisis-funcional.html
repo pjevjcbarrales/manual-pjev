@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estándar de Análisis Funcional — SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Estándar de Análisis Funcional</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-08</div>
+      <h1 class="elem-title">Estándar de Análisis Funcional</h1>
+      <p class="elem-desc">Estructura obligatoria para documentar el levantamiento de requerimientos y diseño de nuevos módulos.</p>
+    </div>
+  </div>
+
+  <!-- 1. OBJETIVO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Objetivo</div>
+    <p>El Análisis Funcional es la piedra angular del desarrollo. Define el "Qué" y el "Por qué" de un módulo antes de escribir una sola línea de código. <strong>Ningún módulo debe desarrollarse sin que su Análisis Funcional correspondiente haya sido redactado, revisado y autorizado.</strong></p>
+    <p>Todos los archivos de Análisis Funcional deben nombrarse con la convención <code>0X.Y.Z-nombre-modulo.html</code> (por ejemplo, <code>01.1.1-entidad.html</code>) y deben seguir estrictamente la estructura detallada a continuación.</p>
+  </div>
+
+  <!-- 2. ESTRUCTURA DEL DOCUMENTO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Estructura Obligatoria de 9 Puntos</div>
+    
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">1. Descripción General</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Un resumen de 1-2 párrafos que explique el propósito del módulo en un lenguaje no técnico y orientado al negocio.</p>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">2. Marco Normativo</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Tabla obligatoria que vincula el módulo con la ley (LGCG, CONAC, etc.). Columnas: <strong>Norma</strong>, <strong>Artículo / Punto</strong>, <strong>Obligación que genera</strong>.</p>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">3. Roles que intervienen</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Tabla de accesos y permisos. Columnas: <strong>Rol</strong>, <strong>Acción permitida</strong>, <strong>Restricción</strong>.</p>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">4. Modelo de Datos</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Tabla con los campos físicos en la base de datos, marcando llaves (PK, FK) y requeridos. Columnas: <strong>Campo</strong>, <strong>Tipo</strong>, <strong>Descripción</strong>.</p>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">5. Stored Procedures (SPs)</h3>
+    <p style="font-size: 13px; margin-bottom: 8px; color: var(--pjev-texto-muted);">Se deben definir obligatoriamente las funciones <code>fn_leer_[modulo]</code> y <code>fn_crud_[modulo]</code>.</p>
+    <ul style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted); padding-left: 20px;">
+      <li>Los parámetros de entrada (IN) deben denotarse con el prefijo <code>@</code> (ej. <code>@usuario</code>, <code>@accion</code>, <code>@parametro</code>).</li>
+      <li>Los valores devueltos (OUT) o atributos JSON deben denotarse entre llaves <code>{}</code> (ej. <code>{dato}</code>, <code>{error}</code>).</li>
+      <li>El orden de los parámetros base siempre es: <code>@usuario</code>, <code>@ejercicio</code>, <code>@accion</code>.</li>
+    </ul>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">6. Servicios REST</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Endpoints que el Frontend consumirá. Columnas: <strong>Método (GET, POST, PUT, DELETE)</strong>, <strong>Endpoint</strong>, <strong>Body / Params</strong>, <strong>Descripción</strong>.</p>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">7. Diseño de Interfaces (UI / Wireframes)</h3>
+    <p style="font-size: 13px; margin-bottom: 8px; color: var(--pjev-texto-muted);">Todo análisis debe incluir wireframes (dibujados en SVG embebido) mostrando las dos fases del estándar Frontend en 4 pestañas interactivas:</p>
+    <ul style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted); padding-left: 20px;">
+      <li><code>pantalla_leer con @parametros</code>: Pantalla base o grid mapeando los bindings de variables (ej. mostrando <code>{campo}</code> en la tabla).</li>
+      <li><code>pantalla_leer con valores</code>: La misma pantalla pero ilustrada con datos de ejemplo reales o <em>mockups</em> para el usuario final.</li>
+      <li><code>pantalla_abc con @parametros</code>: Formulario de captura/edición (modal/ventana) indicando dónde se captura cada <code>@parametro</code> del SP.</li>
+      <li><code>pantalla_abc con valores</code>: Formulario de captura ilustrado con datos de ejemplo.</li>
+    </ul>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">8. Reglas de Negocio Críticas</h3>
+    <p style="font-size: 13px; margin-bottom: 8px; color: var(--pjev-texto-muted);">El corazón de la lógica funcional. Debe presentarse en una tabla con las siguientes 5 columnas estrictas:</p>
+    <div class="code-wrap">
+1. Código: (ej. RN-01)
+2. Regla: (Descripción clara de la regla)
+3. Consecuencia: (Qué sucede si se rompe, ej. Error en pantalla)
+4. Dónde se valida: (SP, Frontend Zod, Trigger, Procesos Core)
+5. Fuente (Normativa / Técnica): (Fundamento explícito, ej. "Ley General de Cont. Gubernamental Art. 18" o "Restricción técnica del modelo de datos")
+    </div>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">9. Flujos de Integración</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Diagrama de texto que explica cómo este módulo interactúa con otros (ej. "Entidad afecta a -> Pólizas Automáticas").</p>
+
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

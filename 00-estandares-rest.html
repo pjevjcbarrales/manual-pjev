@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estándar de Servicios REST — Manual Dev SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap { background: #1e1e1e; border-radius: 8px; padding: 16px; margin: 16px 0; overflow-x: auto; }
+  .code-block pre { margin: 0; color: #d4d4d4; font-family: monospace; font-size: 13px; line-height: 1.5; }
+  .http-method { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; color: white; width: 60px; text-align: center; margin-right: 12px; }
+  .method-get { background: #3b82f6; }
+  .method-post { background: #10b981; }
+  .method-put { background: #f59e0b; }
+  .method-delete { background: #ef4444; }
+  .endpoint-card { background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; }
+  .endpoint-path { font-family: monospace; font-size: 14px; font-weight: 600; color: #334155; flex-grow: 1; }
+  .endpoint-sp { font-family: monospace; font-size: 12px; color: var(--pjev-texto-muted); background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Estándar de Servicios REST</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-04</div>
+      <h1 class="elem-title">Estándar de Servicios REST</h1>
+      <p class="elem-desc">Mapeo oficial de rutas HTTP en el backend (Nest.js / Node.js) y su vinculación con la lógica de negocio en la base de datos.</p>
+    </div>
+  </div>
+
+  <!-- 1. RESPONSABILIDAD DEL BACKEND -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Responsabilidad de la Capa REST (Nest.js)</div>
+    <p>Debido a que toda la lógica de validación, joins y reglas de negocio reside en los <em>Stored Procedures</em> de PostgreSQL, la API en Nest.js funciona como un <strong>puente limpio (proxy)</strong>. Su responsabilidad principal es:</p>
+    <ul class="role-list" style="margin-left: 20px;">
+      <li>Manejar la autenticación (JWT) y autorización de la ruta.</li>
+      <li>Mapear los verbos HTTP (GET, POST, PUT, DELETE) hacia la función correspondiente en la base de datos ejecutando Prisma <code>$queryRaw</code>.</li>
+      <li>Traducir el <code>cod_resultado</code> de la base de datos hacia el <strong>Código de Estado HTTP (HTTP Status Code)</strong> correcto.</li>
+    </ul>
+  </div>
+
+  <!-- 2. MAPEO DE ENDPOINTS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Mapeo de Rutas para Formularios (Catálogos)</div>
+    <p>Todo controlador asociado a un catálogo o formulario simple debe exponer estrictamente las siguientes rutas, mapeándolas a los procedimientos <code>fn_leer</code> y <code>fn_abc</code>:</p>
+    
+    <div style="margin-top: 20px;">
+      <div class="endpoint-card">
+        <span class="http-method method-get">GET</span>
+        <span class="endpoint-path">/api/{modulo}</span>
+        <span class="endpoint-sp">fn_leer_*(p_id = NULL)</span>
+      </div>
+      <div class="endpoint-card">
+        <span class="http-method method-get">GET</span>
+        <span class="endpoint-path">/api/{modulo}/nuevo</span>
+        <span class="endpoint-sp">fn_leer_*(p_id = -1)</span>
+      </div>
+      <div class="endpoint-card">
+        <span class="http-method method-get">GET</span>
+        <span class="endpoint-path">/api/{modulo}/:id</span>
+        <span class="endpoint-sp">fn_leer_*(p_id = :id)</span>
+      </div>
+      <div class="endpoint-card">
+        <span class="http-method method-post">POST</span>
+        <span class="endpoint-path">/api/{modulo}</span>
+        <span class="endpoint-sp">fn_abc_*(accion = 1)</span>
+      </div>
+      <div class="endpoint-card">
+        <span class="http-method method-put">PUT</span>
+        <span class="endpoint-path">/api/{modulo}/:id</span>
+        <span class="endpoint-sp">fn_abc_*(accion = 2)</span>
+      </div>
+      <div class="endpoint-card">
+        <span class="http-method method-delete">DELETE</span>
+        <span class="endpoint-path">/api/{modulo}/:id</span>
+        <span class="endpoint-sp">fn_abc_*(accion = 3)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CÓDIGOS DE ESTADO HTTP -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Traducción de Códigos a HTTP Status</div>
+    <p>El backend debe leer la propiedad <code>cod_resultado</code> devuelta por la base de datos y responder al frontend (Next.js) con el código HTTP correspondiente:</p>
+    
+    <table class="props-table">
+      <thead><tr><th>Devuelto por SP</th><th>Significado</th><th>HTTP Status (Nest.js)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>0</code></td>
+          <td>Éxito / Operación completada</td>
+          <td><strong style="color: var(--pjev-verde-oscuro);">200 OK</strong> o <strong style="color: var(--pjev-verde-oscuro);">201 Created</strong></td>
+        </tr>
+        <tr>
+          <td><code>-1</code></td>
+          <td>Warning / Violación a Regla de Negocio</td>
+          <td><strong style="color: var(--pjev-dorado);">400 Bad Request</strong> o <strong style="color: var(--pjev-dorado);">422 Unprocessable Entity</strong></td>
+        </tr>
+        <tr>
+          <td><code>-2</code></td>
+          <td>Danger / Error Técnico o Excepción</td>
+          <td><strong style="color: #dc2626;">500 Internal Server Error</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. ESTRUCTURA DEL MÓDULO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Estructura de Archivos del Módulo</div>
+    <p>Dentro del directorio del backend en el monorepo, cada servicio se maneja con un estándar rígido de separación de responsabilidades. La carpeta de cada módulo debe contener estrictamente la siguiente estructura:</p>
+    
+    <table class="props-table" style="margin-top: 16px;">
+      <thead><tr><th>Archivo / Directorio</th><th>Responsabilidad y Configuración</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong style="color: var(--pjev-verde-oscuro); font-family: monospace;">{modulo}.module.ts</strong></td>
+          <td>Orquestador del dominio. Aquí se deben registrar (importar) el controlador y los proveedores (services). Se asegura de que el módulo sea empaquetable y reutilizable.</td>
+        </tr>
+        <tr>
+          <td><strong style="color: var(--pjev-verde-oscuro); font-family: monospace;">{modulo}.controller.ts</strong></td>
+          <td>Capa de red HTTP. Mapea las rutas (usando <code>@Get</code>, <code>@Post</code>, etc.), invoca los métodos del <em>Service</em> y retorna la respuesta procesada. Aquí van todos los decoradores de Swagger.</td>
+        </tr>
+        <tr>
+          <td><strong style="color: var(--pjev-verde-oscuro); font-family: monospace;">{modulo}.service.ts</strong></td>
+          <td>Capa de lógica (Puente). Contiene la inyección del <code>PrismaService</code>. Aquí es donde se construye y dispara el <code>$queryRaw</code> llamando a los <em>Stored Procedures</em> de la base de datos (<code>fn_leer</code>, <code>fn_abc</code>).</td>
+        </tr>
+        <tr>
+          <td><strong style="color: var(--pjev-dorado); font-family: monospace;">/dto/</strong></td>
+          <td>Carpeta obligatoria que contiene los Data Transfer Objects (DTOs) para validar estrictamente la forma del payload JSON que envía el frontend. Debe contener al menos dos archivos:</td>
+        </tr>
+        <tr>
+          <td><strong style="font-family: monospace; padding-left: 16px;">crear-{modulo}.dto.ts</strong></td>
+          <td>Clase con decoradores de validación (<code>class-validator</code>) para la creación (Acción 1). Documenta los campos obligatorios usando <code>@ApiProperty()</code> de Swagger.</td>
+        </tr>
+        <tr>
+          <td><strong style="font-family: monospace; padding-left: 16px;">actualizar-{modulo}.dto.ts</strong></td>
+          <td>Clase para actualizaciones (Acción 2). Típicamente hereda del DTO de creación usando <code>PartialType()</code> de Nest.js, volviendo todos los campos opcionales pero manteniendo las validaciones.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. EJEMPLOS DE CÓDIGO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Ejemplos de Código (Nest.js)</div>
+    <p>Para asegurar que todos programen igual, aquí tienes la plantilla base dividida en sus 4 archivos esenciales:</p>
+
+    <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 4px; margin-top: 16px;">1. proveedores.module.ts</h3>
+    <div class="code-wrap" style="margin-top: 0;"><div class="code-block"><pre><span style="color:#c678dd;">import</span> { Module } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'@nestjs/common'</span>;
+<span style="color:#c678dd;">import</span> { ProveedoresController } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'./proveedores.controller'</span>;
+<span style="color:#c678dd;">import</span> { ProveedoresService } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'./proveedores.service'</span>;
+
+<span style="color:#c678dd;">@Module</span>({
+  controllers: [ProveedoresController],
+  providers: [ProveedoresService],
+})
+<span style="color:#c678dd;">export class</span> <span style="color:#e5c07b;">ProveedoresModule</span> {}</pre></div></div>
+
+    <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 4px; margin-top: 16px;">2. dto/crear-proveedor.dto.ts</h3>
+    <div class="code-wrap" style="margin-top: 0;"><div class="code-block"><pre><span style="color:#c678dd;">import</span> { ApiProperty } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'@nestjs/swagger'</span>;
+<span style="color:#c678dd;">import</span> { IsString, IsNotEmpty } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'class-validator'</span>;
+
+<span style="color:#c678dd;">export class</span> <span style="color:#e5c07b;">CrearProveedorDto</span> {
+  <span style="color:#c678dd;">@ApiProperty</span>({ example: <span style="color:#98c379;">'XAXX010101000'</span> })
+  <span style="color:#c678dd;">@IsString</span>()
+  <span style="color:#c678dd;">@IsNotEmpty</span>()
+  rfc: <span style="color:#56b6c2;">string</span>;
+
+  <span style="color:#c678dd;">@ApiProperty</span>({ example: <span style="color:#98c379;">'Empresa S.A.'</span> })
+  <span style="color:#c678dd;">@IsString</span>()
+  <span style="color:#c678dd;">@IsNotEmpty</span>()
+  razonsocial: <span style="color:#56b6c2;">string</span>;
+}</pre></div></div>
+
+    <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 4px; margin-top: 16px;">3. proveedores.service.ts</h3>
+    <div class="code-wrap" style="margin-top: 0;"><div class="code-block"><pre><span style="color:#c678dd;">import</span> { Injectable, BadRequestException, InternalServerErrorException } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'@nestjs/common'</span>;
+<span style="color:#c678dd;">import</span> { PrismaService } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'../prisma.service'</span>;
+
+<span style="color:#c678dd;">@Injectable</span>()
+<span style="color:#c678dd;">export class</span> <span style="color:#e5c07b;">ProveedoresService</span> {
+  <span style="color:#c678dd;">constructor</span>(<span style="color:#c678dd;">private readonly</span> prisma: PrismaService) {}
+
+  <span style="color:#c678dd;">async</span> <span style="color:#61afef;">leer</span>(id: <span style="color:#56b6c2;">number | null</span>, filtro?: <span style="color:#56b6c2;">string</span>) {
+    <span style="color:#c678dd;">const</span> res = <span style="color:#c678dd;">await</span> <span style="color:#e5c07b;">this</span>.prisma.$queryRaw<span style="color:#d1d5db;">`SELECT config.fn_leer_proveedores(${id}, ${filtro}) AS payload`</span>;
+    <span style="color:#c678dd;">return</span> <span style="color:#e5c07b;">this</span>.<span style="color:#61afef;">procesarRespuesta</span>(res);
+  }
+
+  <span style="color:#c678dd;">async</span> <span style="color:#61afef;">abc</span>(accion: <span style="color:#56b6c2;">number</span>, dto: <span style="color:#56b6c2;">any</span>) {
+    <span style="color:#c678dd;">const</span> res = <span style="color:#c678dd;">await</span> <span style="color:#e5c07b;">this</span>.prisma.$queryRaw<span style="color:#d1d5db;">`SELECT config.fn_abc_proveedores(${accion}, ${dto}) AS payload`</span>;
+    <span style="color:#c678dd;">return</span> <span style="color:#e5c07b;">this</span>.<span style="color:#61afef;">procesarRespuesta</span>(res);
+  }
+
+  <span style="color:#c678dd;">private</span> <span style="color:#61afef;">procesarRespuesta</span>(resultadoSql: <span style="color:#56b6c2;">any</span>) {
+    <span style="color:#c678dd;">const</span> json = resultadoSql[<span style="color:#d19a66;">0</span>].payload;
+    <span style="color:#c678dd;">if</span> (json.cod_resultado === <span style="color:#d19a66;">-1</span>) <span style="color:#c678dd;">throw new</span> <span style="color:#e5c07b;">BadRequestException</span>(json);
+    <span style="color:#c678dd;">if</span> (json.cod_resultado === <span style="color:#d19a66;">-2</span>) <span style="color:#c678dd;">throw new</span> <span style="color:#e5c07b;">InternalServerErrorException</span>(json);
+    <span style="color:#c678dd;">return</span> json;
+  }
+}</pre></div></div>
+
+    <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 4px; margin-top: 16px;">4. proveedores.controller.ts</h3>
+    <div class="code-wrap" style="margin-top: 0;"><div class="code-block"><pre><span style="color:#c678dd;">import</span> { Controller, Get, Post, Body, Param, Query } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'@nestjs/common'</span>;
+<span style="color:#c678dd;">import</span> { ApiTags, ApiOperation } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'@nestjs/swagger'</span>;
+<span style="color:#c678dd;">import</span> { ProveedoresService } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'./proveedores.service'</span>;
+<span style="color:#c678dd;">import</span> { CrearProveedorDto } <span style="color:#c678dd;">from</span> <span style="color:#98c379;">'./dto/crear-proveedor.dto'</span>;
+
+<span style="color:#c678dd;">@ApiTags</span>(<span style="color:#98c379;">'Proveedores'</span>)
+<span style="color:#c678dd;">@Controller</span>(<span style="color:#98c379;">'api/catalogos/proveedores'</span>)
+<span style="color:#c678dd;">export class</span> <span style="color:#e5c07b;">ProveedoresController</span> {
+  <span style="color:#c678dd;">constructor</span>(<span style="color:#c678dd;">private readonly</span> service: ProveedoresService) {}
+
+  <span style="color:#c678dd;">@Get</span>()
+  <span style="color:#c678dd;">@ApiOperation</span>({ summary: <span style="color:#98c379;">'Listado general'</span> })
+  <span style="color:#61afef;">findAll</span>(<span style="color:#c678dd;">@Query</span>(<span style="color:#98c379;">'filtro'</span>) filtro: <span style="color:#56b6c2;">string</span>) {
+    <span style="color:#c678dd;">return</span> <span style="color:#e5c07b;">this</span>.service.<span style="color:#61afef;">leer</span>(<span style="color:#d19a66;">null</span>, filtro);
+  }
+
+  <span style="color:#c678dd;">@Get</span>(<span style="color:#98c379;">'nuevo'</span>)
+  <span style="color:#61afef;">getNew</span>() {
+    <span style="color:#c678dd;">return</span> <span style="color:#e5c07b;">this</span>.service.<span style="color:#61afef;">leer</span>(<span style="color:#d19a66;">-1</span>);
+  }
+
+  <span style="color:#c678dd;">@Get</span>(<span style="color:#98c379;">':id'</span>)
+  <span style="color:#61afef;">findOne</span>(<span style="color:#c678dd;">@Param</span>(<span style="color:#98c379;">'id'</span>) id: <span style="color:#56b6c2;">number</span>) {
+    <span style="color:#c678dd;">return</span> <span style="color:#e5c07b;">this</span>.service.<span style="color:#61afef;">leer</span>(id);
+  }
+
+  <span style="color:#c678dd;">@Post</span>()
+  <span style="color:#61afef;">create</span>(<span style="color:#c678dd;">@Body</span>() dto: CrearProveedorDto) {
+    <span style="color:#c678dd;">return</span> <span style="color:#e5c07b;">this</span>.service.<span style="color:#61afef;">abc</span>(<span style="color:#d19a66;">1</span>, dto);
+  }
+}
+</pre></div></div>
+  </div>
+  </div>
+
+  <!-- 6. PRUEBAS CON SWAGGER -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Pruebas y Documentación (Swagger)</div>
+    <div class="callout warning" style="margin-bottom: 16px;">
+      <span class="callout-icon">⚡</span>
+      <div>Todos los servicios REST desarrollados en Nest.js deben documentarse y probarse rigurosamente utilizando <strong>Swagger (OpenAPI)</strong> antes de ser consumidos por el Frontend.</div>
+    </div>
+    <p>Swagger funciona como nuestra herramienta oficial de pruebas y como la documentación viva de nuestra API. Para asegurar el estándar de calidad, cada desarrollador backend debe cumplir con lo siguiente:</p>
+    <ul class="role-list" style="margin-left: 20px;">
+      <li><strong>Decoradores Obligatorios:</strong> Todos los <em>Controllers</em> y <em>DTOs</em> en Nest.js deben estar decorados utilizando <code>@nestjs/swagger</code> (ej. <code>@ApiTags</code>, <code>@ApiOperation</code>, <code>@ApiResponse</code>).</li>
+      <li><strong>Pruebas de Integración:</strong> Las acciones de <em>Alta, Baja, Cambio y Lectura</em> deben ejecutarse directamente en la interfaz de Swagger local (típicamente disponible en <code>http://localhost:3000/api/docs</code>).</li>
+      <li><strong>Validación de Payload:</strong> El desarrollador debe verificar visualmente en Swagger que la respuesta del servidor empate exactamente con el JSON estándar (códigos 0, -1 y -2) devuelto por el <em>Stored Procedure</em>.</li>
+    </ul>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav">
+      <span class="foot-nav-label">← Volver</span>
+      <a class="foot-nav-link" href="00-estandares-sp.html">Lógica de Negocios</a>
+    </div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+    <div class="foot-nav" style="align-items:flex-end;">
+      <span class="foot-nav-label">Siguiente →</span>
+      <a class="foot-nav-link" href="home.html">Dashboard</a>
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

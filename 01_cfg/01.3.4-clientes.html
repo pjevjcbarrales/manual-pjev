@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>01.3.4 Clientes</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.patch  { background:#fff8e1; color:#795548; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; }
+  .flujo-box { background:var(--code-bg); border-radius:8px; padding:20px; font-family:var(--font-mono); font-size:12px; color:var(--code-text); line-height:1.8; overflow-x:auto; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Manual Dev</a> ›
+      <span>Configuración Inicial</span> ›
+      <span>Terceros y Padrón</span> ›
+      <span>Clientes</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">01.3.4</div>
+        <h1 class="elem-title">Clientes</h1>
+        <p class="elem-desc">Personas o empresas que tienen cuentas por cobrar con el ente público.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Modo A — existe en código</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">cfg / catalogos / clientes</code></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Catálogo utilizado para registrar a terceros que generan ingresos a la institución (por derechos, aprovechamientos u otros servicios), necesario para la emisión de CFDI de Ingresos y el control de Cuentas por Cobrar.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Código Fiscal de la Federación</td><td>Emisión de Comprobantes</td><td>Requisito de RFC y Domicilio Fiscal para facturación electrónica (CFDI 4.0).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. ROLES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ingresos / Tesorería</strong></td><td>CRUD</td><td>Ninguna.</td></tr>
+          <tr><td><strong>Contabilidad</strong></td><td>Lectura</td><td>Lectura para validación de depósitos e ingresos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos (<code>catalogo_clientes</code>)</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>ccl_id</code> <span class="badge-req">REQ</span></td><td><code>INT PK</code></td><td>ID Autoincrementable.</td></tr>
+        <tr><td><code>ccl_numcli</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(5)</code></td><td>Número de cliente autogenerado.</td></tr>
+        <tr><td><code>ccl_razonsocial</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(150)</code></td><td>Razón social o Nombre completo.</td></tr>
+        <tr><td><code>ccl_rfc</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(14)</code></td><td>RFC del cliente (Para facturación).</td></tr>
+        <tr><td><code>ccl_regimen_fiscal</code></td><td><code>VARCHAR(3)</code></td><td>Régimen fiscal (CFDI 4.0).</td></tr>
+        <tr><td><code>ccl_domicilio_fiscal</code></td><td><code>VARCHAR(500)</code></td><td>Domicilio para facturación (CP).</td></tr>
+        <tr><td><code>ccl_email</code></td><td><code>VARCHAR(100)</code></td><td>Correo electrónico para envío de facturas.</td></tr>
+        <tr><td><code>estatus_registro</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>1=Activo, 0=Baja.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. STORED PROCEDURES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures</div>
+      
+      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.1. Procedimiento LEER (<code>fn_leer_catalogo_clientes</code>)</h4>
+      <table class="props-table" style="margin-bottom:20px;">
+        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>ID del cliente o NULL.</td></tr>
+        <tr><td><code>@p_busqueda</code></td><td><code>VARCHAR</code></td><td>Filtro de búsqueda por nombre o RFC.</td></tr>
+        </tbody>
+      </table>
+
+      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.2. Procedimiento ABC (<code>fn_abc_catalogo_clientes</code>)</h4>
+      <table class="props-table">
+        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>@p_accion</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(1)</code></td><td>'A', 'B', 'C'</td></tr>
+        <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>Para Cambio/Baja</td></tr>
+        <tr><td><code>@p_razonsocial</code></td><td><code>VARCHAR(150)</code></td><td>Nombre del cliente</td></tr>
+        <tr><td><code>@p_rfc</code></td><td><code>VARCHAR(14)</code></td><td>RFC</td></tr>
+        <tr><td><code>@p_regimen_fiscal</code></td><td><code>VARCHAR(3)</code></td><td>Régimen</td></tr>
+        <tr><td><code>@p_domicilio_fiscal</code></td><td><code>VARCHAR(500)</code></td><td>Domicilio</td></tr>
+        <tr><td><code>@p_email</code></td><td><code>VARCHAR(100)</code></td><td>Correo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. SERVICIOS REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code class="method get">GET</code></td><td><code>/configuracion/clientes</code></td><td><code>?q=busqueda</code></td><td>Consulta padrón de clientes.</td></tr>
+        <tr><td><code class="method post">POST</code></td><td><code>/configuracion/clientes</code></td><td><code>{ "ccl_razonsocial": "...", "ccl_rfc": "..." }</code></td><td>Alta de cliente.</td></tr>
+        <tr><td><code class="method put">PUT</code></td><td><code>/configuracion/clientes/:id</code></td><td><code>{ "ccl_email": "..." }</code></td><td>Modificar cliente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. PANTALLAS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Diseño de Interfaces (UI)</div>
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Variables)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Ejemplos)</button>
+        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc (Variables)</button>
+        <button class="wf-tab" onclick="showWF('p4',this)">pantalla_abc (Ejemplos)</button>
+      </div>
+
+      <!-- PANTALLA LEER VARIABLES -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Grid (Variables)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 200" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="200" fill="#f8ebdf" />
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#1b3a2d">Catálogo de Clientes</text>
+              <rect x="20" y="50" width="760" height="36" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="35" y="72" font-size="12" fill="#94a3b8">Buscar por Nombre o RFC...</text>
+              <rect x="20" y="100" width="760" height="80" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <rect x="20" y="100" width="760" height="30" fill="#f8fafc" />
+              <text x="35" y="120" font-size="10" font-weight="bold" fill="#64748b">NO. CLIENTE</text>
+              <text x="120" y="120" font-size="10" font-weight="bold" fill="#64748b">RFC</text>
+              <text x="250" y="120" font-size="10" font-weight="bold" fill="#64748b">RAZÓN SOCIAL</text>
+              <text x="500" y="120" font-size="10" font-weight="bold" fill="#64748b">EMAIL</text>
+              <text x="700" y="120" font-size="10" font-weight="bold" fill="#64748b">ESTATUS</text>
+              <text x="35" y="150" font-size="11" fill="#1b5e20" font-weight="bold">{ccl_numcli}</text>
+              <text x="120" y="150" font-size="11" fill="#333">{ccl_rfc}</text>
+              <text x="250" y="150" font-size="11" fill="#333">{ccl_razonsocial}</text>
+              <text x="500" y="150" font-size="11" fill="#333">{ccl_email}</text>
+              <text x="700" y="150" font-size="11" fill="#333">{estatus_registro}</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANTALLA LEER EJEMPLO -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Grid (Ejemplos)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 200" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="200" fill="#f8ebdf" />
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#1b3a2d">Catálogo de Clientes</text>
+              <rect x="20" y="50" width="760" height="36" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="35" y="72" font-size="12" fill="#94a3b8">Buscar por Nombre o RFC...</text>
+              <rect x="20" y="100" width="760" height="80" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <rect x="20" y="100" width="760" height="30" fill="#f8fafc" />
+              <text x="35" y="120" font-size="10" font-weight="bold" fill="#64748b">NO. CLIENTE</text>
+              <text x="120" y="120" font-size="10" font-weight="bold" fill="#64748b">RFC</text>
+              <text x="250" y="120" font-size="10" font-weight="bold" fill="#64748b">RAZÓN SOCIAL</text>
+              <text x="500" y="120" font-size="10" font-weight="bold" fill="#64748b">EMAIL</text>
+              <text x="700" y="120" font-size="10" font-weight="bold" fill="#64748b">ESTATUS</text>
+              <text x="35" y="150" font-size="11" fill="#1b5e20" font-weight="bold">C0001</text>
+              <text x="120" y="150" font-size="11" fill="#333">XAXX010101000</text>
+              <text x="250" y="150" font-size="11" fill="#333">Público en General</text>
+              <text x="500" y="150" font-size="11" fill="#333">sin@correo.com</text>
+              <text x="700" y="150" font-size="11" fill="#333">ACTIVO</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANTALLA ABC VARIABLES -->
+      <div id="wf-p3" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Formulario (Variables)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 280" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="280" fill="#f8ebdf" />
+              <rect x="20" y="20" width="760" height="240" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="40" y="50" font-size="14" font-weight="bold" fill="#1b3a2d">Datos del Cliente</text>
+              
+              <text x="40" y="80" font-size="10" font-weight="bold" fill="#64748b">RFC *</text>
+              <rect x="40" y="90" width="200" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="50" y="110" font-size="11" fill="#333">{@p_rfc}</text>
+
+              <text x="260" y="80" font-size="10" font-weight="bold" fill="#64748b">Razón Social *</text>
+              <rect x="260" y="90" width="480" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="270" y="110" font-size="11" fill="#333">{@p_razonsocial}</text>
+
+              <text x="40" y="140" font-size="10" font-weight="bold" fill="#64748b">Régimen Fiscal (CFDI)</text>
+              <rect x="40" y="150" width="200" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="50" y="170" font-size="11" fill="#333">{@p_regimen_fiscal} ▼</text>
+
+              <text x="260" y="140" font-size="10" font-weight="bold" fill="#64748b">Código Postal Domicilio Fiscal</text>
+              <rect x="260" y="150" width="200" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="270" y="170" font-size="11" fill="#333">{@p_domicilio_fiscal}</text>
+
+              <text x="480" y="140" font-size="10" font-weight="bold" fill="#64748b">Email Facturación</text>
+              <rect x="480" y="150" width="260" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="490" y="170" font-size="11" fill="#333">{@p_email}</text>
+
+              <rect x="640" y="210" width="100" height="30" fill="#1b3a2d" rx="4" />
+              <text x="670" y="230" font-size="11" fill="#ffffff" font-weight="bold">Guardar</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANTALLA ABC EJEMPLOS -->
+      <div id="wf-p4" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Formulario (Ejemplos)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 280" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="280" fill="#f8ebdf" />
+              <rect x="20" y="20" width="760" height="240" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="40" y="50" font-size="14" font-weight="bold" fill="#1b3a2d">Datos del Cliente</text>
+              
+              <text x="40" y="80" font-size="10" font-weight="bold" fill="#64748b">RFC *</text>
+              <rect x="40" y="90" width="200" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="50" y="110" font-size="11" fill="#333">XAXX010101000</text>
+
+              <text x="260" y="80" font-size="10" font-weight="bold" fill="#64748b">Razón Social *</text>
+              <rect x="260" y="90" width="480" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="270" y="110" font-size="11" fill="#333">Público en General</text>
+
+              <text x="40" y="140" font-size="10" font-weight="bold" fill="#64748b">Régimen Fiscal (CFDI)</text>
+              <rect x="40" y="150" width="200" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="50" y="170" font-size="11" fill="#333">616 - Sin obligaciones fiscales ▼</text>
+
+              <text x="260" y="140" font-size="10" font-weight="bold" fill="#64748b">Código Postal Domicilio Fiscal</text>
+              <rect x="260" y="150" width="200" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="270" y="170" font-size="11" fill="#333">91000</text>
+
+              <text x="480" y="140" font-size="10" font-weight="bold" fill="#64748b">Email Facturación</text>
+              <rect x="480" y="150" width="260" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="490" y="170" font-size="11" fill="#333">sin@correo.com</text>
+
+              <rect x="640" y="210" width="100" height="30" fill="#1b3a2d" rx="4" />
+              <text x="670" y="230" font-size="11" fill="#ffffff" font-weight="bold">Guardar</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. REGLAS DE NEGOCIO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa / Técnica)</th></tr></thead>
+        <tbody>
+        <tr><td><strong>RN-01</strong></td><td>Formato de Código Postal.</td><td>El Domicilio Fiscal (CP) debe ser de 5 dígitos para timbrar facturas.</td><td>Frontend / API</td><td>Anexo 20 (SAT)</td></tr>
+        <tr><td><strong>RN-02</strong></td><td>Asignación de Número.</td><td><code>ccl_numcli</code> se genera con un prefijo 'C' y un consecutivo (C0001).</td><td>Stored Procedure</td><td>Lógica Interna</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 9. FLUJO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Flujos de Integración</div>
+      <div class="flujo-box">[Catálogo Clientes] → (Genera Cuenta por Cobrar) → [Ingresos]
+[Catálogo Clientes] → (Emite CFDI) → [Facturación Electrónica]</div>
+    </div>
+
+    <div class="doc-footer">
+      <div class="foot-center">Manual de Desarrollo SIAF-PJEV<br><span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026</div>
+    </div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

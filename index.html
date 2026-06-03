@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Desarrollo — SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .hero {
+    background: var(--pjev-verde-oscuro);
+    border-radius: 10px; padding: 36px 40px; margin-bottom: 36px;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: 'DEV';
+    position: absolute; right: -10px; top: -20px;
+    font-size: 140px; font-weight: 900; color: rgba(222,172,80,0.05);
+    line-height: 1; pointer-events: none; user-select: none;
+  }
+  .hero-tag   { font-size: 11px; font-weight: 700; color: var(--pjev-dorado); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .hero-title { font-size: 30px; font-weight: 700; color: #fff; line-height: 1.15; margin-bottom: 10px; }
+  .hero-desc  { font-size: 14px; color: rgba(255,255,255,0.7); max-width: 580px; line-height: 1.6; margin-bottom: 24px; }
+  .hero-meta  { display: flex; gap: 28px; flex-wrap: wrap; }
+  .hero-stat  { display: flex; flex-direction: column; gap: 2px; }
+  .hero-stat-num   { font-size: 22px; font-weight: 700; color: var(--pjev-dorado); }
+  .hero-stat-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  .section-h2  { font-size: 17px; font-weight: 700; color: var(--pjev-verde-oscuro); margin-bottom: 6px; }
+  .section-sub { font-size: 13px; color: var(--pjev-texto-muted); margin-bottom: 20px; line-height: 1.5; }
+
+  /* Tarjetas de módulo */
+  .mod-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 40px; }
+  .mod-card {
+    background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); border-radius: 8px;
+    overflow: hidden; text-decoration: none; color: inherit;
+    transition: box-shadow 0.15s, transform 0.15s;
+    display: flex; flex-direction: column;
+  }
+  .mod-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); transform: translateY(-2px); }
+  .mod-card-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--pjev-borde);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .mod-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--pjev-verde-oscuro);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0; color: var(--pjev-dorado); font-weight: 700;
+    font-family: var(--font-mono);
+  }
+  .mod-name  { font-size: 14px; font-weight: 700; color: var(--pjev-verde-oscuro); }
+  .mod-count { font-size: 11px; color: var(--pjev-texto-muted); margin-top: 2px; }
+  .mod-links { padding: 10px 18px; display: flex; flex-direction: column; gap: 1px; flex: 1; }
+  .mod-link {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 5px 8px; border-radius: 5px; font-size: 12px; color: var(--pjev-texto);
+    text-decoration: none; transition: background 0.1s;
+  }
+  .mod-link:hover { background: var(--pjev-crema); color: var(--pjev-verde-oscuro); }
+  .mod-link-id { font-size: 10px; font-family: var(--font-mono); color: var(--pjev-texto-muted); }
+  .mod-link-badge {
+    font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 8px; margin-left: 6px;
+  }
+  .badge-a  { background: var(--pjev-success-bg); color: var(--pjev-success-text); border: 1px solid var(--pjev-success-borde); }
+  .badge-b  { background: var(--pjev-warning-bg); color: var(--pjev-warning-text); border: 1px solid var(--pjev-warning-borde); }
+  .badge-s  { background: var(--pjev-info-bg);    color: var(--pjev-info-text);    border: 1px solid var(--pjev-info-borde); }
+  .badge-c  { background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
+
+  /* Tabla de estándares */
+  .std-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+  .std-card {
+    background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); border-radius: 8px;
+    padding: 16px; text-decoration: none; color: inherit;
+    transition: box-shadow 0.15s;
+  }
+  .std-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+  .std-card-id   { font-size: 10px; font-family: var(--font-mono); color: var(--pjev-texto-muted); margin-bottom: 4px; }
+  .std-card-name { font-size: 13px; font-weight: 700; color: var(--pjev-verde-oscuro); margin-bottom: 4px; }
+  .std-card-desc { font-size: 11px; color: var(--pjev-texto-muted); line-height: 1.5; }
+
+  /* Leyenda modos */
+  .leyenda { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .ley-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--pjev-texto-muted); }
+
+  /* Acordeón Sidebar */
+  .sidebar-group-label { cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; transition: color 0.15s; }
+  .sidebar-group-label:hover { color: var(--pjev-verde-oscuro); }
+  .sidebar-group-label::after { content: '▼'; font-size: 9px; transition: transform 0.2s; color: var(--pjev-dorado); }
+  .sidebar-group.collapsed .sidebar-group-label::after { transform: rotate(-90deg); }
+  .sidebar-group.collapsed .sidebar-link, .sidebar-group.collapsed .sidebar-subgroup-label, .sidebar-group.collapsed .sidebar-subgroup { display: none; }
+  
+  .sidebar-subgroup-label { cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; transition: color 0.15s; font-size: 9px; font-weight: 700; color: var(--pjev-texto-muted); padding: 6px 16px 4px 20px; text-transform: uppercase; letter-spacing: 1.2px; }
+  .sidebar-subgroup-label:hover { color: var(--pjev-verde-oscuro); }
+  .sidebar-subgroup-label::after { content: '▼'; font-size: 8px; transition: transform 0.2s; color: var(--pjev-dorado); }
+  .sidebar-subgroup.collapsed .sidebar-subgroup-label::after { transform: rotate(-90deg); }
+  .sidebar-subgroup.collapsed .sidebar-link { display: none; }
+  .sidebar-subgroup .sidebar-link { padding-left: 28px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="topbar-brand" href="index.html">
+    <div class="topbar-logo">PJ</div>
+    <span class="topbar-name">SIAF-PJEV</span>
+  </a>
+  <div class="topbar-pipe"></div>
+  <div class="topbar-crumb">
+    <span class="topbar-crumb-item active">Manual de Desarrollo</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-version">v1.0.0</span>
+    <span class="topbar-badge">Dix Consultoría</span>
+  </div>
+</header>
+
+<div class="shell">
+
+  <nav class="doc-sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">Inicio</div>
+      <a class="sidebar-link active" target="contentFrame" href="home.html">Resumen</a>
+      <a class="sidebar-link" target="contentFrame" href="guia-maestra.html">Guía maestra</a>
+      <a class="sidebar-link" target="contentFrame" href="00-esquema-operativo.html">Metodología de desarrollo</a>
+      <a class="sidebar-link" target="contentFrame" href="00-arquitectura.html">Arquitectura de persistencia</a>
+      <a class="sidebar-link" target="contentFrame" href="00-estandares-sp.html">Estándar de la lógica de negocios</a>
+      <a class="sidebar-link" target="contentFrame" href="00-estandares-prisma.html">Estándar de Prisma ORM</a>
+      <a class="sidebar-link" target="contentFrame" href="00-estandares-rest.html">Estándar de servicios REST</a>
+      <a class="sidebar-link" target="contentFrame" href="00-estandares-analisis-funcional.html">Estándar de Análisis Funcional</a>
+      <a class="sidebar-link" target="contentFrame" href="00-estandares-front-simples.html">Estándar Frontend: Catálogos</a>
+      <a class="sidebar-link" target="contentFrame" href="00-estandares-front-compuestos.html">Estándar Frontend: Compuestos</a>
+      <a class="sidebar-link" target="contentFrame" href="00-estandares-rep-simples.html">Estándar de Reportes Simples</a>
+      <a class="sidebar-link" target="contentFrame" href="00-estandares-rep-complejos.html">Estándar de Reportes Complejos</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">01 · Configuración Inicial</div>
+      
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">01.1 · Entidad y Ejercicios</div>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.1.1-entidad.html">Entidad <span class="sidebar-id">01.1.1</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.1.2-ejercicios.html">Ejercicios Fiscales <span class="sidebar-id">01.1.2</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.1.3-periodos.html">Períodos Contables <span class="sidebar-id">01.1.3</span></a>
+      </div>
+      
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">01.2 · Catálogos Base</div>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.1-unidades-administrativas.html">Unidades Administrativas <span class="sidebar-id">01.2.1</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.2-cog.html">COG <span class="sidebar-id">01.2.2</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.3-programas.html">Programas <span class="sidebar-id">01.2.3</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.4-fuentes-financiamiento.html">Fuentes Financiamiento <span class="sidebar-id">01.2.4</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.5-cucop.html">CUCOP <span class="sidebar-id">01.2.5</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.6-subprogramas.html">Subprogramas <span class="sidebar-id">01.2.6</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.7-cri.html">CRI <span class="sidebar-id">01.2.7</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.8-proyectos.html">Proyectos <span class="sidebar-id">01.2.8</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.9-centros-costos.html">Centros Costos <span class="sidebar-id">01.2.9</span></a>
+      </div>
+
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">01.3 · Terceros y Padrón</div>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.1-proveedores.html">Proveedores <span class="sidebar-id">01.3.1</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.2-subtipo-proveedor.html">Subtipo Proveedor <span class="sidebar-id">01.3.2</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.3-empleados.html">Empleados <span class="sidebar-id">01.3.3</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.4-clientes.html">Clientes <span class="sidebar-id">01.3.4</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.5-terceros-inst.html">Terceros Inst. <span class="sidebar-id">01.3.5</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.6-terceros.html">Terceros <span class="sidebar-id">01.3.6</span></a>
+      </div>
+
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">01.4 · Bancarios</div>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.4.1-bancos.html">Bancos <span class="sidebar-id">01.4.1</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.4.2-chequeras.html">Chequeras <span class="sidebar-id">01.4.2</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.4.3-conceptos-bancarios.html">Conceptos Banc. <span class="sidebar-id">01.4.3</span></a>
+      </div>
+
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">01.5 · Sistema y Seguridad</div>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.1-sistemas.html">Sistemas <span class="sidebar-id">01.5.1</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.2-subsistemas.html">Subsistemas <span class="sidebar-id">01.5.2</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.3-modulos.html">Módulos <span class="sidebar-id">01.5.3</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.4-roles.html">Roles de Sistema <span class="sidebar-id">01.5.4</span></a>
+      </div>
+
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">01.6 · Operativos</div>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.1-clasificacion-funcional.html">Clasificación Func. <span class="sidebar-id">01.6.1</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.2-funcion.html">Función <span class="sidebar-id">01.6.2</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.3-momentos.html">Momentos <span class="sidebar-id">01.6.3</span></a>
+        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.4-tipo-documento.html">Tipo Documento <span class="sidebar-id">01.6.4</span></a>
+      </div>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">02 · Presupuesto</div>
+      <a class="sidebar-link" target="contentFrame" href="#">Clave Presupuestal <span class="sidebar-id">02.1.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Presupuesto Autorizado <span class="sidebar-id">02.2.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Transferencias <span class="sidebar-id">02.3.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Calendarización <span class="sidebar-id">02.4.1</span></a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">03 · Contabilidad</div>
+      <a class="sidebar-link" target="contentFrame" href="#">Catálogo de Cuentas <span class="sidebar-id">03.1.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Pólizas Manuales <span class="sidebar-id">03.2.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Pólizas Automáticas <span class="sidebar-id">03.3.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Auxiliar / Libro Diario <span class="sidebar-id">03.4.1</span></a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">04 · Cuentas por Cobrar</div>
+      <a class="sidebar-link" target="contentFrame" href="#">Tipos de Movimiento <span class="sidebar-id">04.1.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Conceptos de Ingreso <span class="sidebar-id">04.1.2</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Ingresos por Recurso <span class="sidebar-id">04.2.1</span></a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">05 · Cuentas por Pagar</div>
+      <a class="sidebar-link" target="contentFrame" href="#">Afect. Servicios Personales <span class="sidebar-id">05.1.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Afect. Recursos Materiales <span class="sidebar-id">05.1.2</span></a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">06 · Tesorería</div>
+      <a class="sidebar-link" target="contentFrame" href="#">Movimientos de Caja <span class="sidebar-id">06.1.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Conciliación Bancaria <span class="sidebar-id">06.2.1</span></a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">07 · Adquisiciones</div>
+      <a class="sidebar-link" target="contentFrame" href="#">Adjudicación Directa <span class="sidebar-id">07.1.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Contratos <span class="sidebar-id">07.2.1</span></a>
+      <a class="sidebar-link" target="contentFrame" href="#">Pedidos <span class="sidebar-id">07.2.2</span></a>
+    </div>
+  </nav>
+
+  <main class="doc-main" style="padding: 0; display: flex; flex-direction: column; overflow: hidden; height: 100vh;">
+  <iframe name="contentFrame" src="home.html" style="flex: 1; width: 100%; height: 100%; border: none;"></iframe>
+</main>
+</div>
+<script src="shared.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Lógica del Acordeón
+    const groups = document.querySelectorAll('.sidebar-group');
+    groups.forEach((group, index) => {
+      // Dejamos abierto solo el primer grupo (Inicio) por defecto
+      if (index !== 0) {
+        group.classList.add('collapsed');
+      }
+      const label = group.querySelector('.sidebar-group-label');
+      if (label) {
+        label.addEventListener('click', () => {
+          group.classList.toggle('collapsed');
+        });
+      }
+    });
+
+    // 2. Lógica del Acordeón para Subgrupos
+    const subgroups = document.querySelectorAll('.sidebar-subgroup');
+    subgroups.forEach((subgroup, index) => {
+      // Dejamos abierto solo el grupo "01.2 Catálogos Base" (index 1) por defecto, el resto colapsados
+      if (index !== 1) {
+        subgroup.classList.add('collapsed');
+      }
+      const label = subgroup.querySelector('.sidebar-subgroup-label');
+      if (label) {
+        label.addEventListener('click', () => {
+          subgroup.classList.toggle('collapsed');
+        });
+      }
+    });
+
+    // 3. Marcar link activo al dar clic
+    const links = document.querySelectorAll('.sidebar-link');
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        links.forEach(l => l.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+</html>

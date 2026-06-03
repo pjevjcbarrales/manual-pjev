@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estándar Reportes Complejos — SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .diagram-box { background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); padding: 20px; border-radius: 8px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Estándar de Reportes Complejos</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-07</div>
+      <h1 class="elem-title">Estándar de Reportes Complejos (JasperReports)</h1>
+      <p class="elem-desc">Manejo de documentos estructurados, con diseño pixel-perfect, agrupaciones complejas y generación en el lado del servidor.</p>
+    </div>
+  </div>
+
+  <!-- 1. INTRODUCCIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> ¿Cuándo usar JasperReports?</div>
+    <p>Se utiliza <strong>JasperReports</strong> exclusivamente cuando el reporte requiere:</p>
+    <ul class="role-list" style="margin-left: 20px;">
+      <li><strong>Diseños Pixel-Perfect:</strong> Posicionamiento exacto de membretes, logos y firmas.</li>
+      <li><strong>Documentos Contables y Oficiales:</strong> Pólizas contables, Afectaciones de gasto, Órdenes de pago.</li>
+      <li><strong>Agrupaciones complejas:</strong> Sumatorias condicionales por página, cortes de control y grupos anidados con subtotales (Bands).</li>
+      <li>Generación de reportes voluminosos que podrían saturar la memoria del Frontend si se generaran en JS.</li>
+    </ul>
+  </div>
+
+  <!-- 2. ARQUITECTURA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Flujo de Generación (Servidor)</div>
+    <p>Los reportes complejos se generan en el backend. El flujo es el siguiente:</p>
+    
+    <div class="diagram-box" style="margin-top: 16px;">
+      <pre style="font-family: var(--font-mono); font-size: 12px; color: var(--pjev-verde-oscuro); text-align: left; background: #f8fafc; padding: 16px; border-radius: 6px;">
+[Frontend Next.js]
+       │
+       │ 1. Pide impresión (ej. /api/conta/poliza/123/pdf)
+       ▼
+[Backend Nest.js]
+       │
+       │ 2. Ejecuta Query SQL en PostgreSQL
+       │ 3. Recupera datos de Póliza y Partidas
+       │ 4. Invoca el compilador JasperReports (java -jar / jasperserver)
+       │    con la plantilla .jrxml y los datos.
+       ▼
+[Motor JasperReports] -> 5. Retorna un Buffer / Blob PDF
+       │
+       ▼
+[Frontend Next.js] -> 6. Descarga o Muestra en iframe visor
+      </pre>
+    </div>
+  </div>
+
+  <!-- 3. CONFIGURACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Reglas de Desarrollo (.jrxml)</div>
+    <p>Los desarrolladores encargados de los reportes complejos deben observar las siguientes reglas al utilizar <em>Jaspersoft Studio</em>:</p>
+    
+    <div class="callout req" style="margin-top: 16px; border-left: 4px solid var(--pjev-warning-text);">
+      <span class="callout-icon" style="color: var(--pjev-warning-text);">!</span>
+      <div>
+        <strong style="color: var(--pjev-warning-text);">Requisitos de Instalación:</strong> El entorno de backend requiere la instalación de la máquina virtual de Java (JVM) y las dependencias de JasperReports para poder compilar y exportar los archivos `.jrxml`.
+      </div>
+    </div>
+
+    <ul class="role-list" style="margin-left: 20px; margin-top: 16px;">
+      <li><strong>Consultas SQL:</strong> La lógica pesada y los cruces (JOINs) deben hacerse en el Query principal dentro del reporte, no en fórmulas de Jasper.</li>
+      <li><strong>Imágenes:</strong> Los logos y sellos deben pasarse como parámetros (Base64 o URL) para que la plantilla sea agnóstica de su ruta física.</li>
+      <li><strong>Estructura:</strong> Siempre dividir el diseño en <code>Title</code>, <code>PageHeader</code>, <code>ColumnHeader</code>, <code>Detail</code>, <code>PageFooter</code> y <code>Summary</code> de manera limpia.</li>
+    </ul>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav">
+      <span class="foot-nav-label">← Volver</span>
+      <a class="foot-nav-link" href="00-estandares-rep-simples.html">Reportes Simples</a>
+    </div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+    <div class="foot-nav" style="align-items:flex-end;">
+      <span class="foot-nav-label">Siguiente →</span>
+      <a class="foot-nav-link" href="00-estandares-front-compuestos.html">Frontend Compuestos</a>
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>

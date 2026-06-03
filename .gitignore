@@ -1,0 +1,12 @@
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+.chrome-debug/
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

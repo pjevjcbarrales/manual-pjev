@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estándar Reportes Simples — SIAF-PJEV</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .table-std { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+  .table-std th, .table-std td { border: 1px solid var(--pjev-borde); padding: 10px 14px; text-align: left; }
+  .table-std th { background: var(--pjev-verde-oscuro); color: white; font-weight: 600; }
+  .table-std td { color: var(--pjev-texto); background: #fff; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="home.html">Inicio</a> ›
+    <span>Estándar de Reportes Simples</span>
+  </div>
+
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">DOC-06</div>
+      <h1 class="elem-title">Estándar de Reportes Simples (JavaScript)</h1>
+      <p class="elem-desc">Reglas para generar reportes tabulares, catálogos e impresiones base directamente desde el cliente (Frontend) utilizando librerías de JS.</p>
+    </div>
+  </div>
+
+  <!-- 1. INTRODUCCIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> ¿Cuándo usar un Reporte Simple?</div>
+    <p>Se consideran "Reportes Simples" aquellos que cumplen con las siguientes características:</p>
+    <ul class="role-list" style="margin-left: 20px;">
+      <li>Consisten principalmente en listados, tablas o catálogos (ej. <em>Catálogo de Cuentas</em>, <em>Listado de Proveedores</em>).</li>
+      <li>No requieren diseños complejos de impresión (como folios pre-impresos, acomodo exacto de membretes, marcas de agua complejas, pólizas o afectaciones de gasto).</li>
+      <li>La generación ocurre mayoritariamente en el cliente, apoyándose en la información que el Frontend recibe en formato JSON o directamente desde el servidor como string HTML/CSV.</li>
+    </ul>
+    <div class="callout info" style="margin-top: 16px;">
+      <span class="callout-icon">ℹ</span>
+      <div>Para ver la implementación base de esto, puedes revisar el código en el repositorio bajo el módulo de Contabilidad: <code>/apps/frontend/app/(dashboard)/conta/reg/catalogocuentas</code></div>
+    </div>
+  </div>
+
+  <!-- 2. COMPONENTES Y FORMATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Formatos de Salida Soportados</div>
+    <p>Todo reporte simple generado para un catálogo debe proveer al usuario la capacidad de elegir criterios (filtros) y el <strong>formato de exportación</strong> mediante un modal <em>wizard</em> estándar. Los formatos obligatorios son:</p>
+    
+    <table class="table-std">
+      <thead>
+        <tr>
+          <th>Formato</th>
+          <th>Descripción</th>
+          <th>Método de Generación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>PDF</strong></td>
+          <td>Visualizar en pantalla e imprimir nativamente.</td>
+          <td>Se genera una plantilla HTML a partir de los datos JSON y se utiliza <code>window.open</code> para imprimir nativamente o se usa una librería de <code>jspdf</code> para pintar el documento desde el Frontend.</td>
+        </tr>
+        <tr>
+          <td><strong>Excel (.xls / .xlsx)</strong></td>
+          <td>Archivo compatible con Microsoft Excel.</td>
+          <td>Generado vía librerías JavaScript que transforman el JSON a binario (ej. <code>xlsx</code> o `exceljs`).</td>
+        </tr>
+        <tr>
+          <td><strong>CSV</strong></td>
+          <td>Valores separados por coma (Codificación UTF-8).</td>
+          <td>Generación de un <code>Blob</code> en texto plano separando los campos con comas e inyectando BOM para que Excel respete los acentos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. MOCKUP VISUAL Y CÓDIGO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Mockup Visual y Código</div>
+    <p>Navega entre el <strong>Preview Visual</strong> para observar el flujo esperado (Modal <em>Wizard</em> de configuración y el Visor de Reporte HTML), y la pestaña de <strong>Código React</strong>.</p>
+    
+    <div style="border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-top: 20px; background: #fff;">
+      <div style="display: flex; background: #f8fafc; border-bottom: 1px solid var(--pjev-borde);">
+        <button id="btn-preview" onclick="switchTab('preview')" style="padding: 12px 24px; font-size: 12px; font-weight: bold; background: #fff; border: none; border-bottom: 2px solid var(--pjev-verde-oscuro); color: var(--pjev-verde-oscuro); cursor: pointer; outline: none; transition: all 0.2s;">Preview Visual</button>
+        <button id="btn-code" onclick="switchTab('code')" style="padding: 12px 24px; font-size: 12px; font-weight: bold; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--pjev-texto-muted); cursor: pointer; outline: none; transition: all 0.2s;">Código React</button>
+      </div>
+
+      <!-- Tab Content: Preview (SVG) -->
+      <div id="tab-preview" style="padding: 24px; text-align: center;">
+        <svg viewBox="0 0 800 500" width="100%" height="auto" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;">
+          <defs>
+            <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.2" />
+            </filter>
+          </defs>
+
+          <!-- Background Canvas -->
+          <rect width="800" height="500" fill="#e2e8f0" />
+
+          <!-- ========================================== -->
+          <!-- LEFT: MODAL WIZARD (Paso 1 y 2 conceptual) -->
+          <!-- ========================================== -->
+          <g transform="translate(20, 20)">
+            <rect width="360" height="460" fill="#ffffff" rx="8" filter="url(#shadow)" />
+            <!-- Modal Header -->
+            <path d="M0 8 C0 3.58172 3.58172 0 8 0 L352 0 C356.418 0 360 3.58172 360 8 L360 70 L0 70 L0 8 Z" fill="#1b3a2d" />
+            <text x="20" y="30" font-size="16" font-weight="bold" fill="#ffffff">Imprimir / Exportar</text>
+            <text x="20" y="50" font-size="11" fill="rgba(255,255,255,0.7)">Paso 1 de 2 — Criterios del reporte</text>
+            <rect x="320" y="20" width="24" height="24" fill="rgba(255,255,255,0.15)" rx="4" />
+            <text x="332" y="36" font-size="12" fill="#ffffff" text-anchor="middle">✕</text>
+
+            <!-- Modal Content (Criterios) -->
+            <text x="20" y="100" font-size="13" font-weight="bold" fill="#0f172a">Agrupado por</text>
+            <rect x="20" y="110" width="320" height="40" fill="#f0f7f3" rx="4" />
+            <circle cx="34" cy="130" r="6" fill="#ffffff" stroke="#1b3a2d" stroke-width="4" />
+            <text x="50" y="134" font-size="12" fill="#334155">Nivel de agrupamiento</text>
+            
+            <circle cx="34" cy="170" r="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+            <text x="50" y="174" font-size="12" fill="#334155">Por Grupo (Nivel 1)</text>
+
+            <text x="20" y="220" font-size="13" font-weight="bold" fill="#0f172a">Rango de cuentas</text>
+            <rect x="20" y="235" width="150" height="36" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+            <text x="30" y="258" font-size="12" fill="#94a3b8">Desde: Ej. 1</text>
+            <rect x="190" y="235" width="150" height="36" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+            <text x="200" y="258" font-size="12" fill="#94a3b8">Hasta: Ej. 9</text>
+
+            <text x="20" y="310" font-size="13" font-weight="bold" fill="#0f172a">Visualizar datos</text>
+            <rect x="20" y="325" width="320" height="46" fill="#f0f7f3" rx="4" />
+            <circle cx="34" cy="348" r="6" fill="#ffffff" stroke="#1b3a2d" stroke-width="4" />
+            <text x="50" y="344" font-size="12" font-weight="bold" fill="#0f172a">Sólo cuentas activas</text>
+            <text x="50" y="358" font-size="10" fill="#64748b">Excluye cuentas con estatus Inactivo</text>
+
+            <!-- Modal Footer -->
+            <line x1="0" y1="390" x2="360" y2="390" stroke="#e2e8f0" />
+            <rect x="230" y="405" width="110" height="36" fill="#1b3a2d" rx="6" />
+            <text x="285" y="428" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Continuar →</text>
+          </g>
+
+          <!-- ========================================== -->
+          <!-- RIGHT: REPORTE HTML VISOR (Pantalla Completa Simulada) -->
+          <!-- ========================================== -->
+          <g transform="translate(410, 20)">
+            <rect width="370" height="460" fill="#ffffff" rx="8" filter="url(#shadow)" stroke="#cbd5e1" />
+            
+            <!-- Report Header -->
+            <path d="M0 8 C0 3.58172 3.58172 0 8 0 L362 0 C366.418 0 370 3.58172 370 8 L370 60 L0 60 L0 8 Z" fill="#1b3a2d" />
+            <text x="16" y="26" font-size="14" font-weight="bold" fill="#ffffff">Catálogo de Cuentas · CONTA</text>
+            <text x="16" y="44" font-size="10" fill="rgba(255,255,255,0.7)">27 de mayo de 2026 · 4284 registros</text>
+            
+            <!-- Actions -->
+            <rect x="250" y="18" width="70" height="24" fill="#deac50" rx="4" />
+            <text x="285" y="34" font-size="11" font-weight="bold" fill="#000000" text-anchor="middle">🖨 Imprimir</text>
+            <rect x="330" y="18" width="24" height="24" fill="rgba(255,255,255,0.15)" rx="4" />
+            <text x="342" y="34" font-size="11" fill="#ffffff" text-anchor="middle">✕</text>
+
+            <!-- Report Content -->
+            <rect x="16" y="80" width="338" height="24" fill="#1b3a2d" rx="4" />
+            <text x="24" y="96" font-size="11" font-weight="bold" fill="#ffffff">Nivel 1</text>
+            <rect x="70" y="84" width="60" height="16" fill="rgba(255,255,255,0.2)" rx="8" />
+            <text x="100" y="95" font-size="9" fill="#ffffff" text-anchor="middle">9 cuentas</text>
+
+            <!-- Table Header -->
+            <rect x="16" y="104" width="338" height="20" fill="#f0f7f3" />
+            <text x="24" y="118" font-size="9" font-weight="bold" fill="#1b3a2d">NIVEL</text>
+            <text x="60" y="118" font-size="9" font-weight="bold" fill="#1b3a2d">CUENTA</text>
+            <text x="110" y="118" font-size="9" font-weight="bold" fill="#1b3a2d">DESCRIPCIÓN</text>
+            <text x="260" y="118" font-size="9" font-weight="bold" fill="#1b3a2d">TIPO</text>
+            <text x="310" y="118" font-size="9" font-weight="bold" fill="#1b3a2d">ESTATUS</text>
+
+            <!-- Rows -->
+            <line x1="16" y1="124" x2="354" y2="124" stroke="#e2e8f0" />
+            <text x="24" y="140" font-size="9" fill="#64748b">1</text>
+            <text x="60" y="140" font-size="9" font-weight="bold" fill="#0f172a">1</text>
+            <text x="110" y="140" font-size="9" fill="#334155">ACTIVO</text>
+            <rect x="250" y="130" width="50" height="14" fill="#f1f5f9" rx="2" />
+            <text x="275" y="140" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">Agrupadora</text>
+            <text x="310" y="140" font-size="9" font-weight="bold" fill="#10b981">Activa</text>
+
+            <line x1="16" y1="150" x2="354" y2="150" stroke="#f1f5f9" />
+            <text x="24" y="166" font-size="9" fill="#64748b">1</text>
+            <text x="60" y="166" font-size="9" font-weight="bold" fill="#0f172a">2</text>
+            <text x="110" y="166" font-size="9" fill="#334155">PASIVO</text>
+            <rect x="250" y="156" width="50" height="14" fill="#f1f5f9" rx="2" />
+            <text x="275" y="166" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">Agrupadora</text>
+            <text x="310" y="166" font-size="9" font-weight="bold" fill="#10b981">Activa</text>
+            
+            <line x1="16" y1="176" x2="354" y2="176" stroke="#f1f5f9" />
+            <text x="24" y="192" font-size="9" fill="#64748b">1</text>
+            <text x="60" y="192" font-size="9" font-weight="bold" fill="#0f172a">3</text>
+            <text x="110" y="192" font-size="9" fill="#334155">HACIENDA PÚBLICA</text>
+            <rect x="250" y="182" width="50" height="14" fill="#f1f5f9" rx="2" />
+            <text x="275" y="192" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">Agrupadora</text>
+            <text x="310" y="192" font-size="9" font-weight="bold" fill="#10b981">Activa</text>
+
+            <!-- Group 2 -->
+            <rect x="16" y="210" width="338" height="24" fill="#1b3a2d" rx="4" />
+            <text x="24" y="226" font-size="11" font-weight="bold" fill="#ffffff">Nivel 2</text>
+            <rect x="70" y="214" width="60" height="16" fill="rgba(255,255,255,0.2)" rx="8" />
+            <text x="100" y="225" font-size="9" fill="#ffffff" text-anchor="middle">31 cuentas</text>
+
+            <rect x="16" y="234" width="338" height="20" fill="#f0f7f3" />
+            <text x="24" y="248" font-size="9" font-weight="bold" fill="#1b3a2d">NIVEL</text>
+            <text x="60" y="248" font-size="9" font-weight="bold" fill="#1b3a2d">CUENTA</text>
+            <text x="110" y="248" font-size="9" font-weight="bold" fill="#1b3a2d">DESCRIPCIÓN</text>
+            <text x="260" y="248" font-size="9" font-weight="bold" fill="#1b3a2d">TIPO</text>
+            <text x="310" y="248" font-size="9" font-weight="bold" fill="#1b3a2d">ESTATUS</text>
+
+            <line x1="16" y1="254" x2="354" y2="254" stroke="#e2e8f0" />
+            <text x="24" y="270" font-size="9" fill="#64748b">2</text>
+            <text x="60" y="270" font-size="9" font-weight="bold" fill="#0f172a">1.1</text>
+            <text x="110" y="270" font-size="9" fill="#334155">ACTIVO CIRCULANTE</text>
+            <rect x="250" y="260" width="50" height="14" fill="#f1f5f9" rx="2" />
+            <text x="275" y="270" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">Agrupadora</text>
+            <text x="310" y="270" font-size="9" font-weight="bold" fill="#10b981">Activa</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Tab Content: Código -->
+      <div id="tab-code" style="display: none; padding: 24px; background: #1e1e1e;">
+        <div class="code-block" style="padding: 0; background: transparent;">
+          <pre><span style="color:#5c6370;">// 1. Componente Modal de Selección (Wizard)</span>
+<span style="color:#e5c07b;">&lt;ModalImprimir&gt;</span>
+  - <strong>Paso 1:</strong> Seleccionar Criterios (Filtros de búsqueda o estructura)
+  - <strong>Paso 2:</strong> Seleccionar Formato (PDF, Excel, CSV)
+<span style="color:#e5c07b;">&lt;/ModalImprimir&gt;</span>
+
+<span style="color:#5c6370;">// 2. Ejecución desde la vista principal de la página:</span>
+<span style="color:#c678dd;">const</span> res = <span style="color:#c678dd;">await</span> <span style="color:#61afef;">fetch</span>(<span style="color:#98c379;">`/api/.../reporte?formato=${formato}`</span>);
+
+<span style="color:#5c6370;">// 3. Lógica de renderizado según el formato elegido:</span>
+<span style="color:#c678dd;">if</span> (formato === <span style="color:#98c379;">'pdf'</span>) {
+  <span style="color:#56b6c2;">setReporteData</span>(res.data); <span style="color:#5c6370;">// Abre el &lt;ReporteVisor /&gt; HTML que vemos en el Mockup</span>
+} <span style="color:#c678dd;">else if</span> (formato === <span style="color:#98c379;">'csv'</span>) {
+  <span style="color:#61afef;">descargarCSV</span>(res.data);   <span style="color:#5c6370;">// Dispara archivo descargable</span>
+} <span style="color:#c678dd;">else</span> {
+  <span style="color:#61afef;">descargarExcel</span>(res.data); <span style="color:#5c6370;">// Dispara archivo descargable</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      document.getElementById('tab-preview').style.display = tabId === 'preview' ? 'block' : 'none';
+      document.getElementById('tab-code').style.display = tabId === 'code' ? 'block' : 'none';
+      
+      const btnPreview = document.getElementById('btn-preview');
+      const btnCode = document.getElementById('btn-code');
+      
+      if (tabId === 'preview') {
+        btnPreview.style.background = '#fff';
+        btnPreview.style.borderBottomColor = 'var(--pjev-verde-oscuro)';
+        btnPreview.style.color = 'var(--pjev-verde-oscuro)';
+        
+        btnCode.style.background = 'transparent';
+        btnCode.style.borderBottomColor = 'transparent';
+        btnCode.style.color = 'var(--pjev-texto-muted)';
+      } else {
+        btnCode.style.background = '#1e1e1e';
+        btnCode.style.borderBottomColor = '#10b981';
+        btnCode.style.color = '#fff';
+        
+        btnPreview.style.background = 'transparent';
+        btnPreview.style.borderBottomColor = 'transparent';
+        btnPreview.style.color = 'var(--pjev-texto-muted)';
+      }
+    }
+  </script>
+
+  <div class="doc-footer">
+    <div class="foot-nav">
+      <span class="foot-nav-label">← Volver</span>
+      <a class="foot-nav-link" href="00-estandares-front-simples.html">Frontend Simples</a>
+    </div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV<br>
+      <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+    </div>
+    <div class="foot-nav" style="align-items:flex-end;">
+      <span class="foot-nav-label">Siguiente →</span>
+      <a class="foot-nav-link" href="00-estandares-rep-complejos.html">Reportes Complejos</a>
+    </div>
+  </div>
+
+</div>
+<script src="shared.js"></script>
+</body>
+</html>
