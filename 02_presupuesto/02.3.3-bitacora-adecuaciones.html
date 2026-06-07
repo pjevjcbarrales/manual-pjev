@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.3.3-bitacora-adecuaciones.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:var(--pjev-exito-bg); color:var(--pjev-exito-text); border:1px solid var(--pjev-exito-borde); }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); margin-top:10px; }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> › <span>Presupuesto</span> › <span>Imprimir</span> › <span>Bitácora Adecuaciones</span>
+    </div>
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.3.3</div>
+        <h1 class="elem-title">Bitácora de Adecuaciones</h1>
+        <p class="elem-desc">Historial detallado de todas las afectaciones presupuestales de tipo Ampliación, Reducción o Transferencia aplicadas durante un periodo.</p>
+        <div class="mod-header-badges"><span class="mod-badge badge-p">Reporte Operativo</span></div>
+      </div>
+    </div>
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Es un auxiliar contable y presupuestario para rastrear por qué la columna de "Modificado" cambió respecto al "Aprobado".</p>
+    </div>
+    <!-- 3. LÓGICA DE NEGOCIO Y PERSISTENCIA -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Lógica de Negocio y Persistencia</div>
+      <p><strong>Origen de Datos:</strong> Tabla transaccional <code>presup_adecuaciones</code> y <code>presup_adecuaciones_det</code>.</p>
+      <table class="props-table">
+        <thead><tr><th>Columna del Reporte</th><th>Lógica de Cálculo / Campo Físico</th></tr></thead>
+        <tbody>
+          <tr><td>Tipo</td><td>Valor directo del campo <code>tipo_adecuacion</code> (Ampliacion, Reduccion, Transferencia).</td></tr>
+          <tr><td>Monto Origen (-)</td><td>Detalles donde <code>tipo_movimiento = 'REDUCCION'</code>. En Transferencias, representa el recurso que sale.</td></tr>
+          <tr><td>Monto Destino (+)</td><td>Detalles donde <code>tipo_movimiento = 'AMPLIACION'</code>. En Transferencias, el recurso que entra a la nueva partida.</td></tr>
+          <tr><td>Estatus</td><td>Sólo se listan las que están en estatus <code>'Aprobado'</code> y ya aplicaron en el modificado.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4a</span> Visualización Aproximada del Reporte</div>
+      <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Output (Adecuaciones)</span></div>
+          <div class="wf-svg-area" style="background:#fff;">
+            <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg">
+              <text x="500" y="30" fill="#1B3A2D" font-size="14" font-weight="bold" text-anchor="middle">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+              <text x="500" y="45" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">BITÁCORA DE ADECUACIONES (AMPLIACIONES Y REDUCCIONES)</text>
+              <rect x="20" y="80" width="960" height="30" fill="#1B3A2D" rx="2"/>
+              <text x="30" y="99" fill="#fff" font-size="9" font-weight="bold">FOLIO ADECUACIÓN</text>
+              <text x="150" y="99" fill="#fff" font-size="9" font-weight="bold">TIPO</text>
+              <text x="230" y="99" fill="#fff" font-size="9" font-weight="bold">CLAVE PRESUPUESTAL AFECTADA</text>
+              <text x="480" y="99" fill="#fff" font-size="9" font-weight="bold">JUSTIFICACIÓN</text>
+              <text x="750" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">MONTO ORIGEN (-)</text>
+              <text x="860" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">MONTO DESTINO (+)</text>
+              <text x="960" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">ESTATUS</text>
+              
+              <rect x="20" y="110" width="960" height="24" fill="#f0f7f3"/>
+              <text x="30" y="126" fill="#1B3A2D" font-size="10">TR-005/2026</text>
+              <text x="150" y="126" fill="#333" font-size="10">Transferencia</text>
+              <text x="230" y="126" fill="#333" font-size="9">101.01.2000.2110.1.1.1 (Papelería)</text>
+              <text x="480" y="126" fill="#666" font-size="9">Compra urgente de consumibles</text>
+              <text x="750" y="126" fill="#B91C1C" font-size="10" font-weight="bold" text-anchor="end">$0.00</text>
+              <text x="860" y="126" fill="#166534" font-size="10" font-weight="bold" text-anchor="end">$10,000.00</text>
+              <text x="960" y="126" fill="#10B981" font-size="10" font-weight="bold" text-anchor="end">Aprobado</text>
+            </svg>
+          </div>
+      </div>
+    </div>
+</div>
+</body></html>

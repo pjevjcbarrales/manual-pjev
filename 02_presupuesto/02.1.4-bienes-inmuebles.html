@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.1.4-bienes-inmuebles.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.put    { background:#fff8e1; color:#f57f17; }
+  .method.delete { background:#ffebee; color:#b71c1c; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:var(--pjev-gris-claro); color:var(--pjev-texto); border:1px solid var(--pjev-borde); }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Presupuesto</span> ›
+      <span>Registro</span> ›
+      <span>Bienes Inmuebles</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.1.4</div>
+        <h1 class="elem-title">Catálogo de Bienes Inmuebles</h1>
+        <p class="elem-desc">Catálogo maestro donde se registran los inmuebles ocupados por el Poder Judicial (Juzgados, oficinas, etc.), clasificando si son propios, en comodato o arrendados. Es un insumo fundamental para el padrón de arrendamientos y contratos.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Catálogo Simple (CRUD)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Este catálogo concentra todos los espacios físicos donde operan los órganos jurisdiccionales o administrativos del Poder Judicial. Aunque normativamente algunos inmuebles sean propiedad del Gobierno y dados en comodato, o rentados a terceros, todos deben estar inventariados para poder ligar un contrato de arrendamiento o gastos de mantenimiento a una ubicación física específica.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Procedimiento Interno</td><td>"Trámite de pago de arrendamiento..."</td><td>Se requiere conocer el "Juzgado que alberga el inmueble" y el "Domicilio del inmueble".</td></tr>
+          <tr><td>CONAC</td><td>Bienes Inmuebles, Infraestructura y Construcciones en Proceso</td><td>Control patrimonial y ligadura de pólizas de gasto a ubicaciones.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Tabla: <code>catalogo.bienes_inmuebles</code></strong></td></tr>
+        <tr><td><code>inmueble_id</code></td><td><code>BIGINT PK</code></td><td>Identificador único del inmueble.</td></tr>
+        <tr><td><code>clave_inventario</code></td><td><code>VARCHAR(50)</code></td><td>Clave de control interno patrimonial (Opcional si es arrendado).</td></tr>
+        <tr><td><code>nombre_oficial</code></td><td><code>VARCHAR(150)</code></td><td>Nombre descriptivo (Ej. "Edificio Sede", "Juzgado 1ro Familiar Coatzacoalcos").</td></tr>
+        <tr><td><code>domicilio</code></td><td><code>VARCHAR(255)</code></td><td>Calle, número, colonia, código postal.</td></tr>
+        <tr><td><code>municipio_id</code></td><td><code>INT FK</code></td><td>Clave del municipio (Catálogo INEGI o interno).</td></tr>
+        <tr><td><code>tipo_tenencia</code></td><td><code>VARCHAR(1)</code></td><td><code>'P'</code> (Propio), <code>'A'</code> (Arrendado), <code>'C'</code> (Comodato).</td></tr>
+        <tr><td><code>unidad_adm_id</code></td><td><code>INT FK</code></td><td>Vínculo con la Unidad Administrativa que lo ocupa (Juzgado / Dirección).</td></tr>
+        <tr><td><code>activo</code></td><td><code>BOOLEAN</code></td><td>Si el inmueble sigue siendo operado por el PJEV.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. SERVICIOS REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Servicios REST (Endpoints)</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><span class="method get">GET</span></td><td><code>/cfg/inmuebles</code></td><td>?tipo=A</td><td>Obtiene la lista de inmuebles (filtrables por tipo).</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/cfg/inmuebles/{id}</code></td><td></td><td>Obtiene los detalles de un inmueble específico.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/cfg/inmuebles</code></td><td><code>{nombre, domicilio, tipo, unidad_id...}</code></td><td>Registra un nuevo inmueble en el catálogo.</td></tr>
+        <tr><td><span class="method put">PUT</span></td><td><code>/cfg/inmuebles/{id}</code></td><td><code>{domicilio...}</code></td><td>Actualiza datos del inmueble.</td></tr>
+        <tr><td><span class="method delete">DEL</span></td><td><code>/cfg/inmuebles/{id}</code></td><td></td><td>Baja lógica del inmueble (solo si no tiene contratos vigentes).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. REGLAS DE NEGOCIO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th></tr></thead>
+        <tbody>
+        <tr><td><strong>RN-INM-01</strong></td><td>Protección de Eliminación</td><td>No se puede dar de baja (o eliminar) un inmueble si está referenciado en un contrato de arrendamiento activo.</td><td>Backend (Controller/DB)</td></tr>
+        <tr><td><strong>RN-INM-02</strong></td><td>Clasificación Arrendamiento</td><td>Al crear un Contrato de Arrendamiento, el sistema solo sugerirá los inmuebles con <code>tipo_tenencia = 'A'</code>.</td><td>Frontend / API</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA Y MATRIZ FUNCIONAL NO REQUIEREN
+     PARA CATÁLOGOS SIMPLES.
+=========================================== -->
+<script src="../shared.js"></script>
+</body>
+</html>

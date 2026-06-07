@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.4.3-estados-financieros-trimestrales.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.4.3 Estados Financieros Trimestrales</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.4.3</div>
+        <h1 class="elem-title">Generación de Estados Financieros Trimestrales (Básicos)</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV (Referencia: Manual PJEV 261).</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Herramienta de Cierre / Reporteo Analítico y Gráfico</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Es la cima de la pirámide de contabilidad. Todas las transacciones, pólizas, conciliaciones y depreciaciones capturadas en los módulos anteriores convergen en este módulo para producir los documentos contables de más alto nivel exigidos por la Ley. Aquí se emiten: El Estado de Situación Financiera (Balance General), el Estado de Actividades (Estado de Resultados), el Estado de Variación en la Hacienda Pública y el Estado de Flujos de Efectivo.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>LGCG</td><td>Art. 46 (Fracción I)</td><td>Obligatoriedad de emitir periódicamente los 4 Estados Financieros Básicos.</td></tr>
+          <tr><td>Acuerdos CONAC</td><td>Formatos de Presentación</td><td>El sistema no puede diseñar sus propios reportes. DEBE exportar los PDF exactamente con las columnas, títulos y agrupaciones dictadas por la Secretaría de Hacienda (CONAC).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Director de Finanzas</td><td>Visualizar y analizar indicadores globales (Ej. Liquidez).</td><td>Este módulo es de sólo lectura y reporteo. No se capturan datos aquí.</td></tr>
+          <tr><td>Jefe de Contabilidad</td><td>Generar y exportar los paquetes de reportes para el Congreso.</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>No aplica (Módulo OLAP)</code></td><td><code>-</code></td><td>El motor SQL de este módulo consulta la "Balanza de Comprobación" y consolida (agrupa) las cuentas de sexto nivel hacia niveles Padre (Género, Grupo, Rubro) según el Plan de Cuentas CONAC para construir los PDF formales.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL (Pesadas / Analíticas):</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_generar_estado_situacion_financiera</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@fecha_corte</code>
+          <br><span style="color:#666">OUT:</span> Array JSON con Activo Circulante, No Circulante, Pasivo y Hacienda Pública (Cuadrado bajo la Ecuación Contable `A = P + C`).
+        </li>
+        <li><strong><code>fn_generar_estado_actividades</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@fecha_inicio</code>, <code>@fecha_fin</code>
+          <br><span style="color:#666">OUT:</span> Ingresos de Gestión, Subsidios, vs Gastos de Operación = Resultado del Ejercicio (Ahorro / Desahorro).
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/reportes/financieros/generar</code></td><td>JSON con <code>{ reporte_id, fecha_inicio, fecha_corte }</code></td><td>Devuelve el estado financiero solicitado para pintar en pantalla o PDF.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Dashboard Directivo:</strong> Antes de imprimir los PDF largos, la pantalla principal muestra gráficas de pastel o barras resumiendo la salud financiera (Ej. De qué tamaño es el Activo vs el Pasivo).</li>
+        <li><strong>Reporteo Comparativo:</strong> Por ley, los reportes contables públicos deben mostrar la columna del Año Actual vs la columna del Año Anterior (Ej. 2026 vs 2025) para analizar variaciones.</li>
+        <li><strong>Impresión en Lote (Batch Print):</strong> Permite seleccionar con checkboxes los 4 Estados Básicos y exportarlos de un solo golpe en un único PDF consolidado con índice y firmas.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Dashboard / Selector)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Visor Estado Actividades)</button>
+      </div>
+
+      <!-- TAB 1: Selector -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Generador de Estados Financieros CONAC</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="400" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Toolbar -->
+              <rect x="20" y="20" width="960" height="60" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              <text x="30" y="44" font-size="11">Periodo:</text>
+              <rect x="80" y="29" width="120" height="22" fill="#fff" stroke="#ccc" rx="3"/> <text x="90" y="43" font-size="10">Ene-Mar 2026</text>
+              
+              <rect x="750" y="29" width="220" height="30" fill="#1B3A2D" rx="3"/> <text x="860" y="48" fill="#fff" font-size="11" text-anchor="middle">🖨 IMPRIMIR PAQUETE (PDF)</text>
+
+              <!-- Panel Central: Selección de Reportes -->
+              <rect x="20" y="100" width="460" height="250" fill="#fff" stroke="#ccc" rx="4"/>
+              <rect x="20" y="100" width="460" height="30" fill="#e0f2fe" rx="4"/>
+              <text x="250" y="120" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">SELECCIÓN DE ESTADOS BÁSICOS</text>
+
+              <!-- Checkbox List -->
+              <rect x="40" y="150" width="15" height="15" fill="#10b981" rx="2"/> <text x="45" y="162" fill="#fff" font-size="12">✓</text>
+              <text x="65" y="162" font-size="12" font-weight="bold">Estado de Situación Financiera (Balance)</text>
+              
+              <rect x="40" y="190" width="15" height="15" fill="#10b981" rx="2"/> <text x="45" y="202" fill="#fff" font-size="12">✓</text>
+              <text x="65" y="202" font-size="12" font-weight="bold">Estado de Actividades (Resultados)</text>
+
+              <rect x="40" y="230" width="15" height="15" fill="#10b981" rx="2"/> <text x="45" y="242" fill="#fff" font-size="12">✓</text>
+              <text x="65" y="242" font-size="12" font-weight="bold">Estado de Variación en la Hacienda Pública</text>
+
+              <rect x="40" y="270" width="15" height="15" fill="#10b981" rx="2"/> <text x="45" y="282" fill="#fff" font-size="12">✓</text>
+              <text x="65" y="282" font-size="12" font-weight="bold">Estado de Flujos de Efectivo</text>
+
+              <!-- Panel Derecho: KPI / Gráfica rápida -->
+              <rect x="500" y="100" width="480" height="250" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="740" y="130" font-size="12" font-weight="bold" fill="#666" text-anchor="middle">Resumen Ejecutivo (Indicadores Rápidos)</text>
+              
+              <circle cx="600" cy="220" r="60" fill="#14b8a6"/>
+              <path d="M 600 220 L 660 220 A 60 60 0 0 1 570 270 Z" fill="#f59e0b"/>
+              <text x="600" y="300" font-size="10" text-anchor="middle">Activo vs Pasivo</text>
+
+              <text x="720" y="180" font-size="11" fill="#333">Total Activo:</text> <text x="950" y="180" font-size="11" font-weight="bold" fill="#166534" text-anchor="end">$ 2,500 MDP</text>
+              <text x="720" y="210" font-size="11" fill="#333">Total Pasivo:</text> <text x="950" y="210" font-size="11" font-weight="bold" fill="#b45309" text-anchor="end">$ 350 MDP</text>
+              <text x="720" y="240" font-size="11" fill="#333">Hacienda / Patrimonio:</text> <text x="950" y="240" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="end">$ 2,150 MDP</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Visor PDF -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Vista Previa: Estado de Actividades CONAC</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="450" fill="#cbd5e1" rx="4"/>
+              
+              <!-- Hoja PDF -->
+              <rect x="150" y="20" width="700" height="400" fill="#fff" stroke="#999" rx="2" filter="drop-shadow(3px 3px 5px rgba(0,0,0,0.2))"/>
+              
+              <text x="500" y="50" font-size="12" font-weight="bold" text-anchor="middle">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+              <text x="500" y="65" font-size="11" font-weight="bold" text-anchor="middle">ESTADO DE ACTIVIDADES</text>
+              <text x="500" y="80" font-size="10" fill="#666" text-anchor="middle">Del 01 de Enero al 31 de Marzo de 2026</text>
+              <text x="500" y="95" font-size="10" fill="#666" text-anchor="middle">(Cifras en Pesos)</text>
+
+              <line x1="200" y1="110" x2="800" y2="110" stroke="#000"/>
+              <text x="210" y="125" font-size="10" font-weight="bold">CONCEPTO</text>
+              <text x="650" y="125" font-size="10" font-weight="bold" text-anchor="end">2026</text>
+              <text x="780" y="125" font-size="10" font-weight="bold" text-anchor="end">2025</text>
+              <line x1="200" y1="130" x2="800" y2="130" stroke="#000"/>
+
+              <!-- INGRESOS -->
+              <text x="210" y="150" font-size="10" font-weight="bold" fill="#0369a1">INGRESOS Y OTROS BENEFICIOS</text>
+              <text x="220" y="165" font-size="10">Participaciones, Aportaciones, Convenios</text>
+              <text x="650" y="165" font-size="10" text-anchor="end">500,000,000</text> <text x="780" y="165" font-size="10" text-anchor="end">480,000,000</text>
+              <text x="220" y="180" font-size="10">Otros Ingresos y Beneficios</text>
+              <text x="650" y="180" font-size="10" text-anchor="end">2,500,000</text> <text x="780" y="180" font-size="10" text-anchor="end">1,500,000</text>
+              <text x="210" y="200" font-size="10" font-weight="bold">Total de Ingresos y Otros Beneficios</text>
+              <text x="650" y="200" font-size="10" font-weight="bold" text-anchor="end">502,500,000</text> <text x="780" y="200" font-size="10" font-weight="bold" text-anchor="end">481,500,000</text>
+
+              <!-- GASTOS -->
+              <text x="210" y="230" font-size="10" font-weight="bold" fill="#b45309">GASTOS Y OTRAS PÉRDIDAS</text>
+              <text x="220" y="245" font-size="10">Gastos de Funcionamiento (Capítulo 1000, 2000, 3000)</text>
+              <text x="650" y="245" font-size="10" text-anchor="end">450,000,000</text> <text x="780" y="245" font-size="10" text-anchor="end">440,000,000</text>
+              <text x="220" y="260" font-size="10">Estimaciones, Depreciaciones y Amortizaciones</text>
+              <text x="650" y="260" font-size="10" text-anchor="end">12,500,000</text> <text x="780" y="260" font-size="10" text-anchor="end">10,000,000</text>
+              <text x="210" y="280" font-size="10" font-weight="bold">Total de Gastos y Otras Pérdidas</text>
+              <text x="650" y="280" font-size="10" font-weight="bold" text-anchor="end">462,500,000</text> <text x="780" y="280" font-size="10" font-weight="bold" text-anchor="end">450,000,000</text>
+
+              <line x1="200" y1="300" x2="800" y2="300" stroke="#000" stroke-width="2"/>
+              <!-- RESULTADO -->
+              <text x="210" y="320" font-size="10" font-weight="bold" fill="#166534">RESULTADO DEL EJERCICIO (AHORRO / DESAHORRO)</text>
+              <text x="650" y="320" font-size="10" font-weight="bold" fill="#166534" text-anchor="end">40,000,000</text> <text x="780" y="320" font-size="10" font-weight="bold" fill="#166534" text-anchor="end">31,500,000</text>
+              <line x1="200" y1="330" x2="800" y2="330" stroke="#000" stroke-width="2"/>
+
+              <text x="500" y="370" font-size="8" fill="#666" text-anchor="middle">Bajo protesta de decir verdad declaramos que los Estados Financieros y sus Notas son razonablemente correctos.</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-EF-01</strong></td>
+            <td>Ecuación Contable Universal: En el Estado de Situación Financiera, la suma del Activo DEBE ser exactamente igual a la suma del Pasivo + Hacienda Pública.</td>
+            <td>Si hay una diferencia de $0.01 centavo, el sistema pinta un letrero rojo de "ESTADO FINANCIERO DESCUADRADO - NO IMPRIMIR".</td>
+            <td>Motor de Reportes (Frontend)</td>
+            <td>Teoría Contable LGCG</td>
+          </tr>
+          <tr>
+            <td><strong>RN-EF-02</strong></td>
+            <td>Formato Inalterable: No se permite exportar a Excel para que el usuario "cuadre manual". La salida oficial es en PDF directamente desde BD.</td>
+            <td>Garantiza la inalterabilidad de la información presentada a la Auditoría.</td>
+            <td>Sistema Archivos</td>
+            <td>Control Interno PJEV</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Es el Módulo Cumbre. Absorbe la <strong>Balanza de Comprobación (Todos los módulos de la Fase 1)</strong>, las amortizaciones de la <strong>Descarga Masiva (03.3.1)</strong> y junta los PDF generados en este módulo con las <strong>Notas Financieras (03.4.2)</strong> y la <strong>Antigüedad de Saldos (03.4.1)</strong> para ensamblar un solo archivo (Zip/Carpeta) que se manda a la Secretaría de Fiscalización del Congreso.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>NO</strong></td>
+            <td>Reporteo puro. Lee los saldos acumulados de Cuentas de Balance (1, 2, 3) y Cuentas de Resultados (4, 5).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-07</td>
+            <td>2.0</td>
+            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma de carriles.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV (Motor OLAP)</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">FINANZAS / CONTABILIDAD</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO (Trimestre)</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Consulta -->
+  <polygon points="340,130 525,130 510,180 325,180" class="node-data"/>
+  <text x="425" y="150" class="node-text">Petición de Estados Financieros</text>
+  <text x="425" y="165" class="node-sub">Selecciona Periodo y Formatos</text>
+
+  <path d="M 515 155 L 650 155" class="path-line"/>
+
+  <!-- SIAF Calcula -->
+  <path d="M 650 135 C 650 125, 900 125, 900 135 L 900 175 C 900 185, 650 185, 650 175 Z" class="node-db" />
+  <path d="M 650 135 C 650 145, 900 145, 900 135" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="157" class="node-text">Agrupación CONAC</text>
+  <text x="775" y="170" class="node-sub">Colapsa la Balanza a Nivel Mayor</text>
+
+  <path d="M 775 185 L 775 220" class="path-line"/>
+  <line x1="775" y1="220" x2="425" y2="220" class="path-line"/>
+
+  <!-- Rombo Cuadre -->
+  <polygon points="425,220 485,250 425,280 365,250" class="node-rombo"/>
+  <text x="425" y="255" class="node-text">¿A = P + C ?</text>
+
+  <path d="M 365 250 L 300 250 L 300 370 L 325 370" class="path-green"/>
+  <text x="270" y="240" font-size="10" fill="#166534" font-weight="bold">Sí (Cuadre Perfecto)</text>
+
+  <path d="M 425 280 L 425 310" class="path-red"/>
+  <text x="440" y="300" font-size="10" fill="#991B1B" font-weight="bold">No (Alerta BD)</text>
+
+  <!-- Proceso: Error -->
+  <rect x="325" y="310" width="200" height="40" class="node" stroke="#dc2626"/>
+  <text x="425" y="325" class="node-text">Depuración de Balanza</text>
+  <text x="425" y="340" class="node-sub">Auditoría manual de pólizas</text>
+  
+  <path d="M 525 330 L 570 330 L 570 140 L 650 140" stroke="#dc2626" stroke-dasharray="4 4" fill="none" marker-end="url(#arrow-red)"/>
+
+  <!-- Imprime -->
+  <path d="M 325 370 L 525 370 L 525 420 C 475 440, 375 400, 325 420 Z" class="node-doc"/>
+  <text x="425" y="395" class="node-text">Paquete Financiero Oficial</text>
+  <text x="425" y="410" class="node-sub">Exporta PDFs firmables</text>
+
+  <path d="M 425 430 L 425 470" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="470" width="80" height="30" class="node-term" />
+  <text x="425" y="489" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>DIRECCIÓN DE FINANZAS</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. SOLICITUD</td>
+        <td>Al término del trimestre, ingresa al módulo, selecciona los 4 estados financieros, el periodo y da clic en "Calcular".</td>
+        <td>Ejecuta querys masivas sobre la balanza, agrupa según el árbol CONAC, e incluye el subquery del ejercicio fiscal anterior (para la columna comparativa).</td>
+      </tr>
+      <tr>
+        <td>2. VERIFICACIÓN (PANTALLA)</td>
+        <td>Revisa los totales en pantalla y valida que la Ecuación Contable se cumpla.</td>
+        <td>Verifica internamente <code>Activo == Pasivo + Hacienda Pública</code>. Si no cuadra, pinta un banner rojo bloqueando la impresión.</td>
+      </tr>
+      <tr>
+        <td>3. GENERACIÓN DE REPORTES</td>
+        <td>Si está en verde, presiona "Imprimir Paquete PDF".</td>
+        <td>Imprime la sábana de reportes formales, inyectando al pie la leyenda de responsabilidad solidaria y las líneas para firmas de los directivos.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

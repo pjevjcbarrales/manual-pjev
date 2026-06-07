@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.3.1-edo-ejercicio-presup.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:var(--pjev-exito-bg); color:var(--pjev-exito-text); border:1px solid var(--pjev-exito-borde); }
+  .badge-info { background:var(--pjev-info-bg); color:var(--pjev-info-text); border:1px solid var(--pjev-info-borde); }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Presupuesto</span> ›
+      <span>Imprimir</span> ›
+      <span>Estado del Ejercicio del Presupuesto de Egresos</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.3.1</div>
+        <h1 class="elem-title">Edo. Ejercicio Presup.</h1>
+        <p class="elem-desc">El reporte normativo principal que muestra el avance presupuestal ("sábana"). Integra los momentos contables (Aprobado, Ampliaciones, Modificado, Comprometido, Devengado, Ejercido, Pagado y Subejercicio).</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-p">Tipo B/C: Reporte Complejo (Jasper)</span>
+          <span class="mod-badge badge-info">Solo Lectura</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Es el reporte de "batalla" diario. Los titulares, analistas y la junta directiva lo utilizan para saber de cuánto presupuesto disponen en tiempo real. Dependiendo de los filtros, puede generar una sábana consolidada institucional o un reporte detallado por Partida Específica para un Centro de Costo particular.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Punto Relacionado</th><th>Impacto en el Reporte</th></tr></thead>
+        <tbody>
+          <tr><td>Procedimiento de Cierre Presupuestal</td><td>Emisión de los Estados del Ejercicio en sus modalidades: Mes, Acumulado y Al periodo.</td><td>El reporte debe permitir configurar estas tres periodicidades.</td></tr>
+          <tr><td>LGCG / CONAC</td><td>Momentos Contables de los Egresos</td><td>Las columnas obligatorias son: Aprobado, Ampliaciones/Reducciones, Modificado, Comprometido, Devengado, Ejercido, Pagado, y Subejercicio.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Arquitectura de Datos (Generación)</div>
+      <p>Debido al volumen de cruces que requiere este reporte, aplica el <strong>Estándar de Generación por Tabla Temporal</strong>.</p>
+      <table class="props-table">
+        <thead><tr><th>Paso</th><th>Acción Técnica</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td>1</td><td><strong>Disparador (API)</strong></td><td>El backend recibe los filtros (ej. mes inicial, mes final, centro de costo).</td></tr>
+        <tr><td>2</td><td><strong>Cálculo en BD (SP)</strong></td><td>Un procedimiento almacenado consolida el saldo inicial más afectaciones y pólizas automáticas del rango de fechas.</td></tr>
+        <tr><td>3</td><td><strong>Tabla Temporal</strong></td><td>Los datos sumariados se insertan en una tabla tipo <code>tmp_rep_avance_presup_{UUID}</code>.</td></tr>
+        <tr><td>4</td><td><strong>JasperReports</strong></td><td>El motor Jasper hace un <code>SELECT * FROM tmp...</code> super veloz, pinta el PDF y retorna el blob al usuario.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. DISEÑO DE INTERFACES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Diseño de Interfaces (Filtros UI)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('w1',this)">Filtros (Wizard)</button>
+      </div>
+
+      <div id="wf-w1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Consola Central de Reportes Mensuales</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="650" fill="#f4f6f8" rx="4" stroke="#ddd"/>
+              
+              <!-- Título General -->
+              <text x="30" y="35" fill="#1B3A2D" font-size="16" font-weight="bold">CONSOLA DE REPORTES Y CIERRES</text>
+              
+              <!-- FRAME 1: TABLA DE INDICADORES (IZQUIERDA/ARRIBA) -->
+              <rect x="30" y="60" width="940" height="200" fill="#fff" rx="4" stroke="#ccc"/>
+              <rect x="30" y="60" width="940" height="30" fill="#1B3A2D" rx="4" />
+              <text x="45" y="80" fill="#fff" font-size="12" font-weight="bold">1. INDICADORES DE CÁLCULO MENSUAL (EJERCICIO 2026)</text>
+              
+              <rect x="30" y="90" width="940" height="24" fill="#f0f7f3"/>
+              <text x="50" y="106" fill="#1B3A2D" font-size="10" font-weight="bold">MES</text>
+              <text x="250" y="106" fill="#1B3A2D" font-size="10" font-weight="bold">ESTATUS CÁLCULO</text>
+              <text x="500" y="106" fill="#1B3A2D" font-size="10" font-weight="bold">VALIDACIÓN CONTABLE</text>
+              <text x="750" y="106" fill="#1B3A2D" font-size="10" font-weight="bold">ACCIÓN DE PROCESAMIENTO</text>
+              
+              <!-- Fila Enero -->
+              <line x1="30" y1="114" x2="970" y2="114" stroke="#eee"/>
+              <text x="50" y="132" fill="#333" font-size="11" font-weight="bold">01 - Enero</text>
+              <rect x="250" y="118" width="160" height="20" fill="#e8f5e9" rx="10"/>
+              <text x="330" y="132" fill="#166534" font-size="10" font-weight="bold" text-anchor="middle">Calculado (05-Feb 12:30)</text>
+              <text x="500" y="132" fill="#166534" font-size="11">✅ Mes Cerrado</text>
+              <rect x="750" y="118" width="100" height="20" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+              <text x="800" y="132" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">Bloqueado</text>
+
+              <!-- Fila Febrero -->
+              <line x1="30" y1="144" x2="970" y2="144" stroke="#eee"/>
+              <rect x="30" y="145" width="940" height="30" fill="#e0f2fe"/> <!-- Seleccionado -->
+              <text x="50" y="164" fill="#0369a1" font-size="11" font-weight="bold">02 - Febrero (Seleccionado)</text>
+              <rect x="250" y="150" width="160" height="20" fill="#e8f5e9" rx="10"/>
+              <text x="330" y="164" fill="#166534" font-size="10" font-weight="bold" text-anchor="middle">Calculado (02-Mar 09:15)</text>
+              <text x="500" y="164" fill="#b45309" font-size="11">⏳ Abierto / En Revisión</text>
+              <rect x="750" y="150" width="100" height="20" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="800" y="164" fill="#333" font-size="9" font-weight="bold" text-anchor="middle">⚙ Recalcular Datos</text>
+
+              <!-- Fila Marzo -->
+              <line x1="30" y1="175" x2="970" y2="175" stroke="#eee"/>
+              <text x="50" y="195" fill="#333" font-size="11" font-weight="bold">03 - Marzo</text>
+              <rect x="250" y="181" width="160" height="20" fill="#fff3cd" rx="10"/>
+              <text x="330" y="195" fill="#856404" font-size="10" font-weight="bold" text-anchor="middle">Pendiente Calcular</text>
+              <text x="500" y="195" fill="#999" font-size="11">Abierto</text>
+              <rect x="750" y="181" width="100" height="20" fill="#1B3A2D" rx="4"/>
+              <text x="800" y="195" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">▶ Calcular Ahora</text>
+
+              <!-- Fila Abril -->
+              <line x1="30" y1="206" x2="970" y2="206" stroke="#eee"/>
+              <text x="50" y="226" fill="#999" font-size="11">04 - Abril</text>
+              <text x="250" y="226" fill="#999" font-size="10">Sin datos registrados</text>
+              <text x="500" y="226" fill="#999" font-size="11">Abierto</text>
+              
+              <!-- FRAME 2: FILTROS DE IMPRESIÓN (IZQUIERDA/ABAJO) -->
+              <rect x="30" y="280" width="450" height="340" fill="#fff" rx="4" stroke="#ccc"/>
+              <rect x="30" y="280" width="450" height="30" fill="#f0f7f3" rx="4" />
+              <text x="45" y="300" fill="#1B3A2D" font-size="12" font-weight="bold">2. FILTROS DE IMPRESIÓN</text>
+              
+              <text x="50" y="330" fill="#666" font-size="10">Si desea reportes específicos, llene estos filtros.</text>
+              
+              <text x="50" y="360" fill="#333" font-size="10" font-weight="bold">MES A IMPRIMIR (PRESELECCIONADO)</text>
+              <rect x="50" y="370" width="410" height="30" fill="#f8fafc" stroke="#ccc" rx="4"/>
+              <text x="60" y="390" fill="#0369a1" font-size="11" font-weight="bold">Febrero (Calculado)</text>
+
+              <text x="50" y="430" fill="#333" font-size="10" font-weight="bold">UNIDAD ADMINISTRATIVA</text>
+              <rect x="50" y="440" width="410" height="30" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="60" y="460" fill="#999" font-size="11">Seleccione Unidad...</text>
+
+              <text x="50" y="500" fill="#333" font-size="10" font-weight="bold">CAPÍTULO DE GASTO</text>
+              <rect x="50" y="510" width="410" height="30" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="60" y="530" fill="#999" font-size="11">Seleccione Capítulo...</text>
+
+              <text x="50" y="570" fill="#333" font-size="10" font-weight="bold">FUENTE DE FINANCIAMIENTO</text>
+              <rect x="50" y="580" width="410" height="30" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="60" y="600" fill="#999" font-size="11">Seleccione Fuente...</text>
+
+              <!-- FRAME 3: EMISIÓN DE REPORTES (DERECHA/ABAJO) -->
+              <rect x="500" y="280" width="470" height="340" fill="#fff" rx="4" stroke="#ccc"/>
+              <rect x="500" y="280" width="470" height="30" fill="#f0f7f3" rx="4" />
+              <text x="515" y="300" fill="#1B3A2D" font-size="12" font-weight="bold">3. EMISIÓN DE REPORTES (FEBRERO)</text>
+
+              <!-- OPERATIVOS -->
+              <text x="520" y="335" fill="#1B3A2D" font-size="11" font-weight="bold">REPORTES OPERATIVOS</text>
+              <line x1="520" y1="345" x2="950" y2="345" stroke="#eee"/>
+              
+              <text x="520" y="365" fill="#333" font-size="10">Sábana de Edo. Ejercicio Presupuestal</text>
+              <rect x="850" y="352" width="40" height="20" fill="#2E7D32" rx="3"/> <text x="870" y="365" fill="#fff" font-size="8" text-anchor="middle">XLS</text>
+              <rect x="900" y="352" width="40" height="20" fill="#B91C1C" rx="3"/> <text x="920" y="365" fill="#fff" font-size="8" text-anchor="middle">PDF</text>
+
+              <text x="520" y="390" fill="#333" font-size="10">Suficiencias Presupuestales</text>
+              <rect x="850" y="377" width="40" height="20" fill="#2E7D32" rx="3"/> <text x="870" y="390" fill="#fff" font-size="8" text-anchor="middle">XLS</text>
+              <rect x="900" y="377" width="40" height="20" fill="#B91C1C" rx="3"/> <text x="920" y="390" fill="#fff" font-size="8" text-anchor="middle">PDF</text>
+
+              <text x="520" y="415" fill="#333" font-size="10">Bitácora de Adecuaciones</text>
+              <rect x="850" y="402" width="40" height="20" fill="#2E7D32" rx="3"/> <text x="870" y="415" fill="#fff" font-size="8" text-anchor="middle">XLS</text>
+              <rect x="900" y="402" width="40" height="20" fill="#B91C1C" rx="3"/> <text x="920" y="415" fill="#fff" font-size="8" text-anchor="middle">PDF</text>
+
+              <text x="520" y="440" fill="#333" font-size="10">Gastos de Operación (UA)</text>
+              <rect x="850" y="427" width="40" height="20" fill="#2E7D32" rx="3"/> <text x="870" y="440" fill="#fff" font-size="8" text-anchor="middle">XLS</text>
+              <rect x="900" y="427" width="40" height="20" fill="#B91C1C" rx="3"/> <text x="920" y="440" fill="#fff" font-size="8" text-anchor="middle">PDF</text>
+
+              <!-- CONAC -->
+              <text x="520" y="475" fill="#1B3A2D" font-size="11" font-weight="bold">REPORTES CONAC LGCG</text>
+              <line x1="520" y1="485" x2="950" y2="485" stroke="#eee"/>
+              
+              <text x="520" y="505" fill="#333" font-size="10">EAepe - Clasificación Administrativa</text>
+              <rect x="850" y="492" width="40" height="20" fill="#2E7D32" rx="3"/> <text x="870" y="505" fill="#fff" font-size="8" text-anchor="middle">XLS</text>
+              <rect x="900" y="492" width="40" height="20" fill="#B91C1C" rx="3"/> <text x="920" y="505" fill="#fff" font-size="8" text-anchor="middle">PDF</text>
+
+              <text x="520" y="530" fill="#333" font-size="10">EAepe - Clasificación Económica</text>
+              <rect x="850" y="517" width="40" height="20" fill="#2E7D32" rx="3"/> <text x="870" y="530" fill="#fff" font-size="8" text-anchor="middle">XLS</text>
+              <rect x="900" y="517" width="40" height="20" fill="#B91C1C" rx="3"/> <text x="920" y="530" fill="#fff" font-size="8" text-anchor="middle">PDF</text>
+
+              <text x="520" y="555" fill="#333" font-size="10">EAepe - Objeto del Gasto</text>
+              <rect x="850" y="542" width="40" height="20" fill="#2E7D32" rx="3"/> <text x="870" y="555" fill="#fff" font-size="8" text-anchor="middle">XLS</text>
+              <rect x="900" y="542" width="40" height="20" fill="#B91C1C" rx="3"/> <text x="920" y="555" fill="#fff" font-size="8" text-anchor="middle">PDF</text>
+
+              <text x="520" y="580" fill="#333" font-size="10">EAepe - Clasificación Funcional</text>
+              <rect x="850" y="567" width="40" height="20" fill="#2E7D32" rx="3"/> <text x="870" y="580" fill="#fff" font-size="8" text-anchor="middle">XLS</text>
+              <rect x="900" y="567" width="40" height="20" fill="#B91C1C" rx="3"/> <text x="920" y="580" fill="#fff" font-size="8" text-anchor="middle">PDF</text>
+
+              <text x="520" y="605" fill="#333" font-size="10">Estado Analítico de Ingresos</text>
+              <rect x="850" y="592" width="40" height="20" fill="#2E7D32" rx="3"/> <text x="870" y="605" fill="#fff" font-size="8" text-anchor="middle">XLS</text>
+              <rect x="900" y="592" width="40" height="20" fill="#B91C1C" rx="3"/> <text x="920" y="605" fill="#fff" font-size="8" text-anchor="middle">PDF</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4a. VISUALIZACIÓN APROXIMADA -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4a</span> Visualización Aproximada del Reporte</div>
+      <p>Esquema visual de la distribución de columnas generadas por JasperReports cuando se exporta a PDF o se visualiza en pantalla plana. Nótense las columnas del esquema CONAC.</p>
+      
+      <div class="wf-box" style="margin-top: 10px;">
+          <div class="wf-bar"><span class="wf-bar-label">Output (Sábana de Avance Presupuestal)</span></div>
+          <div class="wf-svg-area" style="background:#fff;">
+            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+              
+              <!-- Membrete -->
+              <text x="500" y="30" fill="#1B3A2D" font-size="14" font-weight="bold" text-anchor="middle">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+              <text x="500" y="45" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">ESTADO DEL EJERCICIO DEL PRESUPUESTO DE EGRESOS</text>
+              <text x="500" y="60" fill="#666" font-size="10" text-anchor="middle">Al 31 de Mayo de 2026 (Expresado en Pesos)</text>
+
+              <!-- Encabezado de la Tabla -->
+              <rect x="20" y="80" width="960" height="30" fill="#1B3A2D" rx="2"/>
+              <text x="30" y="99" fill="#fff" font-size="9" font-weight="bold">CÓDIGO (COG)</text>
+              <text x="140" y="99" fill="#fff" font-size="9" font-weight="bold">CONCEPTO / DESCRIPCIÓN</text>
+              
+              <!-- Columnas CONAC -->
+              <text x="380" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">APROBADO</text>
+              <text x="470" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">AMP/RED</text>
+              <text x="560" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">MODIFICADO</text>
+              <text x="650" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">COMPROMETIDO</text>
+              <text x="740" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">DEVENGADO</text>
+              <text x="830" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">EJERCIDO</text>
+              <text x="960" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">SUBEJERCICIO</text>
+              <!-- Nota: Subejercicio = Modificado - Comprometido (o Modificado - Devengado según el criterio de avance) -->
+
+              <!-- Fila 1 (Nivel Agrupador: Capítulo) -->
+              <rect x="20" y="110" width="960" height="24" fill="#f0f7f3"/>
+              <text x="30" y="126" fill="#1B3A2D" font-size="10" font-weight="bold">1000</text>
+              <text x="140" y="126" fill="#1B3A2D" font-size="10" font-weight="bold">Servicios Personales</text>
+              <text x="380" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">$1,000,000.00</text>
+              <text x="470" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">$0.00</text>
+              <text x="560" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">$1,000,000.00</text>
+              <text x="650" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">$500,000.00</text>
+              <text x="740" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">$500,000.00</text>
+              <text x="830" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">$500,000.00</text>
+              <text x="960" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">$500,000.00</text>
+
+              <!-- Fila 2 (Nivel Detalle: Partida Genérica/Específica) -->
+              <line x1="20" y1="134" x2="980" y2="134" stroke="#eee"/>
+              <text x="30" y="150" fill="#333" font-size="9">1130</text>
+              <text x="140" y="150" fill="#333" font-size="9">Sueldos base al personal permanente</text>
+              <text x="380" y="150" fill="#333" font-size="9" text-anchor="end">$800,000.00</text>
+              <text x="470" y="150" fill="#333" font-size="9" text-anchor="end">$0.00</text>
+              <text x="560" y="150" fill="#333" font-size="9" text-anchor="end">$800,000.00</text>
+              <text x="650" y="150" fill="#333" font-size="9" text-anchor="end">$400,000.00</text>
+              <text x="740" y="150" fill="#333" font-size="9" text-anchor="end">$400,000.00</text>
+              <text x="830" y="150" fill="#333" font-size="9" text-anchor="end">$400,000.00</text>
+              <text x="960" y="150" fill="#333" font-size="9" text-anchor="end">$400,000.00</text>
+
+              <!-- Fila 3 -->
+              <line x1="20" y1="158" x2="980" y2="158" stroke="#eee"/>
+              <text x="30" y="174" fill="#333" font-size="9">1210</text>
+              <text x="140" y="174" fill="#333" font-size="9">Honorarios asimilables a salarios</text>
+              <text x="380" y="174" fill="#333" font-size="9" text-anchor="end">$200,000.00</text>
+              <text x="470" y="174" fill="#333" font-size="9" text-anchor="end">$0.00</text>
+              <text x="560" y="174" fill="#333" font-size="9" text-anchor="end">$200,000.00</text>
+              <text x="650" y="174" fill="#333" font-size="9" text-anchor="end">$100,000.00</text>
+              <text x="740" y="174" fill="#333" font-size="9" text-anchor="end">$100,000.00</text>
+              <text x="830" y="174" fill="#333" font-size="9" text-anchor="end">$100,000.00</text>
+              <text x="960" y="174" fill="#333" font-size="9" text-anchor="end">$100,000.00</text>
+
+            </svg>
+          </div>
+        </div>
+    </div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

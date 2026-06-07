@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.3.9-edo-analitico-ingresos.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:var(--pjev-exito-bg); color:var(--pjev-exito-text); border:1px solid var(--pjev-exito-borde); }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); margin-top:10px; }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> › <span>Presupuesto</span> › <span>Imprimir</span> › <span>Edo. Analítico Ingresos</span>
+    </div>
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.3.9</div>
+        <h1 class="elem-title">Estado Analítico de Ingresos</h1>
+        <div class="mod-header-badges"><span class="mod-badge badge-p" style="background:#e0e7ff; color:#3730a3; border-color:#c7d2fe;">Reporte CONAC LGCG</span></div>
+      </div>
+    </div>
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Al igual que hay un estado para los egresos, este reporte es la contraparte contable que muestra los momentos del Ingreso: Estimado, Ampliaciones, Modificado, Devengado y Recaudado, basado en el CRI.</p>
+    </div>
+    <!-- 3. LÓGICA DE NEGOCIO Y PERSISTENCIA -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Lógica de Negocio y Persistencia</div>
+      <p><strong>Origen de Datos:</strong> Tablas <code>ingresos_estimados</code> y <code>ingresos_recaudados</code> (Afectaciones automáticas del módulo de Tesorería/Bancos).</p>
+      <table class="props-table">
+        <thead><tr><th>Columna del Reporte</th><th>Lógica de Cálculo / Campo Físico</th></tr></thead>
+        <tbody>
+          <tr><td>Estimado</td><td>Suma anual de la Ley de Ingresos capturada en <code>ingresos_estimados</code> por CRI.</td></tr>
+          <tr><td>Ampliaciones/Red.</td><td>Afectaciones presupuestales de ingresos (Aumentos o disminuciones a la meta).</td></tr>
+          <tr><td>Modificado</td><td><code>Estimado + Ampliaciones - Reducciones</code>.</td></tr>
+          <tr><td>Devengado</td><td>Pólizas de ingreso donde nace el derecho de cobro. En PJEV suele ser simultáneo al Recaudado.</td></tr>
+          <tr><td>Recaudado</td><td>Recibos oficiales emitidos y cobrados en bancos (<code>ingresos_recaudados</code>).</td></tr>
+          <tr><td>Diferencia</td><td><code>Recaudado - Estimado</code>. Positivo indica superávit, negativo indica déficit contra la meta.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4a</span> Visualización Aproximada del Reporte</div>
+      <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Output (CONAC Ingresos)</span></div>
+          <div class="wf-svg-area" style="background:#fff;">
+            <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg">
+              <text x="500" y="30" fill="#1B3A2D" font-size="12" font-weight="bold" text-anchor="middle">ESTADO ANALÍTICO DE INGRESOS</text>
+              <rect x="20" y="80" width="960" height="30" fill="#1B3A2D" rx="2"/>
+              <text x="30" y="99" fill="#fff" font-size="9" font-weight="bold">RUBRO DE INGRESOS</text>
+              <text x="380" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">ESTIMADO</text>
+              <text x="470" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">AMP/RED</text>
+              <text x="560" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">MODIFICADO</text>
+              <text x="650" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">DEVENGADO</text>
+              <text x="740" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">RECAUDADO</text>
+              <text x="850" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">DIFERENCIA</text>
+              
+              <rect x="20" y="110" width="960" height="24" fill="#f0f7f3"/>
+              <text x="30" y="126" fill="#1B3A2D" font-size="10">8 Participaciones y Aportaciones</text>
+              <text x="380" y="126" fill="#333" font-size="10" text-anchor="end">1,000,000.00</text>
+              <text x="470" y="126" fill="#333" font-size="10" text-anchor="end">0.00</text>
+              <text x="560" y="126" fill="#333" font-size="10" text-anchor="end">1,000,000.00</text>
+              <text x="650" y="126" fill="#333" font-size="10" text-anchor="end">200,000.00</text>
+              <text x="740" y="126" fill="#333" font-size="10" text-anchor="end">200,000.00</text>
+              <text x="850" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">-800,000.00</text>
+            </svg>
+          </div>
+      </div>
+    </div>
+</div>
+</body></html>

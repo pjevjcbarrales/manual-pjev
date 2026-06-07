@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.4.4-cuenta-publica-anual.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.4.4 Cuenta Pública Anual</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.4.4</div>
+        <h1 class="elem-title">Integración de la Cuenta Pública Anual</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Herramienta de Empaquetado y Exportación Legal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>La "Cuenta Pública" no es un reporte contable en sí, sino un "Súper-Documento" (un libro/legajo) que consolida más de 40 anexos distintos (Financieros, Presupuestales, Patrimoniales y Programáticos) generados a lo largo del año. Este módulo funciona como un asistente de empaquetado (Wizard) que extrae los PDFs de todos los submódulos, verifica que ninguno falte, y los concatena en un solo archivo maestro indexado que se envía a la Legislatura del Estado.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Constitución Política del Estado</td><td>Art. 67, Fracción III</td><td>Los poderes del Estado deben entregar la Cuenta Pública a más tardar el 30 de abril del año siguiente.</td></tr>
+          <tr><td>Ley de Fiscalización Superior</td><td>Integración de la Cuenta</td><td>El documento debe estar ordenado en 4 tomos exactos: 1) Info Contable, 2) Info Presupuestaria, 3) Info Programática y 4) Anexos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Jefe de Contabilidad</td><td>Ejecutar el proceso de ensamble y revisión de integridad.</td><td>No puede modificar el contenido de los reportes individuales desde aquí.</td></tr>
+          <tr><td>Dirección General de Administración</td><td>Descargar el Tomo final sellado para entrega al ORFIS.</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>No aplica (Módulo de Archivos)</code></td><td><code>-</code></td><td>Este módulo interactúa principalmente con el Servidor de Archivos (File System) y los microservicios de generación de PDF. Usa la tabla de catálogo <code>cat_anexos_cuenta_publica</code> para saber qué reportes son obligatorios invocar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_validar_integridad_cuenta_publica</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@anio_fiscal</code>
+          <br><span style="color:#666">OUT:</span> Array con el "Checklist" de los 40 anexos. Retorna el estatus de cada uno (Generado, Faltante, Con Errores de Cuadre).
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/reportes/cuenta-publica/ensamblar</code></td><td>JSON con <code>{ anio }</code></td><td>Invoca la rutina asíncrona (Job) que genera y concatena los PDFs masivos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Checklist Automático:</strong> Muestra un tablero tipo semáforo indicando si ya están listos los reportes de Presupuestos (Subdirección 02) y Patrimonio para poder generar el libro final.</li>
+        <li><strong>Compilación Asíncrona:</strong> Dado que generar 40 reportes puede tomar minutos, el usuario da clic en "Ensamblar" y el sistema le notifica cuando el archivo ZIP (con los 4 tomos) está listo para descarga.</li>
+        <li><strong>Firma Electrónica (Opcional):</strong> Aplica la e-Firma del titular en todas las fojas del legajo PDF ensamblado para cumplir con la entrega digital al ORFIS (SIGMAVER).</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Dashboard / Checklist)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Visor de Ensamblado)</button>
+      </div>
+
+      <!-- TAB 1: Checklist -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Asistente de Integración: Cuenta Pública 2026</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="450" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Progreso -->
+              <text x="20" y="30" font-size="14" font-weight="bold">Progreso de Integración del Ejercicio 2026</text>
+              <rect x="20" y="45" width="960" height="20" fill="#e5e7eb" rx="10"/>
+              <rect x="20" y="45" width="860" height="20" fill="#10b981" rx="10"/> <!-- 90% -->
+              <text x="940" y="59" font-size="10" font-weight="bold" fill="#fff" text-anchor="end">90% Listo</text>
+
+              <rect x="20" y="80" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              <rect x="800" y="87" width="160" height="21" fill="#fff" stroke="#ccc" rx="3"/> <text x="880" y="101" fill="#ccc" font-size="9" text-anchor="middle">⚙ ENSAMBLAR TOMOS (Bloqueado)</text>
+
+              <!-- Panel 1: Info Contable -->
+              <rect x="20" y="130" width="460" height="150" fill="#fff" stroke="#166534" rx="4"/>
+              <rect x="20" y="130" width="460" height="25" fill="#166534"/>
+              <text x="30" y="147" fill="#fff" font-size="11" font-weight="bold">TOMO I: INFORMACIÓN CONTABLE (100% OK)</text>
+
+              <rect x="30" y="165" width="12" height="12" fill="#10b981" rx="2"/> <text x="50" y="175" font-size="11">Estados Financieros Básicos (Mód. 03.4.3)</text>
+              <rect x="30" y="185" width="12" height="12" fill="#10b981" rx="2"/> <text x="50" y="195" font-size="11">Notas a los Estados Financieros (Mód. 03.4.2)</text>
+              <rect x="30" y="205" width="12" height="12" fill="#10b981" rx="2"/> <text x="50" y="215" font-size="11">Antigüedad de Saldos (Mód. 03.4.1)</text>
+              <rect x="30" y="225" width="12" height="12" fill="#10b981" rx="2"/> <text x="50" y="235" font-size="11">Conciliación Bancaria Diciembre (Mód. 03.3.2)</text>
+              <rect x="30" y="245" width="12" height="12" fill="#10b981" rx="2"/> <text x="50" y="255" font-size="11">Conciliación Presupuestaria-Contable (Mód. 03.3.4)</text>
+
+              <!-- Panel 2: Info Presupuestal -->
+              <rect x="520" y="130" width="460" height="150" fill="#fff" stroke="#991b1b" rx="4"/>
+              <rect x="520" y="130" width="460" height="25" fill="#991b1b"/>
+              <text x="530" y="147" fill="#fff" font-size="11" font-weight="bold">TOMO II: INFO. PRESUPUESTARIA (Falta 1 Anexo)</text>
+
+              <rect x="530" y="165" width="12" height="12" fill="#10b981" rx="2"/> <text x="550" y="175" font-size="11">Estado Analítico de Ingresos (Mód. 02.2)</text>
+              <rect x="530" y="185" width="12" height="12" fill="#10b981" rx="2"/> <text x="550" y="195" font-size="11">Estado Analítico del Ejercicio de Egresos por Capítulo</text>
+              <rect x="530" y="205" width="12" height="12" fill="#10b981" rx="2"/> <text x="550" y="215" font-size="11">Estado Analítico por Clasificación Administrativa</text>
+              <rect x="530" y="225" width="12" height="12" fill="#ef4444" rx="2"/> <text x="550" y="235" font-size="11" fill="#991b1b" font-weight="bold">Endeudamiento Neto (Pendiente Presupuestos)</text> <text x="850" y="235" font-size="9" fill="blue" text-decoration="underline">Solicitar a Área</text>
+
+              <!-- Panel 3 y 4 Mock -->
+              <rect x="20" y="295" width="460" height="80" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="30" y="315" font-size="11" font-weight="bold" fill="#666">TOMO III: INFO. PROGRAMÁTICA (100% OK)</text>
+
+              <rect x="520" y="295" width="460" height="80" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="530" y="315" font-size="11" font-weight="bold" fill="#666">TOMO IV: ANEXOS Y PATRIMONIO (100% OK)</text>
+              
+              <text x="500" y="420" font-size="12" fill="#dc2626" font-weight="bold" text-anchor="middle">ATENCIÓN: El sistema no permitirá generar los ZIP de entrega hasta que la Subdirección de Presupuestos libere el anexo marcado en rojo.</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Descarga -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Descarga de Libros Ensamblados</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="350" fill="#f0fdf4" rx="4" stroke="#86efac"/>
+              
+              <circle cx="500" cy="100" r="40" fill="#22c55e"/>
+              <path d="M 485 100 L 495 110 L 515 90" fill="none" stroke="#fff" stroke-width="6"/>
+              
+              <text x="500" y="170" font-size="16" font-weight="bold" fill="#166534" text-anchor="middle">¡ENSAMBLAJE DE CUENTA PÚBLICA COMPLETADO!</text>
+              <text x="500" y="195" font-size="12" fill="#15803d" text-anchor="middle">El sistema ha generado 4 archivos PDF indexados y foliados, así como el archivo XML para el sistema SIGMAVER.</text>
+
+              <rect x="300" y="230" width="400" height="40" fill="#1B3A2D" rx="6"/>
+              <text x="500" y="255" fill="#fff" font-size="14" font-weight="bold" text-anchor="middle">⬇ DESCARGAR PAQUETE (.ZIP) - 45 MB</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-CPA-01</strong></td>
+            <td>Interdependencia Operativa: Contabilidad no puede cerrar ni imprimir la Cuenta Pública si la Subdirección de Presupuestos (Módulo 02) o Recursos Materiales (Módulo 04) no han "sellado" sus respectivos anexos.</td>
+            <td>Bloquea el botón "Ensamblar" para evitar enviar documentos incompletos a la legislatura.</td>
+            <td>Controlador (Checklist DB)</td>
+            <td>Ley de Fiscalización</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Es el punto final de todo el SIAF-PJEV. Lee banderas de estatus de los <strong>Módulos de Presupuestos, Ingresos, Contabilidad, Activo Fijo y Obra Pública</strong>. Actúa como el compilador final del esfuerzo institucional de todo un año.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>NO</strong></td>
+            <td>No afecta saldos ni pólizas. Solo recopila y empaqueta reportes ya generados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-07</td>
+            <td>2.0</td>
+            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV (Servicios de Archivo)</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">FINANZAS / CONTABILIDAD</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO (Cierre Anual)</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Consulta -->
+  <rect x="325" y="130" width="200" height="40" class="node"/>
+  <text x="425" y="145" class="node-text">Ingreso al Checklist Anual</text>
+  <text x="425" y="160" class="node-sub">Módulo integrador de áreas</text>
+
+  <path d="M 525 150 L 650 150" class="path-line"/>
+
+  <!-- SIAF Calcula -->
+  <path d="M 650 135 C 650 125, 900 125, 900 135 L 900 175 C 900 185, 650 185, 650 175 Z" class="node-db" />
+  <path d="M 650 135 C 650 145, 900 145, 900 135" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="157" class="node-text">Sondeo de Estatus</text>
+  <text x="775" y="170" class="node-sub">Cruza datos Presupuestos y Activos</text>
+
+  <path d="M 775 185 L 775 220" class="path-line"/>
+  <line x1="775" y1="220" x2="425" y2="220" class="path-line"/>
+
+  <!-- Rombo Cuadre -->
+  <polygon points="425,220 485,250 425,280 365,250" class="node-rombo"/>
+  <text x="425" y="255" class="node-text">¿Están los 40 Anexos?</text>
+
+  <path d="M 425 280 L 425 310" class="path-red"/>
+  <text x="440" y="300" font-size="10" fill="#991B1B" font-weight="bold">No (Faltan Áreas)</text>
+  
+  <path d="M 365 250 L 300 250 L 300 370 L 325 370" class="path-green"/>
+  <text x="270" y="240" font-size="10" fill="#166534" font-weight="bold">Sí (100% OK)</text>
+
+  <!-- Proceso: Corrección (Loop) -->
+  <rect x="325" y="310" width="200" height="40" class="node" stroke="#dc2626"/>
+  <text x="425" y="325" class="node-text">Gestión Administrativa</text>
+  <text x="425" y="340" class="node-sub">Exigir a departamentos morosos</text>
+
+  <path d="M 525 330 L 570 330 L 570 140 L 650 140" stroke="#dc2626" stroke-dasharray="4 4" fill="none" marker-end="url(#arrow-red)"/>
+
+  <!-- Imprime -->
+  <path d="M 325 370 L 525 370 L 525 420 C 475 440, 375 400, 325 420 Z" class="node-doc"/>
+  <text x="425" y="395" class="node-text">Archivo Maestro (ZIP/PDF)</text>
+  <text x="425" y="410" class="node-sub">Los 4 Tomos para el Congreso</text>
+
+  <path d="M 425 430 L 425 470" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="470" width="80" height="30" class="node-term" />
+  <text x="425" y="489" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>CONTABILIDAD</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. MONITOREO DE CIERRE</td>
+        <td>Ingresa diariamente al módulo en el mes de marzo para ver el avance de las otras áreas del PJEV.</td>
+        <td>Checa las banderas de cierre de los módulos 02 (Presupuestos), 04 (Activo Fijo), etc., e ilumina el checklist en tiempo real.</td>
+      </tr>
+      <tr>
+        <td>2. COMPILACIÓN</td>
+        <td>Al llegar al 100%, da clic en el botón "Ensamblar Cuenta Pública".</td>
+        <td>Inicia un Job en background que renderiza los PDFs de los 40 anexos obligatorios y los une en 4 archivos "Tomo_I.pdf", "Tomo_II.pdf", etc.</td>
+      </tr>
+      <tr>
+        <td>3. EXTRACCIÓN</td>
+        <td>Descarga el archivo .ZIP generado y lo envía a e-Firma.</td>
+        <td>Pone a disposición el link de descarga y "Sella" el ejercicio fiscal para evitar cualquier alteración retroactiva posterior a la entrega.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

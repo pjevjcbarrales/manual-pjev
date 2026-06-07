@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.2.3-transferencias.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:var(--pjev-exito-bg); color:var(--pjev-exito-text); border:1px solid var(--pjev-exito-borde); }
+  
+  .conac-alert { background:#fff3cd; border:1px solid #ffeeba; color:#856404; padding:10px 15px; border-radius:6px; font-size:13px; margin:15px 0; display:flex; gap:10px; align-items:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Presupuesto</span> ›
+      <span>Proceso</span> ›
+      <span>Transferencias Compensadas</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.2.3</div>
+        <h1 class="elem-title">Transferencias Compensadas</h1>
+        <p class="elem-desc">Proporciona disponibilidad presupuestal mediante la reasignación de montos entre distintas claves (Suma Cero) sin alterar el techo presupuestal global.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-p">Tipo: Proceso Financiero y Transaccional</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Módulo transaccional que permite proporcionar o reasignar disponibilidad presupuestal entre distintas claves presupuestales durante el ejercicio activo. Al ser de tipo "compensadas", operan matemáticamente bajo la regla de <strong>Suma Cero</strong>, donde el monto total de las reducciones (origen) debe ser exactamente igual al monto total de las ampliaciones (destino).</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>LGCG</td><td>Art. 41 y 43</td><td>Obliga a reflejar los aumentos y disminuciones al presupuesto autorizado.</td></tr>
+          <tr><td>Manual DGA (PJEV)</td><td>Pág. 50-56</td><td>Dicta el procedimiento "Afectación presupuestal a través de transferencias compensadas...".</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. ROLES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Analista de Presupuesto</td><td>Captura de solicitudes.</td><td>No puede autorizar movimientos Inter-Capítulos ni afectar Piso Devengado.</td></tr>
+          <tr><td>Jefe de Ppto</td><td>Autorización en SAFPOJ.</td><td>Afecta directamente la contabilidad y el estado de ejercicio.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Cabecera: <code>presupuesto.transferencia</code></strong></td></tr>
+        <tr><td><code>tr_id</code></td><td><code>BIGINT PK</code></td><td>Identificador único.</td></tr>
+        <tr><td><code>tr_folio</code></td><td><code>VARCHAR(20)</code></td><td>Ej. TR-TSJ-001.</td></tr>
+        <tr><td><code>tr_justificacion</code></td><td><code>TEXT</code></td><td>Justificación legal/motivo.</td></tr>
+        <tr><td><code>tr_bandera_especial</code></td><td><code>BOOLEAN</code></td><td>TRUE = Aprobada por Consejo/Pdte para cruzar capítulos.</td></tr>
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Detalle: <code>presupuesto.transferencia_detalle</code></strong></td></tr>
+        <tr><td><code>trd_tipo</code></td><td><code>CHAR(1)</code></td><td>'R' = Reducción (Origen) / 'A' = Ampliación (Destino).</td></tr>
+        <tr><td><code>trd_monto</code></td><td><code>DECIMAL</code></td><td>Importe a transferir.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. STORED PROCEDURES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>presupuesto.sp_leer_transferencia</code></strong> (Devuelve lista general)</li>
+        <li><strong><code>presupuesto.fn_abc_transferencia</code></strong> (Guarda la cabecera y el detalle)</li>
+        <li><strong><code>presupuesto.sp_autorizar_transferencia</code></strong> (Valida saldo final y detona afectación)</li>
+      </ul>
+    </div>
+
+    <!-- 6. SERVICIOS REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><span class="method post">POST</span></td><td><code>/ppto/transferencia/leer</code></td><td>{ p_mes }</td><td>Consulta listado.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/ppto/transferencia/abc</code></td><td>Dto Completo</td><td>Guarda validando Suma Cero.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/ppto/transferencia/autorizar</code></td><td>{ p_tr_id }</td><td>Cambia estado a Aprobada.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. ACCIONES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Registro (CRUD):</strong> <code>[+ NUEVA TRANSFERENCIA]</code>. Acciones fila: <code>[✏ EDITAR]</code>, <code>[🗑 CANCELAR]</code>, <code>[✅ AUTORIZAR]</code>.</li>
+        <li><strong>Especiales:</strong> <code>[VERIFICAR SALDOS ORIGEN]</code> (A nivel backend antes de enviar).</li>
+        <li><strong>Reportes:</strong> <code>[🖨 IMPRIMIR OFICIO / FORMATO]</code>.</li>
+      </ul>
+    </div>
+
+    <!-- 8. DISEÑO DE INTERFACES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">Pantalla Captura (Origen y Destino)</button>
+      </div>
+
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Captura: Doble Panel con Desglose</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="450" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Cabecera -->
+              <rect x="20" y="20" width="960" height="50" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              <text x="30" y="40" font-size="11" font-weight="bold" fill="#666">Justificación:</text>
+              <rect x="110" y="27" width="500" height="25" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="120" y="44" font-size="11" fill="#333">Oficio OM-010-2026. Apoyo a la Dirección Gral. de Administración.</text>
+              
+              <text x="630" y="40" font-size="11" font-weight="bold" fill="#666">Acuerdo TSJ:</text>
+              <rect x="710" y="30" width="15" height="15" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="735" y="42" font-size="10" fill="#666">(Habilitar Inter-capítulos)</text>
+
+              <!-- Panel ORIGEN (Izquierdo) -->
+              <rect x="20" y="90" width="470" height="250" fill="#FEF2F2" stroke="#FECACA" rx="4"/>
+              <rect x="20" y="90" width="470" height="30" fill="#FCA5A5" rx="4" />
+              <text x="255" y="110" font-size="12" font-weight="bold" fill="#7F1D1D" text-anchor="middle">ORIGEN (Reducciones)</text>
+
+              <!-- Row 1 Origen -->
+              <text x="30" y="140" font-size="10" fill="#666">Clave Ptal:</text>
+              <rect x="90" y="128" width="280" height="20" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="95" y="142" font-size="10" fill="#333">21100001-301... [Mat. de Oficina]</text>
+              
+              <text x="380" y="140" font-size="10" fill="#666">Monto:</text>
+              <rect x="420" y="128" width="60" height="20" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="430" y="142" font-size="10" fill="#B91C1C">-$5,000</text>
+
+              <!-- Desglose de Cuenta Origen -->
+              <rect x="90" y="152" width="280" height="30" fill="#fff" stroke="#FCA5A5" stroke-dasharray="2,2"/>
+              <text x="95" y="165" font-size="9" fill="#666">Disponible: $12,500.00</text>
+              <text x="95" y="177" font-size="9" fill="#666">Comprometido: $4,000.00</text>
+
+              <!-- Panel DESTINO (Derecho) -->
+              <rect x="510" y="90" width="470" height="250" fill="#F0FDF4" stroke="#BBF7D0" rx="4"/>
+              <rect x="510" y="90" width="470" height="30" fill="#86EFAC" rx="4" />
+              <text x="745" y="110" font-size="12" font-weight="bold" fill="#14532D" text-anchor="middle">DESTINO (Ampliaciones)</text>
+
+              <!-- Row 1 Destino -->
+              <text x="520" y="140" font-size="10" fill="#666">Clave Ptal:</text>
+              <rect x="580" y="128" width="280" height="20" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="585" y="142" font-size="10" fill="#333">33400001-301... [Capacitación]</text>
+              
+              <text x="870" y="140" font-size="10" fill="#666">Monto:</text>
+              <rect x="910" y="128" width="60" height="20" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="920" y="142" font-size="10" fill="#15803D">+$5,000</text>
+
+              <!-- Desglose de Cuenta Destino -->
+              <rect x="580" y="152" width="280" height="30" fill="#fff" stroke="#86EFAC" stroke-dasharray="2,2"/>
+              <text x="585" y="165" font-size="9" fill="#666">Disponible actual: $0.00</text>
+              <text x="585" y="177" font-size="9" fill="#666">Presupuesto Nuevo: $5,000.00</text>
+
+              <!-- Totales -->
+              <rect x="20" y="360" width="960" height="60" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              <text x="400" y="385" font-size="13" font-weight="bold" fill="#666">Suma Reducciones:</text>
+              <text x="530" y="385" font-size="13" font-weight="bold" fill="#B91C1C">-$5,000.00</text>
+
+              <text x="400" y="405" font-size="13" font-weight="bold" fill="#666">Suma Ampliaciones:</text>
+              <text x="530" y="405" font-size="13" font-weight="bold" fill="#15803D">+$5,000.00</text>
+              
+              <line x1="630" y1="360" x2="630" y2="420" stroke="#ccc"/>
+
+              <text x="650" y="395" font-size="15" font-weight="bold" fill="#333">Diferencia:</text>
+              <rect x="735" y="375" width="100" height="30" fill="#D1FAE5" rx="4"/>
+              <text x="785" y="395" font-size="15" font-weight="bold" fill="#047857" text-anchor="middle">$0.00</text>
+
+              <rect x="850" y="375" width="110" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="905" y="395" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">GUARDAR</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. REGLAS DE NEGOCIO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th></tr></thead>
+        <tbody>
+        <tr><td><strong>RN-TRA-01</strong></td><td>Suma Cero obligatoria.</td><td>El sistema inhabilita el botón GUARDAR si Diferencia != $0.00.</td><td>Frontend / SP</td></tr>
+        <tr><td><strong>RN-TRA-02</strong></td><td>Prohibición Inter-Capítulos.</td><td>Por defecto, el sistema prohíbe guardar si Origen y Destino cruzan diferentes capítulos de gasto o diferentes Tribunales.</td><td>SP</td></tr>
+        <tr><td><strong>RN-TRA-03</strong></td><td>Excepción de Consejo.</td><td>Si se marca el flag de "Acuerdo de Consejo", se omite la restricción RN-TRA-02.</td><td>Frontend / SP</td></tr>
+        <tr><td><strong>RN-TRA-04</strong></td><td>Protección de Piso Devengado.</td><td>Ninguna reducción puede superar el "Disponible" real.</td><td>SP</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. FLUJO DE INTEGRACIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Al hacer clic en <code>[✅ AUTORIZAR]</code>, el estatus pasa a 2 (Autorizado) e inserta directamente en la tabla <code>presupuesto.presupuesto_movimientos</code> los montos de Ampliación y Reducción por cada partida afectada. Esto recalcula de inmediato la sábana del <strong>Estado de Ejercicio</strong>.</p>
+    </div>
+
+    <!-- 11. AFECTACIÓN CONTABLE -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      
+      <div class="conac-alert">
+        <strong>¡Importante!</strong> Al ser transferencias, el presupuesto aprobado original NO se toca. El movimiento contable ocurre exclusivamente entre las cuentas de Modificado y Por Ejercer.
+      </div>
+
+      <table class="props-table">
+        <thead><tr><th>Origen / Destino</th><th>Cargo</th><th>Abono</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Líneas de Reducción (Origen)</strong></td>
+            <td><code>8.2.3</code> Ppto de Egresos Modificado</td>
+            <td><code>8.2.2</code> Ppto de Egresos por Ejercer</td>
+          </tr>
+          <tr>
+            <td><strong>Líneas de Ampliación (Destino)</strong></td>
+            <td><code>8.2.2</code> Ppto de Egresos por Ejercer</td>
+            <td><code>8.2.3</code> Ppto de Egresos Modificado</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. HISTORIAL DE CAMBIOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-06</td>
+            <td>1.0</td>
+            <td>Creación del Análisis Funcional de Transferencias (12 secciones).</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 900 950" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto; background: #fff;">
+  <defs>
+    <style>
+      .header-bg { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-size: 14px; font-weight: bold; text-anchor: middle; }
+      .col-line { stroke: #e5e7eb; stroke-width: 3; }
+      .area-bg { fill: #f8fafc; }
+      .area-label { font-family: sans-serif; font-size: 13px; font-weight: bold; fill: #1e293b; text-anchor: middle; }
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 6; }
+      .node-text { font-family: sans-serif; font-size: 11px; fill: #333; text-anchor: middle; font-weight: bold; }
+      .node-sub { font-family: sans-serif; font-size: 10px; fill: #666; text-anchor: middle; }
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; font-size: 10px; fill: #fff; text-anchor: middle; font-weight: bold; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+      .sys-node { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 6; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 6; }
+      .line { stroke: #1B3A2D; stroke-width: 2; fill: none; }
+      .arrow { fill: #1B3A2D; }
+      .row-line { stroke: #e5e7eb; stroke-width: 1; stroke-dasharray: 4; }
+    </style>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrow" />
+    </marker>
+  </defs>
+
+  <!-- Headers -->
+  <rect x="0" y="0" width="900" height="40" class="header-bg"/>
+  <text x="100" y="25" class="header-text">ÁREA</text>
+  <text x="400" y="25" class="header-text">PROCESOS OPERATIVOS</text>
+  <text x="750" y="25" class="header-text">SIAF</text>
+
+  <!-- Backgrounds -->
+  <rect x="0" y="40" width="200" height="910" class="area-bg"/>
+
+  <!-- Divisores -->
+  <line x1="200" y1="40" x2="200" y2="950" class="col-line"/>
+  <line x1="600" y1="40" x2="600" y2="950" class="col-line"/>
+
+  <!-- ================= FILA 1: ÁREA REQUIRENTE ================= -->
+  <line x1="0" y1="130" x2="900" y2="130" class="row-line"/>
+  <text x="100" y="75" class="area-label">ÁREA REQUIRENTE</text>
+  <text x="100" y="90" class="node-sub">(Tribunal, RH,</text>
+  <text x="100" y="105" class="node-sub">Materiales, Tesorería)</text>
+
+  <rect x="360" y="50" width="80" height="25" class="node-term" />
+  <text x="400" y="66" class="node-term-text">INICIO</text>
+  <line x1="400" y1="75" x2="400" y2="90" class="line" marker-end="url(#arr)"/>
+
+  <path d="M 320 90 L 480 90 L 480 135 C 440 150, 360 120, 320 135 Z" class="doc"/>
+  <text x="400" y="110" class="node-text">Oficio de Solicitud de</text>
+  <text x="400" y="125" class="node-sub">Afectación Ptal (Transferencia)</text>
+  <line x1="400" y1="140" x2="400" y2="160" class="line" marker-end="url(#arr)"/>
+
+  <!-- ================= FILA 2: PRESUPUESTOS ================= -->
+  <line x1="0" y1="670" x2="900" y2="670" class="row-line"/>
+  <text x="100" y="400" class="area-label">PRESUPUESTOS</text>
+
+  <!-- Recibe y Revisa -->
+  <rect x="300" y="160" width="200" height="50" class="node"/>
+  <text x="400" y="180" class="node-text">Recibe Oficio y Revisa</text>
+  <text x="400" y="195" class="node-sub">que esté requisitada</text>
+  
+  <line x1="400" y1="210" x2="400" y2="240" class="line" marker-end="url(#arr)"/>
+
+  <!-- Solicita Consulta -->
+  <rect x="300" y="240" width="200" height="40" class="node"/>
+  <text x="400" y="265" class="node-text">Consulta Disponibilidad</text>
+
+  <!-- Va al SIAF -->
+  <line x1="500" y1="260" x2="650" y2="260" class="line" marker-end="url(#arr)"/>
+
+  <!-- SIAF -> Valida -->
+  <rect x="650" y="240" width="200" height="40" class="sys-node"/>
+  <text x="750" y="265" class="node-text">Valida información en SIAF</text>
+
+  <!-- Regresa de SIAF -->
+  <line x1="750" y1="280" x2="750" y2="310" class="line"/>
+  <line x1="750" y1="310" x2="400" y2="310" class="line"/>
+  <line x1="400" y1="310" x2="400" y2="330" class="line" marker-end="url(#arr)"/>
+
+  <!-- Rombo de Decisión -->
+  <polygon points="400,330 490,380 400,430 310,380" class="node" style="stroke: #D97706;"/>
+  <text x="400" y="375" class="node-text">¿Correcta y con</text>
+  <text x="400" y="390" class="node-text">Disponibilidad?</text>
+
+  <!-- Rama NO -->
+  <line x1="310" y1="380" x2="250" y2="380" class="line"/>
+  <text x="280" y="375" font-family="sans-serif" font-size="12" fill="#D97706" font-weight="bold">NO</text>
+  <line x1="250" y1="380" x2="250" y2="440" class="line" marker-end="url(#arr)"/>
+
+  <rect x="210" y="440" width="180" height="50" class="node" style="stroke:#D97706;"/>
+  <text x="300" y="460" class="node-text" fill="#D97706">Elabora Oficio de</text>
+  <text x="300" y="475" class="node-sub" fill="#D97706">Devolución (Rechazada)</text>
+  
+  <line x1="300" y1="490" x2="300" y2="520" class="line" marker-end="url(#arr)"/>
+  
+  <rect x="230" y="520" width="140" height="30" class="node-term" />
+  <text x="300" y="539" class="node-term-text">FIN / Devuelve Oficio</text>
+
+  <!-- Rama SÍ -->
+  <line x1="400" y1="430" x2="400" y2="480" class="line" marker-end="url(#arr)"/>
+  <text x="410" y="455" font-family="sans-serif" font-size="12" fill="#15803D" font-weight="bold">SÍ</text>
+
+  <rect x="300" y="480" width="200" height="50" class="node"/>
+  <text x="400" y="500" class="node-text">Captura y Autoriza</text>
+  <text x="400" y="515" class="node-sub">Movimiento (Asigna folio)</text>
+
+  <!-- Hacia el SIAF (Captura/Autoriza) -->
+  <line x1="500" y1="505" x2="650" y2="505" class="line" marker-end="url(#arr)"/>
+
+  <!-- SIAF -> Registra -->
+  <path d="M 650 490 C 650 480, 850 480, 850 490 L 850 520 C 850 530, 650 530, 650 520 Z" class="node-db" />
+  <path d="M 650 490 C 650 500, 850 500, 850 490" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="750" y="508" class="node-text">Registra Movimiento</text>
+  <text x="750" y="519" class="node-sub">y Autoriza en BD</text>
+
+  <line x1="750" y1="530" x2="750" y2="560" class="line" marker-end="url(#arr)"/>
+
+  <!-- SIAF -> Afectación Suma Cero -->
+  <rect x="650" y="560" width="200" height="50" class="sys-node"/>
+  <text x="750" y="580" class="node-text">Afectación Presupuestal</text>
+  <text x="750" y="595" class="node-sub">(Suma Cero entre cuentas)</text>
+
+  <line x1="750" y1="610" x2="750" y2="690" class="line" marker-end="url(#arr)"/>
+
+  <!-- Regresa de Autorizar a Proceso para Archivar -->
+  <line x1="400" y1="530" x2="400" y2="580" class="line" marker-end="url(#arr)"/>
+
+  <rect x="300" y="580" width="200" height="40" class="node"/>
+  <text x="400" y="605" class="node-text">Archiva Oficio Original</text>
+
+  <line x1="400" y1="620" x2="400" y2="640" class="line" marker-end="url(#arr)"/>
+
+  <!-- FIN DEL PROCESO PRINCIPAL -->
+  <rect x="360" y="640" width="80" height="30" class="node-term" />
+  <text x="400" y="659" class="node-term-text">FIN</text>
+
+  <!-- ================= FILA 3: CONTABILIDAD ================= -->
+  <line x1="0" y1="810" x2="900" y2="810" class="row-line"/>
+  <text x="100" y="740" class="area-label">CONTABILIDAD</text>
+
+  <!-- SIAF -> Genera Póliza -->
+  <rect x="650" y="690" width="200" height="50" class="poliza"/>
+  <text x="750" y="710" class="node-text" fill="#9d174d">Genera Póliza Automática</text>
+  <text x="750" y="725" class="node-sub">(Cargo 8.2.2 / Abono 8.2.1)</text>
+
+  <line x1="650" y1="715" x2="500" y2="715" class="line" marker-end="url(#arr)"/>
+
+  <!-- Proceso -> Afecta Póliza -->
+  <rect x="300" y="685" width="200" height="60" class="node"/>
+  <text x="400" y="705" class="node-text">Afecta Póliza en Bandeja</text>
+  <text x="400" y="720" class="node-sub">(Se bloquea transferencia</text>
+  <text x="400" y="730" class="node-sub">para evitar alteraciones)</text>
+
+  <!-- SIAF -> Continúa a enviar alerta -->
+  <line x1="750" y1="740" x2="750" y2="830" class="line" marker-end="url(#arr)"/>
+
+  <!-- ================= FILA 4: TESORERÍA ================= -->
+  <text x="100" y="880" class="area-label">TESORERÍA</text>
+
+  <!-- SIAF -> Envía Alerta -->
+  <rect x="650" y="830" width="200" height="50" class="sys-node"/>
+  <text x="750" y="850" class="node-text">Envía Alerta Digital</text>
+  <text x="750" y="865" class="node-sub">vía tablero SIAF</text>
+
+  <line x1="650" y1="855" x2="500" y2="855" class="line" marker-end="url(#arr)"/>
+
+  <!-- Proceso -> Tesorería recibe alerta -->
+  <rect x="300" y="830" width="200" height="50" class="node"/>
+  <text x="400" y="850" class="node-text">Recibe Alerta Digital de</text>
+  <text x="400" y="865" class="node-sub">Transferencia Aprobada</text>
+
+</svg>
+</div>
+
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>ÁREA REQUIRENTE</th>
+        <th>PRESUPUESTOS</th>
+        <th>CONTABILIDAD</th>
+        <th>TESORERÍA</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>RECEPCIÓN DE SOLICITUD</td>
+        <td>Emite Oficio original de solicitud de transferencia y Solicitud de afectación presupuestal.</td>
+        <td>Recibe Oficio y revisa que la solicitud se encuentre requisitada correctamente.</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>VERIFICACIÓN DE DISPONIBILIDAD</td>
+        <td></td>
+        <td>Consulta disponibilidad presupuestal de la partida solicitada.</td>
+        <td></td>
+        <td></td>
+        <td>Valida información y confirma si cuenta con disponibilidad.</td>
+      </tr>
+      <tr>
+        <td>DECISIÓN Y DEVOLUCIÓN</td>
+        <td>Recibe oficio de devolución si la solicitud es rechazada.</td>
+        <td>Si es incorrecta o no hay disponibilidad, elabora oficio de devolución, recaba firmas y devuelve.</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>CAPTURA Y AUTORIZACIÓN</td>
+        <td></td>
+        <td>Si es correcta, captura y autoriza en el SAFPOJ el movimiento de la solicitud.</td>
+        <td></td>
+        <td></td>
+        <td>Registra el movimiento, asigna folio, autoriza en BD y realiza la afectación (suma cero).</td>
+      </tr>
+      <tr>
+        <td>AFECTACIÓN CONTABLE</td>
+        <td></td>
+        <td></td>
+        <td>Recibe póliza en bandeja de automáticas y la afecta (la transferencia se bloquea).</td>
+        <td></td>
+        <td>Genera póliza contable automática (Cargo 8.2.2 / Abono 8.2.1).</td>
+      </tr>
+      <tr>
+        <td>NOTIFICACIÓN Y ARCHIVO</td>
+        <td></td>
+        <td>Archiva el oficio original y la solicitud en el expediente de manera cronológica permanente.</td>
+        <td></td>
+        <td>Recibe alerta digital de disponibilidad presupuestal otorgada.</td>
+        <td>Envía alerta digital vía tablero indicando que la transferencia ha sido aprobada.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

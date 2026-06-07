@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.1.5-registro-contratos.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.put    { background:#fff8e1; color:#f57f17; }
+  .method.delete { background:#ffebee; color:#b71c1c; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:var(--pjev-gris-claro); color:var(--pjev-texto); border:1px solid var(--pjev-borde); }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Presupuesto</span> ›
+      <span>Registro</span> ›
+      <span>Registro de Contratos</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.1.5</div>
+        <h1 class="elem-title">Registro de Contratos</h1>
+        <p class="elem-desc">Módulo central para capturar la información jurídica y financiera de los contratos celebrados por el PJEV (Ej. Arrendamientos, Servicios, Obra Pública). Aquí se define la "Bolsa de Dinero" ligando el contrato con las partidas presupuestales (COG) que lo fondearán.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Catálogo Compuesto (Maestro-Detalle)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Este módulo permite traducir un documento legal (el Contrato) en una estructura transaccional dentro del SIAF-PJEV. Consta de dos partes: la Cabecera, que contiene los datos normativos y de vigencia; y los Movimientos (Detalle), donde se agregan explícitamente las claves del Clasificador por Objeto del Gasto (COG) que aportarán los recursos para pagar dicho contrato.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Procedimientos Internos</td><td>"Base de datos Rentas en Excel"</td><td>El sistema debe sustituir el Excel de rentas, centralizando RFC, proveedor, montos, vigencias e inmueble.</td></tr>
+          <tr><td>CONAC</td><td>Registro del Compromiso</td><td>Para poder comprometer un recurso, debe existir un acto administrativo previo (el Contrato) amarrado a una partida específica del COG.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Modelo de Datos</div>
+      
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Tabla: <code>catalogo.contratos</code> (Cabecera)</strong></td></tr>
+        <tr><td><code>contrato_id</code></td><td><code>BIGINT PK</code></td><td>Identificador interno del contrato.</td></tr>
+        <tr><td><code>folio_contrato</code></td><td><code>VARCHAR(100)</code></td><td>Folio físico/oficial asignado por Asuntos Jurídicos.</td></tr>
+        <tr><td><code>proveedor_id</code></td><td><code>BIGINT FK</code></td><td>Vínculo con el Padrón de Terceros (Arrendador/Contratista).</td></tr>
+        <tr><td><code>inmueble_id</code></td><td><code>BIGINT FK</code></td><td>Opcional. Vínculo con el Catálogo de Bienes Inmuebles.</td></tr>
+        <tr><td><code>fecha_inicio</code></td><td><code>DATE</code></td><td>Inicio de la vigencia.</td></tr>
+        <tr><td><code>fecha_fin</code></td><td><code>DATE</code></td><td>Fin de la vigencia.</td></tr>
+        <tr><td><code>monto_total</code></td><td><code>DECIMAL</code></td><td>Importe total del contrato (Techo financiero).</td></tr>
+        <tr><td><code>estatus</code></td><td><code>VARCHAR(20)</code></td><td>'ACTIVO', 'CANCELADO', 'TERMINADO'.</td></tr>
+        
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Tabla: <code>catalogo.contrato_partidas</code> (Detalle / Bolsa)</strong></td></tr>
+        <tr><td><code>cpartida_id</code></td><td><code>BIGINT PK</code></td><td>ID del movimiento de contrato.</td></tr>
+        <tr><td><code>contrato_id</code></td><td><code>BIGINT FK</code></td><td>Vínculo a la cabecera.</td></tr>
+        <tr><td><code>cog_id</code></td><td><code>VARCHAR(10) FK</code></td><td>Partida Genérica o Específica (Ej. 32201 - Arrendamiento de edificios).</td></tr>
+        <tr><td><code>centro_costo_id</code></td><td><code>VARCHAR(10) FK</code></td><td>A qué centro de costo se cargará (Ej. Juzgado).</td></tr>
+        <tr><td><code>monto_asignado</code></td><td><code>DECIMAL</code></td><td>Monto específico que esta partida aporta a la bolsa total del contrato.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. SERVICIOS REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Servicios REST (Endpoints)</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><span class="method get">GET</span></td><td><code>/cfg/contratos</code></td><td>?estatus=ACTIVO</td><td>Lista de contratos vigentes.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/cfg/contratos</code></td><td><code>{folio, proveedor_id, ...}</code></td><td>Crea la cabecera de un contrato.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/cfg/contratos/{id}/partidas</code></td><td><code>{cog_id, monto...}</code></td><td>Agrega una partida COG a la bolsa del contrato.</td></tr>
+        <tr><td><span class="method delete">DEL</span></td><td><code>/cfg/contratos/{id}/partidas/{pid}</code></td><td></td><td>Elimina una partida (solo si no ha sido comprometida en el módulo 02.2.6).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. DISEÑO DE INTERFACES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('w1',this)">Pantalla de Captura Maestro-Detalle</button>
+      </div>
+
+      <div id="wf-w1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Registro de Contrato</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="450" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Cabecera -->
+              <rect x="20" y="20" width="960" height="150" fill="#fff" rx="4" stroke="#eee"/>
+              <text x="40" y="45" fill="#1B3A2D" font-size="12" font-weight="bold">DATOS GENERALES DEL CONTRATO (CABECERA)</text>
+              <line x1="40" y1="55" x2="940" y2="55" stroke="#eee"/>
+              
+              <text x="40" y="80" fill="#666" font-size="10">FOLIO CONTRATO</text>
+              <rect x="40" y="90" width="150" height="25" fill="#fafafa" stroke="#ccc" rx="3"/>
+              <text x="50" y="106" fill="#333" font-size="10">PJEV-AR-2026-001</text>
+
+              <text x="210" y="80" fill="#666" font-size="10">PROVEEDOR / ARRENDADOR</text>
+              <rect x="210" y="90" width="250" height="25" fill="#fafafa" stroke="#ccc" rx="3"/>
+              <text x="220" y="106" fill="#333" font-size="10">INMOBILIARIA DEL GOLFO SA DE CV</text>
+
+              <text x="480" y="80" fill="#666" font-size="10">INMUEBLE ASOCIADO</text>
+              <rect x="480" y="90" width="200" height="25" fill="#fafafa" stroke="#ccc" rx="3"/>
+              <text x="490" y="106" fill="#333" font-size="10">Juzgado 1ro Familiar (Xalapa)</text>
+
+              <text x="40" y="130" fill="#666" font-size="10">VIGENCIA INICIO</text>
+              <rect x="40" y="140" width="120" height="25" fill="#fafafa" stroke="#ccc" rx="3"/>
+              <text x="50" y="156" fill="#333" font-size="10">01/01/2026</text>
+
+              <text x="180" y="130" fill="#666" font-size="10">VIGENCIA FIN</text>
+              <rect x="180" y="140" width="120" height="25" fill="#fafafa" stroke="#ccc" rx="3"/>
+              <text x="190" y="156" fill="#333" font-size="10">31/12/2026</text>
+
+              <text x="320" y="130" fill="#666" font-size="10">MONTO TOTAL</text>
+              <rect x="320" y="140" width="150" height="25" fill="#fafafa" stroke="#ccc" rx="3"/>
+              <text x="330" y="156" fill="#166534" font-weight="bold" font-size="11">$ 180,000.00</text>
+              
+              <rect x="860" y="140" width="80" height="25" fill="#DEAC50" rx="3"/>
+              <text x="900" y="156" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">GUARDAR</text>
+
+              <!-- Detalle -->
+              <rect x="20" y="190" width="960" height="240" fill="#fff" rx="4" stroke="#eee"/>
+              <text x="40" y="215" fill="#1B3A2D" font-size="12" font-weight="bold">AFECTACIÓN PRESUPUESTAL (BOLSA DE DINERO)</text>
+              <line x1="40" y1="225" x2="940" y2="225" stroke="#eee"/>
+
+              <rect x="800" y="200" width="140" height="20" fill="#1B3A2D" rx="3"/>
+              <text x="870" y="213" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">+ AGREGAR PARTIDA</text>
+
+              <!-- Tabla de Partidas -->
+              <rect x="40" y="240" width="900" height="25" fill="#f4f6f5"/>
+              <text x="50" y="256" fill="#666" font-size="9" font-weight="bold">PARTIDA COG</text>
+              <text x="350" y="256" fill="#666" font-size="9" font-weight="bold">CENTRO DE COSTO</text>
+              <text x="650" y="256" fill="#666" font-size="9" font-weight="bold">MONTO APORTADO</text>
+              <text x="850" y="256" fill="#666" font-size="9" font-weight="bold">ACCIONES</text>
+
+              <!-- Fila 1 -->
+              <rect x="40" y="265" width="900" height="30" fill="#fff" stroke="#eee"/>
+              <text x="50" y="284" fill="#333" font-size="10">32201 - Arrendamiento de edificios</text>
+              <text x="350" y="284" fill="#333" font-size="10">Juzgado 1ro Familiar (Xalapa)</text>
+              <text x="650" y="284" fill="#166534" font-weight="bold" font-size="10">$ 150,000.00</text>
+              <rect x="850" y="272" width="50" height="16" fill="#fee2e2" rx="2"/>
+              <text x="875" y="283" fill="#991B1B" font-size="8" text-anchor="middle">BORRAR</text>
+
+              <!-- Fila 2 (IVA) -->
+              <rect x="40" y="295" width="900" height="30" fill="#fafafa" stroke="#eee"/>
+              <text x="50" y="314" fill="#333" font-size="10">39202 - Otros Impuestos y Derechos (IVA)</text>
+              <text x="350" y="314" fill="#333" font-size="10">Juzgado 1ro Familiar (Xalapa)</text>
+              <text x="650" y="314" fill="#166534" font-weight="bold" font-size="10">$ 30,000.00</text>
+              <rect x="850" y="302" width="50" height="16" fill="#fee2e2" rx="2"/>
+              <text x="875" y="313" fill="#991B1B" font-size="8" text-anchor="middle">BORRAR</text>
+
+              <!-- Sumatoria Footer -->
+              <rect x="40" y="325" width="900" height="30" fill="#e8f5e9" stroke="#bbf7d0"/>
+              <text x="50" y="344" fill="#166534" font-size="10" font-weight="bold">TOTAL ASIGNADO EN PARTIDAS</text>
+              <text x="650" y="344" fill="#166534" font-size="11" font-weight="bold">$ 180,000.00</text>
+              <text x="850" y="344" fill="#166534" font-size="10" font-weight="bold">✅ CUADRADO</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. REGLAS DE NEGOCIO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th></tr></thead>
+        <tbody>
+        <tr><td><strong>RN-CTR-01</strong></td><td>Cuadre de la Bolsa</td><td>La suma de los <code>monto_asignado</code> de las partidas (detalle) debe ser estrictamente igual al <code>monto_total</code> de la cabecera. De lo contrario, no se permite cambiar el estatus a 'ACTIVO'.</td><td>Backend (Commit Transaccional)</td></tr>
+        <tr><td><strong>RN-CTR-02</strong></td><td>Candado de Eliminación</td><td>Si una partida del contrato ya fue utilizada para hacer un "Compromiso" en el módulo 02.2.6, no puede ser eliminada ni modificada a la baja por debajo de lo ya comprometido.</td><td>Backend (Cruce con Compromisos)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

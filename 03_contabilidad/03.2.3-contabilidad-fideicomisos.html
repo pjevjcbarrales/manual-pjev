@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.2.3-contabilidad-fideicomisos.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.2.3 Contabilidad Fideicomisos</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.2.3</div>
+        <h1 class="elem-title">Contabilidad de Fideicomisos de Administración</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV (Referencia: Manual PJEV 291).</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Módulo Extendido de Pólizas Especiales</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El Poder Judicial administra fondos especiales externos a su presupuesto ordinario llamados "Fideicomisos" (e.g. Fideicomiso para la Implementación de la Reforma Penal). Estos recursos deben llevar su propia contabilidad separada (Sub-entes contables). Este módulo permite registrar y aislar pólizas de Ingreso, Egreso y Diario que afectan exclusivamente a la base de datos o espacio del Fideicomiso seleccionado, generando sus propias Balanzas de Comprobación.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>LGCG</td><td>Normas de Fideicomisos Públicos</td><td>Las operaciones de los fideicomisos públicos sin estructura orgánica propia deben registrarse de forma separada pero armónica al ente que los coordina.</td></tr>
+          <tr><td>Control Interno PJEV</td><td>Punto 291</td><td>Prohíbe mezclar el recurso contable y bancario del subsidio estatal u ordinario con el recurso radicado en fondos fiduciarios.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Contador del Fideicomiso</td><td>Registrar pólizas I/E/D seleccionando el fondo.</td><td>No puede acceder ni visualizar pólizas del Ente Principal u otros fideicomisos no asignados a él.</td></tr>
+          <tr><td>Jefe de Contabilidad</td><td>Revisar y autorizar, emitir estados financieros consolidados.</td><td>No puede autorizar sin la comprobación bancaria fiduciaria.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>FIDEICOMISO_ID</code></td><td><code>INT (PK)</code></td><td>Catálogo de Sub-Entes. (1 = Reforma, 2 = Mejora, etc).</td></tr>
+        <tr><td><code>POL_ID</code></td><td><code>BIGINT (PK)</code></td><td>ID único de póliza (comparte estructura con módulo manual).</td></tr>
+        <tr><td><code>IS_FIDEICOMISO</code></td><td><code>BOOLEAN</code></td><td>Bandera que aísla los datos del ente central.</td></tr>
+        <tr><td><code>FONDO_ORIGEN</code></td><td><code>INT (FK)</code></td><td>A qué Fideicomiso pertenece este registro contable.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_leer_polizas_fideicomiso</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@fideicomiso_id</code>, <code>@fecha_inicio</code>
+          <br><span style="color:#666">OUT:</span> Recordset aislado por el ID de sub-ente.
+        </li>
+        <li><strong><code>fn_guardar_poliza_fideicomiso</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@fideicomiso_id</code>, <code>@xml_asientos</code>
+          <br><span style="color:#666">OUT:</span> <code>{status}</code>, validación de cuadratura estricta.
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/fideicomisos/polizas/leer</code></td><td>JSON con <code>{ f_id }</code></td><td>Obtiene las operaciones del fondo seleccionado.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/fideicomisos/polizas/abc</code></td><td>JSON Completo</td><td>Guarda la póliza bajo el namespace del fondo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Selección de Contexto:</strong> Selector principal (Combobox) que cambia todo el entorno gráfico al fideicomiso seleccionado.</li>
+        <li><strong>Registro Manual Especializado:</strong> Captura de pólizas de Ingreso, Egreso o Diario específicas al fondo.</li>
+        <li><strong>Impresión / Exportación:</strong> Botón 🖨️ que emite la póliza, colocando en el encabezado del PDF el Nombre Legal del Fideicomiso en lugar del "Poder Judicial" ordinario.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Visor Fideicomisos)</button>
+        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc (Captura Póliza)</button>
+      </div>
+
+      <!-- TAB 1: Grid Parametros -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Pólizas Fiduciarias</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Context Selector (Header) -->
+              <rect x="20" y="10" width="960" height="40" fill="#0369a1" rx="4"/>
+              <text x="30" y="35" fill="#fff" font-size="12" font-weight="bold">CONTEXTO:</text>
+              <rect x="110" y="20" width="300" height="22" fill="#fff" rx="3"/>
+              <text x="120" y="35" font-size="11">Fideicomiso Reforma Penal Federal</text>
+              <polygon points="390,28 400,28 395,35" fill="#666"/>
+              
+              <!-- Action Bar -->
+              <rect x="20" y="60" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <text x="30" y="82" font-size="10" font-weight="bold" fill="#666">Registro:</text>
+              <rect x="90" y="67" width="130" height="21" fill="#1B3A2D" rx="3"/> <text x="155" y="81" fill="#fff" font-size="9" text-anchor="middle">+ NUEVA PÓLIZA FONDO</text>
+              <line x1="240" y1="65" x2="240" y2="90" stroke="#ccc" />
+
+              <text x="780" y="82" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="67" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="81" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR PÓLIZA</text>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="110" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="126" fill="#fff" font-size="10">FOLIO FONDO</text>
+              <text x="150" y="126" fill="#fff" font-size="10">FECHA</text>
+              <text x="300" y="126" fill="#fff" font-size="10">CONCEPTO FIDUCIARIO</text>
+              <text x="650" y="126" fill="#fff" font-size="10">IMPORTE</text>
+              <text x="850" y="126" fill="#fff" font-size="10">ACCIONES</text>
+
+              <!-- Grid Row -->
+              <rect x="20" y="135" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <text x="30" y="155" font-size="11">F1-E-26-005</text>
+              <text x="150" y="155" font-size="11">05/02/2026</text>
+              <text x="300" y="155" font-size="11">Pago Consultoría Implementación Salas</text>
+              <text x="650" y="155" font-size="11" font-weight="bold">$ 500,000.00</text>
+              <text x="850" y="155" font-size="10" fill="blue">[VER DETALLE]</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ABC Parametros -->
+      <div id="wf-p3" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Captura Póliza Fondo</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+              <rect width="800" height="300" fill="#fff" stroke="#ddd"/>
+              
+              <!-- Cabecera -->
+              <rect x="0" y="0" width="800" height="30" fill="#e0f2fe"/>
+              <text x="400" y="20" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">CREANDO PÓLIZA PARA: FIDEICOMISO REFORMA PENAL</text>
+
+              <text x="20" y="60" font-size="12">Tipo:</text>
+              <rect x="60" y="45" width="100" height="20" fill="#eee" rx="2"/> <text x="70" y="59" font-size="10">Egreso</text>
+              <text x="180" y="60" font-size="12">Concepto:</text>
+              <rect x="250" y="45" width="400" height="20" fill="#eee" rx="2"/>
+              
+              <!-- Área de Asientos -->
+              <rect x="20" y="80" width="760" height="25" fill="#1B3A2D"/>
+              <text x="30" y="96" fill="#fff" font-size="10">CUENTA (PLAN DE CUENTAS FIDUCIARIO)</text>
+              <text x="500" y="96" fill="#fff" font-size="10">DEBE</text>
+              <text x="650" y="96" fill="#fff" font-size="10">HABER</text>
+
+              <!-- Renglón 1 (Input) -->
+              <rect x="20" y="105" width="760" height="30" fill="#fafafa" stroke="#eee"/>
+              <rect x="30" y="110" width="400" height="20" fill="#fff" stroke="#ccc" rx="2"/> <text x="35" y="124" font-size="10" fill="#999">Buscar cuenta del fideicomiso...</text>
+              <rect x="500" y="110" width="100" height="20" fill="#fff" stroke="#ccc" rx="2"/>
+              <rect x="650" y="110" width="100" height="20" fill="#fff" stroke="#ccc" rx="2"/>
+
+              <rect x="650" y="250" width="100" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="700" y="270" fill="#fff" font-size="12" text-anchor="middle">[ GUARDAR ]</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-FD-01</strong></td>
+            <td>Aislamiento Absoluto (Multitenant): Una póliza de un fideicomiso jamás debe sumar o restar en la balanza del ente central.</td>
+            <td>Las tablas y reportes deben tener el filtro estricto <code>WHERE is_fideicomiso = true AND fondo_id = X</code>.</td>
+            <td>Views / DB Store Proc.</td>
+            <td>Arquitectura de Software.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Totalmente independiente. Este módulo genera sus propias <strong>Balanzas de Comprobación Fiduciarias</strong> y sus propios <strong>Estados Financieros</strong>, los cuales se envían por separado al ente rector o fideicomitente.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SÍ</strong></td>
+            <td>Sigue las mismas reglas exactas del Plan de Cuentas estándar (CONAC), pero enclavadas dentro del "espacio virtual" del fideicomiso (Ej. Bancos Fiduciarios, Gasto Fiduciario).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-07</td>
+            <td>2.0</td>
+            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma de carriles.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">CONTABILIDAD</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Seleccion de Fondo -->
+  <polygon points="340,130 525,130 510,180 325,180" class="node-data"/>
+  <text x="425" y="150" class="node-text">Selecciona Fideicomiso</text>
+  <text x="425" y="165" class="node-sub">Aísla el contexto de trabajo</text>
+
+  <path d="M 425 180 L 425 210" class="path-line"/>
+  
+  <!-- Proceso: Captura -->
+  <rect x="325" y="210" width="200" height="40" class="node"/>
+  <text x="425" y="225" class="node-text">Captura de Operación Fiduciaria</text>
+  <text x="425" y="240" class="node-sub">Ingreso, Egreso o Diario</text>
+
+  <path d="M 525 230 L 650 230" class="path-line"/>
+
+  <!-- SIAF Inserta Aislado -->
+  <path d="M 650 210 C 650 200, 900 200, 900 210 L 900 250 C 900 260, 650 260, 650 250 Z" class="node-db" />
+  <path d="M 650 210 C 650 220, 900 220, 900 210" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="232" class="node-text">Guarda en Sub-Balanza</text>
+  <text x="775" y="245" class="node-sub">Genera Folio F1-XXX</text>
+
+  <path d="M 775 260 L 775 310" class="path-line"/>
+
+  <!-- Regresa a proceso -->
+  <line x1="775" y1="310" x2="425" y2="310" class="path-line"/>
+
+  <!-- Imprime -->
+  <path d="M 325 310 L 525 310 L 525 360 C 475 380, 375 340, 325 360 Z" class="node-doc"/>
+  <text x="425" y="335" class="node-text">Póliza Impresa de Fideicomiso</text>
+  <text x="425" y="350" class="node-sub">Membretada con Nombre del Fondo</text>
+
+  <path d="M 425 370 L 425 410" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="410" width="80" height="30" class="node-term" />
+  <text x="425" y="429" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>CONTADOR FIDEICOMISO</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. CAMBIO CONTEXTO</td>
+        <td>Ingresa al módulo y selecciona en el combo superior el Fideicomiso a operar.</td>
+        <td>Oculta toda la información del ente central y cambia el color del dashboard a azul para indicar modo "Fideicomiso".</td>
+      </tr>
+      <tr>
+        <td>2. REGISTRO</td>
+        <td>Captura la póliza contable con los comprobantes externos bancarios del fideicomiso.</td>
+        <td>Verifica que la cuadratura y asienta la póliza inyectando la llave foránea <code>FONDO_ORIGEN</code>.</td>
+      </tr>
+      <tr>
+        <td>3. GENERACIÓN DE REPORTES</td>
+        <td>Presiona Imprimir para archivo físico fiduciario.</td>
+        <td>Genera el PDF sustituyendo "Poder Judicial del Estado" por "Fideicomiso XXXX" en el encabezado.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -489,3 +489,52 @@ pre { white-space: pre; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ═══════════════════════════════════════════════
+   PRINT STYLES
+═══════════════════════════════════════════════ */
+@media print {
+  /* Ocultar elementos UI innecesarios al imprimir */
+  .topbar, .doc-sidebar, .copy-btn, .elem-breadcrumb { display: none !important; }
+  .shell { padding-top: 0; }
+  .doc-main { margin-left: 0; padding: 0; }
+  body { background: #fff; }
+  
+  /* Forzar que el diagrama oculto se muestre en papel */
+  #module-flowchart {
+    display: block !important;
+    page-break-before: always;
+    margin-top: 15mm;
+  }
+
+  /* Título automático para el anexo impreso */
+  #module-flowchart::before {
+    content: "Anexo 1: Diagrama Interfuncional del Procedimiento";
+    display: block;
+    font-size: 16pt;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+  }
+
+  /* Forzar que la tabla de procesos oculta se muestre en papel */
+  #module-process-table {
+    display: block !important;
+    page-break-before: always;
+    margin-top: 15mm;
+  }
+  #module-process-table::before {
+    content: "Anexo 2: Flujograma de Procesos y Descripción del Procedimiento";
+    display: block;
+    font-size: 16pt;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+  }
+}

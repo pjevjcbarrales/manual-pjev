@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.4.1-antiguedad-saldos.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.4.1 Antigüedad de Saldos</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.4.1</div>
+        <h1 class="elem-title">Reporte de Antigüedad de Saldos (Activo y Pasivo)</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV (Referencia: Manual PJEV 270, 274).</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Herramienta Analítica / Reporteo Avanzado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El Módulo de Antigüedad de Saldos es una herramienta de auditoría continua que analiza la edad (en días) de cada partida contable pendiente de cobro (Activos - Deudores Diversos) o pendiente de pago (Pasivos - Proveedores, Contratistas). Su finalidad es prevenir la prescripción de deudas y evidenciar la eficiencia (o ineficiencia) en la recuperación de viáticos y pagos de facturas institucionales.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Reglamento de Viáticos PJEV</td><td>Comprobación</td><td>Los servidores públicos tienen un máximo de días hábiles para comprobar viáticos. Este reporte vigila ese límite.</td></tr>
+          <tr><td>Auditoría Superior ORFIS</td><td>Manual de Fiscalización</td><td>Exige desglosar los saldos a 6to nivel analítico, agrupados por edad (0-30 días, 31-90, 91-180, +180) para evaluar riesgo de incobrabilidad o penalizaciones.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Analista Contable</td><td>Generar reportes y enviarlos a las áreas morosas (Ej. Requerir a un juez la comprobación de su viaje).</td><td>No puede modificar las fechas de las pólizas originales para "rejuvenecer" una deuda.</td></tr>
+          <tr><td>Jefe de Contabilidad</td><td>Autorizar el reporte final para incluirlo en Notas a los Estados Financieros.</td><td>Módulo de sólo lectura, no afecta la base de datos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>No aplica (Vista DB)</code></td><td><code>-</code></td><td>Se alimenta de la tabla <code>polizas_asientos</code> cruzada con <code>cat_cuentas</code> (Clase 1 y 2). El motor calcula la diferencia en días <code>(CURRENT_DATE - POL_FECHA)</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_analizar_antiguedad_saldos</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@fecha_corte</code>, <code>@tipo (ACTIVO | PASIVO)</code>
+          <br><span style="color:#666">OUT:</span> Array de partidas no conciliadas o con saldo vivo, clasificadas en buckets: <code>[0-30]</code>, <code>[31-90]</code>, <code>[91-180]</code>, <code>[181+]</code>.
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/reportes/antiguedad-saldos</code></td><td>JSON con <code>{ fecha_corte, tipo_cuenta }</code></td><td>Devuelve la matriz de datos lista para renderizar el cubo OLAP / Pivot.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Selección de Enfoque:</strong> Permite alternar entre deudas a favor del PJEV (Activo) o deudas que el PJEV le debe a terceros (Pasivo).</li>
+        <li><strong>Agrupación a 6to Nivel:</strong> Expande las cuentas contables (Ej. 1123 -> 1123.01 -> Empleado Julio Barrales) para ver quién debe y desde cuándo.</li>
+        <li><strong>Impresión / Exportación:</strong> Botón que genera el PDF o Excel de "Antigüedad de Saldos", el cual es un anexo fundamental de los Estados Financieros.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Dashboard Activos)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Dashboard Pasivos)</button>
+      </div>
+
+      <!-- TAB 1: Grid Activos -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Antigüedad de Saldos: ACTIVO (Derechos de Cobro)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <!-- Filtros -->
+              <rect x="20" y="20" width="150" height="25" fill="#eee" rx="3"/> <text x="25" y="35" font-size="10">Fecha: 31/01/2026</text>
+              <rect x="180" y="20" width="150" height="25" fill="#1B3A2D" rx="3"/> <text x="185" y="35" font-size="10" fill="#fff">Tipo: ACTIVOS</text>
+              
+              <!-- Action Bar -->
+              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Acciones:</text>
+              <rect x="90" y="62" width="100" height="21" fill="#fff" stroke="#0369a1" rx="3"/> <text x="140" y="76" fill="#0369a1" font-size="9" text-anchor="middle">↻ CALCULAR</text>
+
+              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR PDF</text>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="105" width="960" height="25" fill="#0f766e"/>
+              <text x="30" y="121" fill="#fff" font-size="10">CUENTA CONTABLE (6to Nivel)</text>
+              <text x="350" y="121" fill="#fff" font-size="10" text-anchor="end">TOTAL SALDO</text>
+              <text x="500" y="121" fill="#fff" font-size="10" text-anchor="end">0 A 30 DÍAS</text>
+              <text x="650" y="121" fill="#fff" font-size="10" text-anchor="end">31 A 90 DÍAS</text>
+              <text x="800" y="121" fill="#fff" font-size="10" text-anchor="end">91 A 180 DÍAS</text>
+              <text x="950" y="121" fill="#fff" font-size="10" text-anchor="end">> 180 DÍAS (ROJO)</text>
+
+              <!-- Row 1: Cuenta Padre -->
+              <rect x="20" y="130" width="960" height="25" fill="#e0f2fe" stroke="#bae6fd"/>
+              <text x="30" y="147" font-size="11" font-weight="bold" fill="#0369a1">1123 - Deudores Diversos (Total)</text>
+              <text x="350" y="147" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="end">$ 200,000.00</text>
+              <text x="500" y="147" font-size="11" fill="#0369a1" text-anchor="end">$ 100,000.00</text>
+              <text x="650" y="147" font-size="11" fill="#0369a1" text-anchor="end">$ 50,000.00</text>
+              <text x="800" y="147" font-size="11" fill="#0369a1" text-anchor="end">$ 0.00</text>
+              <text x="950" y="147" font-size="11" font-weight="bold" fill="#b91c1c" text-anchor="end">$ 50,000.00</text>
+
+              <!-- Row 2: Cuenta Hija -->
+              <rect x="20" y="155" width="960" height="25" fill="#fff" stroke="#eee"/>
+              <text x="50" y="172" font-size="11">↳ 1123.01.0001 - Julio César Barrales (Viáticos)</text>
+              <text x="350" y="172" font-size="11" text-anchor="end">$ 15,000.00</text>
+              <text x="500" y="172" font-size="11" text-anchor="end">$ 15,000.00</text>
+              <text x="650" y="172" font-size="11" text-anchor="end" fill="#ccc">-</text>
+              <text x="800" y="172" font-size="11" text-anchor="end" fill="#ccc">-</text>
+              <text x="950" y="172" font-size="11" text-anchor="end" fill="#ccc">-</text>
+
+              <!-- Row 3: Cuenta Hija Morosa -->
+              <rect x="20" y="180" width="960" height="25" fill="#fef2f2" stroke="#fca5a5"/>
+              <text x="50" y="197" font-size="11" fill="#991b1b">↳ 1123.01.0099 - Ex-Empleado Despedido (Viáticos)</text>
+              <text x="350" y="197" font-size="11" text-anchor="end" fill="#991b1b">$ 50,000.00</text>
+              <text x="500" y="197" font-size="11" text-anchor="end" fill="#ccc">-</text>
+              <text x="650" y="197" font-size="11" text-anchor="end" fill="#ccc">-</text>
+              <text x="800" y="197" font-size="11" text-anchor="end" fill="#ccc">-</text>
+              <text x="950" y="197" font-size="11" font-weight="bold" fill="#b91c1c" text-anchor="end">$ 50,000.00</text>
+
+              <text x="500" y="270" font-size="12" fill="#999" text-anchor="middle">Nota: Los saldos en la columna > 180 días son observados por el ORFIS como de dudoso cobro.</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Grid Pasivos -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Antigüedad de Saldos: PASIVO (Cuentas por Pagar)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <!-- Filtros -->
+              <rect x="20" y="20" width="150" height="25" fill="#eee" rx="3"/> <text x="25" y="35" font-size="10">Fecha: 31/01/2026</text>
+              <rect x="180" y="20" width="150" height="25" fill="#991B1B" rx="3"/> <text x="185" y="35" font-size="10" fill="#fff">Tipo: PASIVOS</text>
+              
+              <!-- Header -->
+              <rect x="20" y="105" width="960" height="25" fill="#991B1B"/>
+              <text x="30" y="121" fill="#fff" font-size="10">CUENTA CONTABLE (PROVEEDORES)</text>
+              <text x="350" y="121" fill="#fff" font-size="10" text-anchor="end">TOTAL DEUDA</text>
+              <text x="500" y="121" fill="#fff" font-size="10" text-anchor="end">0 A 30 DÍAS</text>
+              <text x="650" y="121" fill="#fff" font-size="10" text-anchor="end">31 A 90 DÍAS</text>
+              <text x="800" y="121" fill="#fff" font-size="10" text-anchor="end">91 A 180 DÍAS</text>
+              <text x="950" y="121" fill="#fff" font-size="10" text-anchor="end">> 180 DÍAS (ROJO)</text>
+
+              <!-- Row 1: Cuenta Padre -->
+              <rect x="20" y="130" width="960" height="25" fill="#fef2f2" stroke="#fca5a5"/>
+              <text x="30" y="147" font-size="11" font-weight="bold" fill="#991b1b">2112 - Proveedores por Pagar a Corto Plazo</text>
+              <text x="350" y="147" font-size="11" font-weight="bold" fill="#991b1b" text-anchor="end">$ 2,000,000.00</text>
+              <text x="500" y="147" font-size="11" fill="#991b1b" text-anchor="end">$ 2,000,000.00</text>
+              <text x="650" y="147" font-size="11" fill="#991b1b" text-anchor="end">$ 0.00</text>
+              <text x="800" y="147" font-size="11" fill="#991b1b" text-anchor="end">$ 0.00</text>
+              <text x="950" y="147" font-size="11" fill="#991b1b" text-anchor="end">$ 0.00</text>
+
+              <text x="500" y="270" font-size="12" fill="#999" text-anchor="middle">Un pasivo en la columna > 180 días indica riesgo de demanda por parte del proveedor por falta de pago.</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-AS-01</strong></td>
+            <td>Cálculo Dinámico: La antigüedad se calcula restando la fecha de la póliza origen menos la <code>fecha_corte</code> seleccionada por el usuario.</td>
+            <td>Permite emitir reportes retroactivos (Ej. Cómo estaba la antigüedad a Diciembre del año pasado).</td>
+            <td>Motor SQL (Backend)</td>
+            <td>LGCG y Auditoría</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Módulo analítico que se alimenta de la <strong>Balanza de Comprobación</strong>. Su salida impresa es obligatoria para armar el legajo del <strong>Módulo 03.4.2 Notas a los Estados Financieros</strong>.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>NO</strong></td>
+            <td>Sólo lectura. No afecta saldos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-07</td>
+            <td>2.0</td>
+            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma de carriles.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">CONTABILIDAD</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Consulta -->
+  <rect x="325" y="130" width="200" height="40" class="node"/>
+  <text x="425" y="145" class="node-text">Configura Parámetros</text>
+  <text x="425" y="160" class="node-sub">Elige Fecha Corte y (Activo/Pasivo)</text>
+
+  <path d="M 525 150 L 650 150" class="path-line"/>
+
+  <!-- SIAF Calcula -->
+  <path d="M 650 130 C 650 120, 900 120, 900 130 L 900 170 C 900 180, 650 180, 650 170 Z" class="node-db" />
+  <path d="M 650 130 C 650 140, 900 140, 900 130" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="152" class="node-text">Motor Analítico (Buckets)</text>
+  <text x="775" y="165" class="node-sub">Calcula: Fecha_Actual - Fecha_Poliza</text>
+
+  <path d="M 775 180 L 775 220" class="path-line"/>
+  <line x1="775" y1="220" x2="425" y2="220" class="path-line"/>
+
+  <!-- Proceso: Análisis -->
+  <rect x="325" y="220" width="200" height="40" class="node"/>
+  <text x="425" y="235" class="node-text">Análisis de Partidas Viejas</text>
+  <text x="425" y="250" class="node-sub">Visualiza saldos mayores a 180 días</text>
+
+  <path d="M 425 260 L 425 290" class="path-line"/>
+
+  <!-- Imprime -->
+  <path d="M 325 290 L 525 290 L 525 340 C 475 360, 375 320, 325 340 Z" class="node-doc"/>
+  <text x="425" y="315" class="node-text">Reporte Antigüedad de Saldos</text>
+  <text x="425" y="330" class="node-sub">Anexo de Cuenta Pública PDF</text>
+
+  <path d="M 425 350 L 425 390" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="390" width="80" height="30" class="node-term" />
+  <text x="425" y="409" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>CONTABILIDAD</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. EXTRACCIÓN DE DATOS</td>
+        <td>Al cierre del trimestre, ingresa al módulo para generar la evidencia para ORFIS.</td>
+        <td>Consulta todas las cuentas de clase 1 (Deudores) o clase 2 (Proveedores) que tengan saldo distinto a cero y las distribuye en 4 columnas (buckets de días).</td>
+      </tr>
+      <tr>
+        <td>2. REVISIÓN DE ALERTAS ROJAS</td>
+        <td>Detecta si hay viáticos sin comprobar por más de 180 días (Rojo).</td>
+        <td>Resalta condicionalmente en rojo los saldos viejos.</td>
+      </tr>
+      <tr>
+        <td>3. GENERACIÓN DE REPORTES</td>
+        <td>Imprime el anexo con firmas.</td>
+        <td>Exporta el PDF foliado y cruzado con la suma de la Balanza de Comprobación para garantizar integridad matemática.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

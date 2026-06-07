@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.3.7-eaepe-objeto-gasto.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:var(--pjev-exito-bg); color:var(--pjev-exito-text); border:1px solid var(--pjev-exito-borde); }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); margin-top:10px; }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> › <span>Presupuesto</span> › <span>Imprimir</span> › <span>EAepe - Objeto Gasto</span>
+    </div>
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.3.7</div>
+        <h1 class="elem-title">Estado Analítico del Ejercicio del Presupuesto de Egresos<br>Clasificación por Objeto del Gasto</h1>
+        <div class="mod-header-badges"><span class="mod-badge badge-p" style="background:#e0e7ff; color:#3730a3; border-color:#c7d2fe;">Reporte CONAC LGCG</span></div>
+      </div>
+    </div>
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Agrupa el reporte basándose exclusivamente en el segmento COG (Clasificador por Objeto del Gasto). Muestra totales por Capítulo, Concepto y Partida Genérica.</p>
+    </div>
+    <!-- 3. LÓGICA DE NEGOCIO Y PERSISTENCIA -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Lógica de Negocio y Persistencia</div>
+      <p><strong>Origen de Datos:</strong> Tabla Temporal <code>tmp_rep_avance_presup_{uuid}</code>.</p>
+      <p><strong>Lógica de Agrupación (Rollup):</strong> Este reporte usa agrupaciones en 3 niveles jerárquicos:</p>
+      <ul class="role-list" style="margin-left: 20px;">
+        <li><strong>Nivel 1 (Capítulo):</strong> Ej. 1000 Servicios Personales. (Suma de todos sus conceptos).</li>
+        <li><strong>Nivel 2 (Concepto):</strong> Ej. 1100 Remuneraciones al Personal. (Suma de sus partidas).</li>
+        <li><strong>Nivel 3 (Partida Genérica):</strong> Ej. 1130 Sueldos base.</li>
+      </ul>
+      <p>En el backend se genera un Query con <code>GROUP BY ROLLUP(capitulo, concepto, partida_generica)</code> o se agrupa desde el motor de JasperReports.</p>
+    </div>
+
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4a</span> Visualización Aproximada del Reporte</div>
+      <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Output (CONAC Objeto Gasto)</span></div>
+          <div class="wf-svg-area" style="background:#fff;">
+            <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg">
+              <text x="500" y="30" fill="#1B3A2D" font-size="12" font-weight="bold" text-anchor="middle">ESTADO ANALÍTICO DEL EJERCICIO DEL PRESUPUESTO DE EGRESOS</text>
+              <text x="500" y="45" fill="#333" font-size="11" font-weight="bold" text-anchor="middle">CLASIFICACIÓN POR OBJETO DEL GASTO (CAPÍTULO Y CONCEPTO)</text>
+              <rect x="20" y="80" width="960" height="30" fill="#1B3A2D" rx="2"/>
+              <text x="30" y="99" fill="#fff" font-size="9" font-weight="bold">CONCEPTO</text>
+              <text x="380" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">APROBADO</text>
+              <text x="470" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">AMP/RED</text>
+              <text x="560" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">MODIFICADO</text>
+              <text x="650" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">DEVENGADO</text>
+              <text x="740" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">PAGADO</text>
+              <text x="850" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">SUBEJERCICIO</text>
+              
+              <rect x="20" y="110" width="960" height="24" fill="#f0f7f3"/>
+              <text x="30" y="126" fill="#1B3A2D" font-size="10">1000 SERVICIOS PERSONALES</text>
+              <text x="380" y="126" fill="#333" font-size="10" text-anchor="end">1,000,000.00</text>
+              <text x="470" y="126" fill="#333" font-size="10" text-anchor="end">0.00</text>
+              <text x="560" y="126" fill="#333" font-size="10" text-anchor="end">1,000,000.00</text>
+              <text x="650" y="126" fill="#333" font-size="10" text-anchor="end">500,000.00</text>
+              <text x="740" y="126" fill="#333" font-size="10" text-anchor="end">500,000.00</text>
+              <text x="850" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">500,000.00</text>
+            </svg>
+          </div>
+      </div>
+    </div>
+</div>
+</body></html>

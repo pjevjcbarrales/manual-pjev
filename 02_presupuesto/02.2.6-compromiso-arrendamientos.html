@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.2.6-compromiso-arrendamientos.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.put    { background:#fff8e1; color:#f57f17; }
+  .method.delete { background:#ffebee; color:#b71c1c; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:var(--pjev-exito-bg); color:var(--pjev-exito-text); border:1px solid var(--pjev-exito-borde); }
+  
+  .conac-alert { background:#fff3cd; border:1px solid #ffeeba; color:#856404; padding:10px 15px; border-radius:6px; font-size:13px; margin:15px 0; display:flex; gap:10px; align-items:center; }
+  .conac-alert.error { background:#fee2e2; border-color:#fca5a5; color:#991B1B; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Presupuesto</span> ›
+      <span>Proceso</span> ›
+      <span>Compromiso de Arrendamientos</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.2.6</div>
+        <h1 class="elem-title">Compromiso de Arrendamientos</h1>
+        <p class="elem-desc">Módulo central para calendarizar los pagos de los contratos vigentes. Cruza el importe a pagar contra la suficiencia presupuestal del mes, y detona la generación de la póliza de Compromiso en la contabilidad.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-p">Tipo: Proceso Principal Transaccional</span>
+          <span class="mod-badge badge-p">Momentos CONAC: Comprometido</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Tras firmar y registrar un Contrato (Módulo 02.1.5), este no tiene impacto presupuestal real hasta que se <strong>compromete</strong> el recurso. En este módulo, el área de Presupuesto selecciona un contrato, distribuye su "Bolsa de Dinero" en los 12 meses del calendario, y el sistema valida que exista Saldo Disponible en cada mes. Si todo es correcto, el sistema <strong>congela</strong> el recurso y genera la póliza automática para Contabilidad.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Procedimiento Interno</td><td>"Afectación presupuestal de contratos de arrendamiento"</td><td>Elaborar listado de rentas, verificar disponibilidad presupuestal en COG 3200, y reservar el recurso.</td></tr>
+          <tr><td>CONAC</td><td>Momento del Gasto: Comprometido</td><td>"Refleja la aprobación por autoridad competente de un acto administrativo (contrato) que significa una obligación de pago."</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Tabla: <code>presupuesto.compromisos_contratos</code></strong></td></tr>
+        <tr><td><code>compromiso_id</code></td><td><code>BIGINT PK</code></td><td>Identificador de la transacción de afectación.</td></tr>
+        <tr><td><code>contrato_id</code></td><td><code>BIGINT FK</code></td><td>Vínculo con <code>catalogo.contratos</code>.</td></tr>
+        <tr><td><code>fecha_autorizacion</code></td><td><code>TIMESTAMP</code></td><td>Cuándo se selló la operación.</td></tr>
+        <tr><td><code>estatus</code></td><td><code>VARCHAR(20)</code></td><td>'EN REVISION', 'AUTORIZADO', 'CANCELADO'.</td></tr>
+        
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Tabla: <code>presupuesto.compromisos_calendario</code> (Detalle de Meses)</strong></td></tr>
+        <tr><td><code>calendario_id</code></td><td><code>BIGINT PK</code></td><td>ID de la celda mensual.</td></tr>
+        <tr><td><code>compromiso_id</code></td><td><code>BIGINT FK</code></td><td>Vínculo a la cabecera del compromiso.</td></tr>
+        <tr><td><code>cpartida_id</code></td><td><code>BIGINT FK</code></td><td>Vínculo a <code>catalogo.contrato_partidas</code> (La línea de COG afectada).</td></tr>
+        <tr><td><code>mes</code></td><td><code>INT</code></td><td>1 (Enero) al 12 (Diciembre).</td></tr>
+        <tr><td><code>monto_comprometido</code></td><td><code>DECIMAL</code></td><td>Monto exacto congelado en este mes para esta partida.</td></tr>
+        <tr><td><code>poliza_id</code></td><td><code>BIGINT FK</code></td><td>Vínculo a la póliza en Contabilidad (8.2.4).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. DISEÑO DE INTERFACES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('w1',this)">Paso 1: Seleccionar Contrato</button>
+        <button class="wf-tab" onclick="showWF('w2',this)">Paso 2: Calendarizar y Validar</button>
+      </div>
+
+      <!-- WIREFRAME 1 -->
+      <div id="wf-w1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Buscar y Seleccionar Contrato</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 250" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="250" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <rect x="20" y="20" width="960" height="60" fill="#fff" rx="4" stroke="#eee"/>
+              <text x="40" y="40" fill="#666" font-size="10">PROVEEDOR O BIEN INMUEBLE</text>
+              <rect x="40" y="45" width="400" height="25" fill="#fafafa" stroke="#ccc" rx="3"/>
+              <text x="50" y="61" fill="#333" font-size="10">🔍 Inmobiliaria del Golfo SA de CV</text>
+              <rect x="460" y="45" width="100" height="25" fill="#1B3A2D" rx="3"/>
+              <text x="510" y="61" fill="#fff" font-size="10" text-anchor="middle">BUSCAR</text>
+
+              <rect x="20" y="100" width="960" height="25" fill="#f4f6f5"/>
+              <text x="40" y="116" fill="#666" font-size="9" font-weight="bold">FOLIO CONTRATO</text>
+              <text x="250" y="116" fill="#666" font-size="9" font-weight="bold">PROVEEDOR</text>
+              <text x="550" y="116" fill="#666" font-size="9" font-weight="bold">INMUEBLE / JUZGADO</text>
+              <text x="800" y="116" fill="#666" font-size="9" font-weight="bold">MONTO TOTAL</text>
+              
+              <rect x="20" y="125" width="960" height="40" fill="#fff" stroke="#eee"/>
+              <text x="40" y="148" fill="#0284c7" font-size="11" font-weight="bold" text-decoration="underline">PJEV-AR-2026-001</text>
+              <text x="250" y="148" fill="#333" font-size="10">INMOBILIARIA DEL GOLFO</text>
+              <text x="550" y="148" fill="#333" font-size="10">Juzgado 1ro Familiar (Xalapa)</text>
+              <text x="800" y="148" fill="#166534" font-weight="bold" font-size="11">$ 180,000.00</text>
+              
+              <rect x="910" y="132" width="60" height="25" fill="#0284c7" rx="3"/>
+              <text x="940" y="148" fill="#fff" font-size="9" text-anchor="middle">AFECTAR</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- WIREFRAME 2 -->
+      <div id="wf-w2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Calendarización y Validación de Suficiencia</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 380" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="380" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <text x="20" y="30" fill="#1B3A2D" font-size="12" font-weight="bold">PJEV-AR-2026-001 | BOLSA: $180,000.00</text>
+              
+              <rect x="20" y="50" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="66" fill="#fff" font-size="9" font-weight="bold">MES</text>
+              <text x="120" y="66" fill="#fff" font-size="9" font-weight="bold">PARTIDA COG</text>
+              <text x="400" y="66" fill="#fff" font-size="9" font-weight="bold">CAPTURAR IMPORTE</text>
+              <text x="600" y="66" fill="#fff" font-size="9" font-weight="bold">SALDO DISPONIBLE</text>
+              <text x="800" y="66" fill="#fff" font-size="9" font-weight="bold">ESTATUS VALIDACIÓN</text>
+
+              <!-- Mes 1 -->
+              <rect x="20" y="75" width="960" height="40" fill="#fff" stroke="#eee"/>
+              <text x="30" y="100" fill="#333" font-size="11" font-weight="bold">ENERO</text>
+              <text x="120" y="94" fill="#333" font-size="10">32201 - Arrendamiento</text>
+              <text x="120" y="108" fill="#666" font-size="9">39202 - Otros Imp. (IVA)</text>
+              
+              <rect x="400" y="82" width="100" height="25" fill="#fafafa" stroke="#ccc" rx="3"/>
+              <text x="410" y="98" fill="#166534" font-size="11" font-weight="bold">$ 15,000.00</text>
+              
+              <text x="600" y="98" fill="#666" font-size="10">Disponible: $ 500,000.00</text>
+              
+              <rect x="800" y="85" width="80" height="20" fill="#e8f5e9" rx="3"/>
+              <text x="840" y="98" fill="#166534" font-size="9" font-weight="bold" text-anchor="middle">SUFICIENTE</text>
+
+              <!-- Mes 2 -->
+              <rect x="20" y="115" width="960" height="40" fill="#fafafa" stroke="#eee"/>
+              <text x="30" y="140" fill="#333" font-size="11" font-weight="bold">FEBRERO</text>
+              <text x="120" y="134" fill="#333" font-size="10">32201 - Arrendamiento</text>
+              <text x="120" y="148" fill="#666" font-size="9">39202 - Otros Imp. (IVA)</text>
+              
+              <rect x="400" y="122" width="100" height="25" fill="#fafafa" stroke="#fca5a5" rx="3"/>
+              <text x="410" y="138" fill="#991B1B" font-size="11" font-weight="bold">$ 15,000.00</text>
+              
+              <text x="600" y="138" fill="#991B1B" font-size="10" font-weight="bold">Disponible: $ 5,000.00</text>
+              
+              <rect x="800" y="125" width="100" height="20" fill="#fee2e2" rx="3"/>
+              <text x="850" y="138" fill="#991B1B" font-size="9" font-weight="bold" text-anchor="middle">INSUFICIENCIA</text>
+
+              <!-- Panel inferior -->
+              <rect x="20" y="220" width="960" height="50" fill="#fee2e2" stroke="#fca5a5" rx="4"/>
+              <text x="40" y="248" fill="#991B1B" font-size="11" font-weight="bold">⚠ ERROR: EXISTEN MESES SIN SALDO DISPONIBLE SUFICIENTE. NO SE PUEDE COMPROMETER EL CONTRATO.</text>
+              
+              <rect x="780" y="232" width="180" height="25" fill="#ccc" rx="3"/>
+              <text x="870" y="248" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">AUTORIZAR Y GENERAR PÓLIZA</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. REGLAS DE NEGOCIO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th></tr></thead>
+        <tbody>
+        <tr><td><strong>RN-COM-01</strong></td><td>Suficiencia Total</td><td>El sistema cruza cada mes de la calendarización contra el Saldo Disponible de la partida COG en ese mes exacto. Si UN solo mes carece de fondos, se bloquea toda la autorización del contrato.</td><td>Backend (Motor Presupuestal)</td></tr>
+        <tr><td><strong>RN-COM-02</strong></td><td>Cierre e Inalterabilidad</td><td>Una vez presionado el botón "Autorizar y Generar Póliza", el calendario queda congelado (Read-Only). Para modificarlo, la póliza generada debe ser desafectada desde la bandeja de Contabilidad primero.</td><td>Frontend / API</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. AFECTACIÓN CONTABLE -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Afectación Contable (Reglas CONAC)</div>
+      
+      <div class="conac-alert">
+        <strong>Detonador de Póliza Automática:</strong> Al presionar "Autorizar", el SIAF inserta directamente en la base de contabilidad una póliza amparando el compromiso anual.
+      </div>
+
+      <table class="props-table">
+        <thead><tr><th>Momento del Gasto</th><th>Cargo</th><th>Abono</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Comprometido</strong></td>
+            <td><code>8.2.4</code> Presupuesto de Egresos Comprometido</td>
+            <td><code>8.2.2</code> Presupuesto de Egresos por Ejercer</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-siaf { fill: #0284c7; }
+      .header-conta { fill: #9d174d; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .node-conta { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      .node-db { fill: #fff; stroke: #DEAC50; stroke-width: 2; rx: 15; ry: 15;}
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-error { stroke: #dc2626; stroke-width: 2; fill: none; stroke-dasharray: 4 4; marker-end: url(#arrow-error); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+    <marker id="arrow-error" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras -->
+  <rect x="50" y="20" width="250" height="40" class="header-area"/>
+  <text x="175" y="45" class="header-text">PRESUPUESTO</text>
+  
+  <rect x="300" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="475" y="45" class="header-text">SIAF-PJEV (MOTOR)</text>
+  
+  <rect x="650" y="20" width="300" height="40" class="header-conta"/>
+  <text x="800" y="45" class="header-text">CONTABILIDAD</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="300" y1="60" x2="300" y2="600" class="lane-line"/>
+  <line x1="650" y1="60" x2="650" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Flujo Presupuesto -->
+  <rect x="135" y="80" width="80" height="25" class="node-term" />
+  <text x="175" y="96" class="node-term-text">START</text>
+  <path d="M 175 105 L 175 130" class="path-line"/>
+
+  <rect x="100" y="130" width="150" height="50" class="node"/>
+  <text x="175" y="150" class="node-text">Selecciona Contrato</text>
+  <text x="175" y="165" class="node-sub">Generado en Módulo 02.1.5</text>
+  <path d="M 175 180 L 175 210" class="path-line"/>
+
+  <rect x="100" y="210" width="150" height="50" class="node"/>
+  <text x="175" y="230" class="node-text">Captura Calendario</text>
+  <text x="175" y="245" class="node-sub">Distribuye Bolsa en 12 Meses</text>
+  <path d="M 250 235 L 350 235" class="path-line"/>
+
+  <!-- Flujo SIAF -->
+  <rect x="350" y="210" width="250" height="50" class="node-siaf"/>
+  <text x="475" y="230" class="node-text">Valida Suficiencia</text>
+  <text x="475" y="245" class="node-sub">Cruza Calendario vs Saldo Disponible</text>
+  
+  <!-- Decisión -->
+  <path d="M 475 260 L 475 290" class="path-line"/>
+  <polygon points="475,290 525,320 475,350 425,320" fill="#fff" stroke="#0284c7" stroke-width="2"/>
+  <text x="475" y="324" font-size="10" font-weight="bold" fill="#0284c7" text-anchor="middle">¿Hay Saldo?</text>
+
+  <!-- No hay saldo -->
+  <path d="M 425 320 L 175 320 L 175 260" class="path-error"/>
+  <text x="280" y="315" fill="#dc2626" font-size="10" font-weight="bold">NO (Rechazo / Alerta)</text>
+
+  <!-- Si hay saldo -->
+  <path d="M 475 350 L 475 390" class="path-line"/>
+  <text x="485" y="375" fill="#166534" font-size="10" font-weight="bold">SÍ</text>
+
+  <rect x="350" y="390" width="250" height="50" class="node-db"/>
+  <text x="475" y="410" class="node-text">Actualiza Base de Datos</text>
+  <text x="475" y="425" class="node-sub">Congela Saldo -> Estatus: Comprometido</text>
+  <path d="M 475 440 L 475 470" class="path-line"/>
+
+  <rect x="350" y="470" width="250" height="50" class="node-siaf"/>
+  <text x="475" y="490" class="node-text" fill="#9d174d">Genera Póliza (8.2.4)</text>
+  <text x="475" y="505" class="node-sub">Cargo 8.2.4 / Abono 8.2.2</text>
+  <path d="M 600 495 L 700 495" class="path-line"/>
+
+  <!-- Flujo Contabilidad -->
+  <rect x="700" y="470" width="200" height="50" class="node-conta"/>
+  <text x="800" y="490" class="node-text" fill="#9d174d">Recibe Póliza Automática</text>
+  <text x="800" y="505" class="node-sub">Bandeja de Entrada Contable</text>
+  <path d="M 800 520 L 800 550" class="path-line"/>
+
+  <rect x="760" y="550" width="80" height="30" class="node-term" />
+  <text x="800" y="569" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>PRESUPUESTO</th>
+        <th>SIAF-PJEV (MOTOR)</th>
+        <th>CONTABILIDAD</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. SELECCIÓN</td>
+        <td>Busca y selecciona un contrato registrado y vigente usando RFC, Nombre de Proveedor o Inmueble.</td>
+        <td>Despliega los datos cabecera y el listado de partidas (COG) asociadas a ese contrato.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>2. CALENDARIZACIÓN</td>
+        <td>Distribuye los importes a pagar por mes en cada una de las partidas asociadas.</td>
+        <td>Calcula totales y valida que la distribución no exceda la "Bolsa" global del contrato.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>3. VALIDACIÓN (SUFICIENCIA)</td>
+        <td>Presiona botón "Autorizar".</td>
+        <td>Cruza celda por celda (Partida y Mes) contra el Saldo Disponible. Si falta $1 en un mes, bloquea y manda alerta. Si es exitoso, congela el saldo (Pasa de Disponible a Comprometido).</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>4. PÓLIZA AUTOMÁTICA</td>
+        <td>Recibe folio de éxito y puede imprimir el "Oficio de Afectación" / "Reporte de Compromiso".</td>
+        <td>Genera silenciosamente la Póliza de Diario (Cargo 8.2.4 / Abono 8.2.2) y sella el registro para evitar modificaciones.</td>
+        <td>Recibe en su bandeja de entrada la póliza para afectación en el Libro Diario.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

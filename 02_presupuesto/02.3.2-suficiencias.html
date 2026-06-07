@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.3.2-suficiencias.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:var(--pjev-exito-bg); color:var(--pjev-exito-text); border:1px solid var(--pjev-exito-borde); }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); margin-top:10px; }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> › <span>Presupuesto</span> › <span>Imprimir</span> › <span>Suficiencias Presup.</span>
+    </div>
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.3.2</div>
+        <h1 class="elem-title">Reporte de Suficiencias Presupuestales</h1>
+        <p class="elem-desc">Muestra un listado de los folios de suficiencias emitidas, el monto reservado original, y el grado de compromiso actual.</p>
+        <div class="mod-header-badges"><span class="mod-badge badge-p">Reporte Operativo</span></div>
+      </div>
+    </div>
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Reporte interno utilizado para dar seguimiento a los folios de "Apartado" o Suficiencia Presupuestal. Ayuda a Control Presupuestal a detectar suficiencias "ociosas" que no se han comprometido y liberar ese recurso.</p>
+    </div>
+    <!-- 3. LÓGICA DE NEGOCIO Y PERSISTENCIA -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Lógica de Negocio y Persistencia</div>
+      <p><strong>Origen de Datos:</strong> Tablas <code>presup_suficiencias</code> (Cabecera) y <code>presup_suficiencias_det</code> (Partidas). Cruzadas con <code>presup_compromisos</code>.</p>
+      <table class="props-table">
+        <thead><tr><th>Columna del Reporte</th><th>Lógica de Cálculo / Campo Físico</th></tr></thead>
+        <tbody>
+          <tr><td>Monto Reservado</td><td><code>SUM(d.monto)</code> de <code>presup_suficiencias_det</code>.</td></tr>
+          <tr><td>Monto Comprometido</td><td>Suma de los compromisos (contratos/pedidos) asociados al UUID de esta suficiencia.</td></tr>
+          <tr><td>Saldo Disponible</td><td><code>Monto Reservado - Monto Comprometido</code>. Si es mayor a cero y el año está cerrado, debe cancelarse.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4a</span> Visualización Aproximada del Reporte</div>
+      <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Output (Suficiencias)</span></div>
+          <div class="wf-svg-area" style="background:#fff;">
+            <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg">
+              <text x="500" y="30" fill="#1B3A2D" font-size="14" font-weight="bold" text-anchor="middle">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+              <text x="500" y="45" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">REPORTE DE SUFICIENCIAS PRESUPUESTALES</text>
+              <rect x="20" y="80" width="960" height="30" fill="#1B3A2D" rx="2"/>
+              <text x="30" y="99" fill="#fff" font-size="9" font-weight="bold">FOLIO</text>
+              <text x="120" y="99" fill="#fff" font-size="9" font-weight="bold">FECHA EMISIÓN</text>
+              <text x="240" y="99" fill="#fff" font-size="9" font-weight="bold">UNIDAD SOLICITANTE</text>
+              <text x="500" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">MONTO RESERVADO</text>
+              <text x="650" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">MONTO COMPROMETIDO</text>
+              <text x="800" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">SALDO DISPONIBLE</text>
+              <text x="960" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">ESTATUS</text>
+              
+              <rect x="20" y="110" width="960" height="24" fill="#f0f7f3"/>
+              <text x="30" y="126" fill="#1B3A2D" font-size="10">SUF-001/2026</text>
+              <text x="120" y="126" fill="#333" font-size="10">15-Ene-2026</text>
+              <text x="240" y="126" fill="#333" font-size="10">Dirección de Recursos Materiales</text>
+              <text x="500" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">$150,000.00</text>
+              <text x="650" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">$100,000.00</text>
+              <text x="800" y="126" fill="#B91C1C" font-size="10" font-weight="bold" text-anchor="end">$50,000.00</text>
+              <text x="960" y="126" fill="#10B981" font-size="10" font-weight="bold" text-anchor="end">Activa</text>
+            </svg>
+          </div>
+      </div>
+    </div>
+</div>
+</body></html>

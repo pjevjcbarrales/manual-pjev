@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.2.1-presupuesto-autorizado.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>02.2.1 Presupuesto Autorizado</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.2.1</div>
+        <h1 class="elem-title">Presupuesto Autorizado</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Módulo de Registro y Control</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El módulo de Presupuesto Autorizado tiene el propósito fundamental de establecer el techo financiero de arranque para el ejercicio fiscal en curso. Permite al área de Presupuestos vincular un monto monetario específico a cada Clave Presupuestal válida, ya sea de forma manual o mediante importación masiva (Excel). Su acción culminante es la "Autorización", que blinda los importes e inicia formalmente el ejercicio del gasto.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>LGCG (CONAC)</td><td>Art. 16, 42</td><td>Establece que el presupuesto de egresos aprobado debe estar clasificado con estricto apego a los manuales de CONAC y representar un techo infranqueable (suficiencia).</td></tr>
+          <tr><td>Ley de Presupuesto del Estado</td><td>Art. 45 y 48</td><td>El ente público no puede modificar los techos originales de arranque sin un procedimiento de ampliación/reducción formal.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Analista de Presupuestos</td><td>Importar lote Excel, editar montos en captura, generar reportes PDF.</td><td>No puede modificar un presupuesto cuyo <code>PE_ESTATUS_WORKFLOW</code> sea 2 (Autorizado).</td></tr>
+          <tr><td>Titular de Presupuestos</td><td>Todo lo anterior + Clic en "Autorizar".</td><td>No puede desafectar/revertir una Autorización directamente en el módulo si la póliza ya fue afectada por Contabilidad.</td></tr>
+          <tr><td>Jefe de Contabilidad</td><td>Recepción y Afectación Contable de póliza.</td><td>No realiza la desafectación desde aquí, sino desde su propio módulo de Pólizas, lo cual libera el candado indirectamente para que Presupuestos pueda desbloquear.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>PE_NO</code></td><td><code>BIGINT (PK)</code></td><td>Identificador único del registro presupuestal.</td></tr>
+        <tr><td><code>PE_EJERCICIO</code></td><td><code>INTEGER</code></td><td>Año fiscal del presupuesto.</td></tr>
+        <tr><td><code>CP_ID</code></td><td><code>BIGINT (FK)</code></td><td>Referencia a <code>presupuesto.clave_presupuestal</code>.</td></tr>
+        <tr><td><code>PE_TOTAL</code></td><td><code>NUMERIC(15,2)</code></td><td>Monto total autorizado de arranque.</td></tr>
+        <tr><td><code>PE_ESTATUS</code></td><td><code>SMALLINT</code></td><td>1 = Activo, 0 = Baja lógica.</td></tr>
+        <tr><td><code>PE_ESTATUS_WORKFLOW</code></td><td><code>INTEGER</code></td><td>1 = En Captura, 2 = Autorizado (Bloqueado).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_leer_presupuesto_egresos</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@ejercicio</code>, <code>@accion</code>, <code>@entidad</code>, <code>@clasif_funcional</code>, <code>@fuente</code>, <code>@page</code>, <code>@limit</code>
+          <br><span style="color:#666">OUT:</span> Recordset con los registros y <code>{total_count}</code> para paginación.
+        </li>
+        <li><strong><code>fn_crud_presupuesto_egresos</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@ejercicio</code>, <code>@accion (ALTA, MODIFICAR, BAJA, AUTORIZAR)</code>, <code>@pe_no</code>, <code>@cp_id</code>, <code>@pe_total</code>, <code>@tipo_calculo</code>
+          <br><span style="color:#666">OUT:</span> <code>{status}</code>, <code>{message}</code>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/ppto/presupuesto-egresos/leer</code></td><td>JSON con <code>{ ejercicio, page, filtros... }</code></td><td>Devuelve la lista paginada del presupuesto.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/presupuesto/presupuesto-egresos/abc</code></td><td>JSON con <code>{ accion, pe_no, cp_id, pe_total, tipo_calculo }</code></td><td>Llamada al CRUD base para alta/modificación unitaria y Autorización.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone 4 acciones críticas operadas desde la interfaz principal de Presupuesto Autorizado:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Registro Nuevo:</strong> Abre un formulario/modal exigiendo la captura de la <em>Clave Presupuestal</em>, el <em>Techo Aprobado (Monto)</em>, y el <em>Tipo de cálculo quincenal</em> (Equitativo, Q1, Q2, Personalizado o Manual de 12 meses).</li>
+        <li><strong>Análisis de datos:</strong> Acción a nivel fila (grid) que despliega información analítica histórica y trazabilidad normativa sobre esa clave presupuestal.</li>
+        <li><strong>Impresión de presupuesto:</strong> Botón global que exporta el reporte de partidas autorizadas a formato oficial (PDF/Excel) para firma.</li>
+        <li><strong>Autorizar presupuesto:</strong> Acción que cambia el estatus a <code>2 (Autorizado)</code>, bloqueando la fila de por vida y detonando la generación de la póliza contable en el backend. Inhabilita botones de edición y borrado.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer con @parametros</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer con valores</button>
+        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc con @parametros</button>
+        <button class="wf-tab" onclick="showWF('p4',this)">pantalla_abc con valores</button>
+      </div>
+
+      <!-- TAB 1: Grid Parametros -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Grid View (Esqueleto / Parametrizado)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <rect x="20" y="20" width="200" height="25" fill="#eee" rx="3"/> <text x="25" y="35" font-size="10">@entidad</text>
+              <rect x="230" y="20" width="200" height="25" fill="#eee" rx="3"/> <text x="235" y="35" font-size="10">@clasif_funcional</text>
+              <rect x="440" y="20" width="200" height="25" fill="#eee" rx="3"/> <text x="445" y="35" font-size="10">@fuente</text>
+              
+              <!-- Action Bar -->
+              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <!-- 1. Acciones de registro -->
+              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Registro (CRUD):</text>
+              <rect x="120" y="62" width="110" height="21" fill="#1B3A2D" rx="3"/> <text x="175" y="76" fill="#fff" font-size="9" text-anchor="middle">+ REGISTRO NUEVO</text>
+              <line x1="250" y1="60" x2="250" y2="85" stroke="#ccc" />
+
+              <!-- 2. Acciones especiales -->
+              <text x="260" y="77" font-size="10" font-weight="bold" fill="#666">Especiales:</text>
+              <rect x="320" y="62" width="120" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="380" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">✓ AUTORIZAR LOTE</text>
+              <rect x="450" y="62" width="70" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="485" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">ANÁLISIS</text>
+              <line x1="535" y1="60" x2="535" y2="85" stroke="#ccc" />
+
+              <!-- 3. Vacío -->
+              <text x="545" y="77" font-size="10" font-weight="bold" fill="#aaa">Vacío</text>
+              <line x1="770" y1="60" x2="770" y2="85" stroke="#ccc" />
+
+              <!-- 4. Acciones de reportes -->
+              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR PPTO</text>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="121" fill="#fff" font-size="10">{pe_no}</text>
+              <text x="120" y="121" fill="#fff" font-size="10">{clave_presupuestal}</text>
+              <text x="450" y="121" fill="#fff" font-size="10">{pe_total}</text>
+              <text x="650" y="121" fill="#fff" font-size="10">{pe_estatus_workflow}</text>
+              <text x="780" y="121" fill="#fff" font-size="10">ACCIONES_FILA</text>
+
+              <!-- Grid Row -->
+              <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <text x="30" y="150" font-size="11">{val.pe_no}</text>
+              <text x="120" y="150" font-size="11">{val.cp_text}</text>
+              <text x="450" y="150" font-size="11">{val.pe_total}</text>
+              <text x="650" y="150" font-size="11">{val.workflow_desc}</text>
+              <text x="780" y="150" font-size="10" fill="blue">[EDIT]</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Grid Valores -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Grid View (Datos de ejemplo)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <rect x="20" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="25" y="37" font-size="10">Dirección General...</text>
+              <rect x="230" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="235" y="37" font-size="10">Impartición de Just...</text>
+              <rect x="440" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="445" y="37" font-size="10">Recursos Fiscales</text>
+              
+              <!-- Action Bar -->
+              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <!-- 1. Acciones de registro -->
+              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Registro (CRUD):</text>
+              <rect x="120" y="62" width="110" height="21" fill="#1B3A2D" rx="3"/> <text x="175" y="76" fill="#fff" font-size="9" text-anchor="middle">+ Registro Nuevo</text>
+              <line x1="250" y1="60" x2="250" y2="85" stroke="#ccc" />
+
+              <!-- 2. Acciones especiales -->
+              <text x="260" y="77" font-size="10" font-weight="bold" fill="#666">Especiales:</text>
+              <rect x="320" y="62" width="120" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="380" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">✓ Autorizar Lote</text>
+              <rect x="450" y="62" width="70" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="485" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">Análisis</text>
+              <line x1="535" y1="60" x2="535" y2="85" stroke="#ccc" />
+
+              <!-- 3. Vacío -->
+              <text x="545" y="77" font-size="10" font-weight="bold" fill="#aaa">Vacío</text>
+              <line x1="770" y1="60" x2="770" y2="85" stroke="#ccc" />
+
+              <!-- 4. Acciones de reportes -->
+              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 Imprimir Ppto</text>
+
+              <!-- Grid Header -->
+              <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="121" fill="#fff" font-size="10">ID</text>
+              <text x="120" y="121" fill="#fff" font-size="10">CLAVE PRESUPUESTAL</text>
+              <text x="450" y="121" fill="#fff" font-size="10">MONTO TOTAL</text>
+              <text x="650" y="121" fill="#fff" font-size="10">ESTATUS</text>
+              <text x="780" y="121" fill="#fff" font-size="10">ACCIONES_FILA</text>
+
+              <!-- Grid Row 1 -->
+              <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <text x="30" y="150" font-size="11">102</text>
+              <text x="120" y="150" font-size="11">11300001-301-C-11001-1-2-1-E7-02-01-1-601</text>
+              <text x="450" y="150" font-size="11">$ 12,500,000.00</text>
+              <rect x="650" y="135" width="80" height="20" rx="10" fill="#FEF3C7"/> <text x="690" y="149" fill="#92400E" font-size="10" text-anchor="middle">En Captura</text>
+              <text x="780" y="150" font-size="10" fill="blue">Editar</text>
+
+              <!-- Grid Row 2 -->
+              <rect x="20" y="160" width="960" height="30" fill="#fafafa" stroke="#eee"/>
+              <text x="30" y="180" font-size="11">103</text>
+              <text x="120" y="180" font-size="11">12200001-301-C-11001-1-2-1-E7-02-01-1-603</text>
+              <text x="450" y="180" font-size="11">$ 850,000.00</text>
+              <rect x="650" y="165" width="80" height="20" rx="10" fill="#D1FAE5"/> <text x="690" y="179" fill="#065F46" font-size="10" text-anchor="middle">Autorizado</text>
+              <text x="780" y="180" font-size="10" fill="#999"><span style="font-style:italic">Bloqueado</span></text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ABC Parametros -->
+      <div id="wf-p3" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Esqueleto / Parametrizado)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="250" fill="#fff" stroke="#ddd"/>
+              <text x="30" y="40" font-size="16" font-weight="bold">Registro Nuevo</text>
+              
+              <text x="30" y="80" font-size="12">Clave Presupuestal:</text>
+              <rect x="200" y="65" width="300" height="25" fill="#eee" rx="3"/>
+              <text x="210" y="82" font-size="11">@cp_id (Buscador)</text>
+              
+              <text x="30" y="115" font-size="12">Techo Aprobado:</text>
+              <rect x="200" y="100" width="300" height="25" fill="#eee" rx="3"/>
+              <text x="210" y="117" font-size="11">@pe_total (Numeric)</text>
+
+              <text x="30" y="150" font-size="12">Tipo de Cálculo:</text>
+              <rect x="200" y="135" width="300" height="25" fill="#eee" rx="3"/>
+              <text x="210" y="152" font-size="11">@tipo_calculo (Dropdown 1-5)</text>
+
+              <rect x="400" y="190" width="100" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="450" y="210" fill="#fff" font-size="12" text-anchor="middle">[ GUARDAR ]</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ABC Valores -->
+      <div id="wf-p4" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Datos de ejemplo)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="250" fill="#fff" stroke="#ddd"/>
+              <text x="30" y="40" font-size="16" font-weight="bold">Registro Nuevo</text>
+              
+              <text x="30" y="80" font-size="12">Clave Presupuestal:</text>
+              <rect x="200" y="65" width="300" height="25" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="210" y="82" font-size="11">11300001-301-C-11001-1-2-1-E7-02...</text>
+              
+              <text x="30" y="115" font-size="12">Techo Aprobado:</text>
+              <rect x="200" y="100" width="300" height="25" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="210" y="117" font-size="11">$ 12,500,000.00</text>
+
+              <text x="30" y="150" font-size="12">Tipo de Cálculo:</text>
+              <rect x="200" y="135" width="300" height="25" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="210" y="152" font-size="11">3 - Equitativo (50% / 50%)</text>
+
+              <rect x="400" y="190" width="100" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="450" y="210" fill="#fff" font-size="12" text-anchor="middle">Guardar Registro</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-PA-01</strong></td>
+            <td>Matrimonio Fuerte: No se puede dar de alta un presupuesto a una clave inexistente.</td>
+            <td>Error: "Clave no encontrada". No se guarda.</td>
+            <td>SP (<code>fn_crud</code>) y BD (Constraint FK).</td>
+            <td>Restricción técnica del modelo de datos.</td>
+          </tr>
+          <tr>
+            <td><strong>RN-PA-02</strong></td>
+            <td>Importación No Destructiva: El lote Excel aplica UPDATE, no DELETE.</td>
+            <td>Las claves que no vienen en el Excel permanecen intactas.</td>
+            <td>SP (<code>sp_importar</code>).</td>
+            <td>Lógica de negocio Presupuestal.</td>
+          </tr>
+          <tr>
+            <td><strong>RN-PA-03</strong></td>
+            <td>Candado de Autorización y Generación de Póliza.</td>
+            <td>El estatus cambia a 2. Se detona Póliza Contable. Los campos se bloquean.</td>
+            <td>SP y Frontend.</td>
+            <td>LGCG y Control Interno.</td>
+          </tr>
+          <tr>
+            <td><strong>RN-PA-04</strong></td>
+            <td>Bloqueo Fuerte por Póliza Afectada.</td>
+            <td>Si la póliza de apertura generada se marca como "Afectada" por el área de Contabilidad, el SIAF prohíbe el desbloqueo del presupuesto. Para reabrir, se requiere que Contabilidad "Desafecte" la póliza.</td>
+            <td>Validaciones Cruzadas (DB).</td>
+            <td>Integridad Contable/Presupuestal.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>El Presupuesto Autorizado se alimenta de las Claves Presupuestales. Posteriormente, al presionar "Autorizar", alimenta al módulo de <strong>Pólizas Automáticas</strong>. Finalmente, sirve como techo base inmutable para el motor de <strong>Calendarización</strong>.</p>
+      <p><strong>Bloqueo Bidireccional:</strong> La integración con Contabilidad garantiza que una vez que la póliza automática se asume como "Afectada", el módulo presupuestal no pueda manipularse sin la "Desafectación" coordinada desde Contabilidad.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SÍ</strong></td>
+            <td>
+              Al autorizar el presupuesto (Estatus 2), se detona automáticamente una Póliza de Apertura Presupuestal.<br><br>
+              <strong>Cargo:</strong> Cuentas de Ley de Ingresos Estimada.<br>
+              <strong>Abono:</strong> <code>8210</code> - Presupuesto de Egresos Aprobado.<br><br>
+              Este movimiento refleja en los libros contables el arranque formal del ciclo presupuestario (LGCG).
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-06</td>
+            <td>1.1</td>
+            <td>Alineación al estándar DOC-08 y adición de la sección de Acciones.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área (Dividido por Área de responsabilidad) -->
+  <text x="150" y="250" transform="rotate(-90 150 250)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">PRESUPUESTOS</text>
+
+  <!-- División para Contabilidad -->
+  <line x1="50" y1="400" x2="250" y2="400" class="lane-line" stroke-dasharray="none"/>
+  <text x="150" y="440" font-weight="bold" font-size="14" fill="#9d174d" text-anchor="middle" letter-spacing="2">CONTABILIDAD</text>
+  <line x1="50" y1="480" x2="250" y2="480" class="lane-line" stroke-dasharray="none"/>
+
+  <text x="150" y="550" transform="rotate(-90 150 550)" font-weight="bold" font-size="14" fill="#ccc" text-anchor="middle" letter-spacing="4">PPTO</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="90" width="80" height="25" class="node-term" />
+  <text x="425" y="106" class="node-term-text">INICIO</text>
+  
+  <path d="M 425 115 L 425 140" class="path-line"/>
+
+  <!-- Proceso: Carga Presupuesto -->
+  <polygon points="340,140 525,140 510,190 325,190" class="node-data"/>
+  <text x="425" y="160" class="node-text">Captura / Importación Excel</text>
+  <text x="425" y="175" class="node-sub">Ingresa techos por Clave Presupuestal</text>
+
+  <path d="M 515 165 L 650 165" class="path-line"/>
+
+  <!-- SIAF: Inserta en Borrador -->
+  <path d="M 650 140 C 650 130, 900 130, 900 140 L 900 180 C 900 190, 650 190, 650 180 Z" class="node-db" />
+  <path d="M 650 140 C 650 150, 900 150, 900 140" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="162" class="node-text">Registro Estatus "En Captura"</text>
+  <text x="775" y="175" class="node-sub">Guarda en BD (Estatus=1)</text>
+
+  <path d="M 775 190 L 775 240" class="path-line"/>
+
+  <!-- SIAF -> Regresa para Análisis -->
+  <line x1="775" y1="240" x2="425" y2="240" class="path-line"/>
+
+  <rect x="325" y="240" width="200" height="50" class="node"/>
+  <text x="425" y="260" class="node-text">Análisis y Verificación</text>
+  <text x="425" y="275" class="node-sub">Revisa importes en la sábana presupuestal</text>
+
+  <path d="M 425 290 L 425 330" class="path-line"/>
+
+  <!-- Botón Autorizar -->
+  <rect x="325" y="330" width="200" height="50" class="node"/>
+  <text x="425" y="350" class="node-text">Autoriza Presupuesto</text>
+  <text x="425" y="365" class="node-sub">Presiona "✓ Autorizar Lote"</text>
+
+  <path d="M 525 355 L 650 355" class="path-line"/>
+
+  <!-- SIAF Bloqueo -->
+  <path d="M 650 330 C 650 320, 900 320, 900 330 L 900 370 C 900 380, 650 380, 650 370 Z" class="node-db" />
+  <path d="M 650 330 C 650 340, 900 340, 900 330" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="352" class="node-text">Bloqueo de Modificaciones</text>
+  <text x="775" y="365" class="node-sub">Estatus=2. Ya no se permite edición.</text>
+
+  <path d="M 775 380 L 775 420" class="path-line"/>
+
+  <!-- SIAF Póliza -->
+  <rect x="650" y="420" width="250" height="50" class="poliza"/>
+  <text x="775" y="440" class="node-text" fill="#9d174d">Genera Póliza de Apertura</text>
+  <text x="775" y="455" class="node-sub">(Abono 8.2.1 Ppto Aprobado)</text>
+
+  <path d="M 650 445 L 525 445" class="path-line"/>
+
+  <!-- Proceso: Contabilidad Afecta -->
+  <rect x="325" y="420" width="200" height="50" class="node" stroke="#9d174d"/>
+  <text x="425" y="440" class="node-text" fill="#9d174d">CONTABILIDAD: Afecta Póliza</text>
+  <text x="425" y="455" class="node-sub">(Genera Candado Bidireccional)</text>
+
+  <!-- Flecha de regreso indicando candado -->
+  <path d="M 425 420 L 425 390 L 650 360" fill="none" stroke="#991B1B" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-red)"/>
+  <text x="560" y="380" fill="#991B1B" font-size="10" font-weight="bold">Bloquea Reversión</text>
+
+  <path d="M 425 470 L 425 500" class="path-line"/>
+
+  <!-- Imprime PPTO -->
+  <path d="M 325 500 L 525 500 L 525 550 C 475 570, 375 530, 325 550 Z" class="node-doc"/>
+  <text x="425" y="525" class="node-text">Reporte PPTO Oficial</text>
+  <text x="425" y="540" class="node-sub">Imprime Ppto para firmas</text>
+
+  <path d="M 425 560 L 425 600" class="path-line"/>
+
+  <!-- Fin (Terminador Píldora) -->
+  <rect x="385" y="600" width="80" height="30" class="node-term" />
+  <text x="425" y="619" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>PRESUPUESTOS</th>
+        <th>CONTABILIDAD</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. CARGA INICIAL</td>
+        <td>Registra manualmente o importa vía Excel el techo inicial por cada Clave Presupuestal.</td>
+        <td></td>
+        <td>Recibe y almacena los datos con Estatus = 1 (En Captura), permitiendo ediciones futuras.</td>
+      </tr>
+      <tr>
+        <td>2. VERIFICACIÓN</td>
+        <td>Analiza la sábana de claves y montos para confirmar que coincidan con la Gaceta Oficial.</td>
+        <td></td>
+        <td>Despliega grid con totales consolidados para facilitar la verificación.</td>
+      </tr>
+      <tr>
+        <td>3. AUTORIZACIÓN</td>
+        <td>Presiona el botón "✓ Autorizar Lote" indicando que el presupuesto es final.</td>
+        <td></td>
+        <td>Bloquea todas las filas involucradas (Estatus = 2), impidiendo cualquier acción UPDATE o DELETE posterior.</td>
+      </tr>
+      <tr>
+        <td>4. APERTURA CONTABLE</td>
+        <td>Imprime reportes oficiales para firmas de validación.</td>
+        <td>Recibe póliza en bandeja y realiza la <strong>Afectación Contable</strong>. En caso de requerirse una corrección presupuestal, debe ejecutar la <strong>Desafectación</strong> de la misma.</td>
+        <td>Detona la generación de la Póliza de Apertura Presupuestal. Impide el desbloqueo del presupuesto mientras la póliza esté "Afectada".</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

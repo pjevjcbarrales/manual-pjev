@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.3.4-conciliacion-presupuesto-contable.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.3.4 Conciliación Egresos y Gastos</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.3.4</div>
+        <h1 class="elem-title">Conciliación de Egresos Presupuestarios vs Gastos Contables</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV (Referencia: Manual PJEV 278).</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Herramienta de Auditoría Estructural (ORFIS)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Este módulo es la máxima prueba de fuego de la Matriz de Conversión. Compara que la suma total del dinero gastado según Presupuestos (Egresos Pagados - Cuentas 82X0) sea exactamente igual a la suma del Gasto según Contabilidad (Cuentas 5XXX). Existen partidas presupuestales que NO son gasto contable (ej. comprar un coche es Activo Fijo, no gasto) y gastos contables que NO son egreso presupuestal (ej. la depreciación). El sistema genera la ecuación matemática automática para justificar esas diferencias legales.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Acuerdos CONAC</td><td>Formato de Conciliación</td><td>El ente público está obligado a presentar en Cuenta Pública un anexo firmado que concilie explícitamente los Flujos de Efectivo vs el Estado de Actividades.</td></tr>
+          <tr><td>LGCG</td><td>Relación Presupuesto-Contabilidad</td><td>Debe existir correspondencia demostrable entre el registro presupuestal de la cuenta 8250 y el registro contable de las cuentas 5000.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Analista Contable</td><td>Generar el reporte de conciliación a una fecha de corte.</td><td>La herramienta es 100% analítica, no permite edición manual de los totales calculados.</td></tr>
+          <tr><td>Jefe de Contabilidad</td><td>Revisar y validar el cuadre perfecto (Diferencia = 0).</td><td>Debe rastrear manualmente en libros si existe descuadre no justificado por las reglas CONAC.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>No aplica (Vista DB)</code></td><td><code>-</code></td><td>Este módulo no inserta datos, es un motor que consume vistas materializadas dinámicas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_generar_conciliacion_egresos_gastos</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@ejercicio</code>, <code>@mes_corte</code>
+          <br><span style="color:#666">OUT:</span> Retorna JSON complejo con:<br>
+          1. <code>Total_Egresos_Presupuestarios</code><br>
+          2. <code>(-) Egresos_No_Contables (Ej. Compras de Activo)</code><br>
+          3. <code>(+) Gastos_No_Presupuestarios (Ej. Depreciaciones)</code><br>
+          4. <code>Total_Gasto_Contable</code><br>
+          5. <code>Diferencia_Matematica</code>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/reportes/conciliacion/egresos-gastos</code></td><td>JSON con <code>{ fecha_corte }</code></td><td>Ejecuta la fórmula completa y devuelve la tabla financiera.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Cálculo en Tiempo Real:</strong> El usuario selecciona un periodo y el motor procesa miles de pólizas al instante para generar el anexo.</li>
+        <li><strong>Drill-down (Exploración):</strong> Si hay un descuadre (Diferencia != 0), el usuario puede hacer clic en los rubros para ver las pólizas exactas que conforman esa bolsa de dinero, facilitando cazar el error humano.</li>
+        <li><strong>Impresión / Exportación:</strong> Botón que exporta el Anexo CONAC obligatorio para la Cuenta Pública.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Estructura CONAC)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Datos Reales Cuadrados)</button>
+      </div>
+
+      <!-- TAB 1: Grid Parametros -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Generador de Conciliación Egresos/Gastos (Esqueleto)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="400" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Toolbar -->
+              <rect x="20" y="20" width="960" height="40" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              <text x="30" y="44" font-size="11">Fecha Corte:</text>
+              <rect x="110" y="29" width="150" height="22" fill="#fff" stroke="#ccc" rx="3"/> <text x="120" y="43" font-size="10">@fecha</text>
+              <rect x="270" y="29" width="120" height="22" fill="#1B3A2D" rx="3"/> <text x="330" y="44" fill="#fff" font-size="10" text-anchor="middle">CALCULAR</text>
+
+              <rect x="830" y="29" width="140" height="22" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="900" y="44" fill="#1B3A2D" font-size="10" text-anchor="middle">🖨 IMPRIMIR ANEXO</text>
+
+              <!-- Main Report Body -->
+              <rect x="250" y="80" width="500" height="290" fill="#fff" stroke="#999" rx="2"/>
+              <text x="500" y="105" font-size="12" font-weight="bold" text-anchor="middle">CONCILIACIÓN ENTRE LOS EGRESOS PRESUPUESTARIOS Y LOS GASTOS CONTABLES</text>
+              <line x1="260" y1="115" x2="740" y2="115" stroke="#ccc"/>
+              
+              <text x="260" y="135" font-size="11" font-weight="bold">1. Total de Egresos (Presupuestarios)</text>
+              <text x="730" y="135" font-size="11" text-anchor="end">@monto_1</text>
+
+              <text x="260" y="160" font-size="11" font-weight="bold">2. Menos Egresos Presupuestarios No Contables</text>
+              <text x="730" y="160" font-size="11" text-anchor="end">@monto_2</text>
+              <text x="280" y="175" font-size="10" fill="#666">Mobiliario y Equipo (Activo Fijo)</text>
+              <text x="280" y="190" font-size="10" fill="#666">Obra Pública en Proceso</text>
+
+              <text x="260" y="215" font-size="11" font-weight="bold">3. Más Gastos Contables No Presupuestarios</text>
+              <text x="730" y="215" font-size="11" text-anchor="end">@monto_3</text>
+              <text x="280" y="230" font-size="10" fill="#666">Estimaciones y Depreciaciones</text>
+              <text x="280" y="245" font-size="10" fill="#666">Amortizaciones</text>
+
+              <line x1="260" y1="260" x2="740" y2="260" stroke="#000" stroke-width="2"/>
+              <text x="260" y="280" font-size="11" font-weight="bold">4. Total de Gasto Contable Calculado</text>
+              <text x="730" y="280" font-size="11" font-weight="bold" text-anchor="end">@monto_4_calculado</text>
+
+              <text x="260" y="305" font-size="11" font-weight="bold" fill="#0369a1">5. Total de Gasto según Estado de Actividades (Real BD)</text>
+              <text x="730" y="305" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="end">@monto_5_real</text>
+
+              <rect x="260" y="325" width="480" height="30" fill="#eee" rx="2"/>
+              <text x="270" y="345" font-size="12" font-weight="bold">DIFERENCIA (Debe ser Cero):</text>
+              <text x="730" y="345" font-size="12" font-weight="bold" text-anchor="end">@diff_0</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Grid Valores -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Generador de Conciliación (Datos Cuadrados)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="400" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Toolbar -->
+              <rect x="20" y="20" width="960" height="40" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              <text x="30" y="44" font-size="11">Fecha Corte:</text>
+              <rect x="110" y="29" width="150" height="22" fill="#fff" stroke="#ccc" rx="3"/> <text x="120" y="43" font-size="10">31/03/2026</text>
+              <rect x="270" y="29" width="120" height="22" fill="#1B3A2D" rx="3"/> <text x="330" y="44" fill="#fff" font-size="10" text-anchor="middle">CALCULAR</text>
+
+              <!-- Main Report Body -->
+              <rect x="250" y="80" width="500" height="290" fill="#fff" stroke="#999" rx="2"/>
+              <text x="500" y="105" font-size="12" font-weight="bold" text-anchor="middle">CONCILIACIÓN ENTRE LOS EGRESOS PRESUPUESTARIOS Y LOS GASTOS CONTABLES</text>
+              <line x1="260" y1="115" x2="740" y2="115" stroke="#ccc"/>
+              
+              <text x="260" y="135" font-size="11" font-weight="bold">1. Total de Egresos (Presupuestarios)</text>
+              <text x="730" y="135" font-size="11" font-weight="bold" text-anchor="end">$ 50,000,000.00</text>
+
+              <text x="260" y="160" font-size="11" font-weight="bold">2. Menos Egresos Presupuestarios No Contables</text>
+              <text x="730" y="160" font-size="11" font-weight="bold" text-anchor="end">$ -5,000,000.00</text>
+              <text x="280" y="175" font-size="10" fill="#666">Mobiliario y Equipo de Cómputo (5000)</text>
+              <text x="730" y="175" font-size="10" fill="#666" text-anchor="end">$ 5,000,000.00</text>
+
+              <text x="260" y="215" font-size="11" font-weight="bold">3. Más Gastos Contables No Presupuestarios</text>
+              <text x="730" y="215" font-size="11" font-weight="bold" text-anchor="end">$ +2,000,000.00</text>
+              <text x="280" y="230" font-size="10" fill="#666">Estimaciones, Depreciaciones y Deterioro</text>
+              <text x="730" y="230" font-size="10" fill="#666" text-anchor="end">$ 2,000,000.00</text>
+
+              <line x1="260" y1="260" x2="740" y2="260" stroke="#000" stroke-width="2"/>
+              <text x="260" y="280" font-size="11" font-weight="bold">4. Total de Gasto Contable Calculado (1 - 2 + 3)</text>
+              <text x="730" y="280" font-size="11" font-weight="bold" text-anchor="end">$ 47,000,000.00</text>
+
+              <text x="260" y="305" font-size="11" font-weight="bold" fill="#0369a1">5. Total de Gasto según Estado de Actividades (BD)</text>
+              <text x="730" y="305" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="end">$ 47,000,000.00</text>
+
+              <rect x="260" y="325" width="480" height="30" fill="#d1fae5" rx="2"/>
+              <text x="270" y="345" font-size="12" font-weight="bold" fill="#065f46">DIFERENCIA (Matriz Sana):</text>
+              <text x="730" y="345" font-size="12" font-weight="bold" fill="#065f46" text-anchor="end">$ 0.00</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-CE-01</strong></td>
+            <td>Cálculo Paramétrico: El reporte no debe ser editable. Los saldos se obtienen con `SUM(monto)` filtrado por el primer dígito de la cuenta (8 vs 5).</td>
+            <td>Evita manipulación de la Cuenta Pública.</td>
+            <td>SP de BD (Hardcoded Query)</td>
+            <td>LGCG y Manual CONAC</td>
+          </tr>
+          <tr>
+            <td><strong>RN-CE-02</strong></td>
+            <td>Integridad de Matriz: Si la Diferencia no es Cero, indica una de dos cosas: Alguien hizo una póliza manual mal clasificada o la Matriz de Conversión (03.1.2) tiene un error de configuración.</td>
+            <td>Detiene la entrega de Cuenta Pública hasta que Contabilidad corrija la póliza mal hecha.</td>
+            <td>Validación Humana / Visual</td>
+            <td>Auditoría Superior ORFIS</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Es la culminación de todo el engranaje del SIAF-PJEV. Reúne la ejecución del <strong>Módulo de Egresos</strong>, lo cruza por la <strong>Matriz de Conversión</strong>, incluye las facturas de la <strong>Bóveda CFDI</strong>, las amortizaciones de la <strong>Descarga Masiva</strong> y los ajustes de las <strong>Pólizas Manuales</strong>, condensando miles de transacciones en 5 líneas matemáticas que demuestran que el sistema no "pierde" centavos.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>NO</strong></td>
+            <td>Módulo exclusivo de auditoría de cierre. Solo consulta y emite el "Anexo 2 - Conciliación Egreso-Gasto".</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-07</td>
+            <td>2.0</td>
+            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma de carriles.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">CONTABILIDAD</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO (Corte)</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Ejecuta -->
+  <polygon points="340,130 525,130 510,180 325,180" class="node-data"/>
+  <text x="425" y="150" class="node-text">Petición de Anexo CONAC</text>
+  <text x="425" y="165" class="node-sub">Selecciona fecha y presiona Calcular</text>
+
+  <path d="M 515,155 L 650,155" class="path-line"/>
+  
+  <!-- SIAF Calcula -->
+  <path d="M 650 135 C 650 125, 900 125, 900 135 L 900 175 C 900 185, 650 185, 650 175 Z" class="node-db" />
+  <path d="M 650 135 C 650 145, 900 145, 900 135" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="157" class="node-text">Motor de Conciliación SQL</text>
+  <text x="775" y="170" class="node-sub">Suma cuentas 82X0 y 5XXX</text>
+
+  <path d="M 775 185 L 775 220" class="path-line"/>
+  <line x1="775" y1="220" x2="425" y2="220" class="path-line"/>
+
+  <!-- Rombo Diferencia -->
+  <polygon points="425,220 485,250 425,280 365,250" class="node-rombo"/>
+  <text x="425" y="255" class="node-text">¿Diferencia = 0?</text>
+
+  <path d="M 365 250 L 300 250 L 300 370 L 325 370" class="path-red"/>
+  <text x="270" y="240" font-size="10" fill="#991B1B" font-weight="bold">No</text>
+  <text x="270" y="300" font-size="9" fill="#666" text-anchor="middle">Auditar Pólizas</text>
+
+  <path d="M 425 280 L 425 370" class="path-green"/>
+  <text x="440" y="300" font-size="10" fill="#166534" font-weight="bold">Sí (Perfecto)</text>
+
+  <!-- Imprime -->
+  <path d="M 325 370 L 525 370 L 525 420 C 475 440, 375 400, 325 420 Z" class="node-doc"/>
+  <text x="425" y="395" class="node-text">Anexo de Cuenta Pública</text>
+  <text x="425" y="410" class="node-sub">Genera PDF CONAC</text>
+
+  <path d="M 425 430 L 425 470" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="470" width="80" height="30" class="node-term" />
+  <text x="425" y="489" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>CONTABILIDAD</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. SOLICITUD DE REPORTE</td>
+        <td>Al cerrar trimestre, ingresa la fecha límite y presiona calcular.</td>
+        <td>Ejecuta la macro consulta SQL sumando todos los egresos presupuestales y aislando el activo fijo.</td>
+      </tr>
+      <tr>
+        <td>2. REVISIÓN DE INTEGRIDAD</td>
+        <td>Si nota "Diferencia", hace drill-down y averigua si una póliza manual se capturó mal (Ej. Cargo a Gasto sin abonar a presupuesto). Cancela la póliza y la corrige.</td>
+        <td>Permite desglose de las operaciones (drill-down view).</td>
+      </tr>
+      <tr>
+        <td>3. GENERACIÓN DE REPORTES</td>
+        <td>Con Diferencia Cero, presiona Imprimir.</td>
+        <td>Exporta el PDF Oficial requerido por ORFIS validando la solidez de la Matriz de Conversión.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.3.1-calendarizacion.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-s { background:var(--pjev-info-bg); color:var(--pjev-info-text); border:1px solid var(--pjev-info-borde); }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Presupuesto</span> ›
+      <span>Calendarización</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.3.1</div>
+        <h1 class="elem-title">Calendarización</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV para el motor de proyección financiera temporal del Presupuesto Autorizado.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-s">Tipo: Módulo de Proceso Matemático</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El submódulo de Calendarización tiene la función de proyectar y distribuir financieramente el techo presupuestal autorizado (anual) de cada clave a lo largo de los 12 meses y 24 quincenas del ejercicio fiscal. Este proceso no es una mera vista de datos, es un requisito fundamental para el control del devengado y pagado en el flujo de tesorería, permitiendo habilitar la disponibilidad líquida mes con mes.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Ley Federal de Presupuesto y Responsabilidad Hacendaria</td><td>Art. 43 y 44</td><td>El ejercicio del presupuesto de egresos se sujetará estrictamente a los calendarios de presupuesto aprobados y publicados, para evitar desfases de liquidez.</td></tr>
+          <tr><td>Lineamientos Operativos DGA</td><td>Apartado Tesorería</td><td>La disposición de fondos para el momento contable "Devengado" estará topada invariablemente a la cuota establecida en la calendarización mensual vigente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Analista de Presupuestos</td><td>Filtrar claves autorizadas, generar el calendario en la modal (automático/manual).</td><td>No puede autorizar el guardado definitivo sin recabar firmas (Si aplica en el proceso).</td></tr>
+          <tr><td>Titular de Presupuestos</td><td>Impresión del Reporte Oficial PDF y aplicación en base de datos (Commit).</td><td>No puede procesar claves que no estén "Autorizadas".</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Este proceso distribuye el <code>PE_TOTAL</code> proveniente de <code>presupuesto_egresos</code> hacia dos entidades satélites de granularidad temporal:</p>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>PE_NO</code></td><td><code>BIGINT (PK/FK)</code></td><td>Referencia al registro presupuestal padre.</td></tr>
+        <tr><td><code>P_ENE</code> a <code>P_DIC</code></td><td><code>NUMERIC(15,2)</code></td><td>[Tabla: <code>presupuesto_egresos_meses</code>] Los 12 campos que almacenan el techo mensual autorizado.</td></tr>
+        <tr><td><code>P_Q01</code> a <code>P_Q24</code></td><td><code>NUMERIC(15,2)</code></td><td>[Tabla: <code>presupuesto_egresos_quincenal</code>] Los 24 campos que almacenan la distribución quincenal estricta.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_leer_presupuesto_autorizado_validado</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@ejercicio</code>, <code>@accion</code>, <code>@entidad</code>, <code>@fuente</code>
+          <br><span style="color:#666">OUT:</span> Recordset de claves que cumplen condición <code>PE_ESTATUS_WORKFLOW = 2</code>.
+        </li>
+        <li><strong><code>fn_crud_presupuesto_mes_quincena</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@ejercicio</code>, <code>@accion (PROYECTAR)</code>, <code>@pe_no</code>, <code>@monto_p1...p24</code>, <code>@monto_m1...m12</code>
+          <br><span style="color:#666">OUT:</span> <code>{status}</code>, <code>{message}</code>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/ppto/calendarizacion/leer</code></td><td><code>{ ejercicio, filtros }</code></td><td>Devuelve las claves autorizadas listas para cálculo.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/ppto/calendarizacion/proyectar</code></td><td><code>{ pe_no, distribucion[] }</code></td><td>Guarda la distribución de meses y quincenas validada por el frontend.</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/ppto/calendarizacion/reporte-pdf</code></td><td><code>?ejercicio=2026&entidad=XX</code></td><td>Genera el archivo físico oficial a partir de la pre-proyección en memoria/temporal o DB.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">La arquitectura de interacción se basa estrictamente en un flujo de "Lectura Paramétrica -> Modal de Proyección":</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>1. Leer (Búsqueda Inicial):</strong> El usuario debe buscar la clave a actualizar usando los filtros. El Grid principal arrojará exclusivamente: <em>Clave Presupuestal</em>, <em>Tipo de Cálculo</em> y el <em>Importe Autorizado</em>.</li>
+        <li><strong>2. Acción de Fila (CRUD):</strong> Botón <code>[Crear Calendario]</code> o <code>[Modificar Calendario]</code> incrustado en cada fila del grid de resultados. Este botón detona la apertura del Modal de Proyección.</li>
+        <li><strong>3. Modal de Proyección (El Motor):</strong> Dentro del modal, el usuario tiene la disyuntiva del método de distribución:
+          <ul>
+            <li><strong>Cálculo Automático:</strong> El sistema lee el <em>Tipo de Cálculo</em> y ejecuta el motor matemático para llenar el grid interno de 12 meses/24 quincenas equitativamente (con la RN de arrastre de céntimos en Q24).</li>
+            <li><strong>Cálculo Manual:</strong> Permite al usuario capturar celda por celda a discreción, siempre y cuando el total cuadre con el importe autorizado.</li>
+          </ul>
+        </li>
+        <li><strong>4. Reportes Oficiales:</strong> Botón <code>[🖨 IMPRIMIR VALIDACIÓN]</code> en la barra general para firmar el resultado proyectado.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('c1',this)">Grid Principal (Lectura)</button>
+        <button class="wf-tab" onclick="showWF('c2',this)">Modal: Cálculo (Automático / Manual)</button>
+      </div>
+
+      <!-- TAB 1: Grid Parametros (Leer) -->
+      <div id="wf-c1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Grid Principal de Consulta</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Filtros -->
+              <rect x="20" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="25" y="37" font-size="10">@entidad</text>
+              <rect x="230" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="235" y="37" font-size="10">@clasif_funcional</text>
+              <rect x="440" y="20" width="80" height="25" fill="#1B3A2D" rx="3"/> <text x="480" y="37" fill="#fff" font-size="10" text-anchor="middle">🔍 LEER</text>
+
+              <!-- Action Bar -->
+              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Registro (CRUD):</text>
+              <text x="120" y="77" font-size="10" fill="#aaa">Vía Acciones Fila</text>
+              <line x1="250" y1="60" x2="250" y2="85" stroke="#ccc" />
+
+              <text x="260" y="77" font-size="10" font-weight="bold" fill="#666">Especiales:</text>
+              <text x="320" y="77" font-size="10" fill="#aaa">N/A</text>
+              <line x1="535" y1="60" x2="535" y2="85" stroke="#ccc" />
+
+              <text x="545" y="77" font-size="10" font-weight="bold" fill="#aaa">Vacío</text>
+              <line x1="770" y1="60" x2="770" y2="85" stroke="#ccc" />
+
+              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR VALIDACIÓN</text>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="121" fill="#fff" font-size="10">CLAVE PRESUPUESTAL</text>
+              <text x="400" y="121" fill="#fff" font-size="10">TIPO DE CÁLCULO</text>
+              <text x="600" y="121" fill="#fff" font-size="10">IMPORTE AUTORIZADO</text>
+              <text x="800" y="121" fill="#fff" font-size="10">ACCIONES_FILA</text>
+
+              <!-- Grid Row 1 (Sin Calendarizar) -->
+              <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <text x="30" y="150" font-size="11">11300001-301-C-11001-1-2-1-E7-02-01-1-601</text>
+              <text x="400" y="150" font-size="11">3 - Equitativo</text>
+              <text x="600" y="150" font-size="11" font-weight="bold">$ 12,500,000.00</text>
+              <rect x="800" y="135" width="120" height="20" fill="#FEF3C7" stroke="#F59E0B" rx="3"/> <text x="860" y="149" fill="#92400E" font-size="10" text-anchor="middle">CREAR CALENDARIO</text>
+
+              <!-- Grid Row 2 (Calendarizado) -->
+              <rect x="20" y="160" width="960" height="30" fill="#fafafa" stroke="#eee"/>
+              <text x="30" y="180" font-size="11">12200001-301-C-11001-1-2-1-E7-02-01-1-603</text>
+              <text x="400" y="180" font-size="11">5 - Manual</text>
+              <text x="600" y="180" font-size="11" font-weight="bold">$ 850,000.00</text>
+              <rect x="800" y="165" width="120" height="20" fill="#D1FAE5" stroke="#10B981" rx="3"/> <text x="860" y="179" fill="#065F46" font-size="10" text-anchor="middle">MODIFICAR CALENDARIO</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Modal (Automático vs Manual) -->
+      <div id="wf-c2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Proyección de Calendario</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="400" fill="#000" opacity="0.3" />
+              <!-- Modal Window -->
+              <rect x="50" y="30" width="900" height="340" fill="#fff" rx="8" stroke="#ccc"/>
+              
+              <text x="70" y="60" font-size="16" font-weight="bold">Proyección de Calendario: 11300001-301-C...</text>
+              <text x="70" y="80" font-size="12" fill="#666">Importe Autorizado a Cubrir: <tspan font-weight="bold" fill="#000">$ 12,500,000.00</tspan></text>
+
+              <!-- Modal Toolbar (Toggle) -->
+              <rect x="70" y="100" width="860" height="40" fill="#f4f6f5" rx="4"/>
+              <text x="85" y="125" font-size="12" font-weight="bold">Método de Proyección:</text>
+              
+              <!-- Botón Automático -->
+              <rect x="240" y="108" width="150" height="25" fill="#1B3A2D" rx="12"/> 
+              <text x="315" y="125" fill="#fff" font-size="11" text-anchor="middle">⚙ CÁLCULO AUTOMÁTICO</text>
+
+              <!-- Botón Manual -->
+              <rect x="400" y="108" width="150" height="25" fill="#fff" stroke="#ccc" rx="12"/> 
+              <text x="475" y="125" fill="#666" font-size="11" text-anchor="middle">✍ CÁLCULO MANUAL</text>
+
+              <text x="760" y="125" font-size="12">Balance: <tspan fill="#065F46" font-weight="bold">$ 0.00 (CUADRE OK)</tspan></text>
+
+              <!-- Grid Matriz (Ene-Dic) -->
+              <rect x="70" y="150" width="860" height="25" fill="#eee"/>
+              <text x="80" y="166" font-size="10" font-weight="bold">MES / QUINCENA</text>
+              <text x="250" y="166" font-size="10" font-weight="bold">MONTO ASIGNADO</text>
+
+              <rect x="70" y="175" width="860" height="30" fill="#fff" stroke="#f0f0f0"/>
+              <text x="80" y="195" font-size="11">ENERO (Q01)</text>
+              <rect x="245" y="180" width="120" height="20" fill="#fafafa" stroke="#ccc"/> <text x="250" y="194" font-size="11">$ 520,833.33</text>
+              <text x="380" y="195" font-size="10" fill="#999">← Autocalculado</text>
+
+              <rect x="70" y="205" width="860" height="30" fill="#fff" stroke="#f0f0f0"/>
+              <text x="80" y="225" font-size="11">ENERO (Q02)</text>
+              <rect x="245" y="210" width="120" height="20" fill="#fafafa" stroke="#ccc"/> <text x="250" y="224" font-size="11">$ 520,833.33</text>
+
+              <text x="80" y="255" font-size="14" fill="#aaa">... (Febrero a Noviembre) ...</text>
+
+              <rect x="70" y="275" width="860" height="30" fill="#fff" stroke="#f0f0f0"/>
+              <text x="80" y="295" font-size="11">DICIEMBRE (Q24)</text>
+              <rect x="245" y="280" width="120" height="20" fill="#fafafa" stroke="#ccc"/> <text x="250" y="294" font-size="11">$ 520,833.41</text>
+              <text x="380" y="295" font-size="10" fill="red">← Ajuste Céntimos Automático (RN-CAL-01)</text>
+
+              <!-- Footer Modal -->
+              <rect x="70" y="325" width="860" height="1" fill="#ccc"/>
+              <rect x="700" y="335" width="100" height="25" fill="#fff" stroke="#ccc" rx="4"/> <text x="750" y="352" fill="#666" font-size="11" text-anchor="middle">Cancelar</text>
+              <rect x="810" y="335" width="120" height="25" fill="#1B3A2D" rx="4"/> <text x="870" y="352" fill="#fff" font-size="11" text-anchor="middle">✓ GUARDAR CALENDARIO</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-CAL-01</strong></td>
+            <td>Ajuste de Céntimos (Arrastre Quincena 24)</td>
+            <td>En el Método Automático, si la división `/12/2` deja residuos infinitos, se arroja el céntimo a la Q24 para garantizar Suma Cero.</td>
+            <td>Motor Matemático (Modal)</td>
+            <td>Contabilidad Gubernamental (No creación de dinero)</td>
+          </tr>
+          <tr>
+            <td><strong>RN-CAL-02</strong></td>
+            <td>Suma Cero (Validación de Commit)</td>
+            <td>En el Método Manual, si el total capturado difiere del Importe Autorizado, se bloquea el botón de "GUARDAR CALENDARIO".</td>
+            <td>Frontend Modal</td>
+            <td>Regla de Seguridad Financiera.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Este módulo lee directamente del <strong>Presupuesto Autorizado</strong> (Registro). Al guardar el proceso del Modal, sus datos impactan y nutren al módulo de <strong>Recalendarización</strong> (para reajustes futuros en el flujo de caja) y establecen los límites en la fase de control y pago de la <strong>Tesorería (Devengado/Pagado)</strong>.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>NO</strong></td>
+            <td>
+              La calendarización es estrictamente un proceso de ordenamiento temporal (distribución de flujos) del presupuesto que ya fue aprobado. Según la normativa del CONAC, no se genera ninguna póliza contable al distribuir el presupuesto de egresos en el tiempo, ya que el momento contable aplicable (Aprobado) se reconoció en el módulo anterior.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-06</td>
+            <td>1.2</td>
+            <td>Re-arquitectura del flujo: Implementación de Grid Principal de Lectura y Modal de Cálculo (Automático vs Manual).</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 850" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#991B1B"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="800" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="800" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="800" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="800" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="800" x2="950" y2="800" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Título del Carril Área -->
+  <text x="150" y="400" transform="rotate(-90 150 400)" font-weight="bold" font-size="24" fill="#ccc" text-anchor="middle" letter-spacing="4">PRESUPUESTOS</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Buscar Clave -->
+  <polygon points="340,130 525,130 510,180 325,180" class="node-data"/>
+  <text x="425" y="150" class="node-text">Filtro y Búsqueda</text>
+  <text x="425" y="165" class="node-sub">Selecciona Clave Presupuestal a Proyectar</text>
+
+  <path d="M 425 180 L 425 210" class="path-line"/>
+
+  <!-- Abre Modal -->
+  <rect x="325" y="210" width="200" height="50" class="node"/>
+  <text x="425" y="230" class="node-text">Modal de Proyección</text>
+  <text x="425" y="245" class="node-sub">Clic en [Crear Calendario]</text>
+
+  <path d="M 425 260 L 425 290" class="path-line"/>
+
+  <!-- Rombo: Automático o Manual -->
+  <polygon points="425,290 525,330 425,370 325,330" class="node-rombo"/>
+  <text x="425" y="325" class="node-text">¿Método de</text>
+  <text x="425" y="340" class="node-text">Cálculo?</text>
+
+  <!-- Flecha Automático -->
+  <path d="M 525 330 L 650 330" class="path-line"/>
+  <text x="585" y="320" font-size="10" font-weight="bold" fill="#666">Automático</text>
+
+  <!-- SIAF: Calcula Automático -->
+  <rect x="650" y="305" width="250" height="50" class="node-siaf"/>
+  <text x="775" y="325" class="node-text">Algoritmo de Distribución</text>
+  <text x="775" y="340" class="node-sub">Asigna Equitativamente y Arrastra Céntimos a Q24</text>
+
+  <!-- Flecha Manual -->
+  <path d="M 425 370 L 425 400" class="path-line"/>
+  <text x="460" y="385" font-size="10" font-weight="bold" fill="#666">Manual</text>
+
+  <!-- Proceso: Ingreso Manual -->
+  <rect x="325" y="400" width="200" height="50" class="node"/>
+  <text x="425" y="420" class="node-text">Captura de Techos</text>
+  <text x="425" y="435" class="node-sub">Ingresa importe celda por celda</text>
+
+  <path d="M 525 425 L 650 425" class="path-line"/>
+
+  <!-- De Automático a Validar Cuadre -->
+  <path d="M 775 355 L 775 400" class="path-line"/>
+
+  <!-- SIAF: Valida Cuadre -->
+  <rect x="650" y="400" width="250" height="50" class="node-siaf"/>
+  <text x="775" y="420" class="node-text">Valida Suma Cero</text>
+  <text x="775" y="435" class="node-sub">Suma 24 Quincenas == Monto Autorizado</text>
+
+  <path d="M 775 450 L 775 480" class="path-line"/>
+
+  <!-- Rombo: ¿Cuadra? -->
+  <polygon points="775,480 840,530 775,580 710,530" class="node-rombo"/>
+  <text x="775" y="525" class="node-text">¿Cuadre</text>
+  <text x="775" y="540" class="node-text">OK?</text>
+
+  <!-- NO Cuadra (Rojo) -->
+  <path d="M 710 530 L 425 530 L 425 450" class="path-red"/>
+  <text x="590" y="520" fill="#991B1B" font-weight="bold" font-size="11">NO (Muestra Diferencia)</text>
+
+  <!-- SÍ Cuadra (Verde) -->
+  <path d="M 775 580 L 775 620" class="path-green"/>
+  <text x="785" y="605" fill="#166534" font-weight="bold" font-size="11">SÍ (Guarda)</text>
+
+  <!-- SIAF: Guarda DB -->
+  <path d="M 650 630 C 650 620, 900 620, 900 630 L 900 670 C 900 680, 650 680, 650 670 Z" class="node-db" />
+  <path d="M 650 630 C 650 640, 900 640, 900 630" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="652" class="node-text" fill="#0284c7">Persiste Calendario</text>
+  <text x="775" y="665" class="node-sub">Guarda en DB, no genera Póliza.</text>
+
+  <path d="M 650 650 L 525 650" class="path-line"/>
+
+  <!-- Imprime Reporte -->
+  <path d="M 325 625 L 525 625 L 525 675 C 475 695, 375 655, 325 675 Z" class="node-doc"/>
+  <text x="425" y="650" class="node-text">Reporte Validación</text>
+  <text x="425" y="665" class="node-sub">Imprime Calendario por Clave</text>
+
+  <path d="M 425 690 L 425 730" class="path-line"/>
+
+  <!-- Fin (Terminador Píldora) -->
+  <rect x="385" y="730" width="80" height="30" class="node-term" />
+  <text x="425" y="749" class="node-term-text">FIN</text>
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>PRESUPUESTOS</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. BÚSQUEDA Y SELECCIÓN</td>
+        <td>Utiliza los filtros paramétricos para localizar la Clave Presupuestal a calendarizar y abre la modal.</td>
+        <td>Retorna listado de claves cuyo estatus workflow es 2 (Autorizadas).</td>
+      </tr>
+      <tr>
+        <td>2. PROYECCIÓN AUTOMÁTICA</td>
+        <td>Selecciona la opción de "Cálculo Automático".</td>
+        <td>Ejecuta la división equitativa del monto total entre las 24 quincenas. Arrastra cualquier residuo (céntimos infinitos) a la quincena 24 para garantizar cuadre perfecto (RN-CAL-01).</td>
+      </tr>
+      <tr>
+        <td>3. PROYECCIÓN MANUAL</td>
+        <td>Ingresa los techos celda por celda de acuerdo al oficio de la UA.</td>
+        <td>Valida en tiempo real que el remanente llegue a $0.00 (Suma Cero).</td>
+      </tr>
+      <tr>
+        <td>4. VALIDACIÓN Y GUARDADO</td>
+        <td>Presiona el botón de "Guardar Calendario" tras verificar que no hay descuadres.</td>
+        <td>Almacena definitivamente los montos en <code>presupuesto_egresos_meses</code> y <code>_quincenal</code>. No emite ninguna Póliza Contable.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

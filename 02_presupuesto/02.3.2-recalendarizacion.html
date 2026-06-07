@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.3.2-recalendarizacion.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-s { background:var(--pjev-info-bg); color:var(--pjev-info-text); border:1px solid var(--pjev-info-borde); }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Presupuesto</span> ›
+      <span>Recalendarización</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.3.2</div>
+        <h1 class="elem-title">Recalendarización</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 y lineamientos del Manual de Procedimientos del PJEV. Motor de reajuste temporal para administrar liquidez en tiempo real.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-s">Tipo: Módulo de Proceso Matemático y Transferencia</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El submódulo de Recalendarización permite realizar reajustes al flujo de caja financiero que ya ha sido distribuido en el tiempo. Responde a la dinámica operativa real (pagos adelantados, retrasos en adquisiciones, o inyecciones de liquidez imprevistas). Al operar sobre el "Total Modificado", transfiere liquidez de una quincena a otra en la misma clave, garantizando la cobertura de nóminas, adquisiciones y viáticos según los picos de operación del Poder Judicial.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo y Procedimental</div>
+      <table class="props-table">
+        <thead><tr><th>Norma / Manual</th><th>Artículo / Sección</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Código Financiero del Estado de Veracruz</td><td>Art. 222, 224</td><td>Cualquier modificación al calendario de metas financieras debe estar plenamente justificada (Suma Cero o Ampliación).</td></tr>
+          <tr><td>Manual de Procedimientos PJEV (DGA)</td><td>Control Presupuestal</td><td>Toda recalendarización exige validación de "Saldo Comprometido/Devengado"; es decir, no se puede retirar techo a un mes donde el recurso ya se gastó o apartó.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Analista de Presupuestos</td><td>Filtrar claves en el grid, abrir modal de balanza y proyectar transferencias quincenales (+/-).</td><td>No puede confirmar ajustes si la balanza no suma cero o si rompe el piso del devengado histórico.</td></tr>
+          <tr><td>Titular de Presupuestos / DGA</td><td>Visto Bueno (en sistema o PDF).</td><td>N/A.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>PE_NO</code></td><td><code>BIGINT (PK/FK)</code></td><td>Referencia al registro presupuestal afectado.</td></tr>
+        <tr><td><code>P_ENE</code> a <code>P_DIC</code></td><td><code>NUMERIC(15,2)</code></td><td>[Tabla: <code>presupuesto_egresos_meses</code>] Update de los campos de distribución mensual.</td></tr>
+        <tr><td><code>P_Q01</code> a <code>P_Q24</code></td><td><code>NUMERIC(15,2)</code></td><td>[Tabla: <code>presupuesto_egresos_quincenal</code>] Update de la distribución quincenal estricta.</td></tr>
+        <tr><td><code>BITACORA_RECAL</code></td><td><code>TABLA_LOG</code></td><td>Obligatorio por Auditoría: Audita <code>user_id</code>, <code>monto_movido</code>, <code>q_origen</code>, <code>q_destino</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_leer_claves_recalendarizacion</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@ejercicio</code>, <code>@accion</code>, <code>@entidad</code>, <code>@fuente</code>
+          <br><span style="color:#666">OUT:</span> Recordset base para el Grid Principal (Clave, Importe Modificado, Estatus).
+        </li>
+        <li><strong><code>fn_crud_recalendarizacion</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@ejercicio</code>, <code>@accion (AJUSTAR)</code>, <code>@pe_no</code>, <code>@array_variaciones</code>, <code>@folio_justificacion</code>
+          <br><span style="color:#666">OUT:</span> <code>{status}</code>, <code>{message}</code> (Retorna error SQL state si rompe la validación de devengado del momento contable).
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/ppto/recalendarizacion/leer</code></td><td><code>{ ejercicio, filtros }</code></td><td>Devuelve las claves paramétricas.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/ppto/recalendarizacion/matriz-saldos</code></td><td><code>{ pe_no }</code></td><td>Obtiene la matriz 12/24 de una clave específica y sus topes de Devengado (Para la Modal).</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/ppto/recalendarizacion/ajustar</code></td><td><code>{ pe_no, variaciones[] }</code></td><td>Aplica el reajuste en BD si cuadra y si no deja saldos negativos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">En congruencia con el estándar de Calendarización, este módulo utiliza un flujo "Leer -> Modal":</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>1. Leer (Grid Principal):</strong> Panel de filtrado que arroja las claves presupuestales activas en el año fiscal, mostrando el Importe Modificado global.</li>
+        <li><strong>2. Acción Fila (Registro CRUD):</strong> Botón <code>[RECALENDARIZAR]</code> en la fila deseada, el cual detona una petición asíncrona para traer los saldos devengados y abre el Modal.</li>
+        <li><strong>3. Modal de Balanza (Especiales):</strong> Interfaz de hoja de cálculo confinada en modal. Permite ingresar variaciones positivas (+) o negativas (-) por quincena. El sistema calcula en tiempo real si el remanente (Balanza) da CERO y valida los topes del devengado histórico.</li>
+        <li><strong>4. Reportes Oficiales:</strong> Botón <code>[🖨 BITÁCORA DE REAJUSTES]</code> en la barra general para imprimir las transferencias temporales por clave en formato PDF institucional.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('r1',this)">Grid Principal (Lectura)</button>
+        <button class="wf-tab" onclick="showWF('r2',this)">Modal: Balanza de Reajuste (+/-)</button>
+      </div>
+
+      <!-- TAB 1: Grid Parametros (Leer) -->
+      <div id="wf-r1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Grid Principal de Consulta</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Filtros -->
+              <rect x="20" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="25" y="37" font-size="10">@entidad</text>
+              <rect x="230" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="235" y="37" font-size="10">@clasif_funcional</text>
+              <rect x="440" y="20" width="80" height="25" fill="#1B3A2D" rx="3"/> <text x="480" y="37" fill="#fff" font-size="10" text-anchor="middle">🔍 LEER</text>
+
+              <!-- Action Bar -->
+              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Registro (CRUD):</text>
+              <text x="120" y="77" font-size="10" fill="#aaa">Vía Acciones Fila</text>
+              <line x1="250" y1="60" x2="250" y2="85" stroke="#ccc" />
+
+              <text x="260" y="77" font-size="10" font-weight="bold" fill="#666">Especiales:</text>
+              <text x="320" y="77" font-size="10" fill="#aaa">N/A</text>
+              <line x1="535" y1="60" x2="535" y2="85" stroke="#ccc" />
+
+              <text x="545" y="77" font-size="10" font-weight="bold" fill="#aaa">Vacío</text>
+              <line x1="770" y1="60" x2="770" y2="85" stroke="#ccc" />
+
+              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 BITÁCORA REAJUSTES</text>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="121" fill="#fff" font-size="10">CLAVE PRESUPUESTAL</text>
+              <text x="400" y="121" fill="#fff" font-size="10">DESCRIPCIÓN</text>
+              <text x="600" y="121" fill="#fff" font-size="10">IMPORTE MODIFICADO</text>
+              <text x="800" y="121" fill="#fff" font-size="10">ACCIONES_FILA</text>
+
+              <!-- Grid Row 1 -->
+              <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <text x="30" y="150" font-size="11">11300001-301-C-11001-1-2-1-E7-02-01-1-601</text>
+              <text x="400" y="150" font-size="11">Sueldos Base</text>
+              <text x="600" y="150" font-size="11" font-weight="bold">$ 12,500,000.00</text>
+              <rect x="800" y="135" width="120" height="20" fill="#EFF6FF" stroke="#3B82F6" rx="3"/> <text x="860" y="149" fill="#1E40AF" font-size="10" text-anchor="middle">RECALENDARIZAR</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Modal (Balanza) -->
+      <div id="wf-r2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Balanza de Reajuste (Suma Cero)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="450" fill="#000" opacity="0.3" />
+              <!-- Modal Window -->
+              <rect x="50" y="30" width="900" height="390" fill="#fff" rx="8" stroke="#ccc"/>
+              
+              <text x="70" y="60" font-size="16" font-weight="bold">Reajuste de Flujo: 11300001-301-C...</text>
+              <text x="70" y="80" font-size="12" fill="#666">Importe Modificado Total: <tspan font-weight="bold" fill="#000">$ 12,500,000.00</tspan></text>
+
+              <!-- Modal Toolbar -->
+              <rect x="70" y="100" width="860" height="40" fill="#f4f6f5" rx="4"/>
+              <text x="85" y="125" font-size="12" font-weight="bold">Balanza Aritmética:</text>
+              
+              <!-- Medidor de Balance -->
+              <rect x="700" y="108" width="200" height="25" fill="#D1FAE5" rx="4"/>
+              <text x="800" y="125" font-size="12" fill="#065F46" text-anchor="middle"><tspan font-weight="bold">BALANZA: $ 0.00</tspan> (OK)</text>
+
+              <!-- Grid Matriz (Ene-Dic) -->
+              <rect x="70" y="150" width="860" height="25" fill="#eee"/>
+              <text x="80" y="166" font-size="10" font-weight="bold">MES / QUINCENA</text>
+              <text x="250" y="166" font-size="10" font-weight="bold">PISO DEVENGADO</text>
+              <text x="400" y="166" font-size="10" font-weight="bold">AJUSTE (+ / -)</text>
+              <text x="550" y="166" font-size="10" font-weight="bold">NUEVO MONTO</text>
+
+              <!-- Fila con Decremento (Válido) -->
+              <rect x="70" y="175" width="860" height="35" fill="#fff" stroke="#f0f0f0"/>
+              <text x="80" y="195" font-size="11">ENERO (Q01)</text>
+              <text x="250" y="195" font-size="11" fill="#999">Min: $ 500k</text>
+              
+              <rect x="390" y="180" width="100" height="24" fill="#fef2f2" stroke="#f87171" rx="2"/>
+              <text x="400" y="196" font-size="12" fill="#b91c1c" font-weight="bold">- 50,000.00</text>
+
+              <text x="550" y="195" font-size="11">$ 470,833.33 <tspan fill="red" font-size="9">(¡Error! Abajo de Piso)</tspan></text>
+              <line x1="550" y1="190" x2="620" y2="190" stroke="#b91c1c" stroke-width="2"/> <!-- Tachado visual de error -->
+
+              <!-- Fila con Decremento Legal -->
+              <rect x="70" y="210" width="860" height="35" fill="#fafafa" stroke="#f0f0f0"/>
+              <text x="80" y="230" font-size="11">FEBRERO (Q03)</text>
+              <text x="250" y="230" font-size="11" fill="#999">Min: $ 400k</text>
+              
+              <rect x="390" y="215" width="100" height="24" fill="#fef2f2" stroke="#f87171" rx="2"/>
+              <text x="400" y="231" font-size="12" fill="#b91c1c" font-weight="bold">- 10,000.00</text>
+              
+              <text x="550" y="230" font-size="11" fill="#000" font-weight="bold">$ 510,833.33</text>
+
+              <!-- Fila con Incremento -->
+              <rect x="70" y="245" width="860" height="35" fill="#fff" stroke="#f0f0f0"/>
+              <text x="80" y="265" font-size="11">MARZO (Q05)</text>
+              <text x="250" y="265" font-size="11" fill="#999">Min: $ 0.00</text>
+              
+              <rect x="390" y="250" width="100" height="24" fill="#ecfdf5" stroke="#34d399" rx="2"/>
+              <text x="400" y="266" font-size="12" fill="#047857" font-weight="bold">+ 10,000.00</text>
+              
+              <text x="550" y="265" font-size="11" fill="#000" font-weight="bold">$ 530,833.33</text>
+
+              <text x="80" y="315" font-size="14" fill="#aaa">... (Abril a Diciembre) ...</text>
+
+              <!-- Footer Modal -->
+              <rect x="70" y="375" width="860" height="1" fill="#ccc"/>
+              <rect x="680" y="385" width="100" height="25" fill="#fff" stroke="#ccc" rx="4"/> <text x="730" y="402" fill="#666" font-size="11" text-anchor="middle">Cancelar</text>
+              <rect x="790" y="385" width="140" height="25" fill="#1B3A2D" rx="4"/> <text x="860" y="402" fill="#fff" font-size="11" text-anchor="middle">✓ CONFIRMAR AJUSTE</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-RECAL-01</strong></td>
+            <td>Protección de Saldo Histórico</td>
+            <td>El sistema rechaza la reducción en la Modal si el decremento deja el mes con un "Nuevo Monto" inferior al "Piso Devengado" (suma de su Pagado, Devengado y Comprometido).</td>
+            <td>Motor BD / Modal</td>
+            <td>Control Gubernamental (PJEV DGA)</td>
+          </tr>
+          <tr>
+            <td><strong>RN-RECAL-02</strong></td>
+            <td>Suma Cero Obligatoria (Balanza)</td>
+            <td>Si las sumas de variaciones (+/-) de la clave no dan exactamente `0.00`, se bloquea el botón CONFIRMAR.</td>
+            <td>Frontend Modal</td>
+            <td>Integridad Financiera PJEV</td>
+          </tr>
+          <tr>
+            <td><strong>RN-RECAL-03</strong></td>
+            <td>Excepción a la Suma Cero</td>
+            <td>La balanza puede ser distinta de 0 solo si se provee un <code>folio_ampliacion</code>.</td>
+            <td>BD / Frontend</td>
+            <td>Regla de Ampliación Líquida</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Este módulo lee directamente del <strong>Presupuesto Modificado Temporal</strong>. Cruza forzosamente con el módulo de <strong>Tesorería / Pagos</strong> para recuperar en vivo los saldos comprometidos/devengados (Piso Devengado) y asegurar que no se quite liquidez a periodos cerrados. Su resultado dicta el nuevo "Techo de Liquidez Mensual" para las áreas de Compras y Egresos del Poder Judicial.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>NO</strong></td>
+            <td>
+              La recalendarización es un proceso de ajuste de flujos. Al mantener siempre una "Suma Cero" dentro de la misma clave presupuestal, el techo modificado total no cambia, por lo que no detona ningún momento contable nuevo según CONAC. La excepción es cuando proviene de una Ampliación, en cuyo caso la póliza se genera en el módulo de Ampliaciones, no aquí.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-06</td>
+            <td>1.2</td>
+            <td>Re-arquitectura Modal: Flujo de Grid Principal de Consulta y apertura de Modal de Balanza de Reajustes.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 850" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#991B1B"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="800" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="800" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="800" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="800" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="800" x2="950" y2="800" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="400" transform="rotate(-90 150 400)" font-weight="bold" font-size="24" fill="#ccc" text-anchor="middle" letter-spacing="4">PRESUPUESTOS</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Buscar Clave -->
+  <polygon points="340,130 525,130 510,180 325,180" class="node-data"/>
+  <text x="425" y="150" class="node-text">Filtra y Selecciona Clave</text>
+  <text x="425" y="165" class="node-sub">Clic en [RECALENDARIZAR]</text>
+
+  <path d="M 515 155 L 650 155" class="path-line"/>
+
+  <!-- SIAF: Consulta Saldos -->
+  <rect x="650" y="130" width="250" height="50" class="node-siaf"/>
+  <text x="775" y="150" class="node-text">Consulta Tesorería/Egresos</text>
+  <text x="775" y="165" class="node-sub">Obtiene "Piso Devengado" de la clave</text>
+
+  <path d="M 650 170 L 525 215" class="path-line"/>
+
+  <!-- Modal Balanza -->
+  <rect x="325" y="200" width="200" height="50" class="node"/>
+  <text x="425" y="220" class="node-text">Modal de Balanza</text>
+  <text x="425" y="235" class="node-sub">Despliega matriz con Topes Históricos</text>
+
+  <path d="M 425 250 L 425 280" class="path-line"/>
+
+  <!-- Captura Reajustes -->
+  <rect x="325" y="280" width="200" height="50" class="node"/>
+  <text x="425" y="300" class="node-text">Captura Reajustes (+/-)</text>
+  <text x="425" y="315" class="node-sub">Ingresa variaciones quincenales</text>
+
+  <path d="M 525 305 L 650 305" class="path-line"/>
+
+  <!-- SIAF: Valida Piso y Balanza -->
+  <rect x="650" y="280" width="250" height="50" class="node-siaf"/>
+  <text x="775" y="300" class="node-text">Verifica Saldo y Suma Cero</text>
+  <text x="775" y="315" class="node-sub">No rompe Piso y Balanza == 0.00</text>
+
+  <path d="M 775 330 L 775 360" class="path-line"/>
+
+  <!-- Rombo: ¿Válido? -->
+  <polygon points="775,360 840,410 775,460 710,410" class="node-rombo"/>
+  <text x="775" y="405" class="node-text">¿Es</text>
+  <text x="775" y="420" class="node-text">Válido?</text>
+
+  <!-- NO Válido (Rojo) -->
+  <path d="M 710 410 L 425 410 L 425 330" class="path-red"/>
+  <text x="590" y="400" fill="#991B1B" font-weight="bold" font-size="11">NO (Muestra Error)</text>
+
+  <!-- SÍ Válido (Verde) -->
+  <path d="M 775 460 L 775 510" class="path-green"/>
+  <text x="785" y="495" fill="#166534" font-weight="bold" font-size="11">SÍ (Confirmar Ajuste)</text>
+
+  <!-- SIAF: Guarda DB y Log -->
+  <path d="M 650 510 C 650 500, 900 500, 900 510 L 900 550 C 900 560, 650 560, 650 550 Z" class="node-db" />
+  <path d="M 650 510 C 650 520, 900 520, 900 510" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="532" class="node-text" fill="#0284c7">Aplica Modificación y Audita</text>
+  <text x="775" y="545" class="node-sub">Persiste Calendario y Log BITACORA</text>
+
+  <path d="M 650 535 L 525 535" class="path-line"/>
+
+  <!-- Imprime Reporte -->
+  <path d="M 325 510 L 525 510 L 525 560 C 475 580, 375 540, 325 560 Z" class="node-doc"/>
+  <text x="425" y="535" class="node-text">Bitácora Reajustes</text>
+  <text x="425" y="550" class="node-sub">Reporte Oficial de Modificación</text>
+
+  <path d="M 425 575 L 425 615" class="path-line"/>
+
+  <!-- Fin (Terminador Píldora) -->
+  <rect x="385" y="615" width="80" height="30" class="node-term" />
+  <text x="425" y="634" class="node-term-text">FIN</text>
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>PRESUPUESTOS</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. BÚSQUEDA Y SELECCIÓN</td>
+        <td>Filtra y localiza la Clave Presupuestal. Da clic en "RECALENDARIZAR".</td>
+        <td>Retorna listado paramétrico de claves activas.</td>
+      </tr>
+      <tr>
+        <td>2. CONSULTA DE SALDOS</td>
+        <td></td>
+        <td>Solicita datos cruzados de Tesorería para calcular el "Piso Devengado" de cada quincena y despliega la Modal.</td>
+      </tr>
+      <tr>
+        <td>3. PROYECCIÓN DE BALANZA</td>
+        <td>Captura variaciones (+/-) quincenales según necesidad operativa.</td>
+        <td>Valida en tiempo real que la sumatoria totalice $0.00 (Suma Cero) y rechaza cualquier decremento (-) que rompa el Piso Devengado.</td>
+      </tr>
+      <tr>
+        <td>4. CONFIRMACIÓN Y AUDITORÍA</td>
+        <td>Presiona "Confirmar Ajuste".</td>
+        <td>Persiste las modificaciones en <code>presupuesto_egresos_meses</code> y guarda registro en <code>BITACORA_RECAL</code> para fines de auditoría. No genera póliza contable.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

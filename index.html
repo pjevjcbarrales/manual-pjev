@@ -94,7 +94,7 @@
   .sidebar-subgroup-label:hover { color: var(--pjev-verde-oscuro); }
   .sidebar-subgroup-label::after { content: '▼'; font-size: 8px; transition: transform 0.2s; color: var(--pjev-dorado); }
   .sidebar-subgroup.collapsed .sidebar-subgroup-label::after { transform: rotate(-90deg); }
-  .sidebar-subgroup.collapsed .sidebar-link { display: none; }
+  .sidebar-subgroup.collapsed .sidebar-link, .sidebar-subgroup.collapsed .sidebar-subgroup-label:not(:first-of-type) { display: none; }
   .sidebar-subgroup .sidebar-link { padding-left: 28px; }
 </style>
 </head>
@@ -121,17 +121,17 @@
     <div class="sidebar-group">
       <div class="sidebar-group-label">Inicio</div>
       <a class="sidebar-link active" target="contentFrame" href="home.html">Resumen</a>
-      <a class="sidebar-link" target="contentFrame" href="guia-maestra.html">Guía maestra</a>
-      <a class="sidebar-link" target="contentFrame" href="00-esquema-operativo.html">Metodología de desarrollo</a>
-      <a class="sidebar-link" target="contentFrame" href="00-arquitectura.html">Arquitectura de persistencia</a>
-      <a class="sidebar-link" target="contentFrame" href="00-estandares-sp.html">Estándar de la lógica de negocios</a>
-      <a class="sidebar-link" target="contentFrame" href="00-estandares-prisma.html">Estándar de Prisma ORM</a>
-      <a class="sidebar-link" target="contentFrame" href="00-estandares-rest.html">Estándar de servicios REST</a>
-      <a class="sidebar-link" target="contentFrame" href="00-estandares-analisis-funcional.html">Estándar de Análisis Funcional</a>
-      <a class="sidebar-link" target="contentFrame" href="00-estandares-front-simples.html">Estándar Frontend: Catálogos</a>
-      <a class="sidebar-link" target="contentFrame" href="00-estandares-front-compuestos.html">Estándar Frontend: Compuestos</a>
-      <a class="sidebar-link" target="contentFrame" href="00-estandares-rep-simples.html">Estándar de Reportes Simples</a>
-      <a class="sidebar-link" target="contentFrame" href="00-estandares-rep-complejos.html">Estándar de Reportes Complejos</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/guia-maestra.html">Guía maestra</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-esquema-operativo.html">Metodología de desarrollo</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-arquitectura.html">Arq. de Persistencia</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-sp.html">Estándar Lógica Negocios</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-prisma.html">Estándar de Prisma ORM</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-rest.html">Estándar Servicios REST</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-analisis-funcional.html">Estándar Anál. Funcional</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-front-simples.html">Estándar Front: Catálogo</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-front-compuestos.html">Estándar Front: Compuesto</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-rep-simples.html">Estándar Reporte Simple</a>
+      <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-rep-complejos.html">Estándar Reportes Comp.</a>
     </div>
     <div class="sidebar-group">
       <div class="sidebar-group-label">01 · Configuración Inicial</div>
@@ -191,39 +191,140 @@
     </div>
     <div class="sidebar-group">
       <div class="sidebar-group-label">02 · Presupuesto</div>
-      <a class="sidebar-link" target="contentFrame" href="#">Clave Presupuestal <span class="sidebar-id">02.1.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Presupuesto Autorizado <span class="sidebar-id">02.2.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Transferencias <span class="sidebar-id">02.3.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Calendarización <span class="sidebar-id">02.4.1</span></a>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">02.1 · Registro</div>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.1-clave-presupuestal.html">Clave Presupuestal <span class="sidebar-id">02.1.1</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.1-presupuesto-autorizado.html">Presupuesto Autorizado <span class="sidebar-id">02.1.2</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.3-ley-ingresos-estimada.html">Ley de Ingresos Estimada <span class="sidebar-id">02.1.3</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.4-bienes-inmuebles.html">Bienes Inmuebles <span class="sidebar-id">02.1.4</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.5-registro-contratos.html">Registro de Contratos <span class="sidebar-id">02.1.5</span></a>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">02.2 · Proceso</div>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.1-calendarizacion.html">Calendarización <span class="sidebar-id">02.2.1</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.2-recalendarizacion.html">Recalendarización <span class="sidebar-id">02.2.2</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.3-transferencias.html">Transferencias <span class="sidebar-id">02.2.3</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.4-ampliaciones-reducciones.html">Amp. y Red. (Egresos) <span class="sidebar-id">02.2.4</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.5-ampliaciones-reducciones-ingresos.html">Amp. y Red. (Ingresos) <span class="sidebar-id">02.2.5</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.6-compromiso-arrendamientos.html">Compromiso Arrend. <span class="sidebar-id">02.2.6</span></a>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">02.3 · Imprimir</div>
+        
+        <div class="sidebar-subgroup-label" style="margin-top: 8px; color: #9ca3af; font-size: 8px;">REPORTES OPERATIVOS</div>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.1-edo-ejercicio-presup.html">Consola Central Reportes <span class="sidebar-id">02.3.1</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.2-suficiencias.html">Suficiencias Presup. <span class="sidebar-id">02.3.2</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.3-bitacora-adecuaciones.html">Bitácora de Adecuaciones <span class="sidebar-id">02.3.3</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4-gastos-operacion.html">Gastos de Operación (UA) <span class="sidebar-id">02.3.4</span></a>
+
+        <div class="sidebar-subgroup-label" style="margin-top: 8px; color: #9ca3af; font-size: 8px;">REPORTES CONAC</div>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.5-eaepe-clasif-admin.html">EAepe - Clasif. Admin. <span class="sidebar-id">02.3.5</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.6-eaepe-clasif-eco.html">EAepe - Clasif. Económica <span class="sidebar-id">02.3.6</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.7-eaepe-objeto-gasto.html">EAepe - Objeto del Gasto <span class="sidebar-id">02.3.7</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.8-eaepe-clasif-func.html">EAepe - Clasif. Funcional <span class="sidebar-id">02.3.8</span></a>
+        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.9-edo-analitico-ingresos.html">Edo. Analítico Ingresos <span class="sidebar-id">02.3.9</span></a>
+      </div>
     </div>
     <div class="sidebar-group">
       <div class="sidebar-group-label">03 · Contabilidad</div>
-      <a class="sidebar-link" target="contentFrame" href="#">Catálogo de Cuentas <span class="sidebar-id">03.1.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Pólizas Manuales <span class="sidebar-id">03.2.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Pólizas Automáticas <span class="sidebar-id">03.3.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Auxiliar / Libro Diario <span class="sidebar-id">03.4.1</span></a>
+      
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">03.1 · Catálogos y Config</div>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.1.1-alta-cuentas.html">Plan de Cuentas <span class="sidebar-id">03.1.1</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.1.2-matriz-conversion.html">Matriz de Conversión <span class="sidebar-id">03.1.2</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.1.3-modulo-retenciones.html">Módulo Retenciones <span class="sidebar-id">03.1.3</span> 🚧</a>
+      </div>
+
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">03.2 · Registro Contable</div>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.1-visor-polizas-automaticas.html">Pólizas Automáticas <span class="sidebar-id">03.2.1</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.2-polizas-diario-manuales.html">Pólizas Manuales <span class="sidebar-id">03.2.2</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.3-contabilidad-fideicomisos.html">Fideicomisos <span class="sidebar-id">03.2.3</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.4-boveda-cfdi.html">Bóveda CFDI <span class="sidebar-id">03.2.4</span> 🚧</a>
+      </div>
+
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">03.3 · Procesos y Cierres</div>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.1-descarga-contable-masiva.html">Descarga Contable Masiva <span class="sidebar-id">03.3.1</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.2-conciliacion-bancaria.html">Conciliación Bancaria <span class="sidebar-id">03.3.2</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.3-conciliacion-ministraciones.html">Conc. de Ministraciones <span class="sidebar-id">03.3.3</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.4-conciliacion-presupuesto-contable.html">Presupuesto vs Contable <span class="sidebar-id">03.3.4</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.5-conciliacion-intersistemas.html">Conc. Inter-Sistemas <span class="sidebar-id">03.3.5</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.6-conciliacion-obra-publica.html">Conc. Obra Pública <span class="sidebar-id">03.3.6</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.6.1-cierre-mensual.html">Cierre Mensual Contable <span class="sidebar-id">03.6.1</span></a>
+      </div>
+
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">03.4 · Integración Saldos</div>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.1-antiguedad-saldos.html">Antigüedad de Saldos <span class="sidebar-id">03.4.1</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.2-integracion-activo-circulante.html">Integra Activo Circulante <span class="sidebar-id">03.4.2</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-integracion-pasivo-circulante.html">Integra Pasivo Circulante <span class="sidebar-id">03.4.3</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.4-integracion-activo-no-circulante.html">Integra Activo Fijo <span class="sidebar-id">03.4.4</span> 🚧</a>
+      </div>
+
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">03.5 · Estados Financieros</div>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.5.1-estados-trimestrales-cuenta-publica.html">Trimestrales / Cta. Pub. <span class="sidebar-id">03.5.1</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.5.2-notas-estados-financieros.html">Notas Edos. Financieros <span class="sidebar-id">03.5.2</span> 🚧</a>
+      </div>
     </div>
     <div class="sidebar-group">
       <div class="sidebar-group-label">04 · Cuentas por Cobrar</div>
-      <a class="sidebar-link" target="contentFrame" href="#">Tipos de Movimiento <span class="sidebar-id">04.1.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Conceptos de Ingreso <span class="sidebar-id">04.1.2</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Ingresos por Recurso <span class="sidebar-id">04.2.1</span></a>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Registro</div>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Tipos de Movimiento <span class="sidebar-id">04.1.1</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Conceptos de Ingreso <span class="sidebar-id">04.1.2</span> 🚧</a>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Proceso</div>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Ingresos por Recurso <span class="sidebar-id">04.2.1</span> 🚧</a>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Imprimir</div>
+      </div>
     </div>
     <div class="sidebar-group">
       <div class="sidebar-group-label">05 · Cuentas por Pagar</div>
-      <a class="sidebar-link" target="contentFrame" href="#">Afect. Servicios Personales <span class="sidebar-id">05.1.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Afect. Recursos Materiales <span class="sidebar-id">05.1.2</span></a>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Registro</div>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Proceso</div>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Afect. Serv. Personales <span class="sidebar-id">05.1.1</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Afect. Rec. Materiales <span class="sidebar-id">05.1.2</span> 🚧</a>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Imprimir</div>
+      </div>
     </div>
     <div class="sidebar-group">
       <div class="sidebar-group-label">06 · Tesorería</div>
-      <a class="sidebar-link" target="contentFrame" href="#">Movimientos de Caja <span class="sidebar-id">06.1.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Conciliación Bancaria <span class="sidebar-id">06.2.1</span></a>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Registro</div>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Proceso</div>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Movimientos de Caja <span class="sidebar-id">06.1.1</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Conciliación Bancaria <span class="sidebar-id">06.2.1</span> 🚧</a>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Imprimir</div>
+      </div>
     </div>
     <div class="sidebar-group">
       <div class="sidebar-group-label">07 · Adquisiciones</div>
-      <a class="sidebar-link" target="contentFrame" href="#">Adjudicación Directa <span class="sidebar-id">07.1.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Contratos <span class="sidebar-id">07.2.1</span></a>
-      <a class="sidebar-link" target="contentFrame" href="#">Pedidos <span class="sidebar-id">07.2.2</span></a>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Registro</div>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Contratos <span class="sidebar-id">07.2.1</span> 🚧</a>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Proceso</div>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Adjudicación Directa <span class="sidebar-id">07.1.1</span> 🚧</a>
+        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Pedidos <span class="sidebar-id">07.2.2</span> 🚧</a>
+      </div>
+      <div class="sidebar-subgroup">
+        <div class="sidebar-subgroup-label">Imprimir</div>
+      </div>
     </div>
   </nav>
 
@@ -236,11 +337,8 @@
   document.addEventListener('DOMContentLoaded', () => {
     // 1. Lógica del Acordeón
     const groups = document.querySelectorAll('.sidebar-group');
-    groups.forEach((group, index) => {
-      // Dejamos abierto solo el primer grupo (Inicio) por defecto
-      if (index !== 0) {
-        group.classList.add('collapsed');
-      }
+    groups.forEach((group) => {
+      group.classList.add('collapsed');
       const label = group.querySelector('.sidebar-group-label');
       if (label) {
         label.addEventListener('click', () => {
@@ -251,11 +349,8 @@
 
     // 2. Lógica del Acordeón para Subgrupos
     const subgroups = document.querySelectorAll('.sidebar-subgroup');
-    subgroups.forEach((subgroup, index) => {
-      // Dejamos abierto solo el grupo "01.2 Catálogos Base" (index 1) por defecto, el resto colapsados
-      if (index !== 1) {
-        subgroup.classList.add('collapsed');
-      }
+    subgroups.forEach((subgroup) => {
+      subgroup.classList.add('collapsed');
       const label = subgroup.querySelector('.sidebar-subgroup-label');
       if (label) {
         label.addEventListener('click', () => {

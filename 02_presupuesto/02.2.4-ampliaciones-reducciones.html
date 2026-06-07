@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.2.4-ampliaciones-reducciones.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+  
+  .conac-alert { background:#fff3cd; border:1px solid #ffeeba; color:#856404; padding:10px 15px; border-radius:6px; font-size:13px; margin:15px 0; display:flex; gap:10px; align-items:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Presupuesto</span> ›
+      <span>Proceso</span> ›
+      <span>Ampliaciones y Reducciones (Egresos)</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.2.4</div>
+        <h1 class="elem-title">Ampliaciones y Reducciones (Egresos)</h1>
+        <p class="elem-desc">Módulo transaccional para incrementar o disminuir el Techo Presupuestal de Egresos. Opera con base en oficios notificatorios (ej. SEFIPLAN) y genera afectaciones directas al Presupuesto Modificado, alterando las bolsas del presupuesto disponible.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-p">Tipo: Movimiento Presupuestal Directo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Este procedimiento registra las inyecciones de liquidez adicional (Ampliaciones) o los recortes presupuestales (Reducciones) dictados por una autoridad competente, típicamente la SEFIPLAN. A diferencia de las Transferencias Compensadas (que suman 0 al moverse entre partidas), estos movimientos <strong>alteran el total global</strong> del Presupuesto de Egresos del ejercicio en curso. Toda operación exige adjuntar la evidencia documental (Oficio) y asigna un folio consecutivo.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>LGCG</td><td>Art. 44 y 46</td><td>Exige registro documental y afectación en los momentos contables correspondientes al techo financiero.</td></tr>
+          <tr><td>Manual Procedimientos</td><td>AFECT-2024</td><td>Condición obligatoria de existencia de Clave Presupuestal y Oficio SEFIPLAN.</td></tr>
+          <tr><td>CONAC</td><td>Momentos Presupuestarios</td><td>Generar afectaciones a las cuentas de orden de Presupuesto Modificado (8.2.3).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. ROLES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Programación y Presupuesto (DPP)</td><td>Registra el movimiento, carga el Oficio y emite la autorización en SIAF.</td><td>Para Reducciones, no puede exceder el "Saldo Disponible" de la partida.</td></tr>
+          <tr><td>Dirección General Admin (DGA)</td><td>Visto Bueno (Solo cuando el código presupuestal no existe).</td><td>—</td></tr>
+          <tr><td>Tesorería</td><td>Recibe notificación pasiva de códigos ampliados.</td><td>Solo informativo para proceder a pagar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Tabla: <code>presupuesto.movimientos_modificacion</code></strong></td></tr>
+        <tr><td><code>mod_id</code></td><td><code>BIGINT PK</code></td><td>Identificador único del movimiento.</td></tr>
+        <tr><td><code>tipo_movimiento</code></td><td><code>VARCHAR(1)</code></td><td><code>'A'</code> (Ampliación) o <code>'R'</code> (Reducción).</td></tr>
+        <tr><td><code>folio_oficio</code></td><td><code>VARCHAR(50)</code></td><td>Número de oficio de SEFIPLAN.</td></tr>
+        <tr><td><code>fecha_movimiento</code></td><td><code>DATE</code></td><td>Fecha de recepción del documento oficial.</td></tr>
+        <tr><td><code>archivo_respaldo</code></td><td><code>VARCHAR(255)</code></td><td>Ruta del PDF escaneado (Blob Storage).</td></tr>
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Tabla: <code>presupuesto.movimientos_modificacion_det</code></strong></td></tr>
+        <tr><td><code>clave_presupuestal_id</code></td><td><code>BIGINT FK</code></td><td>Llave de la partida afectada.</td></tr>
+        <tr><td><code>monto</code></td><td><code>DECIMAL</code></td><td>Importe ampliado o reducido.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. STORED PROCEDURES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>presupuesto.sp_validar_reduccion</code></strong> (Valida que la reducción no deje la clave en saldo negativo).</li>
+        <li><strong><code>presupuesto.sp_aplicar_modificacion_egresos</code></strong> (Inserta el movimiento y actualiza las sábanas de "Presupuesto Modificado" y "Por Ejercer").</li>
+      </ul>
+    </div>
+
+    <!-- 6. SERVICIOS REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><span class="method post">POST</span></td><td><code>/ppto/modificaciones/aplicar</code></td><td>{ tipo, folio, detalles[], file }</td><td>Registra el movimiento, carga el PDF y lo oficializa.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/ppto/modificaciones/oficio/{id}</code></td><td>—</td><td>Descarga la notificación enviada a Tesorería.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. DISEÑO DE INTERFACES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('i1',this)">Modal: Ampliación / Reducción</button>
+      </div>
+
+      <div id="wf-i1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Captura de Modificación Presupuestal</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 320" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="320" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Form Header -->
+              <rect x="20" y="20" width="960" height="30" fill="#1B3A2D" rx="2"/>
+              <text x="35" y="40" fill="#fff" font-size="12" font-weight="bold">FOLIO: MOD-2026-0089</text>
+
+              <!-- Tipo selector -->
+              <rect x="35" y="70" width="120" height="25" fill="#166534" rx="3"/>
+              <text x="95" y="87" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">AMPLIACIÓN (+)</text>
+
+              <rect x="165" y="70" width="120" height="25" fill="#f4f6f5" stroke="#ccc" rx="3"/>
+              <text x="225" y="87" fill="#666" font-size="11" text-anchor="middle">REDUCCIÓN (-)</text>
+              
+              <!-- Oficio / Evidencia -->
+              <text x="400" y="80" fill="#333" font-size="10" font-weight="bold">Oficio SEFIPLAN:</text>
+              <rect x="400" y="85" width="200" height="25" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="410" y="102" fill="#333" font-size="10">SEFIPLAN-892-2026</text>
+
+              <rect x="620" y="85" width="100" height="25" fill="#e0f2fe" stroke="#0284c7" rx="2"/>
+              <text x="670" y="102" fill="#0284c7" font-size="10" font-weight="bold" text-anchor="middle">📎 Adjuntar PDF</text>
+
+              <!-- Grid Detail -->
+              <rect x="35" y="140" width="930" height="20" fill="#eee"/>
+              <text x="45" y="154" fill="#333" font-size="9" font-weight="bold">CLAVE PRESUPUESTAL</text>
+              <text x="350" y="154" fill="#333" font-size="9" font-weight="bold">DESCRIPCIÓN (CRI / COG)</text>
+              <text x="650" y="154" fill="#333" font-size="9" font-weight="bold">DISPONIBLE ACTUAL</text>
+              <text x="800" y="154" fill="#333" font-size="9" font-weight="bold">MONTO A MODIFICAR</text>
+
+              <rect x="35" y="160" width="930" height="30" fill="#fff" stroke="#eee"/>
+              <text x="45" y="179" fill="#1B3A2D" font-size="10" font-family="monospace">11-2026-101-33101-1</text>
+              <text x="350" y="179" fill="#666" font-size="10">Servicios legales y contables</text>
+              <text x="650" y="179" fill="#333" font-size="10">$ 100,000.00</text>
+              <rect x="800" y="165" width="100" height="20" fill="#fcfcfc" stroke="#ccc"/>
+              <text x="810" y="179" fill="#166534" font-size="10" font-weight="bold">+ $ 50,000.00</text>
+
+              <!-- Actions -->
+              <rect x="845" y="270" width="120" height="28" fill="#1B3A2D" rx="4"/>
+              <text x="905" y="288" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">✔ AUTORIZAR</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. REGLAS DE NEGOCIO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th></tr></thead>
+        <tbody>
+        <tr><td><strong>RN-AMP-01</strong></td><td>Suficiencia para Reducción</td><td>Una clave no puede reducirse por un monto mayor a su "Saldo Disponible". Si ocurre, el sistema bloquea y arroja error.</td><td>SP Validación</td></tr>
+        <tr><td><strong>RN-AMP-02</strong></td><td>Restricción Documental</td><td>No se permite guardar una afectación sin ingresar el No. de Oficio y haber adjuntado el PDF escaneado (LGCG).</td><td>API Rest</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 9. AFECTACIÓN CONTABLE -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Afectación Contable (Reglas CONAC)</div>
+      <p>Todo movimiento impacta la cuenta de <code>Modificaciones</code>, la cual altera indirectamente la bolsa de Egresos por Ejercer.</p>
+
+      <table class="props-table">
+        <thead><tr><th>Tipo de Movimiento</th><th>Cargo</th><th>Abono</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Ampliación (+)</strong></td>
+            <td><code>8.2.3</code> Modificaciones al Ppto Egresos Aprobado</td>
+            <td><code>8.2.2</code> Presupuesto de Egresos por Ejercer</td>
+          </tr>
+          <tr>
+            <td><strong>Reducción (-)</strong></td>
+            <td><code>8.2.2</code> Presupuesto de Egresos por Ejercer</td>
+            <td><code>8.2.3</code> Modificaciones al Ppto Egresos Aprobado</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 850" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#991B1B"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="800" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="800" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="800" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="800" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">PPTO (DPP)</text>
+  <line x1="50" y1="600" x2="250" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <text x="150" y="680" transform="rotate(-90 150 680)" font-weight="bold" font-size="14" fill="#ccc" text-anchor="middle" letter-spacing="2">TESORERÍA</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO</text>
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Recibe Oficio -->
+  <path d="M 325 130 L 525 130 L 525 180 C 475 200, 375 160, 325 180 Z" class="node-doc"/>
+  <text x="425" y="155" class="node-text">Recibe Oficio (SEFIPLAN)</text>
+  <text x="425" y="170" class="node-sub">Notificación de Ampliación/Reducción</text>
+
+  <path d="M 425 190 L 425 220" class="path-line"/>
+
+  <!-- SIAF: Verifica Clave -->
+  <rect x="325" y="220" width="200" height="50" class="node"/>
+  <text x="425" y="240" class="node-text">Captura Folio y Monto</text>
+  <text x="425" y="255" class="node-sub">Busca Clave Presupuestal</text>
+
+  <path d="M 525 245 L 650 245" class="path-line"/>
+
+  <polygon points="775,210 850,245 775,280 700,245" class="node-rombo"/>
+  <text x="775" y="240" class="node-text">¿Existe</text>
+  <text x="775" y="255" class="node-text">la Clave?</text>
+
+  <path d="M 775 280 L 775 320" class="path-green"/>
+  <text x="785" y="305" fill="#166534" font-weight="bold" font-size="10">SÍ</text>
+
+  <!-- Flujo NO -->
+  <path d="M 850 245 L 900 245 L 900 130 L 775 130" class="path-red"/>
+  <rect x="675" y="110" width="100" height="40" class="node-siaf"/>
+  <text x="725" y="125" class="node-text">DGA</text>
+  <text x="725" y="140" class="node-sub">Crear Clave</text>
+  <text x="860" y="240" fill="#991B1B" font-weight="bold" font-size="10">NO</text>
+
+  <!-- SIAF: Valida Montos -->
+  <rect x="650" y="320" width="250" height="50" class="node-siaf"/>
+  <text x="775" y="340" class="node-text">Valida Reglas de Negocio</text>
+  <text x="775" y="355" class="node-sub">(No exceder Disponible en Reducción)</text>
+
+  <path d="M 775 370 L 775 400" class="path-line"/>
+
+  <!-- Autorización -->
+  <rect x="650" y="400" width="250" height="50" class="node-siaf"/>
+  <text x="775" y="420" class="node-text">Autoriza y Actualiza Saldos</text>
+  <text x="775" y="435" class="node-sub">Impacta Presupuesto Modificado</text>
+
+  <path d="M 775 450 L 775 480" class="path-line"/>
+
+  <!-- Póliza -->
+  <rect x="650" y="480" width="250" height="50" class="poliza"/>
+  <text x="775" y="500" class="node-text" fill="#9d174d">Genera Póliza de Modificación</text>
+  <text x="775" y="515" class="node-sub">(Cargo 8.2.3 / Abono 8.2.2)</text>
+
+  <path d="M 650 505 L 525 505" class="path-line"/>
+
+  <!-- Informa a Tesorería -->
+  <path d="M 325 480 L 525 480 L 525 530 C 475 550, 375 510, 325 530 Z" class="node-doc"/>
+  <text x="425" y="505" class="node-text">Oficio Interno de</text>
+  <text x="425" y="520" class="node-text">Afectación Pptal</text>
+
+  <path d="M 425 540 L 425 630" class="path-line"/>
+
+  <!-- Tesorería Recibe -->
+  <rect x="325" y="630" width="200" height="50" class="node"/>
+  <text x="425" y="650" class="node-text">Recibe Notificación</text>
+  <text x="425" y="665" class="node-sub">Para liberación de trámites de pago</text>
+
+  <path d="M 425 680 L 425 720" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="720" width="80" height="30" class="node-term" />
+  <text x="425" y="739" class="node-term-text">FIN</text>
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>PRESUPUESTO (DPP)</th>
+        <th>TESORERÍA</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. IDENTIFICACIÓN Y VERIFICACIÓN</td>
+        <td>Analiza Oficio de SEFIPLAN, ingresa al SIAF para validar que la Clave Presupuestal exista.</td>
+        <td></td>
+        <td>Valida la base de datos de claves. Si no existe, requiere flujo alterno (Tarjeta Informativa).</td>
+      </tr>
+      <tr>
+        <td>2. CAPTURA Y VALIDACIÓN</td>
+        <td>Ingresa folio, anexa PDF y especifica monto a Ampliar o Reducir.</td>
+        <td></td>
+        <td>Si es reducción, verifica que no rebase el "Saldo Disponible" (Comprometido + Devengado).</td>
+      </tr>
+      <tr>
+        <td>3. AUTORIZACIÓN Y PÓLIZA</td>
+        <td>Firma y Autoriza el movimiento.</td>
+        <td></td>
+        <td>Actualiza cuentas 8.2.3 y 8.2.2 en contabilidad, y suma/resta el monto en el control presupuestal.</td>
+      </tr>
+      <tr>
+        <td>4. NOTIFICACIÓN</td>
+        <td>Imprime oficio interno y envía a Tesorería.</td>
+        <td>Recibe oficio para tener certeza de fondos antes de liberar pagos.</td>
+        <td>Mantiene la bitácora de auditoría inalterable ligada al Folio SEFIPLAN.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

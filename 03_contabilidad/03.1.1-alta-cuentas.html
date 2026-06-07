@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.1.1-alta-cuentas.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.1.1 Alta de Cuentas Contables</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.1.1</div>
+        <h1 class="elem-title">Alta de Cuentas Contables en el SAFPOJ</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV (Referencia: Manual PJEV 243).</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Catálogo Base</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El módulo de Alta de Cuentas Contables permite a la Dirección de Contabilidad gestionar el Plan de Cuentas institucional (niveles 1 a 6). Asegura que el registro de nuevas cuentas, subcuentas y auxiliares (como nuevas cuentas bancarias o tipos de proveedores) se realice respetando la estructura jerárquica del CONAC, facilitando así el registro contable diario.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>LGCG (CONAC)</td><td>Manual de Contabilidad Gubernamental</td><td>El ente debe mantener un Plan de Cuentas armonizado, prohibiendo el registro en cuentas de mayor si existen cuentas de menor nivel.</td></tr>
+          <tr><td>Control Interno PJEV</td><td>Punto 243</td><td>La apertura de cuentas contables debe ser centralizada en la Subdirección de Contabilidad para mantener integridad.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Analista Contable</td><td>Crear cuentas nivel 5 y 6, solicitar reportes.</td><td>No puede crear, modificar ni eliminar cuentas de nivel 1 al 4 (reservadas CONAC).</td></tr>
+          <tr><td>Jefe de Contabilidad</td><td>Crear cualquier nivel (excepto 1 al 3). Imprimir catálogo general.</td><td>No puede eliminar cuentas si estas ya tienen movimientos históricos (sólo inactivar).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>CTA_ID</code></td><td><code>BIGINT (PK)</code></td><td>Identificador único del registro de la cuenta.</td></tr>
+        <tr><td><code>CTA_CODIGO</code></td><td><code>VARCHAR(20)</code></td><td>Código jerárquico (Ej. 1112.01.0001).</td></tr>
+        <tr><td><code>CTA_NOMBRE</code></td><td><code>VARCHAR(255)</code></td><td>Descripción de la cuenta contable.</td></tr>
+        <tr><td><code>CTA_NIVEL</code></td><td><code>SMALLINT</code></td><td>Profundidad en el árbol (1 = Género, 6 = Auxiliar).</td></tr>
+        <tr><td><code>CTA_NATURALEZA</code></td><td><code>CHAR(1)</code></td><td>'D' para Deudora, 'A' para Acreedora.</td></tr>
+        <tr><td><code>CTA_ESTATUS</code></td><td><code>SMALLINT</code></td><td>1 = Activa, 0 = Inactiva.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_leer_cat_cuentas</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@nivel</code>, <code>@codigo_padre</code>, <code>@page</code>, <code>@limit</code>
+          <br><span style="color:#666">OUT:</span> Recordset jerárquico y <code>{total_count}</code> para paginación.
+        </li>
+        <li><strong><code>fn_crud_cat_cuentas</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@accion (ALTA, MODIFICAR, INACTIVAR)</code>, <code>@cta_id</code>, <code>@cta_codigo</code>, <code>@cta_nombre</code>, <code>@cta_naturaleza</code>
+          <br><span style="color:#666">OUT:</span> <code>{status}</code>, <code>{message}</code>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/cuentas/leer</code></td><td>JSON con <code>{ nivel, codigo_padre... }</code></td><td>Devuelve el catálogo de cuentas en formato árbol.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/cuentas/abc</code></td><td>JSON con <code>{ accion, cta_codigo, cta_nombre... }</code></td><td>Alta, baja lógica o modificación de una cuenta.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone 3 acciones críticas operadas desde la interfaz:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Registro Nuevo (Crear Nodo):</strong> Agrega una cuenta hija dependiendo del nodo seleccionado. El sistema valida que el padre exista y hereda la naturaleza.</li>
+        <li><strong>Inactivación:</strong> Oculta la cuenta del seleccionador de pólizas. Valida que su saldo actual sea cero.</li>
+        <li><strong>Impresión / Exportación:</strong> Botón que permite descargar el Plan de Cuentas completo en formato PDF o Excel, obligatorio para anexar a reportes de control.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Esqueleto)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Valores)</button>
+        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc (Esqueleto)</button>
+        <button class="wf-tab" onclick="showWF('p4',this)">pantalla_abc (Valores)</button>
+      </div>
+
+      <!-- TAB 1: Grid Parametros -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Tree-Grid View (Esqueleto / Parametrizado)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <!-- Search Bar -->
+              <rect x="20" y="20" width="300" height="25" fill="#eee" rx="3"/> <text x="25" y="35" font-size="10">@buscar_cuenta</text>
+              
+              <!-- Action Bar -->
+              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Registro:</text>
+              <rect x="90" y="62" width="110" height="21" fill="#1B3A2D" rx="3"/> <text x="145" y="76" fill="#fff" font-size="9" text-anchor="middle">+ AGREGAR HIJO</text>
+              <line x1="220" y1="60" x2="220" y2="85" stroke="#ccc" />
+
+              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR CATÁLOGO</text>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="121" fill="#fff" font-size="10">{cta_codigo}</text>
+              <text x="200" y="121" fill="#fff" font-size="10">{cta_nombre}</text>
+              <text x="500" y="121" fill="#fff" font-size="10">{cta_nivel}</text>
+              <text x="650" y="121" fill="#fff" font-size="10">{cta_naturaleza}</text>
+              <text x="800" y="121" fill="#fff" font-size="10">ACCIONES</text>
+
+              <!-- Grid Row -->
+              <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <text x="30" y="150" font-size="11">{val.codigo_formateado}</text>
+              <text x="200" y="150" font-size="11">{val.descripcion}</text>
+              <text x="500" y="150" font-size="11">{val.nivel_desc}</text>
+              <text x="650" y="150" font-size="11">{val.nat_desc}</text>
+              <text x="800" y="150" font-size="10" fill="blue">[EDITAR]</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Grid Valores -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Tree-Grid View (Datos de Ejemplo)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <!-- Search Bar -->
+              <rect x="20" y="20" width="300" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="25" y="37" font-size="10">Buscar: "Bancos"</text>
+              
+              <!-- Action Bar -->
+              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Registro:</text>
+              <rect x="90" y="62" width="110" height="21" fill="#1B3A2D" rx="3"/> <text x="145" y="76" fill="#fff" font-size="9" text-anchor="middle">+ Agregar Auxiliar</text>
+              <line x1="220" y1="60" x2="220" y2="85" stroke="#ccc" />
+
+              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 Imprimir Catálogo</text>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="121" fill="#fff" font-size="10">CÓDIGO</text>
+              <text x="200" y="121" fill="#fff" font-size="10">DESCRIPCIÓN</text>
+              <text x="500" y="121" fill="#fff" font-size="10">NIVEL</text>
+              <text x="650" y="121" fill="#fff" font-size="10">NATURALEZA</text>
+              <text x="800" y="121" fill="#fff" font-size="10">ACCIONES</text>
+
+              <!-- Row 1 -->
+              <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <text x="30" y="150" font-size="11" font-weight="bold">1112</text>
+              <text x="200" y="150" font-size="11" font-weight="bold">Bancos / Tesorería</text>
+              <text x="500" y="150" font-size="11">4 - Mayor</text>
+              <text x="650" y="150" font-size="11">D - Deudora</text>
+              <text x="800" y="150" font-size="10" fill="#999">Bloqueada CONAC</text>
+
+              <!-- Row 2 (Indented) -->
+              <rect x="20" y="160" width="960" height="30" fill="#fafafa" stroke="#eee"/>
+              <text x="50" y="180" font-size="11">└ 1112.01.0001</text>
+              <text x="200" y="180" font-size="11">Cta. Santander 5512 Nóminas</text>
+              <text x="500" y="180" font-size="11">6 - Auxiliar</text>
+              <text x="650" y="180" font-size="11">D - Deudora</text>
+              <text x="800" y="180" font-size="10" fill="blue">Editar</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ABC Parametros -->
+      <div id="wf-p3" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Esqueleto / Parametrizado)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="250" fill="#fff" stroke="#ddd"/>
+              <text x="30" y="40" font-size="16" font-weight="bold">Nueva Cuenta Hija</text>
+              
+              <text x="30" y="80" font-size="12">Cuenta Padre:</text>
+              <rect x="150" y="65" width="100" height="25" fill="#f0f0f0" rx="3"/>
+              <text x="160" y="82" font-size="11" fill="#666">@codigo_padre</text>
+              
+              <text x="30" y="115" font-size="12">Sufijo Código:</text>
+              <rect x="150" y="100" width="100" height="25" fill="#eee" rx="3"/>
+              <text x="160" y="117" font-size="11">@nuevo_sufijo</text>
+
+              <text x="30" y="150" font-size="12">Descripción:</text>
+              <rect x="150" y="135" width="400" height="25" fill="#eee" rx="3"/>
+              <text x="160" y="152" font-size="11">@cta_nombre (Text)</text>
+
+              <rect x="450" y="190" width="100" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="500" y="210" fill="#fff" font-size="12" text-anchor="middle">[ GUARDAR ]</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ABC Valores -->
+      <div id="wf-p4" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Datos de Ejemplo)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="250" fill="#fff" stroke="#ddd"/>
+              <text x="30" y="40" font-size="16" font-weight="bold">Nueva Cuenta Auxiliar de Bancos</text>
+              
+              <text x="30" y="80" font-size="12">Cuenta Padre:</text>
+              <rect x="150" y="65" width="100" height="25" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
+              <text x="160" y="82" font-size="11" fill="#64748b">1112.01</text>
+              
+              <text x="30" y="115" font-size="12">Sufijo Código:</text>
+              <rect x="150" y="100" width="100" height="25" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="160" y="117" font-size="11" font-weight="bold">0005</text>
+              <text x="260" y="117" font-size="10" fill="#166534">Resultado: 1112.01.0005</text>
+
+              <text x="30" y="150" font-size="12">Descripción:</text>
+              <rect x="150" y="135" width="400" height="25" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="160" y="152" font-size="11">Banorte Cta. Ingresos Propios</text>
+
+              <rect x="450" y="190" width="100" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="500" y="210" fill="#fff" font-size="12" text-anchor="middle">Guardar Registro</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-CT-01</strong></td>
+            <td>Protección CONAC: Las cuentas de Nivel 1 a 4 están hardcodeadas y protegidas.</td>
+            <td>Error: "Nivel protegido, no se puede modificar".</td>
+            <td>SP (<code>fn_crud</code>)</td>
+            <td>LGCG Plan de Cuentas</td>
+          </tr>
+          <tr>
+            <td><strong>RN-CT-02</strong></td>
+            <td>Herencia de Naturaleza: Un hijo no puede tener naturaleza distinta a la de su padre.</td>
+            <td>Forzar la naturaleza del padre al crear el registro.</td>
+            <td>Frontend y SP</td>
+            <td>Teoría Contable Básica</td>
+          </tr>
+          <tr>
+            <td><strong>RN-CT-03</strong></td>
+            <td>Inactivación Segura: No se puede inactivar una cuenta con saldo distinto a 0.</td>
+            <td>Error: "La cuenta posee saldo, depure antes de inactivar".</td>
+            <td>Validaciones DB (SP)</td>
+            <td>Control Interno PJEV</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>El catálogo de cuentas contables es el corazón del sistema SAFPOJ. <strong>Hacia atrás</strong>, no depende de ningún otro módulo, es el origen de los datos maestros. <strong>Hacia adelante</strong>, alimenta a la Matriz de Conversión (Ingresos/Egresos), a los Módulos de Pólizas, Fideicomisos y es la base estructural para la Emisión de Estados Financieros.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>NO</strong></td>
+            <td>
+              Al ser un módulo de catálogo maestro, no genera cargos ni abonos por sí mismo. Solo estructura el lugar donde las pólizas transaccionales depositarán los montos.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-07</td>
+            <td>2.0</td>
+            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma de carriles.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">CONTABILIDAD</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="90" width="80" height="25" class="node-term" />
+  <text x="425" y="106" class="node-term-text">INICIO</text>
+  
+  <path d="M 425 115 L 425 140" class="path-line"/>
+
+  <!-- Proceso: Captura de Cuentas -->
+  <polygon points="340,140 525,140 510,190 325,190" class="node-data"/>
+  <text x="425" y="160" class="node-text">Ingreso de Nueva Cuenta</text>
+  <text x="425" y="175" class="node-sub">Padre, Nivel y Descripción</text>
+
+  <path d="M 515 165 L 650 165" class="path-line"/>
+
+  <!-- SIAF: Validaciones -->
+  <rect x="650" y="140" width="250" height="50" class="node-siaf"/>
+  <text x="775" y="160" class="node-text">Valida Reglas de Negocio</text>
+  <text x="775" y="175" class="node-sub">Nivel > 4, Naturaleza coherente.</text>
+
+  <path d="M 775 190 L 775 230" class="path-line"/>
+
+  <!-- SIAF: Inserta BD -->
+  <path d="M 650 230 C 650 220, 900 220, 900 230 L 900 270 C 900 280, 650 280, 650 270 Z" class="node-db" />
+  <path d="M 650 230 C 650 240, 900 240, 900 230" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="252" class="node-text">Registro de Catálogo</text>
+  <text x="775" y="265" class="node-sub">Inserta en cat_cuentas_contables</text>
+
+  <path d="M 775 280 L 775 320" class="path-line"/>
+
+  <!-- SIAF -> Regresa a Proceso -->
+  <line x1="775" y1="320" x2="425" y2="320" class="path-line"/>
+
+  <!-- Proceso: Impresión -->
+  <path d="M 325 320 L 525 320 L 525 370 C 475 390, 375 350, 325 370 Z" class="node-doc"/>
+  <text x="425" y="345" class="node-text">Catálogo Actualizado</text>
+  <text x="425" y="360" class="node-sub">Impresión de reporte oficial</text>
+
+  <path d="M 425 380 L 425 420" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="420" width="80" height="30" class="node-term" />
+  <text x="425" y="439" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>CONTADOR / ANALISTA</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. IDENTIFICACIÓN NECESIDAD</td>
+        <td>Detecta la necesidad de una cuenta auxiliar para registrar movimientos bancarios o nuevos deudores.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>2. REGISTRO EN SISTEMA</td>
+        <td>Ingresa al módulo, selecciona el nodo padre (Nivel 4 o superior) y teclea la descripción del auxiliar.</td>
+        <td>Despliega el árbol contable para asegurar que la jerarquía base sea la correcta.</td>
+      </tr>
+      <tr>
+        <td>3. VALIDACIÓN TÉCNICA</td>
+        <td></td>
+        <td>Valida las reglas RN-CT-01 (protección CONAC) y RN-CT-02 (herencia de naturaleza) y ejecuta la persistencia.</td>
+      </tr>
+      <tr>
+        <td>4. GENERACIÓN DE REPORTES</td>
+        <td>Presiona el botón de imprimir para descargar el plan de cuentas y notificar a su jefatura.</td>
+        <td>Exporta el PDF oficial conteniendo el árbol jerárquico actualizado.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

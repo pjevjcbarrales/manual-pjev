@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.5.2-apertura-ejercicio.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.5.2 Apertura de Ejercicio</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.5.2</div>
+        <h1 class="elem-title">Apertura de Nuevo Ejercicio (Traspaso de Saldos)</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Herramienta de Migración / Inicialización DB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Es la primera acción que se realiza en el sistema al iniciar un nuevo año calendario (Ej. 1 de Enero de 2027). Este módulo migra los saldos finales del año anterior (exclusivamente cuentas de Balance: Activo, Pasivo y Hacienda Pública) y los convierte en la Póliza Inicial o de Apertura del nuevo año. Garantiza la continuidad patrimonial del ente público.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>LGCG</td><td>Postulados Básicos (Continuidad)</td><td>Asume la existencia permanente del ente público. Los saldos de balance deben reflejarse exactamente igual al inicio del siguiente año.</td></tr>
+          <tr><td>Auditoría Superior ORFIS</td><td>Manual de Fiscalización</td><td>La Póliza de Apertura debe estar fechada el 01 de Enero del año nuevo y el "Total Activo" debe ser idéntico al "Total Activo" del 31 de Diciembre del año previo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Administrador del Sistema (IT)</td><td>Aperturar el catálogo de ejercicios en base de datos.</td><td></td></tr>
+          <tr><td>Contador General</td><td>Ejecutar el traspaso de saldos (Póliza I-01-0001).</td><td>Debe esperar a que el módulo 03.5.1 (Cierre) del año anterior haya finalizado por completo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>anio_fiscal</code></td><td><code>INT</code></td><td>Inserta el nuevo registro (Ej. 2027) en <code>conf_ejercicios</code> con estatus 'ABIERTO'.</td></tr>
+        <tr><td><code>poliza_id</code></td><td><code>BIGINT</code></td><td>Crea automáticamente la póliza de diario/ingreso inicial en <code>polizas</code> con fecha <code>01/01/2027</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_ejecutar_apertura_fiscal</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@anio_nuevo</code>
+          <br><span style="color:#666">OUT:</span> Estatus. El Job lee el saldo acumulado a Nivel 6 de las Clases 1, 2 y 3 del <code>@anio_nuevo - 1</code>, y las inserta como asientos contables en la Póliza 1 del año nuevo.
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/ejercicios/apertura</code></td><td>JSON con <code>{ anio_nuevo }</code></td><td>Genera el traspaso de saldos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Validación de Cuadre:</strong> El sistema hace una suma rápida en memoria. Si el Balance Final del año viejo NO CUADRA, no permite la migración para evitar propagar errores al año nuevo.</li>
+        <li><strong>Generación de Póliza de Apertura (Mes 00):</strong> Genera la póliza 1, a veces considerada "Mes 00" o "Saldo Inicial" dependiendo de la parametrización, para no ensuciar la operación de Enero.</li>
+        <li><strong>Impresión / Exportación:</strong> Botón que genera la Póliza de Apertura oficial.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Dashboard Apertura)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Visor Póliza Inicial)</button>
+      </div>
+
+      <!-- TAB 1: Dashboard Apertura -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Asistente de Apertura de Ejercicio (Traspaso de Saldos)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <text x="20" y="30" font-size="14" font-weight="bold" fill="#0369a1">CONFIGURACIÓN DEL NUEVO AÑO CONTABLE</text>
+              <text x="20" y="50" font-size="11" fill="#666">Esta herramienta tomará la foto final del año anterior y la convertirá en el Saldo Inicial del año seleccionado.</text>
+
+              <!-- Panel Central: Formulario -->
+              <rect x="20" y="80" width="460" height="200" fill="#fff" stroke="#ccc" rx="4"/>
+              <rect x="20" y="80" width="460" height="25" fill="#f4f6f5"/>
+              <text x="250" y="97" font-size="11" font-weight="bold" text-anchor="middle">PARÁMETROS DE MIGRACIÓN</text>
+
+              <text x="40" y="140" font-size="11">Año a Aperturar:</text>
+              <rect x="150" y="125" width="100" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="160" y="142" font-size="12" font-weight="bold">2027</text>
+
+              <text x="40" y="180" font-size="11">Año Origen (Migrar desde):</text>
+              <rect x="190" y="165" width="100" height="25" fill="#f4f6f5" stroke="#ccc" rx="3"/> <text x="200" y="182" font-size="12" fill="#666">2026</text>
+              
+              <text x="310" y="180" font-size="10" fill="#166534" font-weight="bold">✓ CERRADO OK</text>
+
+              <!-- Panel Derecho: Ejecución -->
+              <rect x="520" y="80" width="460" height="200" fill="#fff" stroke="#ccc" rx="4"/>
+              
+              <circle cx="750" cy="140" r="40" fill="#e0f2fe"/>
+              <text x="750" y="145" font-size="24" fill="#0284c7" text-anchor="middle">🔄</text>
+
+              <rect x="650" y="210" width="200" height="35" fill="#0369a1" rx="4"/>
+              <text x="750" y="232" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">EJECUTAR TRASPASO AL 2027</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Póliza Inicial -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Resultado: Póliza de Apertura (01/01/2027)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <rect x="20" y="20" width="960" height="30" fill="#f0fdf4" stroke="#86efac" rx="3"/>
+              <text x="500" y="40" font-size="12" font-weight="bold" fill="#166534" text-anchor="middle">PÓLIZA GENERADA EXITOSAMENTE: D-01-0001 (Fecha: 01/01/2027)</text>
+
+              <rect x="20" y="70" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="86" fill="#fff" font-size="10">CUENTAS DE BALANCE (SALDOS INICIALES)</text>
+              <text x="650" y="86" fill="#fff" font-size="10" text-anchor="end">CARGO (DEBE)</text>
+              <text x="850" y="86" fill="#fff" font-size="10" text-anchor="end">ABONO (HABER)</text>
+
+              <rect x="20" y="95" width="960" height="150" fill="#fff" stroke="#eee"/>
+              
+              <text x="30" y="115" font-size="11" fill="#0369a1" font-weight="bold">1000 - ACTIVO</text>
+              <text x="50" y="130" font-size="11">1111 - Efectivo (Bancos)</text>
+              <text x="650" y="130" font-size="11" text-anchor="end">$ 25,000,000.00</text> <text x="850" y="130" font-size="11" text-anchor="end">$ 0.00</text>
+
+              <text x="30" y="160" font-size="11" fill="#b45309" font-weight="bold">2000 - PASIVO</text>
+              <text x="50" y="175" font-size="11">2112 - Proveedores por Pagar a Corto Plazo</text>
+              <text x="650" y="175" font-size="11" text-anchor="end">$ 0.00</text> <text x="850" y="175" font-size="11" text-anchor="end">$ 5,000,000.00</text>
+
+              <text x="30" y="210" font-size="11" fill="#166534" font-weight="bold">3000 - HACIENDA PÚBLICA / PATRIMONIO</text>
+              <text x="50" y="225" font-size="11">3220 - Resultados de Ejercicios Anteriores (Acumulado Histórico)</text>
+              <text x="650" y="225" font-size="11" text-anchor="end">$ 0.00</text> <text x="850" y="225" font-size="11" font-weight="bold" text-anchor="end">$ 20,000,000.00</text>
+
+              <line x1="20" y1="245" x2="980" y2="245" stroke="#000"/>
+              <text x="500" y="265" font-size="12" font-weight="bold">SUMAS IGUALES</text>
+              <text x="650" y="265" font-size="12" font-weight="bold" text-anchor="end">$ 25,000,000.00</text> <text x="850" y="265" font-size="12" font-weight="bold" text-anchor="end">$ 25,000,000.00</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-AE-01</strong></td>
+            <td>Filtro de Cuentas: La Póliza de Apertura JAMÁS debe incluir cuentas que comiencen con 4 (Ingresos) o 5 (Gastos). Solo clases 1, 2, y 3.</td>
+            <td>Si el sistema detecta cuentas de resultados, aborta el traspaso, indicando que el cierre del año previo (Módulo 03.5.1) falló o no se hizo.</td>
+            <td>Motor Migración (SP)</td>
+            <td>Teoría Contable LGCG</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Es el "Puente" inter-anual del SIAF-PJEV. Lee la base de datos histórica del año viejo y escribe el primer renglón en la base de datos del año nuevo. Sin este módulo, Enero no puede operar contablemente.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SÍ</strong></td>
+            <td>Genera miles de asientos contables. Toma el saldo Deudor final de cada Activo y lo mete como "Cargo" inicial. Toma el saldo Acreedor final de cada Pasivo/Hacienda y lo mete como "Abono" inicial.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-07</td>
+            <td>2.0</td>
+            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">FINANZAS / CONTABILIDAD</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Consulta -->
+  <polygon points="340,130 525,130 510,180 325,180" class="node-data"/>
+  <text x="425" y="150" class="node-text">Configura Apertura</text>
+  <text x="425" y="165" class="node-sub">Selecciona Año Nuevo</text>
+
+  <path d="M 515 155 L 650 155" class="path-line"/>
+
+  <!-- SIAF Calcula -->
+  <path d="M 650 135 C 650 125, 900 125, 900 135 L 900 175 C 900 185, 650 185, 650 175 Z" class="node-db" />
+  <path d="M 650 135 C 650 145, 900 145, 900 135" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="157" class="node-text">Validación Histórica</text>
+  <text x="775" y="170" class="node-sub">Revisa Cierre del año N-1</text>
+
+  <path d="M 775 185 L 775 220" class="path-line"/>
+  <line x1="775" y1="220" x2="425" y2="220" class="path-line"/>
+
+  <!-- Rombo Cuadre -->
+  <polygon points="425,220 485,250 425,280 365,250" class="node-rombo"/>
+  <text x="425" y="255" class="node-text">¿Año anterior cerrado?</text>
+
+  <path d="M 425 280 L 425 310" class="path-red"/>
+  <text x="440" y="300" font-size="10" fill="#991B1B" font-weight="bold">No (Alerta BD)</text>
+
+  <path d="M 365 250 L 300 250 L 300 370 L 325 370" class="path-green"/>
+  <text x="270" y="240" font-size="10" fill="#166534" font-weight="bold">Sí (Pasa a DB)</text>
+
+  <!-- Proceso: Bloqueo -->
+  <rect x="325" y="310" width="200" height="40" class="node" stroke="#dc2626"/>
+  <text x="425" y="325" class="node-text">Abortar Apertura</text>
+  <text x="425" y="340" class="node-sub">Realizar primero Módulo 03.5.1</text>
+
+  <!-- Generar Póliza -->
+  <line x1="425" y1="370" x2="650" y2="370" class="path-line"/>
+  
+  <rect x="650" y="350" width="250" height="40" class="poliza" />
+  <text x="775" y="365" font-family="sans-serif" font-size="11" font-weight="bold" fill="#9d174d" text-anchor="middle">Generar Póliza Inicial</text>
+  <text x="775" y="380" font-family="sans-serif" font-size="9" fill="#9d174d" text-anchor="middle">Traspaso cuentas clase 1, 2, 3</text>
+
+  <path d="M 775 390 L 775 420" class="path-line"/>
+  <line x1="775" y1="420" x2="425" y2="420" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="420" width="80" height="30" class="node-term" />
+  <text x="425" y="439" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>DIRECCIÓN DE FINANZAS</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. VERIFICACIÓN</td>
+        <td>Ingresa al módulo en los primeros días de enero para aperturar el sistema a los usuarios operativos.</td>
+        <td>Cruza la tabla <code>conf_ejercicios</code> para verificar que el año pasado tenga estatus 'CERRADO'.</td>
+      </tr>
+      <tr>
+        <td>2. TRASPASO DE SALDOS</td>
+        <td>Da clic en "Ejecutar Traspaso al 2027".</td>
+        <td>Copia los saldos finales de las cuentas patrimoniales del año viejo y los inserta como póliza de diario fecha 01/Enero en la tabla del año nuevo.</td>
+      </tr>
+      <tr>
+        <td>3. LIBERACIÓN</td>
+        <td>Revisa e imprime la Póliza Inicial para su archivo físico.</td>
+        <td>Libera el sistema. A partir de este momento, los usuarios de Presupuestos e Ingresos ya pueden operar normalmente en Enero.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

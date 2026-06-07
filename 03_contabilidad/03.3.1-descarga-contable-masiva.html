@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.3.1-descarga-contable-masiva.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.3.1 Descarga Contable Masiva</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.3.1</div>
+        <h1 class="elem-title">Descarga Contable Masiva</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV. Procedimiento Crítico de Cierre.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Proceso Batch (Cierre Mensual)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Es una de las herramientas más potentes del SIAF-PJEV. Permite al equipo de Contabilidad amortizar o "descargar" contablemente cientos de comprobaciones de viáticos, compras de almacén, depreciaciones de activo fijo u obras públicas de un solo clic al cierre del mes. En lugar de capturar pólizas manuales una por una, el sistema agrupa saldos de cuentas transitorias y genera pólizas masivas automatizadas que matan los saldos circulantes mandándolos a la cuenta de Gasto definitivo.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Postulado Básico CONAC</td><td>Devengo Contable</td><td>Las transacciones deben reflejarse en el momento que ocurren. Cuando se comprueba un viático, el deudor debe disminuir y el gasto debe reconocerse.</td></tr>
+          <tr><td>Manual de Operaciones PJEV</td><td>Depuración de Cuentas</td><td>Obligación de saldar las cuentas puente/transitorias al menos de forma mensual para mantener Estados Financieros sanos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Jefe de Contabilidad</td><td>Ejecutar el proceso batch y generar pólizas masivas.</td><td>Solo puede ejecutarlo si no hay meses cerrados bloqueando la fecha seleccionada.</td></tr>
+          <tr><td>Subdirector Contable</td><td>Autorizar las pólizas gigantes resultantes.</td><td>Responsabilidad total sobre el cuadre.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>LOTE_ID</code></td><td><code>BIGINT (PK)</code></td><td>ID de la ejecución masiva.</td></tr>
+        <tr><td><code>TIPO_DESCARGA</code></td><td><code>VARCHAR(50)</code></td><td>'VIATICOS', 'ALMACEN', 'ACTIVO_FIJO'.</td></tr>
+        <tr><td><code>FECHA_CORTE</code></td><td><code>DATE</code></td><td>Fecha hasta la cual calcular amortizaciones.</td></tr>
+        <tr><td><code>POLIZA_GENERADA_ID</code></td><td><code>BIGINT (FK)</code></td><td>Vínculo a la mega-póliza creada en <code>cat_polizas</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL (Altamente pesadas):</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_calcular_pre_descarga</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@tipo</code>, <code>@fecha_corte</code>
+          <br><span style="color:#666">OUT:</span> Recordset temporal (Vista previa) de todos los movimientos y su saldo a saldar.
+        </li>
+        <li><strong><code>fn_ejecutar_descarga_masiva</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@tipo</code>, <code>@fecha_corte</code>, <code>@datos_seleccionados_xml</code>
+          <br><span style="color:#666">OUT:</span> Crea la póliza agrupada, retorna <code>{poliza_folio}</code> y actualiza banderas en tablas satélite.
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/descarga/simular</code></td><td>JSON con <code>{ tipo_descarga, fecha_corte }</code></td><td>Genera una vista previa del impacto contable (Simulación).</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/descarga/ejecutar</code></td><td>JSON con los registros confirmados.</td><td>Lanza el Job transaccional asíncrono para crear la póliza.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Simulación de Descarga:</strong> Corre el cálculo y muestra en pantalla lo que ocurrirá sin afectar la BD.</li>
+        <li><strong>Ejecución (Play):</strong> Dispara el Job. Al ser intensivo, muestra una barra de carga en la interfaz.</li>
+        <li><strong>Impresión / Exportación:</strong> Botón 🖨️ que genera el "Reporte Analítico de Descarga", desglosando los 300 o 500 empleados o activos procesados en esa corrida específica (Crucial para auditoría y anexarlo a la póliza).</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Filtros Simulación)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Vista Previa Simulada)</button>
+      </div>
+
+      <!-- TAB 1: Grid Parametros -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Consola de Descarga Masiva (Parametrizada)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Config Box -->
+              <rect x="20" y="20" width="960" height="80" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="40" y="45" font-size="12" font-weight="bold">Parámetros del Proceso:</text>
+              
+              <text x="40" y="70" font-size="11">Tipo de Descarga:</text>
+              <rect x="150" y="55" width="200" height="22" fill="#eee" rx="2"/> <text x="160" y="70" font-size="10">@tipo_proceso</text>
+              
+              <text x="380" y="70" font-size="11">Fecha de Corte:</text>
+              <rect x="470" y="55" width="120" height="22" fill="#eee" rx="2"/> <text x="480" y="70" font-size="10">@fecha_corte</text>
+              
+              <rect x="620" y="55" width="130" height="22" fill="#0369a1" rx="3"/> <text x="685" y="70" fill="#fff" font-size="10" text-anchor="middle">🔎 SIMULAR PROCESO</text>
+
+              <!-- Action Bar -->
+              <rect x="20" y="110" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <text x="30" y="132" font-size="10" font-weight="bold" fill="#666">Acción Ejecutiva:</text>
+              <rect x="120" y="117" width="150" height="21" fill="#1B3A2D" rx="3" opacity="0.5"/> <text x="195" y="131" fill="#fff" font-size="9" text-anchor="middle">▶ EJECUTAR DESCARGA</text>
+
+              <text x="780" y="132" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="117" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="131" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR DETALLE</text>
+
+              <!-- Blank Area -->
+              <text x="500" y="220" font-size="14" fill="#999" text-anchor="middle">Ejecute la simulación para ver la propuesta de póliza.</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Grid Valores -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Consola de Descarga Masiva (Simulación Lista)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Config Box -->
+              <rect x="20" y="20" width="960" height="60" fill="#f0fdfa" stroke="#14b8a6" rx="4"/>
+              <text x="40" y="45" font-size="12" font-weight="bold" fill="#0f766e">✓ Simulación Exitosa: Se encontraron 450 registros de Comprobación de Viáticos pendientes de mandar a Gasto.</text>
+              <text x="40" y="65" font-size="11" fill="#0f766e">Importe Total Circulante a descargar: $ 1,250,400.00 a Fecha de Corte: 31/01/2026</text>
+
+              <!-- Action Bar -->
+              <rect x="20" y="90" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <text x="30" y="112" font-size="10" font-weight="bold" fill="#666">Acción Ejecutiva:</text>
+              <rect x="120" y="97" width="150" height="21" fill="#1B3A2D" rx="3"/> <text x="195" y="111" fill="#fff" font-size="9" text-anchor="middle">▶ CONFIRMAR Y EJECUTAR</text>
+
+              <text x="780" y="112" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="97" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="111" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 Imprimir Detalle Prev.</text>
+
+              <!-- Propuesta Poliza -->
+              <text x="20" y="150" font-size="12" font-weight="bold">VISTA PREVIA DE LA PÓLIZA GIGANTE A GENERAR:</text>
+
+              <rect x="20" y="160" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="176" fill="#fff" font-size="10">CUENTA AGRUPADA</text>
+              <text x="400" y="176" fill="#fff" font-size="10">DESCRIPCIÓN</text>
+              <text x="750" y="176" fill="#fff" font-size="10" text-anchor="end">CARGO (GASTO)</text>
+              <text x="900" y="176" fill="#fff" font-size="10" text-anchor="end">ABONO (CIERRE)</text>
+
+              <!-- Row 1 -->
+              <rect x="20" y="185" width="960" height="25" fill="#fff" stroke="#eee"/>
+              <text x="30" y="202" font-size="11">5137.01</text>
+              <text x="400" y="202" font-size="11">Gasto por Viáticos en el País (Agrupado 450 comp.)</text>
+              <text x="750" y="202" font-size="11" text-anchor="end" font-weight="bold">$ 1,250,400.00</text>
+              <text x="900" y="202" font-size="11" text-anchor="end">$ 0.00</text>
+
+              <!-- Row 2 -->
+              <rect x="20" y="210" width="960" height="25" fill="#fafafa" stroke="#eee"/>
+              <text x="30" y="227" font-size="11">1123.01</text>
+              <text x="400" y="227" font-size="11">Deudores Diversos por Viáticos (Agrupado)</text>
+              <text x="750" y="227" font-size="11" text-anchor="end">$ 0.00</text>
+              <text x="900" y="227" font-size="11" text-anchor="end" font-weight="bold">$ 1,250,400.00</text>
+              
+              <!-- Loader Simulado -->
+              <rect x="350" y="280" width="300" height="8" fill="#eee" rx="4"/>
+              <rect x="350" y="280" width="150" height="8" fill="#14b8a6" rx="4"/>
+              <text x="500" y="310" font-size="10" fill="#14b8a6" text-anchor="middle">Ejecutando proceso... 50%</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-DM-01</strong></td>
+            <td>Inmutabilidad del Pasado: No se puede correr la descarga masiva con una <code>fecha_corte</code> que pertenezca a un mes contable cerrado.</td>
+            <td>Error: "El mes de corte se encuentra bloqueado para operaciones."</td>
+            <td>SP de Base de datos</td>
+            <td>LGCG Cierre Contable</td>
+          </tr>
+          <tr>
+            <td><strong>RN-DM-02</strong></td>
+            <td>Anticolisión: No se pueden ejecutar dos procesos masivos de descarga del mismo tipo para la misma fecha al mismo tiempo.</td>
+            <td>Se previene duplicidad de la megapoliza.</td>
+            <td>Backend Flags de proceso</td>
+            <td>Integridad Transaccional DB</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Es un proceso dependiente. Requiere que otros módulos (<strong>Viáticos, Recursos Materiales, Activo Fijo</strong>) hayan finalizado sus capturas y comprobaciones de fin de mes. Al ejecutarse este proceso batch, inyecta una póliza gigante al módulo <strong>03.2.1 Visor de Pólizas Automáticas</strong>, el cual a su vez alimentará la <strong>Balanza de Comprobación</strong> depurando los saldos transitorios.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SÍ</strong></td>
+            <td>
+              <strong>Ejemplo (Descarga de Viáticos Comprobados):</strong><br>
+              <strong>Cargo:</strong> 5.1.3.7 (Gasto por viáticos).<br>
+              <strong>Abono:</strong> 1.1.2.3 (Deudores Diversos por Viáticos) (Este abono cancela la cuenta circulante creada el día que se entregó el dinero).
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-07</td>
+            <td>2.0</td>
+            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma de carriles.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV BATCH JOB</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">CONTABILIDAD</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO (Fin de mes)</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Simulación -->
+  <polygon points="340,130 525,130 510,180 325,180" class="node-data"/>
+  <text x="425" y="150" class="node-text">Ejecuta Simulación</text>
+  <text x="425" y="165" class="node-sub">Ingresa Tipo y Fecha Corte</text>
+
+  <path d="M 515 155 L 650 155" class="path-line"/>
+  
+  <!-- SIAF: Calcula SP -->
+  <rect x="650" y="135" width="250" height="40" class="node-siaf"/>
+  <text x="775" y="150" class="node-text">Recorre Tablas Operativas</text>
+  <text x="775" y="165" class="node-sub">Suma saldos no amortizados</text>
+
+  <path d="M 775 175 L 775 200" class="path-line"/>
+
+  <line x1="775" y1="200" x2="425" y2="200" class="path-line"/>
+
+  <!-- Proceso: Analiza y Confirma -->
+  <rect x="325" y="200" width="200" height="40" class="node"/>
+  <text x="425" y="215" class="node-text">Revisión de la Propuesta</text>
+  <text x="425" y="230" class="node-sub">Presiona Botón Confirmar</text>
+
+  <path d="M 525 220 L 650 220" class="path-line"/>
+
+  <!-- SIAF: Ejecuta y Genera Poliza -->
+  <path d="M 650 210 C 650 200, 900 200, 900 210 L 900 250 C 900 260, 650 260, 650 250 Z" class="node-db" fill="#fee2e2" stroke="#dc2626"/>
+  <path d="M 650 210 C 650 220, 900 220, 900 210" fill="none" stroke="#dc2626" stroke-width="2"/>
+  <text x="775" y="232" class="node-text">JOB BATCH CRÍTICO</text>
+  <text x="775" y="245" class="node-sub">Genera Póliza Gigante D-XX</text>
+
+  <path d="M 775 260 L 775 300" class="path-line"/>
+
+  <!-- Regresa a proceso -->
+  <line x1="775" y1="300" x2="425" y2="300" class="path-line"/>
+
+  <!-- Imprime -->
+  <path d="M 325 300 L 525 300 L 525 350 C 475 370, 375 330, 325 350 Z" class="node-doc"/>
+  <text x="425" y="325" class="node-text">Reporte Analítico de Descarga</text>
+  <text x="425" y="340" class="node-sub">Imprime listado de los 500 registros</text>
+
+  <path d="M 425 360 L 425 400" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="400" width="80" height="30" class="node-term" />
+  <text x="425" y="419" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>JEFE DE CONTABILIDAD</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. SIMULACIÓN PREVIA</td>
+        <td>Ingresa los parámetros (tipo y fecha) y pide la simulación de lo que amortizará el sistema.</td>
+        <td>Ejecuta SP de solo lectura que barre las tablas de viáticos y almacén. Muestra los totales propuestos.</td>
+      </tr>
+      <tr>
+        <td>2. VERIFICACIÓN</td>
+        <td>Analiza si el importe es coherente con sus expectativas de fin de mes. Si está correcto, ordena la ejecución.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>3. EJECUCIÓN DEL JOB BATCH</td>
+        <td>Espera a que el sistema procese (ve la barra de progreso).</td>
+        <td>Crea N renglones en una póliza consolidada y marca las filas de origen como `descargado=1` para no volverlas a procesar.</td>
+      </tr>
+      <tr>
+        <td>4. GENERACIÓN DE REPORTES</td>
+        <td>Presiona Imprimir para descargar el anexo que soportará la macro-póliza.</td>
+        <td>Exporta el PDF de cientos de páginas con el nivel de detalle requerido por el ORFIS.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.3.3-conciliacion-ministraciones.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.3.3 Conciliación de Ministraciones</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.3.3</div>
+        <h1 class="elem-title">Conciliación de Ministraciones (Ingresos SEFIPLAN)</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Herramienta de Cierre / Validaciones Cruzadas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El Poder Judicial del Estado de Veracruz recibe su presupuesto (subsidio estatal) mediante transferencias periódicas llamadas "Ministraciones" emitidas por la Secretaría de Finanzas y Planeación (SEFIPLAN). Este módulo es vital para asegurar que el ingreso presupuestal (Ley de Ingresos) y el ingreso contable (Depósitos en Bancos) cuadren al centavo con el calendario de pagos oficial autorizado por el Estado.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Ley de Presupuesto del Estado</td><td>Calendario de Ministraciones</td><td>El Poder Judicial debe comprobar y conciliar que los recursos radicados en sus cuentas correspondan exactamente a lo estipulado en la Gaceta Oficial.</td></tr>
+          <tr><td>LGCG (CONAC)</td><td>Ingreso Devengado y Recaudado</td><td>Cotejo estricto entre los momentos presupuestales de ingreso y la afectación a las cuentas de activo 1112.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Analista de Ingresos</td><td>Ejecutar la conciliación y capturar las desviaciones.</td><td>No puede alterar los montos base del calendario de SEFIPLAN.</td></tr>
+          <tr><td>Jefe de Contabilidad</td><td>Revisar e Imprimir los oficios de conciliación.</td><td>Responsable de emitir alertas si la SEFIPLAN deposita de menos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>MINIST_ID</code></td><td><code>BIGINT (PK)</code></td><td>ID del registro del calendario.</td></tr>
+        <tr><td><code>MES</code> / <code>ANIO</code></td><td><code>INT</code></td><td>Mes correspondiente a la partida.</td></tr>
+        <tr><td><code>MONTO_AUTORIZADO</code></td><td><code>NUMERIC(18,2)</code></td><td>Lo que la Gaceta Oficial dice que debería llegar.</td></tr>
+        <tr><td><code>MONTO_RECAUDADO</code></td><td><code>NUMERIC(18,2)</code></td><td>Lo que realmente está contabilizado en SIAF (Pólizas de Ingreso).</td></tr>
+        <tr><td><code>DIFERENCIA</code></td><td><code>NUMERIC(18,2)</code></td><td>Campo calculado (Autorizado - Recaudado).</td></tr>
+        <tr><td><code>OBSERVACIONES</code></td><td><code>TEXT</code></td><td>Justificación si existe diferencia (Ej. Recorte estatal).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_leer_conciliacion_ministraciones</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@ejercicio_fiscal</code>
+          <br><span style="color:#666">OUT:</span> Array de 12 meses cruzando tabla de Autorizado vs Tabla de Pólizas de Ingreso de Subsidio.
+        </li>
+        <li><strong><code>fn_guardar_observaciones_ministracion</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@minist_id</code>, <code>@observaciones</code>
+          <br><span style="color:#666">OUT:</span> <code>{status}</code>. Actualiza la narrativa del acta de cierre.
+        </li>
+      </ul>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/ingresos/ministraciones/leer</code></td><td>JSON con <code>{ anio }</code></td><td>Devuelve la matriz de avance de ingresos.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/ingresos/ministraciones/observar</code></td><td>JSON con <code>{ id, texto }</code></td><td>Agrega comentarios a un mes descuadrado.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Vista de Semáforos:</strong> El grid principal colorea en Verde los meses cuadrados y en Rojo/Naranja los meses donde llegó menos dinero del pactado.</li>
+        <li><strong>Anotaciones de Auditoría:</strong> Permite escribir textos justificativos (Ej. "SEFIPLAN aplicó retención directa de ISR por 5 MDP, de ahí la diferencia").</li>
+        <li><strong>Impresión / Exportación:</strong> Botón 🖨️ que genera el "Reporte Analítico de Ministraciones" exigido para la Cuenta Pública Trimestral.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Dashboard Semáforo)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_abc (Justificación Diferencia)</button>
+      </div>
+
+      <!-- TAB 1: Grid Parametros -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Conciliación de Ingresos (Dashboard)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <!-- Filtros -->
+              <rect x="20" y="20" width="150" height="25" fill="#eee" rx="3"/> <text x="25" y="35" font-size="10">Ejercicio: 2026</text>
+              <rect x="180" y="20" width="200" height="25" fill="#eee" rx="3"/> <text x="185" y="35" font-size="10">Fondo: Ordinario Estatal</text>
+              
+              <!-- Action Bar -->
+              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              
+              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Acciones:</text>
+              <rect x="90" y="62" width="130" height="21" fill="#fff" stroke="#0369a1" rx="3"/> <text x="155" y="76" fill="#0369a1" font-size="9" text-anchor="middle">↻ REFRESCAR PÓLIZAS</text>
+              <line x1="240" y1="60" x2="240" y2="85" stroke="#ccc" />
+
+              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR ANALÍTICO</text>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
+              <text x="30" y="121" fill="#fff" font-size="10">MES</text>
+              <text x="150" y="121" fill="#fff" font-size="10" text-anchor="end">AUTORIZADO (CALENDARIO)</text>
+              <text x="350" y="121" fill="#fff" font-size="10" text-anchor="end">RECAUDADO (SIAF)</text>
+              <text x="550" y="121" fill="#fff" font-size="10" text-anchor="end">DIFERENCIA</text>
+              <text x="650" y="121" fill="#fff" font-size="10">SEMÁFORO</text>
+              <text x="850" y="121" fill="#fff" font-size="10">ACCIONES</text>
+
+              <!-- Row 1: Cuadrado -->
+              <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <text x="30" y="150" font-size="11">01 - Enero</text>
+              <text x="150" y="150" font-size="11" text-anchor="end">$ 120,000,000.00</text>
+              <text x="350" y="150" font-size="11" text-anchor="end">$ 120,000,000.00</text>
+              <text x="550" y="150" font-size="11" text-anchor="end" fill="#666">$ 0.00</text>
+              <circle cx="680" cy="145" r="6" fill="#10b981"/> <text x="695" y="149" font-size="10" fill="#065f46">Cuadrado</text>
+              <text x="850" y="150" font-size="10" fill="#999">-</text>
+
+              <!-- Row 2: Descuadrado -->
+              <rect x="20" y="160" width="960" height="30" fill="#fafafa" stroke="#eee"/>
+              <text x="30" y="180" font-size="11">02 - Febrero</text>
+              <text x="150" y="180" font-size="11" text-anchor="end">$ 120,000,000.00</text>
+              <text x="350" y="180" font-size="11" text-anchor="end" fill="#dc2626">$ 115,000,000.00</text>
+              <text x="550" y="180" font-size="11" text-anchor="end" fill="#dc2626" font-weight="bold">$ -5,000,000.00</text>
+              <circle cx="680" cy="175" r="6" fill="#ef4444"/> <text x="695" y="179" font-size="10" fill="#991b1b">Faltante</text>
+              <text x="850" y="180" font-size="10" fill="blue">[JUSTIFICAR]</text>
+              
+              <!-- Footer Totales -->
+              <line x1="20" y1="200" x2="980" y2="200" stroke="#000"/>
+              <text x="30" y="220" font-size="11" font-weight="bold">TOTAL ACUMULADO (A la fecha)</text>
+              <text x="150" y="220" font-size="11" font-weight="bold" text-anchor="end">$ 240,000,000.00</text>
+              <text x="350" y="220" font-size="11" font-weight="bold" text-anchor="end">$ 235,000,000.00</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: ABC Valores -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Justificación de Diferencias</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="250" fill="#fff" stroke="#ddd"/>
+              
+              <text x="30" y="40" font-size="16" font-weight="bold">Justificar Mes: Febrero 2026</text>
+              <text x="30" y="60" font-size="12" fill="#ef4444" font-weight="bold">Diferencia Detectada: $ -5,000,000.00</text>
+              
+              <text x="30" y="100" font-size="12">Observaciones / Motivo (Para impresión de Acta):</text>
+              <rect x="30" y="115" width="540" height="60" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="40" y="130" font-size="11" fill="#333">La SEFIPLAN realizó una retención directa por concepto</text>
+              <text x="40" y="145" font-size="11" fill="#333">de adeudo de IPE histórico. Se cuenta con el oficio</text>
+              <text x="40" y="160" font-size="11" fill="#333">SFP/045/2026 para respaldo en Cuenta Pública.</text>
+
+              <rect x="450" y="200" width="120" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="510" y="220" fill="#fff" font-size="12" text-anchor="middle">Guardar Notas</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-CM-01</strong></td>
+            <td>Dinamismo de Pólizas: El monto "Recaudado" no es capturable, se calcula sumando exclusivamente las Pólizas de Ingreso de la cuenta 8150 (Ingresos Devengados).</td>
+            <td>Garantiza que el reporte no mienta sobre los ingresos reales del sistema.</td>
+            <td>Vista de BD (View)</td>
+            <td>LGCG y Manual CONAC</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Es un módulo de monitoreo. Hacia atrás, se alimenta del <strong>Módulo de Presupuesto de Ingresos (Calendario)</strong> y del <strong>Registro de Pólizas de Ingreso (Bancos)</strong>. Hacia adelante, el reporte impreso aquí es requisito indispensable para armar el legajo físico de los <strong>Estados Financieros y Cuenta Pública Trimestral</strong>.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>NO</strong></td>
+            <td>Módulo analítico y de reporte. Las pólizas que alimentan este monitor ya fueron realizadas en la sección de ingresos transaccionales.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-07</td>
+            <td>2.0</td>
+            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma de carriles.</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<!-- ==========================================
+     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
+=========================================== -->
+<div id="module-flowchart" style="display:none;">
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
+      
+      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
+      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
+      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="200" height="40" class="header-area"/>
+  <text x="150" y="45" class="header-text">ÁREA</text>
+  
+  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
+  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril Área -->
+  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">FINANZAS PJEV</text>
+
+  <!-- Inicio -->
+  <rect x="385" y="80" width="80" height="25" class="node-term" />
+  <text x="425" y="96" class="node-term-text">INICIO (Fin Mes)</text>
+  
+  <path d="M 425 105 L 425 130" class="path-line"/>
+
+  <!-- Proceso: Consulta -->
+  <rect x="325" y="130" width="200" height="40" class="node"/>
+  <text x="425" y="145" class="node-text">Apertura Módulo Conciliación</text>
+  <text x="425" y="160" class="node-sub">Selecciona Ejercicio Fiscal</text>
+
+  <path d="M 525 150 L 650 150" class="path-line"/>
+
+  <!-- SIAF Calcula -->
+  <path d="M 650 130 C 650 120, 900 120, 900 130 L 900 170 C 900 180, 650 180, 650 170 Z" class="node-db" />
+  <path d="M 650 130 C 650 140, 900 140, 900 130" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="152" class="node-text">Extracción de Pólizas</text>
+  <text x="775" y="165" class="node-sub">Cruza Calendario vs Contabilidad</text>
+
+  <path d="M 775 180 L 775 220" class="path-line"/>
+  <line x1="775" y1="220" x2="425" y2="220" class="path-line"/>
+
+  <!-- Rombo Diferencia -->
+  <polygon points="425,220 485,250 425,280 365,250" class="node-rombo"/>
+  <text x="425" y="255" class="node-text">¿Hay Diferencia?</text>
+
+  <path d="M 365 250 L 300 250 L 300 370 L 325 370" class="path-green"/>
+  <text x="270" y="240" font-size="10" fill="#166534" font-weight="bold">No (OK)</text>
+
+  <path d="M 425 280 L 425 310" class="path-red"/>
+  <text x="440" y="300" font-size="10" fill="#991B1B" font-weight="bold">Sí (Faltante/Sobrante)</text>
+
+  <!-- Proceso: Justifica -->
+  <polygon points="340,310 525,310 510,350 325,350" class="node-data"/>
+  <text x="425" y="325" class="node-text">Captura Justificación</text>
+  <text x="425" y="340" class="node-sub">Redacta motivo legal</text>
+
+  <path d="M 425 350 L 425 370" class="path-line"/>
+
+  <!-- Imprime -->
+  <path d="M 325 370 L 525 370 L 525 420 C 475 440, 375 400, 325 420 Z" class="node-doc"/>
+  <text x="425" y="395" class="node-text">Analítico de Ministraciones</text>
+  <text x="425" y="410" class="node-sub">Exporta PDF para Auditoría</text>
+
+  <path d="M 425 430 L 425 470" class="path-line"/>
+
+  <!-- Fin -->
+  <rect x="385" y="470" width="80" height="30" class="node-term" />
+  <text x="425" y="489" class="node-term-text">FIN</text>
+
+</svg>
+</div>
+
+<!-- ==========================================
+     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
+=========================================== -->
+<div id="module-process-table" style="display:none;">
+  <table class="props-table">
+    <thead>
+      <tr>
+        <th>PROCESO / ÁREA</th>
+        <th>DIRECCIÓN DE FINANZAS</th>
+        <th>SIAF-PJEV</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. CONSULTA</td>
+        <td>Ingresa al módulo a fin de mes para verificar si SEFIPLAN radicó el total del dinero correspondiente al mes actual.</td>
+        <td>Agrupa el total de pólizas de ingreso con cuenta `8150` de ese mes y las compara matemáticamente contra la tabla de `presupuesto_calendario`. Pinta semáforos.</td>
+      </tr>
+      <tr>
+        <td>2. JUSTIFICACIÓN (Si Aplica)</td>
+        <td>Si el semáforo es rojo (Diferencia), el Director redacta la explicación oficial solicitada por el ORFIS.</td>
+        <td>Guarda el texto en base de datos vinculado al registro mensual.</td>
+      </tr>
+      <tr>
+        <td>3. GENERACIÓN DE REPORTES</td>
+        <td>Presiona Imprimir para anexar al expediente de Cuenta Pública Trimestral.</td>
+        <td>Exporta matriz completa con la suma "A la fecha" e imprime las notas al pie.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
