@@ -75,32 +75,50 @@
     <!-- 4. Modelo de Datos -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Tabla principal: <strong><code>contabilidad.catalogo_cuentas</code></strong></p>
       <table class="props-table">
         <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-        <tr><td><code>CTA_ID</code></td><td><code>BIGINT (PK)</code></td><td>Identificador único del registro de la cuenta.</td></tr>
-        <tr><td><code>CTA_CODIGO</code></td><td><code>VARCHAR(20)</code></td><td>Código jerárquico (Ej. 1112.01.0001).</td></tr>
-        <tr><td><code>CTA_NOMBRE</code></td><td><code>VARCHAR(255)</code></td><td>Descripción de la cuenta contable.</td></tr>
-        <tr><td><code>CTA_NIVEL</code></td><td><code>SMALLINT</code></td><td>Profundidad en el árbol (1 = Género, 6 = Auxiliar).</td></tr>
-        <tr><td><code>CTA_NATURALEZA</code></td><td><code>CHAR(1)</code></td><td>'D' para Deudora, 'A' para Acreedora.</td></tr>
-        <tr><td><code>CTA_ESTATUS</code></td><td><code>SMALLINT</code></td><td>1 = Activa, 0 = Inactiva.</td></tr>
+        <tr><td><code>cc_id</code></td><td><code>SERIAL (PK)</code></td><td>Identificador único del registro de la cuenta.</td></tr>
+        <tr><td><code>cc_cuentacompleta</code></td><td><code>VARCHAR(32) (UNIQUE)</code></td><td>Código jerárquico continuo (Ej. 1112010001). Generado por trigger.</td></tr>
+        <tr><td><code>cc_cuentapuntos</code></td><td><code>VARCHAR(40)</code></td><td>Código formateado con puntos para visualización (Ej. 1112.01.0001).</td></tr>
+        <tr><td><code>cc_descripcion</code></td><td><code>VARCHAR(250)</code></td><td>Descripción de la cuenta contable.</td></tr>
+        <tr><td><code>cc_tipocuenta</code></td><td><code>CHAR(1)</code></td><td>'A' (Acumulativa) o 'R' (Registro/Detalle).</td></tr>
+        <tr><td><code>cc_naturaleza</code></td><td><code>CHAR(1)</code></td><td>'D' (Deudora) o 'A' (Acreedora).</td></tr>
+        <tr><td><code>cc_nivelafecta</code></td><td><code>SMALLINT</code></td><td>Nivel de afectación jerárquico (0 a 7).</td></tr>
+        <tr><td><code>cc_nivel</code></td><td><code>SMALLINT</code></td><td>Profundidad en el árbol (1 a 8).</td></tr>
+        <tr><td><code>cc_padre_id</code></td><td><code>INTEGER (FK)</code></td><td>Referencia al <code>cc_id</code> de la cuenta padre.</td></tr>
+        <tr><td><code>cc_permite_poliza</code></td><td><code>SMALLINT</code></td><td>1 = Permite asentar pólizas directas, 0 = Solo acumulación.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>1 = Activa, 0 = Inactiva.</td></tr>
         </tbody>
       </table>
     </div>
 
     <!-- 5. Stored Procedures -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs) y Triggers</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Las operaciones y reglas de negocio sobre el catálogo se gestionan a través de las siguientes funciones y disparadores de PostgreSQL:</p>
+      
+      <h4 style="font-size:12px; margin-bottom:5px; margin-top:10px;">Stored Procedures:</h4>
       <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
         <li><strong><code>fn_leer_cat_cuentas</code></strong>
-          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@nivel</code>, <code>@codigo_padre</code>, <code>@page</code>, <code>@limit</code>
-          <br><span style="color:#666">OUT:</span> Recordset jerárquico y <code>{total_count}</code> para paginación.
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@cc_nivel</code>, <code>@cc_padre_id</code>, <code>@page</code>, <code>@limit</code>
+          <br><span style="color:#666">OUT:</span> Recordset jerárquico (<code>cc_id</code>, <code>cc_cuentapuntos</code>, <code>cc_descripcion</code>, <code>cc_naturaleza</code>, etc.) y <code>{total_count}</code> para paginación.
         </li>
         <li><strong><code>fn_crud_cat_cuentas</code></strong>
-          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@accion (ALTA, MODIFICAR, INACTIVAR)</code>, <code>@cta_id</code>, <code>@cta_codigo</code>, <code>@cta_nombre</code>, <code>@cta_naturaleza</code>
-          <br><span style="color:#666">OUT:</span> <code>{status}</code>, <code>{message}</code>
+          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@accion (ALTA, MOD, BAJA)</code>, <code>@cc_id</code>, <code>@cc_descripcion</code>, <code>@cc_tipocuenta</code>, <code>@cc_naturaleza</code>, <code>@cc_padre_id</code>, <code>@cc_permite_poliza</code>
+          <br><span style="color:#666">OUT:</span> <code>{status}</code>, <code>{message}</code>, <code>{new_cc_id}</code>
         </li>
+        <li><strong><code>fn_lista_cuentas_poliza</code></strong>
+          <br><span style="color:#666">IN:</span> <code>@p_texto</code>, <code>@p_limit</code>, <code>@p_offset</code>
+          <br><span style="color:#666">OUT:</span> JSON jerárquico con coincidencias por texto o código. Exclusivo para búsqueda rápida en módulo de pólizas (solo retorna cuentas <code>cc_tipocuenta = 'R'</code> y <code>cc_permite_poliza = 1</code>).
+        </li>
+      </ul>
+
+      <h4 style="font-size:12px; margin-bottom:5px; margin-top:10px;">Triggers Activos:</h4>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>trg_calc_cuenta_clave</code>:</strong> Se ejecuta ANTES de INSERT o UPDATE. Invoca <code>fn_calc_cuenta_clave()</code> para recalcular automáticamente los campos <code>cc_cuentacompleta</code> y <code>cc_cuentapuntos</code> en base a los niveles padre.</li>
+        <li><strong><code>trg_protect_conac_delete</code> / <code>trg_protect_conac_update</code>:</strong> Se ejecutan ANTES de DELETE/UPDATE. Invocan <code>fn_protect_conac()</code> para impedir modificaciones estructurales si <code>cc_nivel <= 3</code> (Cuentas blindadas del CONAC).</li>
       </ul>
     </div>
 
@@ -110,8 +128,13 @@
       <table class="props-table">
         <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/cuentas/leer</code></td><td>JSON con <code>{ nivel, codigo_padre... }</code></td><td>Devuelve el catálogo de cuentas en formato árbol.</td></tr>
-          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/cuentas/abc</code></td><td>JSON con <code>{ accion, cta_codigo, cta_nombre... }</code></td><td>Alta, baja lógica o modificación de una cuenta.</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/contabilidad/cuentas/arbol</code></td><td><code>?soloRegistro=true|false</code></td><td>Devuelve el catálogo estructurado jerárquicamente.</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/contabilidad/cuentas</code></td><td><code>?search, ?page, ?limit...</code></td><td>Lista cuentas paginadas (utiliza <code>fn_lista_cuentas_poliza</code> o lectura base).</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/contabilidad/cuentas/reporte</code></td><td><code>?agrupado, ?nivelHasta...</code></td><td>Genera los datos para la impresión oficial del catálogo.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/cuentas</code></td><td>JSON del Formulario ABC</td><td>Alta de un nuevo nodo en el catálogo.</td></tr>
+          <tr><td><span class="method patch">PATCH</span></td><td><code>/contabilidad/cuentas/:id</code></td><td>JSON con campos editables</td><td>Modifica descripción, nivel de afectación o estatus.</td></tr>
+          <tr><td><span class="method delete">DELETE</span></td><td><code>/contabilidad/cuentas/:id</code></td><td>-</td><td>Aplica baja lógica de la cuenta.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/cuentas/importar</code></td><td>Multipart File (Excel/CSV)</td><td>Carga y validación masiva del catálogo desde archivo.</td></tr>
         </tbody>
       </table>
     </div>
@@ -231,24 +254,73 @@
         <div class="wf-box">
           <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Esqueleto / Parametrizado)</span></div>
           <div class="wf-svg-area">
-            <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
-              <rect width="600" height="250" fill="#fff" stroke="#ddd"/>
-              <text x="30" y="40" font-size="16" font-weight="bold">Nueva Cuenta Hija</text>
+            <svg viewBox="0 0 600 550" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="550" fill="#fdfbf7" stroke="#e0dcd3" rx="8"/>
               
-              <text x="30" y="80" font-size="12">Cuenta Padre:</text>
-              <rect x="150" y="65" width="100" height="25" fill="#f0f0f0" rx="3"/>
-              <text x="160" y="82" font-size="11" fill="#666">@codigo_padre</text>
-              
-              <text x="30" y="115" font-size="12">Sufijo Código:</text>
-              <rect x="150" y="100" width="100" height="25" fill="#eee" rx="3"/>
-              <text x="160" y="117" font-size="11">@nuevo_sufijo</text>
+              <text x="30" y="30" font-size="16" font-weight="bold" fill="#1B3A2D">Nueva / Editar cuenta</text>
+              <text x="30" y="45" font-size="11" fill="#666">@cuenta_completa — @descripcion</text>
+              <line x1="10" y1="55" x2="590" y2="55" stroke="#e0dcd3"/>
 
-              <text x="30" y="150" font-size="12">Descripción:</text>
-              <rect x="150" y="135" width="400" height="25" fill="#eee" rx="3"/>
-              <text x="160" y="152" font-size="11">@cta_nombre (Text)</text>
+              <rect x="30" y="70" width="540" height="30" fill="#e8f4ed" stroke="#b2d4c0" rx="4"/>
+              <text x="40" y="89" font-size="11" fill="#166534">Sólo los campos @editables son editables en este nivel</text>
 
-              <rect x="450" y="190" width="100" height="30" fill="#1B3A2D" rx="4"/>
-              <text x="500" y="210" fill="#fff" font-size="12" text-anchor="middle">[ GUARDAR ]</text>
+              <!-- Nivel de Cuenta -->
+              <text x="30" y="125" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">NIVEL DE CUENTA</text>
+              <rect x="30" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="36" y="149" fill="#fff" font-size="10" font-weight="bold">N1</text>
+              <rect x="60" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="66" y="149" fill="#fff" font-size="10" font-weight="bold">N2</text>
+              <rect x="90" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="96" y="149" fill="#fff" font-size="10" font-weight="bold">N3</text>
+              <rect x="120" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="126" y="149" fill="#fff" font-size="10" font-weight="bold">N4</text>
+              <rect x="150" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="156" y="149" fill="#fff" font-size="10" font-weight="bold">N5</text>
+              <rect x="180" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="186" y="149" fill="#fff" font-size="10" font-weight="bold">N6</text>
+              <rect x="210" y="135" width="25" height="20" fill="#fff" stroke="#ccc" rx="3"/><text x="216" y="149" fill="#ccc" font-size="10" font-weight="bold">N7</text>
+
+              <!-- Cuenta Agrupadora -->
+              <text x="30" y="180" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">CUENTA CONTABLE AGRUPADORA</text>
+              <text x="30" y="195" font-size="11" font-weight="bold">@codigo_padre <tspan font-weight="normal" fill="#555">@descripcion_padre</tspan></text>
+
+              <!-- Auxiliar -->
+              <text x="30" y="230" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">AUXILIAR</text>
+              <rect x="30" y="240" width="50" height="25" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="40" y="256" font-size="11">@suf</text>
+              <text x="90" y="256" font-size="11" fill="#555">@codigo_padre . @suf</text>
+
+              <rect x="30" y="275" width="540" height="25" fill="#fff" stroke="#b2d4c0" rx="3"/>
+              <text x="40" y="291" font-size="11">@descripcion_auxiliar</text>
+
+              <!-- Tipo / Naturaleza -->
+              <text x="30" y="330" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">TIPO DE CUENTA</text>
+              <circle cx="35" cy="345" r="5" fill="#fff" stroke="#888"/><text x="45" y="348" font-size="11">Agrupadora</text>
+              <circle cx="120" cy="345" r="5" fill="#1B3A2D"/><text x="130" y="348" font-size="11">Registro</text>
+
+              <text x="250" y="330" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">NATURALEZA</text>
+              <circle cx="255" cy="345" r="5" fill="#1B3A2D"/><text x="265" y="348" font-size="11">Deudora</text>
+              <circle cx="330" cy="345" r="5" fill="#fff" stroke="#888"/><text x="340" y="348" font-size="11">Acreedora</text>
+
+              <!-- Afectación -->
+              <text x="30" y="385" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">NIVEL DE AFECTACIÓN</text>
+              <rect x="30" y="395" width="540" height="25" fill="#fff" stroke="#b2d4c0" rx="3"/>
+              <text x="40" y="411" font-size="11">@nivel_afecta (0 a 6)</text>
+              <path d="M 555 405 L 560 410 L 565 405" fill="none" stroke="#555"/>
+
+              <!-- CRI / COG -->
+              <text x="30" y="445" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">CUENTA CRI</text>
+              <rect x="30" y="455" width="120" height="25" fill="#fff" stroke="#b2d4c0" rx="3"/>
+              <text x="40" y="471" font-size="11" fill="#999">—</text>
+              <rect x="160" y="455" width="70" height="25" fill="#fff" stroke="#333" rx="3"/>
+              <text x="168" y="471" font-size="10" font-weight="bold">Buscar mas</text>
+
+              <text x="260" y="445" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">CUENTA COG</text>
+              <rect x="260" y="455" width="310" height="25" fill="#fff" stroke="#b2d4c0" rx="3"/>
+              <text x="270" y="471" font-size="11" fill="#999">—</text>
+
+              <!-- Estatus -->
+              <text x="30" y="505" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">ESTATUS</text>
+              <circle cx="35" cy="520" r="5" fill="#1B3A2D"/><text x="45" y="523" font-size="11">Activa</text>
+              <circle cx="110" cy="520" r="5" fill="#fff" stroke="#888"/><text x="120" y="523" font-size="11">Inactiva</text>
+
+              <!-- Footer btn -->
+              <rect x="440" y="515" width="130" height="25" fill="#1B3A2D" rx="4"/>
+              <text x="460" y="532" fill="#fff" font-size="11" font-weight="bold">Guardar cambios</text>
             </svg>
           </div>
         </div>
@@ -257,27 +329,76 @@
       <!-- TAB 4: ABC Valores -->
       <div id="wf-p4" class="wf-panel">
         <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Datos de Ejemplo)</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Datos de Ejemplo - Edición)</span></div>
           <div class="wf-svg-area">
-            <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
-              <rect width="600" height="250" fill="#fff" stroke="#ddd"/>
-              <text x="30" y="40" font-size="16" font-weight="bold">Nueva Cuenta Auxiliar de Bancos</text>
+            <svg viewBox="0 0 600 550" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="550" fill="#fdfbf7" stroke="#e0dcd3" rx="8"/>
               
-              <text x="30" y="80" font-size="12">Cuenta Padre:</text>
-              <rect x="150" y="65" width="100" height="25" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
-              <text x="160" y="82" font-size="11" fill="#64748b">1112.01</text>
-              
-              <text x="30" y="115" font-size="12">Sufijo Código:</text>
-              <rect x="150" y="100" width="100" height="25" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="160" y="117" font-size="11" font-weight="bold">0005</text>
-              <text x="260" y="117" font-size="10" fill="#166534">Resultado: 1112.01.0005</text>
+              <text x="30" y="30" font-size="16" font-weight="bold" fill="#1B3A2D">Editar cuenta</text>
+              <text x="30" y="45" font-size="11" fill="#666">1.1.1.2.1000.0002 — 0450187720 OTROS INGRESOS</text>
+              <line x1="10" y1="55" x2="590" y2="55" stroke="#e0dcd3"/>
 
-              <text x="30" y="150" font-size="12">Descripción:</text>
-              <rect x="150" y="135" width="400" height="25" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="160" y="152" font-size="11">Banorte Cta. Ingresos Propios</text>
+              <rect x="30" y="70" width="540" height="30" fill="#e8f4ed" stroke="#b2d4c0" rx="4"/>
+              <text x="40" y="89" font-size="11" fill="#166534">Sólo los campos CRI y COG son editables en este nivel</text>
 
-              <rect x="450" y="190" width="100" height="30" fill="#1B3A2D" rx="4"/>
-              <text x="500" y="210" fill="#fff" font-size="12" text-anchor="middle">Guardar Registro</text>
+              <!-- Nivel de Cuenta -->
+              <text x="30" y="125" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">NIVEL DE CUENTA</text>
+              <rect x="30" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="36" y="149" fill="#fff" font-size="10" font-weight="bold">N1</text>
+              <rect x="60" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="66" y="149" fill="#fff" font-size="10" font-weight="bold">N2</text>
+              <rect x="90" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="96" y="149" fill="#fff" font-size="10" font-weight="bold">N3</text>
+              <rect x="120" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="126" y="149" fill="#fff" font-size="10" font-weight="bold">N4</text>
+              <rect x="150" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="156" y="149" fill="#fff" font-size="10" font-weight="bold">N5</text>
+              <rect x="180" y="135" width="25" height="20" fill="#1B3A2D" rx="3"/><text x="186" y="149" fill="#fff" font-size="10" font-weight="bold">N6</text>
+              <rect x="210" y="135" width="25" height="20" fill="#fff" stroke="#ccc" rx="3"/><text x="216" y="149" fill="#ccc" font-size="10" font-weight="bold">N7</text>
+              <rect x="240" y="135" width="25" height="20" fill="#fff" stroke="#ccc" rx="3"/><text x="246" y="149" fill="#ccc" font-size="10" font-weight="bold">N8</text>
+
+              <!-- Cuenta Agrupadora -->
+              <text x="30" y="180" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">CUENTA CONTABLE AGRUPADORA</text>
+              <text x="30" y="195" font-size="11" font-weight="bold">1.1.1.2.1000 <tspan font-weight="normal" fill="#555">BBVA BANCOMER S.A. PODER JUDICIAL</tspan></text>
+
+              <!-- Auxiliar -->
+              <text x="30" y="230" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">AUXILIAR</text>
+              <rect x="30" y="240" width="50" height="25" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="40" y="256" font-size="11" font-weight="bold">0002</text>
+              <text x="90" y="256" font-size="11" fill="#555">1.1.1.2.1000.<tspan font-weight="bold">0002</tspan></text>
+
+              <rect x="30" y="275" width="540" height="25" fill="#fff" stroke="#b2d4c0" rx="3"/>
+              <text x="40" y="291" font-size="11">0450187720 OTROS INGRESOS</text>
+
+              <!-- Tipo / Naturaleza -->
+              <text x="30" y="330" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">TIPO DE CUENTA</text>
+              <circle cx="35" cy="345" r="5" fill="#fff" stroke="#888"/><text x="45" y="348" font-size="11">Agrupadora</text>
+              <circle cx="120" cy="345" r="4" fill="#1B3A2D"/><circle cx="120" cy="345" r="6" fill="none" stroke="#1B3A2D"/><text x="130" y="348" font-size="11">Registro</text>
+
+              <text x="250" y="330" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">NATURALEZA</text>
+              <circle cx="255" cy="345" r="4" fill="#1B3A2D"/><circle cx="255" cy="345" r="6" fill="none" stroke="#1B3A2D"/><text x="265" y="348" font-size="11">Deudora</text>
+              <circle cx="330" cy="345" r="5" fill="#fff" stroke="#888"/><text x="340" y="348" font-size="11">Acreedora</text>
+
+              <!-- Afectación -->
+              <text x="30" y="385" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">NIVEL DE AFECTACIÓN</text>
+              <rect x="30" y="395" width="540" height="25" fill="#fff" stroke="#b2d4c0" rx="3"/>
+              <text x="40" y="411" font-size="11">0 — Cuenta</text>
+              <path d="M 555 405 L 560 410 L 565 405" fill="none" stroke="#555"/>
+
+              <!-- CRI / COG -->
+              <text x="30" y="445" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">CUENTA CRI</text>
+              <rect x="30" y="455" width="120" height="25" fill="#fff" stroke="#b2d4c0" rx="3"/>
+              <text x="40" y="471" font-size="11" fill="#999">—</text>
+              <rect x="160" y="455" width="70" height="25" fill="#fff" stroke="#333" rx="3"/>
+              <text x="168" y="471" font-size="10" font-weight="bold">Buscar mas</text>
+
+              <text x="260" y="445" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">CUENTA COG</text>
+              <rect x="260" y="455" width="310" height="25" fill="#fff" stroke="#b2d4c0" rx="3"/>
+              <text x="270" y="471" font-size="11" fill="#999">—</text>
+
+              <!-- Estatus -->
+              <text x="30" y="505" font-size="9" font-weight="bold" fill="#888" letter-spacing="1">ESTATUS</text>
+              <circle cx="35" cy="520" r="4" fill="#1B3A2D"/><circle cx="35" cy="520" r="6" fill="none" stroke="#1B3A2D"/><text x="45" y="523" font-size="11">Activa</text>
+              <circle cx="110" cy="520" r="5" fill="#fff" stroke="#888"/><text x="120" y="523" font-size="11">Inactiva</text>
+
+              <!-- Footer btn -->
+              <rect x="440" y="515" width="130" height="25" fill="#1B3A2D" rx="4"/>
+              <text x="505" y="532" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Guardar cambios</text>
             </svg>
           </div>
         </div>
@@ -292,24 +413,38 @@
         <tbody>
           <tr>
             <td><strong>RN-CT-01</strong></td>
-            <td>Protección CONAC: Las cuentas de Nivel 1 a 4 están hardcodeadas y protegidas.</td>
-            <td>Error: "Nivel protegido, no se puede modificar".</td>
-            <td>SP (<code>fn_crud</code>)</td>
-            <td>LGCG Plan de Cuentas</td>
+            <td>Inmutabilidad de Edición (Cuentas Creadas): Una vez creada la cuenta, los campos de clave jerárquica (Niveles 1-6), tipo, naturaleza, padre y legacy quedan INMUTABLES.</td>
+            <td>El frontend deshabilita los inputs (`disabled`). Solo permite modificar: Descripción, Nivel de Afectación y Estatus.</td>
+            <td>Frontend (page.tsx) y SP (`fn_crud_cat_cuentas`)</td>
+            <td>Control Interno (Auditoría de Saldos)</td>
           </tr>
           <tr>
             <td><strong>RN-CT-02</strong></td>
-            <td>Herencia de Naturaleza: Un hijo no puede tener naturaleza distinta a la de su padre.</td>
-            <td>Forzar la naturaleza del padre al crear el registro.</td>
-            <td>Frontend y SP</td>
-            <td>Teoría Contable Básica</td>
+            <td>Protección CONAC (Niveles Base): Las cuentas de Nivel 1, 2 y 3 están blindadas.</td>
+            <td>Despliega aviso en UI: "RN-09 — Cuenta CONAC... campos bloqueados". Impide eliminación o alteración estructural desde BD.</td>
+            <td>Frontend y Trigger (`trg_protect_conac`)</td>
+            <td>LGCG Plan de Cuentas</td>
           </tr>
           <tr>
             <td><strong>RN-CT-03</strong></td>
-            <td>Inactivación Segura: No se puede inactivar una cuenta con saldo distinto a 0.</td>
-            <td>Error: "La cuenta posee saldo, depure antes de inactivar".</td>
-            <td>Validaciones DB (SP)</td>
-            <td>Control Interno PJEV</td>
+            <td>Coherencia de Nivel de Afectación: Si la cuenta es "Agrupadora (A)", el nivel obligatoriamente es 0. Si es "Registro (R)", puede ser 0:CUENTA, 1:EMPLEADOS, 2:PROVEEDORES, 3:UNIDAD ADMINISTRATIVA, 4:TERCEROS BENEFICIARIOS, 5:TERCEROS INSTITUCIONALES, 6:BIENES INMUEBLES.</td>
+            <td>El select restringe dinámicamente las opciones. Permite a los módulos de pólizas exigir subcuentas (Ej. Proveedor específico) según el valor.</td>
+            <td>Frontend y BD (`chk_nivelafecta_tipocuenta`)</td>
+            <td>Regla de Sumarización y Pólizas</td>
+          </tr>
+          <tr>
+            <td><strong>RN-CT-04</strong></td>
+            <td>Baja Lógica (Soft Delete): "Eliminar" una cuenta no la borra de la BD, solo cambia su `estatus_registro` a 0 (Inactiva).</td>
+            <td>Protege la integridad referencial de pólizas pasadas. Despliega modal de confirmación en UI advirtiendo conservación de auditoría.</td>
+            <td>Frontend (Modal) y API (DELETE logic)</td>
+            <td>LGCG (Integridad Histórica)</td>
+          </tr>
+          <tr>
+            <td><strong>RN-CT-05</strong></td>
+            <td>Relación Excluyente CRI / COG: Solo pueden habilitarse en los niveles 5 y 6. Solo puedes relacionar UNA cuenta CRI o UNA cuenta COG a un auxiliar, NUNCA ambas.</td>
+            <td>El sistema deshabilita una opción si la otra es llenada, o marca error de validación cruzada. Obliga a que la cuenta funcione estrictamente para Ingresos o para Egresos conforme a la matriz de conversión.</td>
+            <td>Frontend y Validaciones Backend</td>
+            <td>Normatividad CONAC (Matrices de Conversión)</td>
           </tr>
         </tbody>
       </table>
@@ -343,6 +478,12 @@
       <table class="props-table">
         <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
         <tbody>
+          <tr>
+            <td>2026-06-08</td>
+            <td>2.1</td>
+            <td>Actualización de wireframes (Formularios) al diseño actual. Inclusión de endpoints reales de la API (Sección 6), nuevo SP <code>fn_lista_cuentas_poliza</code> (Sección 5), especificación de valores de nivel de afectación (RN-CT-03) y nueva regla de exclusión mutua CRI/COG en niveles 5 y 6 (RN-CT-05).</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
           <tr>
             <td>2026-06-07</td>
             <td>2.0</td>
