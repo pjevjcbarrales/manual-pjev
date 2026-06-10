@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04.2.2-ministraciones.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.patch  { background:#fff8e1; color:#f57f17; }
+  .method.delete { background:#ffebee; color:#c62828; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-s { background:var(--pjev-info-bg); color:var(--pjev-info-text); border:1px solid var(--pjev-info-borde); }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Cuentas por Cobrar</span> ›
+      <span>04.2.2 Registro de Ministraciones</span>
+    </div>
+
+    <div class="elem-header">
+      <div style="width:100%; display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <div class="elem-id">04.2.2</div>
+          <h1 class="elem-title">Registro de Ministraciones</h1>
+          <p class="elem-desc">Módulo transaccional para la captura y registro de transferencias de SEFIPLAN.</p>
+          <div class="mod-header-badges">
+            <span class="mod-badge badge-s">Tipo: Operación Transaccional</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:20px;">
+          <button class="siaf-btn siaf-btn-ghost" onclick="window.location.reload()">Refrescar</button>
+          <button class="siaf-btn siaf-btn-secondary" onclick="window.print()">🖨 Imprimir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Este módulo permite la captura de los depósitos bancarios de SEFIPLAN a favor del PJEV. Genera automáticamente los momentos contables de ingresos (Devengado y Recaudado) e incrementa la liquidez presupuestal.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>LGCG (Nacional)</td><td>Momentos del Ingreso</td><td>Rige la afectación contable simultánea de los momentos del ingreso.</td></tr>
+          <tr><td>Manual de Tesorería (PJEV)</td><td>Registro de ingresos (Pág. 210)</td><td>Referencia al procedimiento oficial de recepción de recursos en cuentas bancarias institucionales.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. ROLES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Oficina de Caja</td><td>Registro del depósito bancario.</td><td>No puede alterar ingresos ya conciliados.</td></tr>
+          <tr><td>Programación y Presupuesto</td><td>Consulta de disponibilidad.</td><td>Ajenos a la captura operativa del flujo de efectivo.</td></tr>
+          <tr><td>Contabilidad</td><td>Conciliación de Ministraciones.</td><td>Cruza la información capturada vs el Estado de Cuenta original.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Tabla principal: <strong><code>ingresos.registro_caja</code></strong></p>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>rc_id</code></td><td><code>SERIAL (PK)</code></td><td>ID transaccional de caja.</td></tr>
+          <tr><td><code>rc_folio</code></td><td><code>VARCHAR(20) (UNIQUE)</code></td><td>Folio autogenerado anual (Ej. CAJA-2026-00012).</td></tr>
+          <tr><td><code>ejercicio_id</code></td><td><code>INTEGER (FK)</code></td><td>Referencia al año fiscal activo.</td></tr>
+          <tr><td><code>ci_id</code></td><td><code>INTEGER (FK)</code></td><td>Relación con <code>ingresos.cat_conceptos</code>.</td></tr>
+          <tr><td><code>cb_id</code></td><td><code>INTEGER (FK)</code></td><td>Relación con <code>configuracion.cat_cuentas_bancarias</code>.</td></tr>
+          <tr><td><code>rc_monto</code></td><td><code>NUMERIC(18,2)</code></td><td>Importe total del depósito.</td></tr>
+          <tr><td><code>rc_fecha_deposito</code></td><td><code>DATE</code></td><td>Fecha exacta de entrada al banco.</td></tr>
+          <tr><td><code>rc_folio_oficio</code></td><td><code>VARCHAR(50)</code></td><td>Oficio de Programación y Presupuesto.</td></tr>
+          <tr><td><code>rc_estado_conciliacion</code></td><td><code>CHAR(1)</code></td><td>'P' = Pendiente, 'C' = Conciliado.</td></tr>
+          <tr><td><code>rc_poliza_id</code></td><td><code>INTEGER (FK)</code></td><td>ID de la póliza de Ingresos generada automáticamente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. STORED PROCEDURES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs) y Triggers</div>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong><code>fn_crud_registro_caja</code></strong>: Maneja el INSERT. Llama a <code>fn_genera_folio_caja</code>.</li>
+        <li><strong><code>fn_afectar_presupuesto_ingresos</code></strong>: Toma el monto y afecta el módulo de Presupuestos (aumenta Disponibilidad).</li>
+        <li><strong><code>fn_generar_poliza_ingreso_automatica</code></strong>: Arma el JSON de la póliza cargo a Bancos y abono a Ingresos.</li>
+        <li><strong><code>trg_valida_periodo_contable</code></strong>: Impide registros si el mes está cerrado.</li>
+        <li><strong><code>trg_afectacion_automatica_caja</code></strong>: AFTER INSERT. Ejecuta asíncronamente los SPs de afectación.</li>
+      </ul>
+    </div>
+
+    <!-- 6. SERVICIOS REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method get">GET</span></td><td><code>/ingresos/ministraciones</code></td><td><code>?mes, ?ejercicio</code></td><td>Lista las capturas.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/ingresos/ministraciones</code></td><td>JSON de captura</td><td>Crea el registro y dispara afectaciones.</td></tr>
+          <tr><td><span class="method patch">PATCH</span></td><td><code>/ingresos/ministraciones/:id/cancelar</code></td><td>-</td><td>Reversa el ingreso (sólo si no está conciliado).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. REGLAS DE NEGOCIO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th></tr></thead>
+        <tbody>
+          <tr><td><strong>RN-IN-01</strong></td><td>Soporte Documental</td><td>Si el Concepto exige oficio, no permite guardar sin el Folio de Presupuestos.</td></tr>
+          <tr><td><strong>RN-IN-02</strong></td><td>Mes Contable</td><td>La <code>fecha_deposito</code> debe pertenecer a un periodo contable ABIERTO.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>
