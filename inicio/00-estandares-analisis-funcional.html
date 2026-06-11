@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estándar de Análisis Funcional — SIAF-PJEV</title>
+<title>Estándar de Análisis Funcional DOC-08 — SIAF-PJEV</title>
 <link rel="stylesheet" href="../shared.css">
 <style>
   body { padding: 36px 44px 80px; background: var(--pjev-crema); }
@@ -12,21 +12,31 @@
     border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
     padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
   }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
 </style>
 </head>
 <body>
 <div class="doc-main-inner">
 
   <div class="elem-breadcrumb">
-    <a href="home.html">Inicio</a> ›
+    <a href="../index.html">Inicio</a> ›
     <span>Estándar de Análisis Funcional</span>
   </div>
 
-  <div class="elem-header">
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <div class="elem-id">DOC-08</div>
-      <h1 class="elem-title">Estándar de Análisis Funcional</h1>
-      <p class="elem-desc">Estructura obligatoria para documentar el levantamiento de requerimientos y diseño de nuevos módulos.</p>
+      <h1 class="elem-title">Estándar de Análisis Funcional (DOC-08)</h1>
+      <p class="elem-desc">Estructura obligatoria para documentar el levantamiento de requerimientos y diseño técnico de nuevos módulos.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-c">Tipo: Normativa Interna</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:20px;">
+      <button class="siaf-btn siaf-btn-ghost" onclick="window.location.reload()">Refrescar</button>
+      <button class="siaf-btn siaf-btn-secondary" onclick="window.print()">🖨 Imprimir</button>
     </div>
   </div>
 
@@ -34,58 +44,87 @@
   <div class="doc-section">
     <div class="section-title"><span class="section-num">1</span> Objetivo</div>
     <p>El Análisis Funcional es la piedra angular del desarrollo. Define el "Qué" y el "Por qué" de un módulo antes de escribir una sola línea de código. <strong>Ningún módulo debe desarrollarse sin que su Análisis Funcional correspondiente haya sido redactado, revisado y autorizado.</strong></p>
-    <p>Todos los archivos de Análisis Funcional deben nombrarse con la convención <code>0X.Y.Z-nombre-modulo.html</code> (por ejemplo, <code>01.1.1-entidad.html</code>) y deben seguir estrictamente la estructura detallada a continuación.</p>
+    <p>Todos los archivos de Análisis Funcional deben nombrarse con la convención <code>0X.Y.Z-nombre-modulo.html</code> (por ejemplo, <code>02.1.1-clave-presupuestal.html</code>) y deben seguir estrictamente la estructura detallada a continuación.</p>
   </div>
 
   <!-- 2. ESTRUCTURA DEL DOCUMENTO -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">2</span> Estructura Obligatoria de 9 Puntos</div>
+    <div class="section-title"><span class="section-num">2</span> Estructura Obligatoria de 12 Puntos</div>
     
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">1. Descripción General</h3>
     <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Un resumen de 1-2 párrafos que explique el propósito del módulo en un lenguaje no técnico y orientado al negocio.</p>
 
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">2. Marco Normativo</h3>
-    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Tabla obligatoria que vincula el módulo con la ley (LGCG, CONAC, etc.). Columnas: <strong>Norma</strong>, <strong>Artículo / Punto</strong>, <strong>Obligación que genera</strong>.</p>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Tabla obligatoria que vincula el módulo con la normatividad. Columnas: <strong>Norma</strong>, <strong>Artículo / Punto</strong>, <strong>Obligación que genera</strong>.</p>
 
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">3. Roles que intervienen</h3>
     <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Tabla de accesos y permisos. Columnas: <strong>Rol</strong>, <strong>Acción permitida</strong>, <strong>Restricción</strong>.</p>
 
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">4. Modelo de Datos</h3>
-    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Tabla con los campos físicos en la base de datos, marcando llaves (PK, FK) y requeridos. Columnas: <strong>Campo</strong>, <strong>Tipo</strong>, <strong>Descripción</strong>.</p>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Tabla exhaustiva con los campos físicos en la base de datos (desglosado por Maestro/Detalle si aplica), marcando llaves (PK, FK) y requeridos. Columnas: <strong>Campo</strong>, <strong>Tipo</strong>, <strong>Descripción</strong>.</p>
 
-    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">5. Stored Procedures (SPs)</h3>
-    <p style="font-size: 13px; margin-bottom: 8px; color: var(--pjev-texto-muted);">Se deben definir obligatoriamente las funciones <code>fn_leer_[modulo]</code> y <code>fn_crud_[modulo]</code>.</p>
-    <ul style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted); padding-left: 20px;">
-      <li>Los parámetros de entrada (IN) deben denotarse con el prefijo <code>@</code> (ej. <code>@usuario</code>, <code>@accion</code>, <code>@parametro</code>).</li>
-      <li>Los valores devueltos (OUT) o atributos JSON deben denotarse entre llaves <code>{}</code> (ej. <code>{dato}</code>, <code>{error}</code>).</li>
-      <li>El orden de los parámetros base siempre es: <code>@usuario</code>, <code>@ejercicio</code>, <code>@accion</code>.</li>
-    </ul>
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">5. Stored Procedures (SPs) y Triggers</h3>
+    <p style="font-size: 13px; margin-bottom: 8px; color: var(--pjev-texto-muted);">Debe documentarse la firma de las funciones transaccionales (Ej. <code>fn_leer</code>, <code>fn_crud</code>) y detallar reglas implementadas en Triggers de integridad. La presentación debe estructurarse usando pestañas navegables con <code>showSP()</code> que muestren las tablas de Entrada (IN), Valores Devueltos (OUT) en JSON y la Definición SQL embebida en un bloque formativo.</p>
 
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">6. Servicios REST</h3>
-    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Endpoints que el Frontend consumirá. Columnas: <strong>Método (GET, POST, PUT, DELETE)</strong>, <strong>Endpoint</strong>, <strong>Body / Params</strong>, <strong>Descripción</strong>.</p>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Endpoints que el Frontend consumirá. Utilizar las etiquetas CSS <code>.method</code>. Columnas: <strong>Método (GET/POST/PATCH/DELETE)</strong>, <strong>Endpoint</strong>, <strong>Body / Params</strong>, <strong>Descripción</strong>.</p>
 
-    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">7. Diseño de Interfaces (UI / Wireframes)</h3>
-    <p style="font-size: 13px; margin-bottom: 8px; color: var(--pjev-texto-muted);">Todo análisis debe incluir wireframes (dibujados en SVG embebido) mostrando las dos fases del estándar Frontend en 4 pestañas interactivas:</p>
-    <ul style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted); padding-left: 20px;">
-      <li><code>pantalla_leer con @parametros</code>: Pantalla base o grid mapeando los bindings de variables (ej. mostrando <code>{campo}</code> en la tabla).</li>
-      <li><code>pantalla_leer con valores</code>: La misma pantalla pero ilustrada con datos de ejemplo reales o <em>mockups</em> para el usuario final.</li>
-      <li><code>pantalla_abc con @parametros</code>: Formulario de captura/edición (modal/ventana) indicando dónde se captura cada <code>@parametro</code> del SP.</li>
-      <li><code>pantalla_abc con valores</code>: Formulario de captura ilustrado con datos de ejemplo.</li>
-    </ul>
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">7. Acciones del Módulo</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Secciones del front, tales como: Registro (CRUD), Especiales (Importaciones, Reportes) o Acciones en Vacío.</p>
 
-    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">8. Reglas de Negocio Críticas</h3>
-    <p style="font-size: 13px; margin-bottom: 8px; color: var(--pjev-texto-muted);">El corazón de la lógica funcional. Debe presentarse en una tabla con las siguientes 5 columnas estrictas:</p>
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">8. Diseño de Interfaces (UI / Wireframes)</h3>
+    <p style="font-size: 13px; margin-bottom: 8px; color: var(--pjev-texto-muted);">Wireframes (dibujados en SVG embebido) organizados mediante pestañas interactivas manejadas por <code>showWF()</code>. Debe contener vistas de Grid principal, formularios modales o Steppers de validación, ilustrando estados abstractos (parámetros) y representaciones con valores de negocio concretos.</p>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">9. Reglas de Negocio Críticas</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">El corazón de la lógica funcional. Columnas estrictas: <strong>Código</strong> (ej. RN-01), <strong>Regla</strong>, <strong>Consecuencia</strong>, <strong>Dónde se valida</strong>.</p>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">10. Flujos de Integración (Impacto Transversal)</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Explicación clara de cómo las acciones de este módulo detonan efectos en otras áreas del ERP (Ej. Impacto en presupuesto y contabilidad simultáneamente).</p>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">11. Afectación Contable (Reglas CONAC)</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Describe si la operación genera o no pólizas automáticas, definiendo los momentos contables que impacta y la matriz de conversión implicada. Columnas: <strong>Aplica</strong>, <strong>Descripción Contable</strong>.</p>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">12. Historial de Cambios</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Control de versiones del documento. Columnas: <strong>Fecha</strong>, <strong>Versión</strong>, <strong>Descripción del Cambio</strong>, <strong>Autor</strong>.</p>
+
+  </div>
+
+  <!-- 3. ANEXOS IMPRESOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Anexos Obligatorios (Diseño para Impresión)</div>
+    <p>Adicional a las 12 secciones de vista en pantalla, el estándar exige la inclusión de 2 anexos ocultos que solo se visualizarán (y añadirán saltos de página) al imprimir el documento o exportarlo a PDF mediante la regla <code>@media print</code> definida en el <code>shared.css</code>.</p>
+    
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px; margin-top: 10px;">Anexo 1: Diagrama Interfuncional del Procedimiento</h3>
+    <p style="font-size: 13px; margin-bottom: 10px; color: var(--pjev-texto-muted);">Un contenedor <code>&lt;div id="module-flowchart" style="display:none;"&gt;</code> que alberga un diagrama SVG detallando el flujo del proceso cruzado por carriles (Área Usuaria vs SIAF-PJEV).</p>
+    
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px; margin-top: 10px;">Anexo 2: Flujograma de Procesos y Descripción</h3>
+    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Un contenedor <code>&lt;div id="module-process-table" style="display:none;"&gt;</code> que contenga una tabla narrativa (.props-table) detallando cada paso del diagrama interfuncional.</p>
+  </div>
+
+  <!-- 4. FUNCIONES JS REQUERIDAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Funciones JavaScript del Estándar</div>
+    <p>Para asegurar la interactividad consistente de los Wireframes y las firmas de Stored Procedures sin cargar librerías externas excesivas, cada documento debe incluir (o referenciar globalmente en <code>shared.js</code>) estas dos funciones transicionales:</p>
+    
     <div class="code-wrap">
-1. Código: (ej. RN-01)
-2. Regla: (Descripción clara de la regla)
-3. Consecuencia: (Qué sucede si se rompe, ej. Error en pantalla)
-4. Dónde se valida: (SP, Frontend Zod, Trigger, Procesos Core)
-5. Fuente (Normativa / Técnica): (Fundamento explícito, ej. "Ley General de Cont. Gubernamental Art. 18" o "Restricción técnica del modelo de datos")
+      <div class="code-block">
+<pre><span style="color:#5c6370;">// Intercambiador de pestañas para Wireframes UI (Sección 8)</span>
+<span style="color:#c678dd;">function</span> <span style="color:#61afef;">showWF</span>(<span style="color:#e06c75;">id</span>, <span style="color:#e06c75;">btn</span>) {
+  <span style="color:#e5c07b;">document</span>.<span style="color:#56b6c2;">querySelectorAll</span>(<span style="color:#98c379;">'.wf-panel'</span>).<span style="color:#56b6c2;">forEach</span>(p => p.classList.<span style="color:#56b6c2;">remove</span>(<span style="color:#98c379;">'active'</span>));
+  <span style="color:#e5c07b;">document</span>.<span style="color:#56b6c2;">querySelectorAll</span>(<span style="color:#98c379;">'.wf-tab'</span>).<span style="color:#56b6c2;">forEach</span>(b => b.classList.<span style="color:#56b6c2;">remove</span>(<span style="color:#98c379;">'active'</span>));
+  <span style="color:#e5c07b;">document</span>.<span style="color:#56b6c2;">getElementById</span>(<span style="color:#98c379;">'wf-'</span> + id).classList.<span style="color:#56b6c2;">add</span>(<span style="color:#98c379;">'active'</span>);
+  btn.classList.<span style="color:#56b6c2;">add</span>(<span style="color:#98c379;">'active'</span>);
+}
+
+<span style="color:#5c6370;">// Intercambiador de pestañas para Stored Procedures (Sección 5)</span>
+<span style="color:#c678dd;">function</span> <span style="color:#61afef;">showSP</span>(<span style="color:#e06c75;">id</span>, <span style="color:#e06c75;">btn</span>) {
+  <span style="color:#e5c07b;">document</span>.<span style="color:#56b6c2;">querySelectorAll</span>(<span style="color:#98c379;">'.sp-panel'</span>).<span style="color:#56b6c2;">forEach</span>(p => p.classList.<span style="color:#56b6c2;">remove</span>(<span style="color:#98c379;">'active'</span>));
+  <span style="color:#e5c07b;">document</span>.<span style="color:#56b6c2;">querySelectorAll</span>(<span style="color:#98c379;">'.sp-tab'</span>).<span style="color:#56b6c2;">forEach</span>(b => b.classList.<span style="color:#56b6c2;">remove</span>(<span style="color:#98c379;">'active'</span>));
+  <span style="color:#e5c07b;">document</span>.<span style="color:#56b6c2;">getElementById</span>(<span style="color:#98c379;">'sp-'</span> + id).classList.<span style="color:#56b6c2;">add</span>(<span style="color:#98c379;">'active'</span>);
+  btn.classList.<span style="color:#56b6c2;">add</span>(<span style="color:#98c379;">'active'</span>);
+}</pre>
+      </div>
     </div>
-
-    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">9. Flujos de Integración</h3>
-    <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Diagrama de texto que explica cómo este módulo interactúa con otros (ej. "Entidad afecta a -> Pólizas Automáticas").</p>
-
   </div>
 
   <div class="doc-footer">

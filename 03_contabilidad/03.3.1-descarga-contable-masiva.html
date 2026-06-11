@@ -45,7 +45,7 @@
     <!-- 1. Descripción General -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-      <p>Es una de las herramientas más potentes del SIAF-PJEV. Permite al equipo de Contabilidad amortizar o "descargar" contablemente cientos de comprobaciones de viáticos, compras de almacén, depreciaciones de activo fijo u obras públicas de un solo clic al cierre del mes. En lugar de capturar pólizas manuales una por una, el sistema agrupa saldos de cuentas transitorias y genera pólizas masivas automatizadas que matan los saldos circulantes mandándolos a la cuenta de Gasto definitivo.</p>
+      <p>Es una de las herramientas más potentes del SIAF-PJEV. Permite al equipo de Contabilidad amortizar o "descargar" contablemente cientos de comprobaciones de viáticos, compras de almacén, depreciaciones de activo fijo u obras públicas de un solo clic al cierre del mes. Adicionalmente, el sistema le permite al usuario elegir el tipo de póliza para consultar por lotes lo que está pendiente de aplicar. En lugar de capturar pólizas manuales una por una, el sistema agrupa saldos de cuentas transitorias y genera pólizas masivas automatizadas que matan los saldos circulantes mandándolos a la cuenta de Gasto definitivo.</p>
     </div>
 
     <!-- 2. Marco Normativo -->
@@ -54,7 +54,8 @@
       <table class="props-table">
         <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
         <tbody>
-          <tr><td>Postulado Básico CONAC</td><td>Devengo Contable</td><td>Las transacciones deben reflejarse en el momento que ocurren. Cuando se comprueba un viático, el deudor debe disminuir y el gasto debe reconocerse.</td></tr>
+          <tr><td>Manual de Contabilidad Gubernamental (CONAC)</td><td>Instructivo de Manejo de Cuentas</td><td>Obligación de registrar la afectación contable definitiva (descarga), cancelando los derechos a recibir bienes o servicios (cuentas puente) y registrando el impacto en las cuentas de resultados (gasto o activo definitivo) al comprobarse la operación.</td></tr>
+          <tr><td>Reglas de Registro y Valoración del Patrimonio (CONAC)</td><td>Reconocimiento de los Efectos Contables</td><td>Establece que los saldos circulantes por anticipos o viáticos deben ser amortizados (descargados) contablemente de forma periódica o al cierre de mes, reflejando su aplicación real en el patrimonio.</td></tr>
           <tr><td>Manual de Operaciones PJEV</td><td>Depuración de Cuentas</td><td>Obligación de saldar las cuentas puente/transitorias al menos de forma mensual para mantener Estados Financieros sanos.</td></tr>
         </tbody>
       </table>
@@ -67,7 +68,7 @@
         <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
         <tbody>
           <tr><td>Jefe de Contabilidad</td><td>Ejecutar el proceso batch y generar pólizas masivas.</td><td>Solo puede ejecutarlo si no hay meses cerrados bloqueando la fecha seleccionada.</td></tr>
-          <tr><td>Subdirector Contable</td><td>Autorizar las pólizas gigantes resultantes.</td><td>Responsabilidad total sobre el cuadre.</td></tr>
+          <tr><td>Analista especializado</td><td>Afectar o desafectar pólizas en bloques y cierres contables.</td><td>Usuario que requiere contar con los privilegios especiales para este proceso.</td></tr>
         </tbody>
       </table>
     </div>
@@ -75,31 +76,91 @@
     <!-- 4. Modelo de Datos -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
-      <table class="props-table">
-        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
-        <tbody>
-        <tr><td><code>LOTE_ID</code></td><td><code>BIGINT (PK)</code></td><td>ID de la ejecución masiva.</td></tr>
-        <tr><td><code>TIPO_DESCARGA</code></td><td><code>VARCHAR(50)</code></td><td>'VIATICOS', 'ALMACEN', 'ACTIVO_FIJO'.</td></tr>
-        <tr><td><code>FECHA_CORTE</code></td><td><code>DATE</code></td><td>Fecha hasta la cual calcular amortizaciones.</td></tr>
-        <tr><td><code>POLIZA_GENERADA_ID</code></td><td><code>BIGINT (FK)</code></td><td>Vínculo a la mega-póliza creada en <code>cat_polizas</code>.</td></tr>
-        </tbody>
-      </table>
+      <p>Al tratarse de un proceso masivo, no se requiere la creación de un nuevo esquema de base de datos, sino que se ocupan los modelos de datos ya existentes correspondientes a <code>contabilidad.poliza</code> y <code>contabilidad.poliza_movtos</code>.</p>
+      <p>Para obtener la información contable válida para la descarga, el sistema aplica las siguientes reglas de selección:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li>Selecciona las pólizas que estén debidamente <strong>cuadradas</strong>.</li>
+        <li>Que <strong>no estén afectadas</strong>.</li>
+        <li>Que se encuentren <strong>autorizadas</strong> (<code>estatus = 3</code>).</li>
+        <li>Que <strong>no estén canceladas</strong>.</li>
+        <li>Que estén dentro del <strong>periodo activo</strong> (mes + ejercicio).</li>
+      </ul>
     </div>
 
     <!-- 5. Stored Procedures -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL (Altamente pesadas):</p>
-      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong><code>fn_calcular_pre_descarga</code></strong>
-          <br><span style="color:#666">IN:</span> <code>@tipo</code>, <code>@fecha_corte</code>
-          <br><span style="color:#666">OUT:</span> Recordset temporal (Vista previa) de todos los movimientos y su saldo a saldar.
-        </li>
-        <li><strong><code>fn_ejecutar_descarga_masiva</code></strong>
-          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@tipo</code>, <code>@fecha_corte</code>, <code>@datos_seleccionados_xml</code>
-          <br><span style="color:#666">OUT:</span> Crea la póliza agrupada, retorna <code>{poliza_folio}</code> y actualiza banderas en tablas satélite.
-        </li>
-      </ul>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Las operaciones en base de datos se manejan a través de los siguientes Stored Procedures principales:</p>
+      
+      <style>
+        .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; }
+        .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+        .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+        .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+        .sp-panel { display: none; }
+        .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+      </style>
+
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_polizas_descarga</button>
+        <button class="sp-tab" onclick="showSP('sp2',this)">fn_abc_polizas_descarga</button>
+      </div>
+
+      <!-- TAB 1: LEER PÓLIZAS -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_tipo_poliza</code></td><td><code>VARCHAR</code></td><td>Tipo de póliza</td></tr>
+            <tr><td><code>@p_fecha_inicio</code></td><td><code>DATE</code></td><td>Fecha inicial (rango de mes y ejercicio activo)</td></tr>
+            <tr><td><code>@p_fecha_fin</code></td><td><code>DATE</code></td><td>Fecha final (rango de mes y ejercicio activo)</td></tr>
+            <tr><td><code>@p_folio_especifico</code></td><td><code>VARCHAR</code></td><td>(Opcional) Folio específico de la póliza</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{poliza_id}</code></td><td><code>INT</code></td><td>ID de la póliza a procesar</td></tr>
+            <tr><td><code>{folio}</code></td><td><code>VARCHAR</code></td><td>Folio de la póliza</td></tr>
+            <tr><td><code>{importe}</code></td><td><code>NUMERIC</code></td><td>Importe total</td></tr>
+            <tr><td><code>{estatus}</code></td><td><code>INT</code></td><td>Estatus de la póliza</td></tr>
+            <tr><td><code>{mensaje_error}</code></td><td><code>VARCHAR</code></td><td><span style="color:#d97706; font-weight:bold;">Manejo de Excepciones:</span> Retorna el motivo si no cumple las reglas (Ej. <em>"La póliza no está cuadrada"</em>, <em>"La póliza la tiene en uso el usuario [Y]"</em>)</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (Snippet Filtros Fijos)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 1. LEER PÓLIZAS PARA DESCARGA
+-- ==========================================</span>
+<span style="color:#c678dd;">WHERE</span> p.cuadrada = <span style="color:#d19a66;">1</span> 
+  <span style="color:#c678dd;">AND</span> p.afectada = <span style="color:#d19a66;">0</span> 
+  <span style="color:#c678dd;">AND</span> p.estatus = <span style="color:#d19a66;">3</span> <span style="color:#5c6370;">-- (Autorizada, No cancelada)</span>
+  <span style="color:#c678dd;">AND</span> p.fecha <span style="color:#c678dd;">BETWEEN</span> @p_fecha_inicio <span style="color:#c678dd;">AND</span> @p_fecha_fin; <span style="color:#5c6370;">-- (Dentro del periodo activo)</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: ABC PÓLIZAS -->
+      <div id="sp-sp2" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario activo en sesión</td></tr>
+            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>Acción a realizar (Afectar o Desafectar)</td></tr>
+            <tr><td><code>@p_polizas_xml</code></td><td><code>XML/JSON</code></td><td>IDs de las pólizas validadas a procesar en bloque</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{codigo_respuesta}</code></td><td><code>INT</code></td><td>0 si fue exitoso, negativo si hubo error</td></tr>
+            <tr><td><code>{mensaje}</code></td><td><code>VARCHAR</code></td><td>Mensaje de éxito o descripción del error</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Función</h3>
+        <p style="font-size:13px; color:var(--pjev-texto-muted);">Aplica la acción sobre las pólizas filtradas y validadas, efectuando la afectación o desafectación en bloque de las mismas de forma transaccional.</p>
+      </div>
     </div>
 
     <!-- 6. Servicios REST -->
@@ -108,8 +169,8 @@
       <table class="props-table">
         <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/descarga/simular</code></td><td>JSON con <code>{ tipo_descarga, fecha_corte }</code></td><td>Genera una vista previa del impacto contable (Simulación).</td></tr>
-          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/descarga/ejecutar</code></td><td>JSON con los registros confirmados.</td><td>Lanza el Job transaccional asíncrono para crear la póliza.</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/contabilidad/polizas-descarga</code></td><td>Query Params: <code>?tipo=&fecha_inicio=&fecha_fin=&folio=</code></td><td>Llama a <code>fn_leer_polizas_descarga</code>. Retorna el listado de pólizas que cumplen con las reglas.</td></tr>
+          <tr><td><span class="method post">POST</span> / <span class="method patch">PATCH</span></td><td><code>/contabilidad/polizas-descarga/abc</code></td><td>JSON con <code>{ accion, polizas_ids: [] }</code></td><td>Llama a <code>fn_abc_polizas_descarga</code>. Ejecuta la afectación o desafectación masiva.</td></tr>
         </tbody>
       </table>
     </div>
@@ -119,9 +180,9 @@
       <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
       <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
       <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong>Simulación de Descarga:</strong> Corre el cálculo y muestra en pantalla lo que ocurrirá sin afectar la BD.</li>
-        <li><strong>Ejecución (Play):</strong> Dispara el Job. Al ser intensivo, muestra una barra de carga en la interfaz.</li>
-        <li><strong>Impresión / Exportación:</strong> Botón 🖨️ que genera el "Reporte Analítico de Descarga", desglosando los 300 o 500 empleados o activos procesados en esa corrida específica (Crucial para auditoría y anexarlo a la póliza).</li>
+        <li><strong>Afectación Masiva:</strong> Dispara el Job de afectación en bloque de las pólizas seleccionadas. Al ser intensivo, muestra una barra de carga en la interfaz.</li>
+        <li><strong>Desafectación Masiva:</strong> Revierte o cancela el impacto de un bloque de pólizas seleccionadas previamente afectadas.</li>
+        <li><strong>Impresión / Exportación:</strong> Botón 🖨️ que genera el "Reporte Analítico", desglosando los registros procesados en esa corrida específica (Crucial para auditoría y anexarlo a la póliza).</li>
       </ul>
     </div>
 
@@ -130,95 +191,106 @@
       <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
       
       <div class="wireframe-tabs">
-        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Filtros Simulación)</button>
-        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Vista Previa Simulada)</button>
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer_masiva (Afectar/Desafectar)</button>
       </div>
 
-      <!-- TAB 1: Grid Parametros -->
+      <!-- TAB 1: Grid Principal -->
       <div id="wf-p1" class="wf-panel active">
         <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Consola de Descarga Masiva (Parametrizada)</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Consola de Afectación Masiva de Pólizas</span></div>
           <div class="wf-svg-area">
-            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="450" fill="#fcfcfc" rx="4" stroke="#ddd"/>
               
-              <!-- Config Box -->
+              <!-- Componentes de Filtro (b10-select, b08-input-text, b02-button-secondary) -->
               <rect x="20" y="20" width="960" height="80" fill="#fff" stroke="#ccc" rx="4"/>
-              <text x="40" y="45" font-size="12" font-weight="bold">Parámetros del Proceso:</text>
               
-              <text x="40" y="70" font-size="11">Tipo de Descarga:</text>
-              <rect x="150" y="55" width="200" height="22" fill="#eee" rx="2"/> <text x="160" y="70" font-size="10">@tipo_proceso</text>
+              <text x="40" y="45" font-size="11" fill="#666">Tipo de Póliza (b10-select)</text>
+              <rect x="40" y="55" width="160" height="26" fill="#f9f9f9" stroke="#ccc" rx="3"/>
+              <text x="50" y="72" font-size="11" fill="#333">-- Todas --</text>
+              <polygon points="185,65 190,70 180,70" fill="#666"/>
               
-              <text x="380" y="70" font-size="11">Fecha de Corte:</text>
-              <rect x="470" y="55" width="120" height="22" fill="#eee" rx="2"/> <text x="480" y="70" font-size="10">@fecha_corte</text>
+              <text x="220" y="45" font-size="11" fill="#666">Fecha Desde (b08-input-text)</text>
+              <rect x="220" y="55" width="130" height="26" fill="#f9f9f9" stroke="#ccc" rx="3"/>
+              <text x="230" y="72" font-size="11" fill="#333">01/01/2026</text>
+
+              <text x="370" y="45" font-size="11" fill="#666">Fecha Hasta (b08-input-text)</text>
+              <rect x="370" y="55" width="130" height="26" fill="#f9f9f9" stroke="#ccc" rx="3"/>
+              <text x="380" y="72" font-size="11" fill="#333">31/01/2026</text>
               
-              <rect x="620" y="55" width="130" height="22" fill="#0369a1" rx="3"/> <text x="685" y="70" fill="#fff" font-size="10" text-anchor="middle">🔎 SIMULAR PROCESO</text>
+              <text x="520" y="45" font-size="11" fill="#666">Folio (b08-input-text)</text>
+              <rect x="520" y="55" width="120" height="26" fill="#f9f9f9" stroke="#ccc" rx="3"/>
+              <text x="530" y="72" font-size="11" fill="#ccc">Opcional...</text>
 
-              <!-- Action Bar -->
-              <rect x="20" y="110" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              <!-- Botones Secundarios (b02-button-secondary) -->
+              <rect x="680" y="55" width="100" height="26" fill="#fff" stroke="#1B3A2D" rx="4"/>
+              <text x="730" y="72" fill="#1B3A2D" font-size="11" text-anchor="middle" font-weight="bold">Consultar</text>
+
+              <rect x="790" y="55" width="120" height="26" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              <text x="850" y="72" fill="#666" font-size="11" text-anchor="middle">Limpiar filtros</text>
+
+              <!-- Action Bar (Botones Primarios b01-button-primary) -->
+              <rect x="20" y="115" width="960" height="45" fill="#f4f6f5" stroke="#ccc" rx="4"/>
               
-              <text x="30" y="132" font-size="10" font-weight="bold" fill="#666">Acción Ejecutiva:</text>
-              <rect x="120" y="117" width="150" height="21" fill="#1B3A2D" rx="3" opacity="0.5"/> <text x="195" y="131" fill="#fff" font-size="9" text-anchor="middle">▶ EJECUTAR DESCARGA</text>
-
-              <text x="780" y="132" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
-              <rect x="840" y="117" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="131" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR DETALLE</text>
-
-              <!-- Blank Area -->
-              <text x="500" y="220" font-size="14" fill="#999" text-anchor="middle">Ejecute la simulación para ver la propuesta de póliza.</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: Grid Valores -->
-      <div id="wf-p2" class="wf-panel">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Consola de Descarga Masiva (Simulación Lista)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <text x="40" y="142" font-size="11" font-weight="bold" fill="#666">Acciones Masivas:</text>
               
-              <!-- Config Box -->
-              <rect x="20" y="20" width="960" height="60" fill="#f0fdfa" stroke="#14b8a6" rx="4"/>
-              <text x="40" y="45" font-size="12" font-weight="bold" fill="#0f766e">✓ Simulación Exitosa: Se encontraron 450 registros de Comprobación de Viáticos pendientes de mandar a Gasto.</text>
-              <text x="40" y="65" font-size="11" fill="#0f766e">Importe Total Circulante a descargar: $ 1,250,400.00 a Fecha de Corte: 31/01/2026</text>
+              <rect x="150" y="125" width="150" height="26" fill="#1B3A2D" rx="4"/> 
+              <text x="225" y="142" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">▶ AFECTAR BLOQUE</text>
 
-              <!-- Action Bar -->
-              <rect x="20" y="90" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+              <rect x="315" y="125" width="160" height="26" fill="#991B1B" rx="4"/> 
+              <text x="395" y="142" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">↺ DESAFECTAR BLOQUE</text>
+
+              <rect x="830" y="125" width="130" height="26" fill="#fff" stroke="#1B3A2D" rx="4"/> 
+              <text x="895" y="142" fill="#1B3A2D" font-size="10" text-anchor="middle">🖨 Imprimir Listado</text>
+
+              <!-- Grid dg02-grid-acciones -->
+              <rect x="20" y="180" width="960" height="250" fill="#fff" stroke="#eee" rx="4"/>
               
-              <text x="30" y="112" font-size="10" font-weight="bold" fill="#666">Acción Ejecutiva:</text>
-              <rect x="120" y="97" width="150" height="21" fill="#1B3A2D" rx="3"/> <text x="195" y="111" fill="#fff" font-size="9" text-anchor="middle">▶ CONFIRMAR Y EJECUTAR</text>
-
-              <text x="780" y="112" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
-              <rect x="840" y="97" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="111" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 Imprimir Detalle Prev.</text>
-
-              <!-- Propuesta Poliza -->
-              <text x="20" y="150" font-size="12" font-weight="bold">VISTA PREVIA DE LA PÓLIZA GIGANTE A GENERAR:</text>
-
-              <rect x="20" y="160" width="960" height="25" fill="#1B3A2D"/>
-              <text x="30" y="176" fill="#fff" font-size="10">CUENTA AGRUPADA</text>
-              <text x="400" y="176" fill="#fff" font-size="10">DESCRIPCIÓN</text>
-              <text x="750" y="176" fill="#fff" font-size="10" text-anchor="end">CARGO (GASTO)</text>
-              <text x="900" y="176" fill="#fff" font-size="10" text-anchor="end">ABONO (CIERRE)</text>
+              <rect x="20" y="180" width="960" height="30" fill="#1B3A2D"/>
+              <rect x="30" y="190" width="10" height="10" fill="#fff" stroke="#ccc" rx="2"/> <!-- Checkbox maestro -->
+              <text x="60" y="199" fill="#fff" font-size="10" font-weight="bold">TIPO</text>
+              <text x="140" y="199" fill="#fff" font-size="10" font-weight="bold">FOLIO</text>
+              <text x="220" y="199" fill="#fff" font-size="10" font-weight="bold">FECHA</text>
+              <text x="320" y="199" fill="#fff" font-size="10" font-weight="bold">CONCEPTO</text>
+              <text x="650" y="199" fill="#fff" font-size="10" font-weight="bold" text-anchor="end">IMPORTE</text>
+              <text x="750" y="199" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">ESTATUS</text>
+              <text x="880" y="199" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">ACCIONES</text>
 
               <!-- Row 1 -->
-              <rect x="20" y="185" width="960" height="25" fill="#fff" stroke="#eee"/>
-              <text x="30" y="202" font-size="11">5137.01</text>
-              <text x="400" y="202" font-size="11">Gasto por Viáticos en el País (Agrupado 450 comp.)</text>
-              <text x="750" y="202" font-size="11" text-anchor="end" font-weight="bold">$ 1,250,400.00</text>
-              <text x="900" y="202" font-size="11" text-anchor="end">$ 0.00</text>
+              <rect x="20" y="210" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <rect x="30" y="220" width="10" height="10" fill="#14b8a6" stroke="#14b8a6" rx="2"/> 
+              <path d="M 32 225 L 34 228 L 38 222" stroke="#fff" fill="none" stroke-width="2"/>
+              <text x="60" y="230" font-size="11">D</text>
+              <text x="140" y="230" font-size="11">000450</text>
+              <text x="220" y="230" font-size="11">31/01/2026</text>
+              <text x="320" y="230" font-size="11">Descarga masiva viáticos comprobados...</text>
+              <text x="650" y="230" font-size="11" text-anchor="end" font-weight="bold">$ 1,250,400.00</text>
+              <rect x="710" y="218" width="80" height="16" fill="#fef3c7" rx="8"/> <text x="750" y="229" font-size="9" fill="#92400e" text-anchor="middle">No Afectada</text>
+              <text x="860" y="230" font-size="14" fill="#0369a1" cursor="pointer">👁</text> <text x="890" y="230" font-size="14" fill="#666" cursor="pointer">🕒</text>
 
               <!-- Row 2 -->
-              <rect x="20" y="210" width="960" height="25" fill="#fafafa" stroke="#eee"/>
-              <text x="30" y="227" font-size="11">1123.01</text>
-              <text x="400" y="227" font-size="11">Deudores Diversos por Viáticos (Agrupado)</text>
-              <text x="750" y="227" font-size="11" text-anchor="end">$ 0.00</text>
-              <text x="900" y="227" font-size="11" text-anchor="end" font-weight="bold">$ 1,250,400.00</text>
-              
-              <!-- Loader Simulado -->
-              <rect x="350" y="280" width="300" height="8" fill="#eee" rx="4"/>
-              <rect x="350" y="280" width="150" height="8" fill="#14b8a6" rx="4"/>
-              <text x="500" y="310" font-size="10" fill="#14b8a6" text-anchor="middle">Ejecutando proceso... 50%</text>
+              <rect x="20" y="240" width="960" height="30" fill="#fafafa" stroke="#eee"/>
+              <rect x="30" y="250" width="10" height="10" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="60" y="260" font-size="11">D</text>
+              <text x="140" y="260" font-size="11">000451</text>
+              <text x="220" y="260" font-size="11">31/01/2026</text>
+              <text x="320" y="260" font-size="11">Amortización Almacén Enero</text>
+              <text x="650" y="260" font-size="11" text-anchor="end" font-weight="bold">$ 85,000.00</text>
+              <rect x="710" y="248" width="80" height="16" fill="#d1fae5" rx="8"/> <text x="750" y="259" font-size="9" fill="#065f46" text-anchor="middle">Afectada</text>
+              <text x="860" y="260" font-size="14" fill="#0369a1" cursor="pointer">👁</text> <text x="890" y="260" font-size="14" fill="#666" cursor="pointer">🕒</text>
+
+              <!-- Row 3 -->
+              <rect x="20" y="270" width="960" height="30" fill="#fff" stroke="#eee"/>
+              <rect x="30" y="280" width="10" height="10" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="60" y="290" font-size="11">I</text>
+              <text x="140" y="290" font-size="11">000102</text>
+              <text x="220" y="290" font-size="11">31/01/2026</text>
+              <text x="320" y="290" font-size="11">Corrección por ajuste contable ORFIS...</text>
+              <text x="650" y="290" font-size="11" text-anchor="end" font-weight="bold">$ 5,000.00</text>
+              <rect x="710" y="278" width="80" height="16" fill="#fef3c7" rx="8"/> <text x="750" y="289" font-size="9" fill="#92400e" text-anchor="middle">No Afectada</text>
+              <text x="860" y="290" font-size="14" fill="#0369a1" cursor="pointer">👁</text> <text x="890" y="290" font-size="14" fill="#666" cursor="pointer">🕒</text>
+
+              <text x="500" y="380" font-size="11" fill="#999" text-anchor="middle">Mostrando 3 de 3 registros. Componente: dg02-grid-acciones.html</text>
 
             </svg>
           </div>
@@ -445,6 +517,13 @@ function showWF(id, btn) {
   document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
   btn.classList.add('active');
 }
 </script>

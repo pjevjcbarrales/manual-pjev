@@ -400,12 +400,12 @@ $$;</pre>
     <!-- 7. Acciones del Módulo -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas (Maestro-Detalle):</p>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Las acciones que pueden realizarse dentro del formulario de la póliza son las siguientes:</p>
       <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong>pantalla_leer (Encabezados):</strong> Listado principal con grid de pólizas.</li>
-        <li><strong>pantalla_abc (Encabezado):</strong> Formulario para capturar/editar Fecha, Concepto y Centro de Costos de la póliza.</li>
-        <li><strong>pantalla_leer_detalle (Movimientos):</strong> Grid incrustado en la póliza que despliega todos los asientos registrados. Muestra la suma del Debe y Haber para validar cuadratura.</li>
-        <li><strong>pantalla_abc_detalle (Movimientos):</strong> Modal o formulario anidado para agregar un Cargo/Abono, afectando a terceros si la cuenta lo exige.</li>
+        <li style="margin-bottom: 8px;"><strong>Guardar encabezado:</strong> Guarda el encabezado de la póliza. En modo "nuevo", sólo aparece esta opción; en modo "editar/ver" aparece bloqueada y se presentan las opciones adicionales.</li>
+        <li style="margin-bottom: 8px;"><strong>Imprimir póliza:</strong> Imprime la póliza que se está revisando.</li>
+        <li style="margin-bottom: 8px;"><strong>Historial:</strong> Presenta una bitácora de cambios, la cual rastrea cuatro transiciones principales de estado <code>[Guardar, afectar, desafectar, cancelar]</code>. La bitácora presenta la información en la siguiente tabla: <em>Acción | Usuario | Observaciones | Fecha</em> (cada entrada está ligada a una acción o desacción en la tabla de bitácora/acciones).</li>
+        <li><strong>Afecta póliza:</strong> Afecta la póliza en la contabilidad general. <strong>Regla:</strong> Sólo se pueden afectar las pólizas que no hayan sido afectadas previamente, que tengan una diferencia matemática exacta de cero (0.00) entre el Debe y Haber, y que no estén canceladas. En cualquier otro escenario, el botón de afectar queda inhabilitado.</li>
       </ul>
     </div>
 

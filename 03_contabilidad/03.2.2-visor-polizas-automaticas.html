@@ -35,7 +35,7 @@
       <div>
         <div class="elem-id">03.2.2</div>
         <h1 class="elem-title">Visor de Pólizas de Diario Automatizadas</h1>
-        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV (Referencia: Manual PJEV 246-248).</p>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV (Referencia: Manual PJEV 253, 257).</p>
         <div class="mod-header-badges">
           <span class="mod-badge badge-c">Tipo: Formulario Compuesto (Lectura y Afectación)</span>
         </div>
@@ -45,7 +45,7 @@
     <!-- 1. Descripción General -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-      <p>Este módulo es el corazón de la integración del SIAF-PJEV. Permite al Departamento de Contabilidad revisar y <strong>afectar</strong> las pólizas que han sido generadas automáticamente por los módulos operativos (Presupuesto, Cuentas por Pagar, Tesorería/Caja, Recursos Humanos) a través de la Matriz de Conversión. El contador no digita cuentas ni importes, su rol es auditar y cruzar la información antes de consolidarla en la contabilidad general.</p>
+      <p>Este módulo es el visor central del SIAF-PJEV para las pólizas que han sido generadas automáticamente por los módulos operativos (Presupuesto, Cuentas por Pagar, Tesorería/Caja, Recursos Humanos). El contador no digita cuentas ni importes; su rol es auditar, verificar el sistema/subsistema origen, y cruzar la información antes de consolidarla en la contabilidad general mediante la afectación.</p>
     </div>
 
     <!-- 2. Marco Normativo -->
@@ -54,7 +54,7 @@
       <table class="props-table">
         <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
         <tbody>
-          <tr><td>LGCG</td><td>Principio de Registro en Base Acumulativa</td><td>La contabilización de las transacciones de gasto e ingreso debe registrarse conforme a la fecha de su realización contable (devengo), independientemente de la de su pago o cobro.</td></tr>
+          <tr><td>LGCG</td><td>Principio de Revelación Suficiente</td><td>Todo ajuste contable o corrección debe quedar registrado mediante una póliza explicativa y documentada (No se permite alterar registros del pasado).</td></tr>
           <tr><td>Control Interno PJEV</td><td>Punto 246, 247, 248</td><td>La Generación de Pólizas Automatizadas es un proceso mensual de revisión cruzada contra reportes operativos (Caja, Presupuesto, CxP) previo a su afectación final.</td></tr>
         </tbody>
       </table>
@@ -66,7 +66,8 @@
       <table class="props-table">
         <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
         <tbody>
-          <tr><td>Analista Contable</td><td>Consultar pólizas origen, conciliar totales, y presionar "Afectar".</td><td>No puede editar directamente los renglones (Cuentas, Cargos, Abonos) de una póliza automática.</td></tr>
+          <tr><td>Analista Contable</td><td>Consultar pólizas origen, conciliar totales, revisar el sistema/subsistema origen y presionar Afectar.</td><td>No puede editar directamente los renglones (Cuentas, Cargos, Abonos) de una póliza automática.</td></tr>
+          <tr><td>Jefe de Contabilidad</td><td>Revisar, Autorizar (Afectar), e imprimir.</td><td>No puede autorizar una póliza matemáticamente descuadrada.</td></tr>
         </tbody>
       </table>
     </div>
@@ -399,12 +400,12 @@ $$;</pre>
     <!-- 7. Acciones del Módulo -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas (Maestro-Detalle):</p>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Las acciones que pueden realizarse dentro del formulario de la póliza son las siguientes:</p>
       <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong>pantalla_leer (Encabezados):</strong> Listado principal con grid de pólizas.</li>
-        <li><strong>pantalla_abc (Encabezado):</strong> Formulario para capturar/editar Fecha, Concepto y Centro de Costos de la póliza.</li>
-        <li><strong>pantalla_leer_detalle (Movimientos):</strong> Grid incrustado en la póliza que despliega todos los asientos registrados. Muestra la suma del Debe y Haber para validar cuadratura.</li>
-        <li><strong>pantalla_abc_detalle (Movimientos):</strong> Modal o formulario anidado para agregar un Cargo/Abono, afectando a terceros si la cuenta lo exige.</li>
+        <li style="margin-bottom: 8px;"><strong>Guardar encabezado:</strong> Guarda el encabezado de la póliza. En modo "nuevo", sólo aparece esta opción; en modo "editar/ver" aparece bloqueada y se presentan las opciones adicionales.</li>
+        <li style="margin-bottom: 8px;"><strong>Imprimir póliza:</strong> Imprime la póliza que se está revisando.</li>
+        <li style="margin-bottom: 8px;"><strong>Historial:</strong> Presenta una bitácora de cambios, la cual rastrea cuatro transiciones principales de estado <code>[Guardar, afectar, desafectar, cancelar]</code>. La bitácora presenta la información en la siguiente tabla: <em>Acción | Usuario | Observaciones | Fecha</em> (cada entrada está ligada a una acción o desacción en la tabla de bitácora/acciones).</li>
+        <li><strong>Afecta póliza:</strong> Afecta la póliza en la contabilidad general. <strong>Regla:</strong> Sólo se pueden afectar las pólizas que no hayan sido afectadas previamente, que tengan una diferencia matemática exacta de cero (0.00) entre el Debe y Haber, y que no estén canceladas. En cualquier otro escenario, el botón de afectar queda inhabilitado.</li>
       </ul>
     </div>
 
@@ -438,7 +439,7 @@ $$;</pre>
               <rect x="20" y="60" width="1160" height="80" fill="#fff" stroke="#ccc" rx="4"/>
               
               <!-- Labels de filtros -->
-              <text x="35" y="80" font-size="10" fill="#666">Origen</text>
+              <text x="35" y="80" font-size="10" fill="#666">Sistema/Subsistema Origen</text>
               <text x="175" y="80" font-size="10" fill="#666">Folio / número</text>
               <text x="335" y="80" font-size="10" fill="#666">Fecha desde / hasta</text>
               <text x="595" y="80" font-size="10" fill="#666">Estatus</text>
@@ -476,7 +477,7 @@ $$;</pre>
               
               <!-- Grid Header -->
               <rect x="20" y="200" width="1160" height="25" fill="#f0f0f0"/>
-              <text x="30" y="217" font-size="10" font-weight="bold" fill="#666">TIPO</text>
+              <text x="30" y="217" font-size="10" font-weight="bold" fill="#666">ORIGEN</text>
               <text x="90" y="217" font-size="10" font-weight="bold" fill="#666">FOLIO</text>
               <text x="150" y="217" font-size="10" font-weight="bold" fill="#666">FECHA</text>
               <text x="240" y="217" font-size="10" font-weight="bold" fill="#666">DESCRIPCIÓN</text>
@@ -539,7 +540,7 @@ $$;</pre>
               <rect x="20" y="60" width="1160" height="80" fill="#fff" stroke="#ccc" rx="4"/>
               
               <!-- Labels de filtros -->
-              <text x="35" y="80" font-size="10" fill="#666">Origen</text>
+              <text x="35" y="80" font-size="10" fill="#666">Sistema/Subsistema Origen</text>
               <text x="175" y="80" font-size="10" fill="#666">Folio / número</text>
               <text x="335" y="80" font-size="10" fill="#666">Fecha desde</text>
               <text x="465" y="80" font-size="10" fill="#666">Fecha hasta</text>
@@ -560,7 +561,7 @@ $$;</pre>
               <text x="475" y="104" font-size="11" fill="#333">31/12/2025</text>
               
               <rect x="595" y="88" width="140" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="605" y="104" font-size="11" fill="#888">Todos</text>
+              <text x="605" y="104" font-size="11" fill="#888">Todas</text>
               
               <rect x="755" y="88" width="410" height="24" fill="#fff" stroke="#ccc" rx="3"/>
               <text x="765" y="104" font-size="11" fill="#ccc">Buscar en descripcion...</text>
@@ -581,7 +582,7 @@ $$;</pre>
               
               <!-- Grid Header -->
               <rect x="20" y="200" width="1160" height="25" fill="#f0f0f0"/>
-              <text x="30" y="217" font-size="10" font-weight="bold" fill="#666">TIPO</text>
+              <text x="30" y="217" font-size="10" font-weight="bold" fill="#666">ORIGEN</text>
               <text x="90" y="217" font-size="10" font-weight="bold" fill="#666">FOLIO</text>
               <text x="150" y="217" font-size="10" font-weight="bold" fill="#666">FECHA</text>
               <text x="240" y="217" font-size="10" font-weight="bold" fill="#666">DESCRIPCIÓN</text>
@@ -635,7 +636,7 @@ $$;</pre>
               
               <!-- Top Header -->
               <text x="20" y="30" font-size="14" fill="#666" font-family="sans-serif">&lt; Volver a la lista</text>
-              <text x="140" y="30" font-size="18" font-weight="bold" fill="#333" font-family="sans-serif">Póliza contable automática {@p_numero}</text>
+              <text x="140" y="30" font-size="18" font-weight="bold" fill="#333" font-family="sans-serif">Póliza contable manual {@p_numero}</text>
               <rect x="420" y="15" width="80" height="20" fill="#f1f5f9" rx="10"/><text x="460" y="29" font-size="11" fill="#475569" text-anchor="middle" font-family="sans-serif">{@estatus}</text>
 
               <!-- Box 1: ENCABEZADO -->
@@ -645,7 +646,7 @@ $$;</pre>
               <!-- Row 1 -->
               <text x="35" y="115" font-size="11" font-weight="bold" fill="#333" font-family="sans-serif">Tipo de póliza *</text>
               <rect x="35" y="125" width="350" height="30" fill="#fcfcfc" stroke="#ccc" rx="3"/>
-              <text x="45" y="145" font-size="12" fill="#1B3A2D" font-family="sans-serif">@p_tipo</text>
+              <text x="45" y="145" font-size="12" fill="#1B3A2D" font-family="sans-serif">@p_origen</text>
               <text x="35" y="170" font-size="10" fill="#999" font-family="sans-serif">El tipo no puede modificarse</text>
 
               <text x="410" y="115" font-size="11" font-weight="bold" fill="#333" font-family="sans-serif">Folio</text>
@@ -752,7 +753,7 @@ $$;</pre>
               
               <!-- Top Header -->
               <text x="20" y="30" font-size="14" fill="#666" font-family="sans-serif">&lt; Volver a la lista</text>
-              <text x="140" y="30" font-size="18" font-weight="bold" fill="#333" font-family="sans-serif">Póliza contable automática 000020</text>
+              <text x="140" y="30" font-size="18" font-weight="bold" fill="#333" font-family="sans-serif">Póliza contable manual 000020</text>
               <rect x="420" y="15" width="80" height="20" fill="#f1f5f9" rx="10"/><text x="460" y="29" font-size="11" fill="#475569" text-anchor="middle" font-family="sans-serif">Borrador</text>
 
               <!-- Box 1: ENCABEZADO -->
@@ -888,7 +889,7 @@ $$;</pre>
     <!-- 10. Flujos de Integración -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
-      <p>A diferencia de las automáticas, las pólizas manuales no tienen un documento "origen" en otros subsistemas. Su existencia nace y muere en la Subdirección de Contabilidad. Hacia adelante, se comportan exactamente igual: una vez en estatus "Afectada", sus importes se acumulan en la Balanza de Comprobación alimentando a los Estados Financieros de forma directa.</p>
+      <p>Estas pólizas automáticas nacen de un documento origen en los diversos sistemas/subsistemas operativos (Presupuesto, CxP, Nómina). El visor permite rastrear la operación hasta su origen.</p>
     </div>
 
     <!-- 11. Afectación Contable -->
@@ -1018,7 +1019,7 @@ $$;</pre>
 
   <!-- Imprime -->
   <path d="M 325 310 L 525 310 L 525 360 C 475 380, 375 340, 325 360 Z" class="node-doc"/>
-  <text x="425" y="335" class="node-text">Póliza Manual Impresa</text>
+  <text x="425" y="335" class="node-text">Póliza Automática Impresa</text>
   <text x="425" y="350" class="node-sub">Exporta PDF con firmas autógrafas</text>
 
   <path d="M 425 370 L 425 410" class="path-line"/>
@@ -1066,392 +1067,6 @@ $$;</pre>
     </tbody>
   </table>
 </div>
-<script src="../shared.js"></script>
-<script>
-function showWF(id, btn) {
-  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('wf-' + id).classList.add('active');
-  btn.classList.add('active');
-}
-function showSP(id, btn) {
-  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('sp-' + id).classList.add('active');
-  btn.classList.add('active');
-}
-</script>
-</body>
-</html<!-- 5. Payload de Entrada (JSON) -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">5</span> Atributos de Búsqueda (Filtros Frontend)</div>
-      <pre><code>{
-  "p_origen": 99, /* 99 = Todos los orígenes, 1 = Presupuesto, 2 = CXP, etc. */
-  "p_origen_id": null,
-  "p_tipo": "D",
-  "p_numero": "000142",
-  "p_fecha_desde": "2025-05-01",
-  "p_fecha_hasta": "2025-05-31",
-  "p_estatus": 1 /* 1=Pendiente de Afectar, 2=Afectada */
-}</code></pre>
-    </div>
-
-    <!-- 6. Payload de Salida (JSON) -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">6</span> Estructura de Respuesta del SP (OUT JSON)</div>
-      <p>El SP retornará TODA la información de la póliza origen (o ya afectada), incluyendo el campo <code>fuente_sistema</code> para que el Frontend lo pinte en el grid.</p>
-      <pre><code>{
-  "success": true,
-  "data": [
-    {
-      "p_id_origen": 4892,
-      "fuente_sistema": "Módulo de Cuentas por Pagar (Tramitada)",
-      "p_tipo": "D",
-      "p_numero": "000142",
-      "p_fecha": "2025-05-15",
-      "p_descripcion": "DEVENGADO FACTURA A-491 PROVEEDOR X",
-      "cargo": 15000.00,
-      "abono": 15000.00,
-      "estatus_registro": "Pendiente",
-      "poliza_contable_id": null
-    }
-  ],
-  "total_records": 1
-}</code></pre>
-    </div>
-
-    <!-- 7. Stored Procedures -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">7</span> Stored Procedures Relacionados</div>
-      <p>Para mantener la modularidad, se utilizarán procedimientos específicos para leer desde los orígenes y ejecutar el copiado transaccional.</p>
-      <div class="sp-tabs">
-        <button class="sp-tab active" onclick="showSP('leer',this)">fn_leer_polizas_origen</button>
-        <button class="sp-tab" onclick="showSP('afectar',this)">fn_afectar_poliza_automatizada</button>
-        <button class="sp-tab" onclick="showSP('leer_movtos',this)">fn_leer_movtos_origen</button>
-      </div>
-
-      <!-- fn_leer_polizas_origen -->
-      <div id="sp-leer" class="sp-panel active">
-        <h4>1. fn_leer_polizas_origen( @p_origen, @p_origen_id, @p_tipo, @p_numero, @p_fecha, ... )</h4>
-        <p><strong>Descripción:</strong> Consulta las pólizas generadas por el motor automático. Puede leer directamente de una vista consolidada (<code>vw_polizas_precontables</code>) que agrupa los módulos operativos, o leer de <code>contabilidad.poliza</code> si ya fueron afectadas.</p>
-        <p><strong>Reglas que valida:</strong></p>
-        <ul>
-          <li>Si <code>@p_origen = 99</code>, consulta de todos los módulos disponibles. El <code>@p_origen_id</code> viaja como NULL en búsquedas generales.</li>
-          <li>Aplica paginación estándar.</li>
-          <li>Devuelve el campo <code>fuente_sistema</code> indicando de dónde proviene.</li>
-        </ul>
-      </div>
-
-      <!-- fn_afectar_poliza_automatizada -->
-      <div id="sp-afectar" class="sp-panel">
-        <h4>2. fn_afectar_poliza_automatizada( @p_origen, @p_origen_id, @p_ejercicio, @p_usuario )</h4>
-        <p><strong>Descripción:</strong> Ejecuta la regla crítica de segregación. Clona la póliza origen hacia el esquema contable y marca el origen como procesado.</p>
-        <p><strong>Reglas que valida:</strong></p>
-        <ul>
-          <li>Busca la póliza en el esquema correspondiente usando <code>p_modulo_origen</code> y <code>p_origen_id</code>.</li>
-          <li>Valida que los renglones (movimientos origen) cuadren matemáticamente (Debe = Haber).</li>
-          <li>Realiza el <code>INSERT INTO contabilidad.poliza</code> y <code>INSERT INTO contabilidad.poliza_movtos</code>.</li>
-          <li>Realiza el <code>UPDATE [esquema_origen].[tabla_polizas] SET poliza_contable_id = NUEVO_ID, estatus = 'Contabilizada'</code>.</li>
-          <li>Suma los importes a la balanza de comprobación (Saldos del mayor).</li>
-        </ul>
-      </div>
-
-      <!-- fn_leer_movtos_origen -->
-      <div id="sp-leer_movtos" class="sp-panel">
-        <h4>3. fn_leer_movtos_origen( p_modulo_origen, p_origen_id )</h4>
-        <p><strong>Descripción:</strong> Consulta los renglones (Cuentas, Debe, Haber) que propuso la Matriz de Conversión para esa póliza específica.</p>
-      </div>
-    </div>
-
-    <!-- 8. Diseño de Interfaces (UI) -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
-      
-      <div class="wireframe-tabs">
-        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer_origen (Parámetros)</button>
-        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer_origen (Valores)</button>
-        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc_solo_lectura (Parámetros)</button>
-        <button class="wf-tab" onclick="showWF('p4',this)">pantalla_abc_solo_lectura (Valores)</button>
-      </div>
-
-      <!-- TAB 1: pantalla_leer_origen -->
-      <div id="wf-p1" class="wf-panel active">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Listado de Pólizas Pre-contables (Parámetros)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1200" height="400" fill="#fcfcfc" rx="4" stroke="#ddd"/>
-              
-              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Visor de Pólizas Automatizadas</text>
-              <rect x="1050" y="15" width="130" height="25" fill="#1B3A2D" rx="4"/>
-              <text x="1115" y="32" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">Actualizar bandeja</text>
-              
-              <!-- Box de Filtros -->
-              <rect x="20" y="60" width="1160" height="80" fill="#fff" stroke="#ccc" rx="4"/>
-              <text x="35" y="80" font-size="10" fill="#666">Módulo Origen</text>
-              <rect x="35" y="88" width="150" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="45" y="104" font-size="11" fill="#1B3A2D">@p_modulo_origen</text>
-              
-              <text x="195" y="80" font-size="10" fill="#666">Tipo y Folio</text>
-              <rect x="195" y="88" width="120" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="205" y="104" font-size="11" fill="#1B3A2D">@p_tipo / @p_numero</text>
-
-              <!-- Botones filtro -->
-              <rect x="35" y="125" width="80" height="24" fill="#1B3A2D" rx="4"/>
-              <text x="75" y="141" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">Consultar</text>
-
-              <!-- Box Grid -->
-              <rect x="20" y="160" width="1160" height="220" fill="#fcfcfc" stroke="#ccc" rx="4"/>
-              <rect x="20" y="200" width="1160" height="25" fill="#f0f0f0"/>
-              
-              <!-- Títulos Grid -->
-              <text x="30" y="217" font-size="10" font-weight="bold" fill="#666">FUENTE DEL SISTEMA</text>
-              <text x="200" y="217" font-size="10" font-weight="bold" fill="#666">TIPO</text>
-              <text x="250" y="217" font-size="10" font-weight="bold" fill="#666">FOLIO</text>
-              <text x="320" y="217" font-size="10" font-weight="bold" fill="#666">FECHA</text>
-              <text x="400" y="217" font-size="10" font-weight="bold" fill="#666">DESCRIPCIÓN</text>
-              <text x="700" y="217" font-size="10" font-weight="bold" fill="#666">CARGO</text>
-              <text x="800" y="217" font-size="10" font-weight="bold" fill="#666">ESTATUS</text>
-              <text x="1080" y="217" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
-
-              <!-- Renglón 1 -->
-              <rect x="20" y="225" width="1160" height="35" fill="#fff" stroke="#eee"/>
-              <text x="30" y="247" font-size="11" font-weight="bold" fill="#6b21a8">{fuente_sistema}</text>
-              <text x="200" y="247" font-size="11" fill="#0284c7">{p_tipo}</text>
-              <text x="250" y="247" font-size="11" font-weight="bold">{p_numero}</text>
-              <text x="320" y="247" font-size="11">{p_fecha}</text>
-              <text x="400" y="247" font-size="11">{p_descripcion}</text>
-              <text x="700" y="247" font-size="11" fill="#15803d">{cargo}</text>
-              <rect x="800" y="234" width="70" height="18" fill="#fef2f2" rx="9"/><text x="835" y="246" font-size="10" fill="#991b1b" text-anchor="middle">{estatus_registro}</text>
-              <rect x="1080" y="232" width="60" height="22" fill="#1B3A2D" rx="4"/><text x="1110" y="247" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Revisar</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: pantalla_leer_origen Valores -->
-      <div id="wf-p2" class="wf-panel">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Listado de Pólizas Pre-contables (Valores)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1200" height="400" fill="#fcfcfc" rx="4" stroke="#ddd"/>
-              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Visor de Pólizas Automatizadas</text>
-              <rect x="20" y="200" width="1160" height="25" fill="#f0f0f0"/>
-              
-              <!-- Títulos Grid -->
-              <text x="30" y="217" font-size="10" font-weight="bold" fill="#666">FUENTE DEL SISTEMA</text>
-              <text x="200" y="217" font-size="10" font-weight="bold" fill="#666">TIPO</text>
-              <text x="250" y="217" font-size="10" font-weight="bold" fill="#666">FOLIO</text>
-              <text x="320" y="217" font-size="10" font-weight="bold" fill="#666">FECHA</text>
-              <text x="400" y="217" font-size="10" font-weight="bold" fill="#666">DESCRIPCIÓN</text>
-              <text x="700" y="217" font-size="10" font-weight="bold" fill="#666">CARGO</text>
-              <text x="800" y="217" font-size="10" font-weight="bold" fill="#666">ESTATUS</text>
-              <text x="1080" y="217" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
-
-              <!-- Renglón 1 -->
-              <rect x="20" y="225" width="1160" height="35" fill="#fff" stroke="#eee"/>
-              <text x="30" y="247" font-size="11" font-weight="bold" fill="#6b21a8">CXP (TRAMITADA)</text>
-              <text x="200" y="247" font-size="11" fill="#0284c7">D</text>
-              <text x="250" y="247" font-size="11" font-weight="bold">000142</text>
-              <text x="320" y="247" font-size="11">15/05/2025</text>
-              <text x="400" y="247" font-size="11">DEVENGADO FACTURA PROVEEDOR</text>
-              <text x="700" y="247" font-size="11" fill="#15803d">$15,000.00</text>
-              <rect x="800" y="234" width="110" height="18" fill="#fef2f2" rx="9"/><text x="855" y="246" font-size="10" fill="#991b1b" text-anchor="middle">Pendiente Afectar</text>
-              <rect x="1080" y="232" width="60" height="22" fill="#1B3A2D" rx="4"/><text x="1110" y="247" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Revisar</text>
-
-              <!-- Renglón 2 -->
-              <rect x="20" y="260" width="1160" height="35" fill="#fafafa" stroke="#eee"/>
-              <text x="30" y="282" font-size="11" font-weight="bold" fill="#6b21a8">CAJA (INGRESOS)</text>
-              <text x="200" y="282" font-size="11" fill="#0284c7">I</text>
-              <text x="250" y="282" font-size="11" font-weight="bold">000088</text>
-              <text x="320" y="282" font-size="11">15/05/2025</text>
-              <text x="400" y="282" font-size="11">DEPÓSITO BANCARIO FAEF</text>
-              <text x="700" y="282" font-size="11" fill="#15803d">$5,000.00</text>
-              <rect x="800" y="269" width="70" height="18" fill="#f0fdf4" rx="9"/><text x="835" y="281" font-size="10" fill="#166534" text-anchor="middle">Afectada</text>
-              <rect x="1080" y="267" width="60" height="22" fill="#1B3A2D" rx="4"/><text x="1110" y="282" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Revisar</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: pantalla_abc_solo_lectura -->
-      <div id="wf-p3" class="wf-panel">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Formulario de Revisión y Afectación (Parámetros)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 1200 450" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1200" height="450" fill="#f5f5f0" rx="4" stroke="#ddd"/>
-              
-              <!-- Top Header -->
-              <text x="20" y="30" font-size="14" fill="#666">&lt; Volver a la lista</text>
-              <text x="140" y="30" font-size="18" font-weight="bold" fill="#333">Revisión de Póliza Automatizada {@p_numero}</text>
-              
-              <!-- Banner Bloqueo -->
-              <rect x="20" y="55" width="1160" height="30" fill="#fffbeb" stroke="#fef3c7" rx="4"/>
-              <text x="35" y="74" font-size="11" fill="#b45309" font-weight="bold">Solo Lectura: Los datos de esta póliza fueron generados por el módulo {@fuente_sistema}. Para corregir, pida al área que cancele en origen.</text>
-
-              <!-- Box 1: ENCABEZADO -->
-              <rect x="20" y="95" width="1160" height="150" fill="#fafafa" stroke="#ccc" rx="4"/>
-              
-              <text x="35" y="125" font-size="11" font-weight="bold" fill="#999">Tipo de póliza</text>
-              <rect x="35" y="135" width="300" height="30" fill="#eee" rx="3"/><text x="45" y="155" font-size="12" fill="#666">@p_tipo</text>
-
-              <text x="400" y="125" font-size="11" font-weight="bold" fill="#999">Folio</text>
-              <rect x="400" y="135" width="200" height="30" fill="#eee" rx="3"/><text x="410" y="155" font-size="12" fill="#666">@p_numero</text>
-
-              <text x="650" y="125" font-size="11" font-weight="bold" fill="#999">Fecha</text>
-              <rect x="650" y="135" width="200" height="30" fill="#eee" rx="3"/><text x="660" y="155" font-size="12" fill="#666">@p_fecha</text>
-
-              <text x="35" y="195" font-size="11" font-weight="bold" fill="#999">Descripción (Origen)</text>
-              <rect x="35" y="205" width="1130" height="30" fill="#eee" rx="3"/><text x="45" y="225" font-size="12" fill="#666">@p_descripcion</text>
-
-              <!-- Botón Afectar -->
-              <rect x="1030" y="260" width="150" height="35" fill="#1B3A2D" rx="4"/>
-              <text x="1105" y="282" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">Afectar póliza</text>
-
-              <!-- GRID MOVTOS (Simplificado) -->
-              <rect x="20" y="310" width="1160" height="120" fill="#fff" stroke="#ccc" rx="4"/>
-              <rect x="20" y="310" width="1160" height="25" fill="#f9f9f9"/>
-              <text x="30" y="327" font-size="10" font-weight="bold" fill="#666">CUENTA</text>
-              <text x="300" y="327" font-size="10" font-weight="bold" fill="#666">CARGO</text>
-              <text x="450" y="327" font-size="10" font-weight="bold" fill="#666">ABONO</text>
-
-              <text x="30" y="355" font-size="11" fill="#666">{pm_cc_id}</text>
-              <text x="300" y="355" font-size="11" fill="#0284c7">{pm_debe}</text>
-              <text x="450" y="355" font-size="11" fill="#999">-</text>
-
-              <text x="30" y="380" font-size="11" fill="#666">{pm_cc_id}</text>
-              <text x="300" y="380" font-size="11" fill="#999">-</text>
-              <text x="450" y="380" font-size="11" fill="#15803d">{pm_haber}</text>
-              
-              <line x1="20" y1="400" x2="1180" y2="400" stroke="#ddd" stroke-width="1"/>
-              <text x="30" y="420" font-size="12" font-weight="bold" fill="#333">Totales Cuadran</text>
-              <text x="300" y="420" font-size="12" font-weight="bold" fill="#0284c7">{suma_debe}</text>
-              <text x="450" y="420" font-size="12" font-weight="bold" fill="#15803d">{suma_haber}</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 4: pantalla_abc_solo_lectura Valores -->
-      <div id="wf-p4" class="wf-panel">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Formulario de Revisión y Afectación (Valores)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 1200 450" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1200" height="450" fill="#f5f5f0" rx="4" stroke="#ddd"/>
-              <!-- Top Header -->
-              <text x="20" y="30" font-size="14" fill="#666">&lt; Volver a la lista</text>
-              <text x="140" y="30" font-size="18" font-weight="bold" fill="#333">Revisión de Póliza Automatizada 000142</text>
-              
-              <rect x="20" y="55" width="1160" height="30" fill="#fffbeb" stroke="#fef3c7" rx="4"/>
-              <text x="35" y="74" font-size="11" fill="#b45309" font-weight="bold">Solo Lectura: Los datos de esta póliza fueron generados por el módulo CXP. Para corregir, pida al área que cancele en origen.</text>
-
-              <!-- Box 1: ENCABEZADO -->
-              <rect x="20" y="95" width="1160" height="150" fill="#fafafa" stroke="#ccc" rx="4"/>
-              
-              <text x="35" y="125" font-size="11" font-weight="bold" fill="#999">Tipo de póliza</text>
-              <rect x="35" y="135" width="300" height="30" fill="#eee" rx="3"/><text x="45" y="155" font-size="12" fill="#666">D - Diario</text>
-
-              <text x="400" y="125" font-size="11" font-weight="bold" fill="#999">Folio</text>
-              <rect x="400" y="135" width="200" height="30" fill="#eee" rx="3"/><text x="410" y="155" font-size="12" fill="#666">000142</text>
-
-              <text x="650" y="125" font-size="11" font-weight="bold" fill="#999">Fecha</text>
-              <rect x="650" y="135" width="200" height="30" fill="#eee" rx="3"/><text x="660" y="155" font-size="12" fill="#666">15/05/2025</text>
-
-              <text x="35" y="195" font-size="11" font-weight="bold" fill="#999">Descripción (Origen)</text>
-              <rect x="35" y="205" width="1130" height="30" fill="#eee" rx="3"/><text x="45" y="225" font-size="12" fill="#666">DEVENGADO FACTURA PROVEEDOR</text>
-
-              <rect x="1030" y="260" width="150" height="35" fill="#1B3A2D" rx="4"/>
-              <text x="1105" y="282" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">Afectar póliza</text>
-
-              <!-- GRID MOVTOS -->
-              <rect x="20" y="310" width="1160" height="120" fill="#fff" stroke="#ccc" rx="4"/>
-              <rect x="20" y="310" width="1160" height="25" fill="#f9f9f9"/>
-              <text x="30" y="327" font-size="10" font-weight="bold" fill="#666">CUENTA</text>
-              <text x="300" y="327" font-size="10" font-weight="bold" fill="#666">CARGO</text>
-              <text x="450" y="327" font-size="10" font-weight="bold" fill="#666">ABONO</text>
-
-              <text x="30" y="355" font-size="11" fill="#666">1.1.2.2.8100.0102</text>
-              <text x="300" y="355" font-size="11" fill="#0284c7">$15,000.00</text>
-              <text x="450" y="355" font-size="11" fill="#999">-</text>
-
-              <text x="30" y="380" font-size="11" fill="#666">2.1.1.2.0000.0001</text>
-              <text x="300" y="380" font-size="11" fill="#999">-</text>
-              <text x="450" y="380" font-size="11" fill="#15803d">$15,000.00</text>
-              
-              <line x1="20" y1="400" x2="1180" y2="400" stroke="#ddd" stroke-width="1"/>
-              <text x="30" y="420" font-size="12" font-weight="bold" fill="#333">Totales Cuadran</text>
-              <text x="300" y="420" font-size="12" font-weight="bold" fill="#0284c7">$15,000.00</text>
-              <text x="450" y="420" font-size="12" font-weight="bold" fill="#15803d">$15,000.00</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 9. Reglas de Negocio Críticas -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
-      <table class="props-table">
-        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><strong>RN-PA-01</strong></td>
-            <td>Inmutabilidad de Origen: Un Analista Contable no puede alterar cuentas ni importes de una póliza generada por otro módulo.</td>
-            <td>Formulario protegido 100% de Solo Lectura. Si hay error, se solicita corrección de la captura origen.</td>
-            <td>Frontend (Js)</td>
-            <td>Control Interno PJEV</td>
-          </tr>
-          <tr>
-            <td><strong>RN-PA-02</strong></td>
-            <td>Consolidación en Afectación: Al presionar "Afectar", el sistema bloquea la póliza origen y clona la información a las tablas maestras de contabilidad.</td>
-            <td>Inyecta <code>poliza_contable_id</code> en el esquema origen para evitar re-afectaciones.</td>
-            <td>Backend (SP)</td>
-            <td>Arquitectura Técnica de Segregación</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 10. Flujos de Integración -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">10</span> Flujos de Integración (APIs)</div>
-      <p>No se exponen Web Services externos, la integración ocurre internamente a nivel de Bases de Datos cruzando esquemas en PostgreSQL.</p>
-    </div>
-
-    <!-- 11. Validaciones Específicas de Base de Datos -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">11</span> Validaciones Específicas (Constraints DB)</div>
-      <p>N/A (Se aplican las mismas restricciones que en Pólizas Manuales una vez afectadas).</p>
-    </div>
-
-    <!-- 12. Control de Cambios -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">12</span> Control de Cambios</div>
-      <table class="props-table">
-        <thead>
-          <tr>
-            <th>Versión</th>
-            <th>Fecha</th>
-            <th>Descripción de la modificación</th>
-            <th>Autor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1.0</td>
-            <td>08-Jun-2026</td>
-            <td>Creación del documento bajo estándar DOC-08, adaptando el modelo de Solo Lectura y Afectación cruzada.</td>
-            <td>Julio César Barrales Flores</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-</div>
-
 <script src="../shared.js"></script>
 <script>
 function showWF(id, btn) {
