@@ -77,6 +77,19 @@ function injectToolbar() {
       toolbar.insertBefore(btnProcess, btnRefresh);
     }
 
+    // Si la página tiene el anexo de conceptos sugeridos, agregamos el botón
+    const conceptsContainer = document.getElementById('module-suggested-concepts');
+    if (conceptsContainer) {
+      const btnConcepts = document.createElement('button');
+      btnConcepts.innerText = '💡 Conceptos Sugeridos';
+      btnConcepts.style.cssText = btnStyle + " background: #0284c7; color: #fff; border-color: #0284c7;";
+      btnConcepts.onmouseover = () => btnConcepts.style.background = '#0369a1';
+      btnConcepts.onmouseout = () => btnConcepts.style.background = '#0284c7';
+      
+      btnConcepts.onclick = () => showModal('Anexo: Conceptos de Ingreso Sugeridos', conceptsContainer.innerHTML);
+      toolbar.insertBefore(btnConcepts, btnRefresh);
+    }
+
     function showModal(titleText, contentHTML) {
       const modal = document.createElement('div');
       modal.style.position = 'fixed';
