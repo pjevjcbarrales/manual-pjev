@@ -127,6 +127,8 @@
         <tr><td><code>concepto_id</code></td><td><code>INT (FK)</code></td><td>Concepto de Ingreso (Ej. MIN-EST).</td></tr>
         <tr><td><code>estatus_documento</code></td><td><code>INT</code></td><td>1=Borrador (Solo en este módulo), 2=Devengado Autorizado.</td></tr>
         <tr><td><code>poliza_devengo_id</code></td><td><code>INT (FK)</code></td><td>ID de la Póliza de Devengo generada.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Default 1. Control lógico.</td></tr>
+        <tr><td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td><td><code>VARCHAR</code> / <code>TIMESTAMPZ</code></td><td>Campos de auditoría.</td></tr>
       </tbody>
     </table>
   </div>
