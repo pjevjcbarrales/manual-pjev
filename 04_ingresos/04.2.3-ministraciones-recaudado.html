@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.2.3 Ministraciones (Recaudado) — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .code-wrap {
+      background: var(--code-bg); color: var(--code-text);
+      border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+      padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+    }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel, .sp-panel { display: none; }
+    .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+    .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>Ingresos (CxC)</span> ›
+    <span>Registro</span> ›
+    <span>Ministraciones (Recaudado)</span>
+  </div>
+
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.2.3</div>
+      <h1 class="elem-title">Ministraciones (Recaudado)</h1>
+      <p class="elem-desc">Módulo transaccional de caja para la formalización contable y vinculación bancaria de los oficios de SEFIPLAN que han caído en firme a las cuentas de la institución.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Modo A — existe en código</span>
+        <span class="mod-badge badge-s">Tipo: Análisis Funcional (DOC-08)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>Este submódulo atiende exclusivamente la fase dos (Tiempo 2) del proceso. Aquí llega la tesorería (Caja Central) con su estado de cuenta en mano para certificar que el dinero prometido por SEFIPLAN ya fue depositado.</p>
+    <p>El sistema lee todos los oficios previamente "Devengados" y permite al cajero seleccionarlos, indicar la fecha en que ingresó el dinero y a qué cuenta bancaria específica (Banco/Cuenta Recaudadora) fue dirigido. Esta acción mata la cuenta por cobrar y refleja el flujo de efectivo real en el SIAF.</p>
+  </div>
+
+  <!-- 2. MARCO NORMATIVO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Norma</th>
+          <th>Obligación que genera</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
+          <td>Obliga a registrar el <strong>Ingreso Recaudado</strong> exclusivamente cuando el recurso económico ingresa físicamente a las cuentas institucionales o caja.</td>
+        </tr>
+        <tr>
+          <td><strong>Norma CONAC</strong></td>
+          <td>Exige la cancelación de la Cuenta por Cobrar (1.1.2.4) registrada en el devengo, y el incremento del Activo Disponible en Bancos (1.1.1.2) por el mismo monto exacto.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. ROLES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Acción permitida</th>
+          <th>Restricción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Cajero / Tesorería</strong></td>
+          <td>Vincular la cuenta bancaria, fecha y folio de operación a un oficio pendiente. Autoriza el registro (Genera Póliza de Recaudo).</td>
+          <td>No puede modificar el monto del oficio. Si el depósito no coincide con el oficio, el registro debe ser devuelto/cancelado.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+    <p>Opera sobre los mismos registros creados en `04.2.2`, actualizando únicamente los campos de depósito (Tiempo 2).</p>
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ing_ministraciones (Update)</h3>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>ministracion_id</code></td><td><code>INT (PK)</code></td><td>Identificador (ya existe).</td></tr>
+        <tr><td><code>cuenta_recaudadora_id</code></td><td><code>INT (FK)</code></td><td>Apunta a `ing_cuentas_recaudadoras` (El Banco).</td></tr>
+        <tr><td><code>fecha_deposito</code></td><td><code>DATE</code></td><td>Fecha de caída en el estado de cuenta.</td></tr>
+        <tr><td><code>folio_operacion</code></td><td><code>VARCHAR(50)</code></td><td>Referencia SPEI o número de rastreo.</td></tr>
+        <tr><td><code>estatus_documento</code></td><td><code>INT</code></td><td>Cambia a `4` (Recaudado).</td></tr>
+        <tr><td><code>poliza_recaudado_id</code></td><td><code>INT (FK)</code></td><td>ID de la Póliza de Recaudado generada.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+    
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_ministraciones_recaudado</button>
+      <button class="sp-tab" onclick="showSP('sp2',this)">fn_abc_ministraciones_recaudado</button>
+    </div>
+
+    <!-- TAB 1: LEER -->
+    <div id="sp-sp1" class="sp-panel active">
+      <table class="props-table">
+        <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio.</td></tr>
+        </tbody>
+      </table>
+      <div class="code-wrap" style="margin-top: 10px;">
+        Retorna únicamente los registros de la tabla <code>ing_ministraciones</code> cuyo <code>estatus_documento</code> sea <strong>2 (Devengado Pendiente)</strong> o <strong>4 (Cobrado)</strong>.
+      </div>
+    </div>
+
+    <!-- TAB 2: ABC -->
+    <div id="sp-sp2" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Autorizar Recaudado (Generar Póliza), 2: Cancelar Cobro (Reversa a Estatus 2).</td></tr>
+          <tr><td><code>@p_ministracion_id</code></td><td><code>INT</code></td><td>Obligatorio.</td></tr>
+          <tr><td><code>@p_cuenta_recaudadora_id</code></td><td><code>INT</code></td><td>ID del Banco destino.</td></tr>
+          <tr><td><code>@p_fecha_deposito</code></td><td><code>DATE</code></td><td>Fecha efectiva.</td></tr>
+          <tr><td><code>@p_folio_operacion</code></td><td><code>VARCHAR</code></td><td>Clave de rastreo bancario.</td></tr>
+        </tbody>
+      </table>
+      <div class="code-wrap" style="margin-top: 10px;">
+        <strong>Autorizar Recaudado (Acción 1):</strong> Actualiza los campos bancarios del registro. Cambia el <code>estatus_documento</code> a 4. Llama al motor contable para generar la póliza (Momento Recaudado) e inyecta el <code>poliza_recaudado_id</code> en la tabla.
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SERVICIOS REST -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Método</th><th>Endpoint</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/ingresos/ministraciones/recaudado</code></td><td>Llama a <code>fn_leer_ministraciones_recaudado</code>.</td></tr>
+        <tr><td><span style="font-weight:bold; color:#eab308;">PUT</span></td><td><code>/api/ingresos/ministraciones/:id/recaudado</code></td><td>Llama a Acción 1 (Vincular y Autorizar Cobro).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. ACCIONES DEL MÓDULO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Acciones de la Pantalla</div>
+    <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
+      <li style="margin-bottom: 12px;"><strong>Ver Detalle Oficio:</strong> Abre el registro en modo solo-lectura para que el cajero compare contra su estado de cuenta.</li>
+      <li style="margin-bottom: 12px;"><strong>Vincular y Autorizar Depósito:</strong> Abre la captura de la Cuenta Recaudadora y Fecha. Al guardar, sella la póliza contable de ingreso a bancos y pinta el registro de verde intenso (Recaudado).</li>
+    </ul>
+  </div>
+
+  <!-- 8. WIREFRAMES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+    
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">Grid de Recaudado</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">Modal de Depósito</button>
+    </div>
+
+    <!-- WF1: GRID -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">Listado de Oficios Pendientes y Cobrados</div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+            <rect x="20" y="20" width="960" height="60" fill="#fff" rx="4" stroke="#e2e8f0"/>
+            <text x="40" y="55" fill="#1B3A2D" font-family="sans-serif" font-weight="bold" font-size="18">Recepción de Ministraciones (Recaudado)</text>
+
+            <rect x="20" y="100" width="960" height="35" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="40" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">NO. OFICIO PENDIENTE</text>
+            <text x="200" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">CONCEPTO</text>
+            <text x="450" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">MONTO A COBRAR</text>
+            <text x="600" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">BANCO DE DEPÓSITO</text>
+            <text x="850" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">ACCIONES</text>
+            
+            <rect x="20" y="135" width="960" height="40" fill="#fff" stroke="#f1f5f9"/>
+            <text x="40" y="160" fill="#333" font-size="12">SEF/001/2026</text>
+            <text x="200" y="160" fill="#333" font-size="12">Ministración Estatal</text>
+            <text x="450" y="160" fill="#333" font-size="12" font-weight="bold">$ 12,500,000.00</text>
+            <text x="600" y="160" fill="#94a3b8" font-size="12"><i>Pendiente de Depósito...</i></text>
+            <rect x="850" y="145" width="95" height="22" fill="#0f766e" rx="4"/>
+            <text x="897" y="160" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">Vincular Banco</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: MODAL -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">Modal Autorización de Cobro</div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 380" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+            <rect x="200" y="10" width="600" height="340" fill="#fff" rx="8" stroke="#ccc"/>
+            <rect x="200" y="10" width="600" height="40" fill="#0f766e" rx="8"/>
+            <text x="220" y="35" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="14">Vincular Depósito Bancario</text>
+            
+            <!-- Resumen Lectura -->
+            <rect x="230" y="60" width="540" height="50" fill="#f8fafc" rx="4" stroke="#e2e8f0"/>
+            <text x="240" y="80" fill="#64748b" font-size="11">Resumen del Oficio Devengado (Solo Lectura):</text>
+            <text x="240" y="100" fill="#333" font-size="12" font-weight="bold">SEF/001/2026 - Ministración Estatal - $12,500,000.00</text>
+
+            <text x="230" y="150" fill="#475569" font-size="12" font-weight="bold">Cuenta Bancaria Receptora *</text>
+            <rect x="230" y="160" width="540" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
+            <text x="240" y="180" fill="#94a3b8" font-size="12">🔍 Buscar en cuentas institucionales...</text>
+
+            <text x="230" y="220" fill="#475569" font-size="12" font-weight="bold">Fecha Real del Depósito *</text>
+            <rect x="230" y="230" width="200" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
+
+            <text x="450" y="220" fill="#475569" font-size="12" font-weight="bold">Folio de Rastreo Bancario</text>
+            <rect x="450" y="230" width="320" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
+
+            <rect x="650" y="300" width="120" height="30" fill="#0f766e" rx="4"/>
+            <text x="710" y="320" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Autorizar Depósito</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+    <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
+      <li><strong>Lectura Estricta:</strong> El cajero no puede alterar el importe del oficio originario (pantalla devengo). Si el estado de cuenta refleja que SEFIPLAN depositó un centavo menos, el oficio completo debe ser cancelado o recibir una nota contable compensatoria.</li>
+      <li><strong>Filtro en Combobox:</strong> El selector de Cuenta Bancaria debe listar únicamente registros activos del módulo <code>04.1.2 Cuentas Recaudadoras</code> (Cuentas ligadas a 1.1.1.2).</li>
+    </ul>
+  </div>
+
+  <!-- 10. FLUJOS DE INTEGRACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
+    <p style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6;">
+      Es la acción que inyecta saldo 100% líquido a los tableros de <strong>Disponibilidad Financiera</strong> del PJEV para su posterior dispersión o pago a proveedores.
+    </p>
+  </div>
+
+  <!-- 11. AFECTACIÓN CONTABLE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Afectación Contable (Póliza de Recaudado)</div>
+    <p style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; margin-bottom: 15px;">
+      Al presionar <strong>"Autorizar Depósito"</strong>, se liquida el derecho de cobro anterior y se genera la siguiente póliza automática:
+    </p>
+    <table class="props-table" style="font-size:12px;">
+      <thead>
+        <tr><th>Cargo / Abono</th><th>Tipo de Cuenta</th><th>Cuenta Específica Inyectada</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO</span></td>
+          <td>Activo (Bancos)</td>
+          <td>La cuenta <code>1.1.1.2.XXXX</code> derivada de la Cuenta Recaudadora seleccionada.</td>
+        </tr>
+        <tr>
+          <td><span style="color:#dc2626; font-weight:bold;">ABONO</span></td>
+          <td>Activo (Cuentas por Cobrar)</td>
+          <td><code>1.1.2.4.XXXX</code> (Matando el saldo vivo registrado en Devengo).</td>
+        </tr>
+        <tr>
+          <td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO (Presupuestal)</span></td>
+          <td>Ley de Ingresos Recaudada</td>
+          <td>La cuenta de clase <code>8.1.5.X</code> derivada del concepto.</td>
+        </tr>
+        <tr>
+          <td><span style="color:#dc2626; font-weight:bold;">ABONO (Presupuestal)</span></td>
+          <td>Ley de Ingresos Devengada</td>
+          <td>La cuenta de clase <code>8.1.4.X</code> derivada del concepto.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 12. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+    <table class="props-table">
+      <thead><tr><th>Fecha</th><th>Versión</th><th>Autor</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td>11-Jun-2026</td><td>1.0</td><td>Julio C. Barrales</td><td>Creación del Documento Funcional DOC-08 independiente.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+  function showWF(id, btn) {
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('wf-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+  function showSP(id, btn) {
+    document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('sp-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
