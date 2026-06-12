@@ -242,10 +242,65 @@
     </div>
   </div>
 
-  <!-- 6-12 PENDIENTES -->
+  <!-- 6. SERVICIOS REST -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Endpoint</th>
+          <th>Body / Params</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td>
+          <td><code>/api/ingresos/ley-ingresos</code></td>
+          <td><code>?ejercicio=2026</code><br><code>&centro_costo_id=X</code><br><code>&id=Y</code></td>
+          <td>Llama a <code>fn_leer_ley_ingresos</code>. Si no se envía el <code>id</code>, devuelve la lista maestra anual agrupada. Si se envía el <code>id</code>, devuelve el json con el detalle de los 12 meses.</td>
+        </tr>
+        <tr>
+          <td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td>
+          <td><code>/api/ingresos/ley-ingresos/generar</code></td>
+          <td><code>{ "ejercicio": 2026 }</code></td>
+          <td>Llama a <code>fn_abc_ley_ingresos</code> con la opción 'GENERAR_AUTOMATICO'. El token JWT del usuario inyecta el parámetro de auditoría. Genera el borrador.</td>
+        </tr>
+        <tr>
+          <td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td>
+          <td><code>/api/ingresos/ley-ingresos/autorizar</code></td>
+          <td><code>{ "ejercicio": 2026 }</code></td>
+          <td>Llama a <code>fn_abc_ley_ingresos</code> con la opción 'AUTORIZAR'. Bloquea los registros y genera la póliza 8110-8120.</td>
+        </tr>
+        <tr>
+          <td><span style="font-weight:bold; color:#dc2626;">DELETE</span></td>
+          <td><code>/api/ingresos/ley-ingresos</code></td>
+          <td><code>{ "ejercicio": 2026 }</code></td>
+          <td>Llama a <code>fn_abc_ley_ingresos</code> con la opción 'BAJA_LOGICA'. Reverte la generación si no hay recaudación.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. ACCIONES DEL MÓDULO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:16px;">
+      Esta sección detalla las interacciones principales que el usuario (Subdirector o DGA) tendrá en la pantalla de la Ley de Ingresos:
+    </p>
+    <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
+      <li style="margin-bottom: 12px;"><strong>Cargar Presupuesto de Ingresos:</strong> Botón primario que detona el barrido del Presupuesto de Egresos Aprobado y su cruce con la Matriz de Conversión (CRI). Llena el grid en pantalla con la estimación anual y mensual, pero en un estatus de "Borrador". Aún no genera pólizas.</li>
+      <li style="margin-bottom: 12px;"><strong>Autorizar Presupuesto de Ingresos:</strong> Acción exclusiva del Director(a) General de Administración (DGA). Bloquea definitivamente los montos generados para que ya no puedan ser alterados. En este instante detona la <strong>Póliza Presupuestal de Apertura de Ingresos</strong> (Cargo 8110 / Abono 8120) impactando la contabilidad.</li>
+      <li style="margin-bottom: 12px;"><strong>Imprimir Reporte Final:</strong> Genera el PDF oficial de la Ley de Ingresos Estimada. Exporta el documento con los rubros (CRI), montos anuales, calendario de ministraciones, y espacios para las firmas autógrafas de revisión y autorización.</li>
+      <li style="margin-bottom: 12px;"><strong>Cancelar Presupuesto:</strong> Botón de seguridad (Baja Lógica) en caso de detectar un error grave después de la carga. Revierte el proceso de carga o autorización. Si la póliza ya estaba generada, la cancela. <em>Restricción:</em> El botón se desactiva permanentemente si ya se registró el cobro de la primera Ministración (Ingreso Recaudado).</li>
+    </ul>
+  </div>
+
+  <!-- 8-12 PENDIENTES -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">...</span> Secciones Restantes en Construcción</div>
-    <p style="color: #9ca3af; font-size: 13px;">Las secciones 6 (Servicios REST), 7 (Acciones), 8 (UI/Wireframes), 9 (Reglas de Negocio), 10 (Integración), 11 (Afectación Contable) y 12 (Historial) se irán integrando conforme avancemos en el diseño funcional.</p>
+    <p style="color: #9ca3af; font-size: 13px;">Las secciones 8 (UI/Wireframes), 9 (Reglas de Negocio), 10 (Integración), 11 (Afectación Contable) y 12 (Historial) se irán integrando conforme avancemos en el diseño funcional.</p>
   </div>
 
 </div>
