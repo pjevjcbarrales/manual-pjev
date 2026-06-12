@@ -147,7 +147,23 @@
       <table class="props-table">
         <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio.</td></tr>
+          <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio. Ejercicio contable activo.</td></tr>
+          <tr><td><code>@p_ministracion_id</code></td><td><code>INT</code></td><td>Opcional. Para leer un registro específico.</td></tr>
+          <tr><td><code>@p_fecha_inicio</code></td><td><code>DATE</code></td><td>Opcional. Inicio de rango por fecha de oficio.</td></tr>
+          <tr><td><code>@p_fecha_fin</code></td><td><code>DATE</code></td><td>Opcional. Fin de rango por fecha de oficio.</td></tr>
+          <tr><td><code>@p_estatus_documento</code></td><td><code>INT</code></td><td>Opcional. 1=Borrador, 2=Devengado.</td></tr>
+          <tr><td><code>@p_oficio_sefiplan</code></td><td><code>VARCHAR</code></td><td>Opcional. Búsqueda texto LIKE del número de oficio.</td></tr>
+        </tbody>
+      </table>
+      <table class="props-table" style="margin-top: 10px;">
+        <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>{ministracion_id}</code></td><td><code>INT</code></td><td>ID único.</td></tr>
+          <tr><td><code>{numero_oficio}</code></td><td><code>VARCHAR</code></td><td>Folio SEFIPLAN.</td></tr>
+          <tr><td><code>{fecha_oficio}</code></td><td><code>DATE</code></td><td>Fecha de recepción.</td></tr>
+          <tr><td><code>{monto_oficio}</code></td><td><code>DECIMAL</code></td><td>Importe.</td></tr>
+          <tr><td><code>{concepto_desc}</code></td><td><code>VARCHAR</code></td><td>Descripción del concepto ligado.</td></tr>
+          <tr><td><code>{estatus_documento}</code></td><td><code>INT</code></td><td>1 o 2.</td></tr>
         </tbody>
       </table>
       <div class="code-wrap" style="margin-top: 10px;">
