@@ -136,7 +136,7 @@
       </tbody>
     </table>
 
-    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ing_presupuesto_estimado</h3>
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ingresos</h3>
     <p style="font-size: 13px; color: var(--pjev-texto-muted); margin-bottom: 8px;">Maestro Anual: Guarda el encabezado del ingreso aprobado para todo el año fiscal.</p>
     <table class="props-table" style="margin-bottom: 24px;">
       <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
@@ -152,7 +152,7 @@
       </tbody>
     </table>
 
-    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ing_presupuesto_calendario</h3>
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ingresosmeses</h3>
     <p style="font-size: 13px; color: var(--pjev-texto-muted); margin-bottom: 8px;">Detalle Mensual: Guarda la distribución mensual exacta que se utilizará para pedir las ministraciones.</p>
     <table class="props-table">
       <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
@@ -211,7 +211,7 @@
       </table>
       <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Lógica Interna</h3>
       <div class="code-wrap" style="margin-top: 0;">
-        Si no recibe <code>p_presupuesto_ing_id</code>, agrupa los montos por CRI y devuelve el resumen anual. Si recibe el ID, hace un <code>JOIN</code> con la tabla <code>ing_presupuesto_calendario</code> y devuelve el JSON con los 12 meses exactos.
+        Si no recibe <code>p_presupuesto_ing_id</code>, agrupa los montos por CRI y devuelve el resumen anual. Si recibe el ID, hace un <code>JOIN</code> con la tabla <code>ingresosmeses</code> y devuelve el JSON con los 12 meses exactos.
       </div>
     </div>
 
