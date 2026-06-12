@@ -422,45 +422,96 @@
     <!-- WF3: HISTORIAL -->
     <div id="wf-wf3" class="wf-panel">
       <div class="wf-box">
-        <div class="wf-bar">Timeline Modal (SiafModal + Custom Timeline)</div>
+        <div class="wf-bar">Historial Modal (SiafModal tipo Full)</div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+          <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
             <!-- Fondo Oscurecido -->
-            <rect x="0" y="0" width="1000" height="350" fill="rgba(0,0,0,0.4)"/>
+            <rect x="0" y="0" width="1000" height="500" fill="rgba(0,0,0,0.4)"/>
             
             <!-- Modal Box -->
-            <rect x="250" y="40" width="500" height="270" fill="#fff" rx="8" stroke="#ccc"/>
+            <rect x="100" y="40" width="800" height="420" fill="#fff" rx="4" stroke="#ccc"/>
             
-            <!-- Header Modal -->
-            <rect x="250" y="40" width="500" height="40" fill="#f9f9f9" rx="8"/>
-            <line x1="250" y1="80" x2="750" y2="80" stroke="#eee" />
-            <text x="270" y="65" fill="#1B3A2D" font-family="sans-serif" font-weight="bold" font-size="14">Historial de Operaciones</text>
-            <text x="720" y="65" fill="#666" font-family="sans-serif" font-size="14" cursor="pointer">✖</text>
+            <!-- Header Modal Dark Green -->
+            <path d="M 100 44 Q 100 40 104 40 L 896 40 Q 900 40 900 44 L 900 90 L 100 90 Z" fill="#1B3A2D"/>
+            <text x="120" y="70" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="16">Historial de la Ley de Ingresos</text>
+            
+            <!-- Botón Cerrar en el Header -->
+            <rect x="820" y="55" width="60" height="24" fill="transparent" stroke="#fff" stroke-width="1" rx="4"/>
+            <text x="850" y="71" fill="#fff" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">Cerrar</text>
 
-            <!-- Timeline item 1 -->
-            <circle cx="290" cy="110" r="6" fill="#166534"/>
-            <line x1="290" y1="116" x2="290" y2="150" stroke="#e5e7eb" stroke-width="2"/>
-            <text x="310" y="114" fill="#333" font-family="sans-serif" font-size="12" font-weight="bold">Autorizado por DGA</text>
-            <text x="580" y="114" fill="#666" font-family="sans-serif" font-size="10">02/Ene/2026 14:30 hrs</text>
-            <text x="310" y="130" fill="#666" font-family="sans-serif" font-size="11">Usuario: dir_admin</text>
+            <!-- SECCIÓN: ENCABEZADO -->
+            <text x="120" y="125" fill="#6b7280" font-family="sans-serif" font-weight="bold" font-size="11">ENCABEZADO</text>
+            
+            <!-- Tabla Encabezado - Contenedor -->
+            <rect x="120" y="135" width="760" height="100" fill="none" stroke="#d1d5db" rx="4"/>
+            <!-- Cabecera de Tabla Encabezado -->
+            <path d="M 120 139 Q 120 135 124 135 L 876 135 Q 880 135 880 139 L 880 165 L 120 165 Z" fill="#f9fafb"/>
+            <line x1="120" y1="165" x2="880" y2="165" stroke="#e5e7eb"/>
+            
+            <!-- Headers Tabla Encabezado -->
+            <text x="135" y="155" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">FECHA</text>
+            <text x="300" y="155" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">USUARIO</text>
+            <text x="450" y="155" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">ACCIÓN</text>
+            <text x="600" y="155" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">ESTATUS</text>
+            <text x="750" y="155" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">DETALLE</text>
 
-            <!-- Timeline item 2 -->
-            <circle cx="290" cy="160" r="6" fill="#0284c7"/>
-            <line x1="290" y1="166" x2="290" y2="200" stroke="#e5e7eb" stroke-width="2"/>
-            <text x="310" y="164" fill="#333" font-family="sans-serif" font-size="12" font-weight="bold">Presupuesto Cargado Exitosamente</text>
-            <text x="580" y="164" fill="#666" font-family="sans-serif" font-size="10">02/Ene/2026 10:15 hrs</text>
-            <text x="310" y="180" fill="#666" font-family="sans-serif" font-size="11">Usuario: sub_presupuesto</text>
+            <!-- Row 1 Encabezado -->
+            <text x="135" y="185" fill="#374151" font-family="sans-serif" font-size="12">11 jun 2026, 03:44 p.m.</text>
+            <text x="300" y="185" fill="#111827" font-family="sans-serif" font-size="12" font-weight="bold">admin</text>
+            <text x="300" y="198" fill="#9ca3af" font-family="sans-serif" font-size="10">Superadministrador</text>
+            <text x="450" y="185" fill="#374151" font-family="sans-serif" font-size="12">Autorizar Presupuesto</text>
+            <text x="600" y="185" fill="#374151" font-family="sans-serif" font-size="12">Borrador → Autorizado</text>
+            <text x="750" y="185" fill="#374151" font-family="sans-serif" font-size="12">p_autoriza</text>
+            
+            <line x1="120" y1="205" x2="880" y2="205" stroke="#e5e7eb"/>
 
-            <!-- Timeline item 3 -->
-            <circle cx="290" cy="210" r="6" fill="#dc2626"/>
-            <text x="310" y="214" fill="#333" font-family="sans-serif" font-size="12" font-weight="bold">Cancelado por Corrección</text>
-            <text x="580" y="214" fill="#666" font-family="sans-serif" font-size="10">01/Ene/2026 18:00 hrs</text>
-            <text x="310" y="230" fill="#666" font-family="sans-serif" font-size="11">Usuario: dir_admin</text>
+            <!-- Row 2 Encabezado -->
+            <text x="135" y="225" fill="#374151" font-family="sans-serif" font-size="12">11 jun 2026, 03:38 p.m.</text>
+            <text x="300" y="225" fill="#111827" font-family="sans-serif" font-size="12" font-weight="bold">admin</text>
+            <text x="450" y="225" fill="#374151" font-family="sans-serif" font-size="12">Crear borrador</text>
+            <text x="600" y="225" fill="#374151" font-family="sans-serif" font-size="12">-</text>
+            <text x="750" y="225" fill="#374151" font-family="sans-serif" font-size="12">Crear borrador</text>
 
-            <!-- Footer Modal -->
-            <line x1="250" y1="260" x2="750" y2="260" stroke="#eee" />
-            <rect x="650" y="270" width="80" height="26" fill="#1B3A2D" rx="4"/>
-            <text x="690" y="287" fill="#fff" font-size="11" text-anchor="middle">Cerrar</text>
+
+            <!-- SECCIÓN: MOVIMIENTOS -->
+            <text x="120" y="270" fill="#6b7280" font-family="sans-serif" font-weight="bold" font-size="11">MOVIMIENTOS / PARTIDAS</text>
+            
+            <!-- Tabla Movimientos - Contenedor -->
+            <rect x="120" y="280" width="760" height="150" fill="none" stroke="#d1d5db" rx="4"/>
+            <!-- Cabecera de Tabla Movimientos -->
+            <path d="M 120 284 Q 120 280 124 280 L 876 280 Q 880 280 880 284 L 880 310 L 120 310 Z" fill="#f9fafb"/>
+            <line x1="120" y1="310" x2="880" y2="310" stroke="#e5e7eb"/>
+            
+            <!-- Headers Tabla Movimientos -->
+            <text x="135" y="300" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">FECHA</text>
+            <text x="300" y="300" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">USUARIO</text>
+            <text x="450" y="300" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">ACCIÓN</text>
+            <text x="600" y="300" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">ESTATUS</text>
+            <text x="750" y="300" fill="#6b7280" font-family="sans-serif" font-size="10" font-weight="bold">DETALLE</text>
+
+            <!-- Row 1 Movimientos -->
+            <text x="135" y="335" fill="#374151" font-family="sans-serif" font-size="12">11 jun 2026, 03:43 p.m.</text>
+            <text x="300" y="335" fill="#111827" font-family="sans-serif" font-size="12" font-weight="bold">admin</text>
+            <text x="450" y="335" fill="#374151" font-family="sans-serif" font-size="12">Alta partida presupuestal</text>
+            <text x="600" y="335" fill="#374151" font-family="sans-serif" font-size="12">-</text>
+            <text x="750" y="335" fill="#374151" font-family="sans-serif" font-size="12">Alta de CRI 8110-91</text>
+            <line x1="120" y1="350" x2="880" y2="350" stroke="#e5e7eb"/>
+
+            <!-- Row 2 Movimientos -->
+            <text x="135" y="375" fill="#374151" font-family="sans-serif" font-size="12">11 jun 2026, 03:42 p.m.</text>
+            <text x="300" y="375" fill="#111827" font-family="sans-serif" font-size="12" font-weight="bold">admin</text>
+            <text x="450" y="375" fill="#374151" font-family="sans-serif" font-size="12">Alta partida presupuestal</text>
+            <text x="600" y="375" fill="#374151" font-family="sans-serif" font-size="12">-</text>
+            <text x="750" y="375" fill="#374151" font-family="sans-serif" font-size="12">Alta de CRI 8110-82</text>
+            <line x1="120" y1="390" x2="880" y2="390" stroke="#e5e7eb"/>
+
+            <!-- Row 3 Movimientos -->
+            <text x="135" y="415" fill="#374151" font-family="sans-serif" font-size="12">11 jun 2026, 03:38 p.m.</text>
+            <text x="300" y="415" fill="#111827" font-family="sans-serif" font-size="12" font-weight="bold">admin</text>
+            <text x="450" y="415" fill="#374151" font-family="sans-serif" font-size="12">Alta partida presupuestal</text>
+            <text x="600" y="415" fill="#374151" font-family="sans-serif" font-size="12">-</text>
+            <text x="750" y="415" fill="#374151" font-family="sans-serif" font-size="12">Alta de CRI 8110-31</text>
+
           </svg>
         </div>
       </div>
