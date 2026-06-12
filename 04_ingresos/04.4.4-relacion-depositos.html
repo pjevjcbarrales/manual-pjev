@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04.4.4-relacion-depositos.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  
+  .flujo-box {
+    background:var(--code-bg); border-radius:8px;
+    padding:20px; font-family:var(--font-mono); font-size:12px;
+    color:var(--code-text); line-height:1.8; overflow-x:auto; margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Manual Dev</a> ›
+      <span>Cuentas por Cobrar (Ingresos)</span> ›
+      <span>Impresión</span> ›
+      <span>Relación de Depósitos Devengados</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">04.4.4</div>
+        <h1 class="elem-title">Relación de Depósitos Devengados</h1>
+        <p class="elem-desc">Reporte que muestra el comparativo de ingresos en sus momentos contables de devengado y recaudado, incluyendo el cálculo de saldos pendientes por concepto y cuenta.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Modo A — existe en código</span>
+          <span class="mod-badge badge-s">Tipo: Reporte</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">ing / rep / depositos_devengados</code></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El reporte <strong>Relación de Depósitos Devengados por Rango de Fechas</strong> es un documento de control interno (procedimiento de caja) que permite a la Dirección General de Administración verificar que todos los derechos de cobro generados durante un periodo (Devengado) hayan sido depositados efectivamente en las cuentas bancarias institucionales (Recaudado).</p>
+      
+      <p>Este reporte resulta fundamental para el control del Subsistema de Ingresos, ya que abarca tanto el ingreso principal (Ministraciones) como los ingresos secundarios (Rendimientos, devoluciones, cheques cancelados, etc.).</p>
+    </div>
+
+    <!-- 2. ESTRUCTURA DEL REPORTE -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Estructura del Reporte</div>
+      <p>El reporte es emitido en PDF y contiene el desglose a nivel de registro operativo, con la siguiente estructura tabular:</p>
+      
+      <table class="props-table">
+        <thead><tr><th>Columna</th><th>Descripción</th><th>Fuente de Datos</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>NÚMERO DE OFICIO / CAJA</code></td>
+            <td>Identificador único del documento origen (ej. DGA/0367/2026, CAJA105001)</td>
+            <td>Tabla de Ingresos (Folio)</td>
+          </tr>
+          <tr>
+            <td><code>ORIGEN</code></td>
+            <td>Concepto o rubro del ingreso (Ministración, Devoluciones, etc.)</td>
+            <td>Catálogo de Conceptos de Ingreso</td>
+          </tr>
+          <tr>
+            <td><code>ORGANIZACIÓN (ORGANIZ)</code></td>
+            <td>Clave de la cuenta bancaria de origen/destino (ej. 301C81001)</td>
+            <td>Catálogo de Cuentas Bancarias / Financieras</td>
+          </tr>
+          <tr>
+            <td><code>FECHA</code></td>
+            <td>Fecha de registro o corte del movimiento</td>
+            <td>Fecha del Devengado</td>
+          </tr>
+          <tr>
+            <td><code>IMPORTE DEVENGADO</code></td>
+            <td>Monto del derecho de cobro (Captura inicial)</td>
+            <td>Póliza de Ingreso Devengado</td>
+          </tr>
+          <tr>
+            <td><code>IMPORTE RECAUDADO</code></td>
+            <td>Monto del depósito bancario confirmado</td>
+            <td>Póliza de Ingreso Recaudado</td>
+          </tr>
+          <tr>
+            <td><code>SALDO</code></td>
+            <td>Diferencia entre Devengado y Recaudado</td>
+            <td>Cálculo: Devengado - Recaudado</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="callout info" style="background: var(--pjev-crema); padding: 12px; border-left: 4px solid var(--pjev-verde-oscuro); margin-top: 16px;">
+        <span style="display:inline-block; margin-right:8px; font-weight:bold; color:var(--pjev-verde-oscuro);">ℹ</span>
+        <div style="display:inline-block; font-size:13px; color:#475569;">
+          <strong>Control de Saldos Cero:</strong><br>
+          En el flujo óptimo, el <code>SALDO</code> debe ser siempre <code>0.00</code>. Un saldo distinto de cero indica un derecho de cobro que aún no ha sido reflejado en bancos, o una discrepancia que requiere conciliación.
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PARAMETROS DE IMPRESION -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Filtros y Parámetros</div>
+      <p>Al invocar el reporte desde la UI, el usuario proporciona los siguientes parámetros obligatorios:</p>
+      
+      <table class="props-table">
+        <thead><tr><th>Parámetro (SP / REST)</th><th>Tipo</th><th>Propósito</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>@fecha_inicial</code></td>
+            <td><code>DATE</code></td>
+            <td>Inicio del rango (ej. 01/05/2026)</td>
+          </tr>
+          <tr>
+            <td><code>@fecha_final</code></td>
+            <td><code>DATE</code></td>
+            <td>Fin del rango (ej. 31/05/2026)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. HISTORIAL -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Autor</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td>2026-06-11</td><td>1.0</td><td>Julio Barrales</td><td>Alta del documento.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-footer">
+      <div class="foot-nav">
+        <span class="foot-nav-label">← Anterior</span>
+        <a class="foot-nav-link" href="04.4.3-recibos.html">04.4.3 · Recibos Oficiales</a>
+      </div>
+      <div class="foot-center">
+        Manual de Desarrollo SIAF-PJEV<br>
+        <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+      </div>
+      <div class="foot-nav" style="align-items:flex-end;">
+      </div>
+    </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

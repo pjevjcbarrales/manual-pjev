@@ -7,129 +7,181 @@
 <link rel="stylesheet" href="../shared.css">
 <style>
   body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
   .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
   .method.get    { background:#e8f5e9; color:#1b5e20; }
   .method.post   { background:#e3f2fd; color:#0d47a1; }
-  .method.patch  { background:#fff8e1; color:#f57f17; }
-  .method.delete { background:#ffebee; color:#c62828; }
+  .method.patch  { background:#fff8e1; color:#795548; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
   .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
   .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
-  .badge-s { background:var(--pjev-info-bg); color:var(--pjev-info-text); border:1px solid var(--pjev-info-borde); }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  
+  .flujo-box {
+    background:var(--code-bg); border-radius:8px;
+    padding:20px; font-family:var(--font-mono); font-size:12px;
+    color:var(--code-text); line-height:1.8; overflow-x:auto; margin-bottom: 16px;
+  }
 </style>
 </head>
 <body>
 <div class="doc-main-inner">
 
     <div class="elem-breadcrumb">
-      <a href="../index.html">Análisis Funcional</a> ›
-      <span>Cuentas por Cobrar</span> ›
-      <span>04.2.2 Registro de Ministraciones</span>
+      <a href="../index.html">Manual Dev</a> ›
+      <span>Cuentas por Cobrar (Ingresos)</span> ›
+      <span>Registro</span> ›
+      <span>Ministraciones y Proceso de Ingresos</span>
     </div>
 
     <div class="elem-header">
-      <div style="width:100%; display:flex; justify-content:space-between; align-items:flex-start;">
-        <div>
-          <div class="elem-id">04.2.2</div>
-          <h1 class="elem-title">Registro de Ministraciones</h1>
-          <p class="elem-desc">Módulo transaccional para la captura y registro de transferencias de SEFIPLAN.</p>
-          <div class="mod-header-badges">
-            <span class="mod-badge badge-s">Tipo: Operación Transaccional</span>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px; margin-top:20px;">
-          <button class="siaf-btn siaf-btn-ghost" onclick="window.location.reload()">Refrescar</button>
-          <button class="siaf-btn siaf-btn-secondary" onclick="window.print()">🖨 Imprimir</button>
+      <div>
+        <div class="elem-id">04.2.2</div>
+        <h1 class="elem-title">Proceso de Registro de Ingresos y Ministraciones</h1>
+        <p class="elem-desc">Módulo para el registro y control del ciclo de ingresos, abarcando las fases de Devengado (solicitud) y Recaudado (depósito bancario). Conforme al procedimiento de caja.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Modo A — existe en código</span>
+          <span class="mod-badge badge-s">Tipo: Compuesto</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">ing / registro / ministraciones</code></span>
         </div>
       </div>
     </div>
 
     <!-- 1. DESCRIPCIÓN -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-      <p>Este módulo permite la captura de los depósitos bancarios de SEFIPLAN a favor del PJEV. Genera automáticamente los momentos contables de ingresos (Devengado y Recaudado) e incrementa la liquidez presupuestal.</p>
+      <div class="section-title"><span class="section-num">1</span> Proceso General de Registro de Ingresos</div>
+      <p>El registro de los ingresos en el SIAF-PJEV obedece a un procedimiento estructurado de caja que se divide en dos momentos contables principales:</p>
+      
+      <ol style="margin-left: 20px; margin-bottom: 20px; line-height: 1.6; color: var(--pjev-texto-muted);">
+        <li><strong>Fase 1: Ingreso Devengado.</strong> Se origina a partir del derecho de cobro. Para las Ministraciones (la principal fuente de ingresos), esto ocurre cuando la Dirección General de Administración (DGA) emite el oficio y la <em>Solicitud - Comprobación de Recursos</em> dirigida a SEFIPLAN. Aquí se desglosan las cuentas como <em>1NOM-1 (Nómina)</em> o <em>1OPE-1 (Gastos de Operación)</em>.</li>
+        <li><strong>Fase 2: Ingreso Recaudado.</strong> Se concreta cuando los recursos ingresan efectivamente a la cuenta bancaria del ente. Se respalda con los comprobantes bancarios (ej. <em>BBVA Net Cash - Consulta</em>) mostrando el "Depósito de Tercero".</li>
+      </ol>
+
+      <div class="callout info" style="background: var(--pjev-crema); padding: 12px; border-left: 4px solid var(--pjev-verde-oscuro);">
+        <span style="display:inline-block; margin-right:8px; font-weight:bold; color:var(--pjev-verde-oscuro);">ℹ</span>
+        <div style="display:inline-block; font-size:13px; color:#475569;">
+          <strong>Orden de prelación en el registro:</strong><br>
+          Lo primero que se registra mensualmente son las <strong>Ministraciones</strong> (Estatal y FASP/Federal), ya que proveen la liquidez para nómina y operación. Posteriormente se registran <strong>Otros Conceptos</strong> (rendimientos, devoluciones, etc.).
+        </div>
+      </div>
     </div>
 
-    <!-- 2. MARCO NORMATIVO -->
+    <!-- 2. CATÁLOGO DE ORÍGENES DE INGRESO -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
-      <table class="props-table">
-        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+      <div class="section-title"><span class="section-num">2</span> Catálogo de Orígenes (Inferido del Reporte de Caja)</div>
+      <p>Según el reporte de <em>Relación de Depósitos Devengados por Rango de Fechas</em>, el sistema clasifica los ingresos en los siguientes orígenes principales:</p>
+      
+      <table class="props-table" style="margin-bottom: 20px;">
+        <thead><tr><th>Tipo de Ingreso</th><th>Origen / Concepto en el Sistema</th><th>Momento Devengado</th></tr></thead>
         <tbody>
-          <tr><td>LGCG (Nacional)</td><td>Momentos del Ingreso</td><td>Rige la afectación contable simultánea de los momentos del ingreso.</td></tr>
-          <tr><td>Manual de Tesorería (PJEV)</td><td>Registro de ingresos (Pág. 210)</td><td>Referencia al procedimiento oficial de recepción de recursos en cuentas bancarias institucionales.</td></tr>
+          <tr>
+            <td><strong>Ministraciones</strong></td>
+            <td>MINISTRACIÓN ESTATAL (SOLICITUD)<br>MINISTRACIÓN FASP/FEDERAL</td>
+            <td>Oficio de solicitud de recursos DGA a SEFIPLAN.</td>
+          </tr>
+          <tr>
+            <td><strong>Rendimientos</strong></td>
+            <td>RENDIMIENTOS BANCARIOS (OTROS INGRESOS, FASP, CTA XXXX)<br>ACTUALIZACIÓN PRECIO CIERRE CTA</td>
+            <td>Corte de estado de cuenta bancario.</td>
+          </tr>
+          <tr>
+            <td><strong>Reintegros y Devoluciones</strong></td>
+            <td>DEVOLUCIONES SUJETOS A COMPROBAR<br>DEUDORES VARIOS / DEVOLUCIONES GASTO CORR.</td>
+            <td>Entrega de recursos sobrantes por parte de los empleados.</td>
+          </tr>
+          <tr>
+            <td><strong>Cheques Cancelados</strong></td>
+            <td>CHEQUES CANC. (NÓMINA, GRAT. EXT., PENSIÓN ALIMENTICIA)</td>
+            <td>Cancelación física o vencimiento del documento.</td>
+          </tr>
+          <tr>
+            <td><strong>Ingresos Propios / Otros</strong></td>
+            <td>INGRESOS REPOSICIÓN DE CREDENCIALES<br>OTROS INGRESOS VARIOS</td>
+            <td>Emisión del recibo oficial de caja al usuario.</td>
+          </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 3. ROLES -->
+    <!-- 3. MODELO DE DATOS -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <div class="section-title"><span class="section-num">3</span> Estructura de Captura: Ministraciones</div>
+      <p>El formulario de captura de ingresos compuestos requiere una cabecera y un detalle para desglosar las partidas (por ejemplo, cuando una solicitud de $51M se divide en Nómina y otras partidas de gasto).</p>
+      
+      <h4 style="color: var(--pjev-verde-oscuro); margin-bottom: 10px;">Cabecera (Devengado)</h4>
       <table class="props-table">
-        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <thead><tr><th>Campo</th><th>Ejemplo (Caso Práctico)</th></tr></thead>
         <tbody>
-          <tr><td>Oficina de Caja</td><td>Registro del depósito bancario.</td><td>No puede alterar ingresos ya conciliados.</td></tr>
-          <tr><td>Programación y Presupuesto</td><td>Consulta de disponibilidad.</td><td>Ajenos a la captura operativa del flujo de efectivo.</td></tr>
-          <tr><td>Contabilidad</td><td>Conciliación de Ministraciones.</td><td>Cruza la información capturada vs el Estado de Cuenta original.</td></tr>
+          <tr><td><code>No. Trámite / Oficio</code></td><td>DGA/0367/2026</td></tr>
+          <tr><td><code>Concepto Gral</code></td><td>1a MINISTRACIÓN DEL MES DE JUNIO 2026</td></tr>
+          <tr><td><code>Fecha Devengado</code></td><td>28/05/2026 (Fecha del Oficio DGA)</td></tr>
+          <tr><td><code>Importe Total</code></td><td>$51,958,628.00</td></tr>
+        </tbody>
+      </table>
+
+      <h4 style="color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 10px;">Líneas de Detalle (Afectación Contable / Presupuestal)</h4>
+      <table class="props-table">
+        <thead><tr><th>Cuenta / Partida</th><th>Descripción</th><th>Importe</th></tr></thead>
+        <tbody>
+          <tr><td><code>1NOM-1</code></td><td>Tribunal Superior de Justicia</td><td>$10,458,826.50</td></tr>
+          <tr><td><code>1NOM-2</code></td><td>Tribunal de Conciliación y Arbitraje</td><td>$2,472,084.50</td></tr>
+          <tr><td><code>1NOM-7</code></td><td>Tribunal de Disciplina Judicial</td><td>$1,588,324.00</td></tr>
+          <tr><td><code>1NOM-8</code></td><td>Órgano de Administración Judicial</td><td>$37,439,393.00</td></tr>
+        </tbody>
+      </table>
+
+      <h4 style="color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 10px;">Recaudación</h4>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Ejemplo (Caso Práctico)</th></tr></thead>
+        <tbody>
+          <tr><td><code>Fecha de Cobro / Banco</code></td><td>09/06/2026 15:36:16</td></tr>
+          <tr><td><code>Referencia Banco</code></td><td>000000000000008327 BMRCASH</td></tr>
+          <tr><td><code>Importe Recaudado</code></td><td>$21,157,862.50 (Coincide con GASTOS DE OPERACIÓN)</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 4. MODELO DE DATOS -->
+    <!-- 4. FLUJO DE INTEGRACIÓN -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Tabla principal: <strong><code>ingresos.registro_caja</code></strong></p>
+      <div class="section-title"><span class="section-num">4</span> Flujos de Integración</div>
+      <div class="flujo-box">[DGA emite Oficio a SEFIPLAN]
+        ↓  
+[Captura de Ingreso DEVENGADO]  ←  Genera Póliza de Ingreso Devengado
+        ↓  (Queda como cuenta por cobrar pendiente)
+[Depósito BBVA Reflejado]
+        ↓  
+[Captura de Ingreso RECAUDADO]  ←  Genera Póliza de Ingreso Recaudado
+        ↓
+[Reporte de Caja: Relación de Depósitos Devengados]
+        ←  Muestra columnas: IMPORTE DEVENGADO | IMPORTE RECAUDADO | SALDO</div>
+    </div>
+
+    <!-- 5. HISTORIAL -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Historial de Cambios</div>
       <table class="props-table">
-        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Autor</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><code>rc_id</code></td><td><code>SERIAL (PK)</code></td><td>ID transaccional de caja.</td></tr>
-          <tr><td><code>rc_folio</code></td><td><code>VARCHAR(20) (UNIQUE)</code></td><td>Folio autogenerado anual (Ej. CAJA-2026-00012).</td></tr>
-          <tr><td><code>ejercicio_id</code></td><td><code>INTEGER (FK)</code></td><td>Referencia al año fiscal activo.</td></tr>
-          <tr><td><code>ci_id</code></td><td><code>INTEGER (FK)</code></td><td>Relación con <code>ingresos.cat_conceptos</code>.</td></tr>
-          <tr><td><code>cb_id</code></td><td><code>INTEGER (FK)</code></td><td>Relación con <code>configuracion.cat_cuentas_bancarias</code>.</td></tr>
-          <tr><td><code>rc_monto</code></td><td><code>NUMERIC(18,2)</code></td><td>Importe total del depósito.</td></tr>
-          <tr><td><code>rc_fecha_deposito</code></td><td><code>DATE</code></td><td>Fecha exacta de entrada al banco.</td></tr>
-          <tr><td><code>rc_folio_oficio</code></td><td><code>VARCHAR(50)</code></td><td>Oficio de Programación y Presupuesto.</td></tr>
-          <tr><td><code>rc_estado_conciliacion</code></td><td><code>CHAR(1)</code></td><td>'P' = Pendiente, 'C' = Conciliado.</td></tr>
-          <tr><td><code>rc_poliza_id</code></td><td><code>INTEGER (FK)</code></td><td>ID de la póliza de Ingresos generada automáticamente.</td></tr>
+          <tr><td>2026-06-11</td><td>1.0</td><td>Julio Barrales</td><td>Definición del proceso de caja e incorporación de Ministraciones.</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 5. STORED PROCEDURES -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs) y Triggers</div>
-      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong><code>fn_crud_registro_caja</code></strong>: Maneja el INSERT. Llama a <code>fn_genera_folio_caja</code>.</li>
-        <li><strong><code>fn_afectar_presupuesto_ingresos</code></strong>: Toma el monto y afecta el módulo de Presupuestos (aumenta Disponibilidad).</li>
-        <li><strong><code>fn_generar_poliza_ingreso_automatica</code></strong>: Arma el JSON de la póliza cargo a Bancos y abono a Ingresos.</li>
-        <li><strong><code>trg_valida_periodo_contable</code></strong>: Impide registros si el mes está cerrado.</li>
-        <li><strong><code>trg_afectacion_automatica_caja</code></strong>: AFTER INSERT. Ejecuta asíncronamente los SPs de afectación.</li>
-      </ul>
-    </div>
-
-    <!-- 6. SERVICIOS REST -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
-      <table class="props-table">
-        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td><span class="method get">GET</span></td><td><code>/ingresos/ministraciones</code></td><td><code>?mes, ?ejercicio</code></td><td>Lista las capturas.</td></tr>
-          <tr><td><span class="method post">POST</span></td><td><code>/ingresos/ministraciones</code></td><td>JSON de captura</td><td>Crea el registro y dispara afectaciones.</td></tr>
-          <tr><td><span class="method patch">PATCH</span></td><td><code>/ingresos/ministraciones/:id/cancelar</code></td><td>-</td><td>Reversa el ingreso (sólo si no está conciliado).</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 7. REGLAS DE NEGOCIO -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">7</span> Reglas de Negocio Críticas</div>
-      <table class="props-table">
-        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th></tr></thead>
-        <tbody>
-          <tr><td><strong>RN-IN-01</strong></td><td>Soporte Documental</td><td>Si el Concepto exige oficio, no permite guardar sin el Folio de Presupuestos.</td></tr>
-          <tr><td><strong>RN-IN-02</strong></td><td>Mes Contable</td><td>La <code>fecha_deposito</code> debe pertenecer a un periodo contable ABIERTO.</td></tr>
-        </tbody>
-      </table>
+    <div class="doc-footer">
+      <div class="foot-nav">
+        <span class="foot-nav-label">← Anterior</span>
+        <a class="foot-nav-link" href="04.2.1-ley-ingresos.html">04.2.1 · Ley de Ingresos</a>
+      </div>
+      <div class="foot-center">
+        Manual de Desarrollo SIAF-PJEV<br>
+        <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+      </div>
+      <div class="foot-nav" style="align-items:flex-end;">
+        <span class="foot-nav-label">Siguiente →</span>
+        <a class="foot-nav-link" href="04.2.3-rendimientos.html">04.2.3 · Rendimientos</a>
+      </div>
     </div>
 
 </div>

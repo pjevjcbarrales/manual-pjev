@@ -7,47 +7,31 @@
 <link rel="stylesheet" href="../shared.css">
 <style>
   body { padding: 36px 44px 80px; background: var(--pjev-crema); }
-  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
-  .method.get    { background:#e8f5e9; color:#1b5e20; }
-  .method.post   { background:#e3f2fd; color:#0d47a1; }
-  .method.patch  { background:#fff8e1; color:#f57f17; }
-  .method.delete { background:#ffebee; color:#c62828; }
-  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
-  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
-  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
-  .wf-panel { display:none; }
-  .wf-panel.active { display:block; }
-  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
-  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
-  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
-  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
   .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
   .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
-  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
 </style>
 </head>
 <body>
 <div class="doc-main-inner">
 
     <div class="elem-breadcrumb">
-      <a href="../index.html">Análisis Funcional</a> ›
-      <span>Cuentas por Cobrar</span> ›
-      <span>04.1.1 Conceptos de Ingreso</span>
+      <a href="../index.html">Manual Dev</a> ›
+      <span>Cuentas por Cobrar (Ingresos)</span> ›
+      <span>Catálogos</span> ›
+      <span>Conceptos de Ingreso</span>
     </div>
 
     <div class="elem-header">
-      <div style="width:100%; display:flex; justify-content:space-between; align-items:flex-start;">
-        <div>
-          <div class="elem-id">04.1.1</div>
-          <h1 class="elem-title">Catálogo de Conceptos de Ingreso</h1>
-          <p class="elem-desc">Catálogo base operativo para tipificar las entradas de dinero al Poder Judicial y enlazarlas a la cuenta CRI.</p>
-          <div class="mod-header-badges">
-            <span class="mod-badge badge-c">Tipo: Catálogo Base</span>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px; margin-top:20px;">
-          <button class="siaf-btn siaf-btn-ghost" onclick="window.location.reload()">Refrescar</button>
-          <button class="siaf-btn siaf-btn-secondary" onclick="window.print()">🖨 Imprimir</button>
+      <div>
+        <div class="elem-id">04.1.1</div>
+        <h1 class="elem-title">Conceptos de Ingreso</h1>
+        <p class="elem-desc">Catálogo principal para clasificar el origen de los recursos que ingresan al ente público. Configura la base para la generación automática de las pólizas contables de devengado y recaudado.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Modo A — existe en código</span>
+          <span class="mod-badge badge-s">Tipo: Simple</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">ing / catalogos / conceptos</code></span>
         </div>
       </div>
     </div>
@@ -55,219 +39,87 @@
     <!-- 1. DESCRIPCIÓN -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-      <p>Este submódulo corresponde al <strong>Catálogo Base</strong> operativo para tipificar la naturaleza de las entradas de dinero al Poder Judicial. Aunque el CONAC cuenta con un <em>Clasificador por Rubros de Ingresos (CRI)</em>, el Concepto de Ingreso funciona como una nomenclatura interna más amigable y específica para los operadores de la Oficina de Caja.</p>
+      <p>El catálogo de <strong>Conceptos de Ingreso</strong> (como Ministraciones, Rendimientos Bancarios, Reposición de Credenciales, etc.) no solo sirve para clasificar el origen del dinero a nivel operativo, sino que funciona como el "puente" hacia la contabilidad gubernamental.</p>
+      
+      <p>Para que el sistema SIAF-PJEV pueda automatizar el proceso de caja, cada concepto de ingreso debe estar vinculado forzosamente a una matriz o configuración de cuentas contables específicas.</p>
     </div>
 
-    <!-- 2. MARCO NORMATIVO -->
+    <!-- 2. VÍNCULOS CONTABLES -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <div class="section-title"><span class="section-num">2</span> Vinculación Contable (Matriz de Ingresos)</div>
+      <p>De acuerdo con la normatividad (CONAC), cada concepto configurado en este catálogo debe solicitar al usuario la vinculación con las siguientes cuentas del Plan de Cuentas:</p>
+
       <table class="props-table">
-        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <thead><tr><th>Tipo de Cuenta Vinculada</th><th>Naturaleza (CONAC)</th><th>Propósito en el Proceso de Caja</th></tr></thead>
         <tbody>
-          <tr><td>LGCG (Nacional)</td><td>Clasificadores de Ingresos</td><td>Garantiza que cada concepto interno se traduzca correctamente a los rubros armonizados por el CONAC.</td></tr>
-          <tr><td>Manual de Tesorería (PJEV)</td><td>Registro de ingresos</td><td>El procedimiento de <em>"Registro de ingresos de recurso"</em> requiere clasificar los depósitos.</td></tr>
+          <tr>
+            <td><strong>Cuenta de Ingresos</strong></td>
+            <td>Clase 4 (Acreedora)</td>
+            <td>Se abona durante la fase de <strong>Devengado</strong> para reconocer el derecho de cobro a favor del ente público (ej. 4111 Impuestos, 4211 Participaciones, o 4311 Ingresos Financieros).</td>
+          </tr>
+          <tr>
+            <td><strong>Cuenta de Activo Circulante (Por Cobrar)</strong></td>
+            <td>Clase 1 (Deudora)</td>
+            <td>Se configura <strong>fija en el catálogo</strong>. Se carga durante el <strong>Devengado</strong> (ej. 1122 Cuentas por Cobrar) y se abona durante el <strong>Recaudado</strong> para matar el derecho de cobro.</td>
+          </tr>
+          <tr>
+            <td><strong>Cuenta de Activo Circulante (Bancos)</strong></td>
+            <td>Clase 1 (Deudora)</td>
+            <td><strong>No se fija rígidamente en el catálogo</strong>. Aunque puede tener una sugerida, <strong>el usuario debe elegir la cuenta bancaria o caja específica</strong> al momento de registrar el <strong>Recaudado</strong>, ya que un mismo concepto puede ser depositado en distintas cuentas. Al seleccionarla, esta cuenta se carga para reflejar la entrada física del dinero.</td>
+          </tr>
         </tbody>
       </table>
-    </div>
 
-    <!-- 3. ROLES -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
-      <table class="props-table">
-        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
-        <tbody>
-          <tr><td>Administrador DGA</td><td>Alta, Modificación, Baja Lógica.</td><td>No puede borrar físicamente.</td></tr>
-          <tr><td>Analista de Caja</td><td>Lectura (Selección en formulario).</td><td>No puede crear nuevos conceptos ni modificar cuentas vinculadas.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 4. MODELO DE DATOS -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Tabla principal: <strong><code>ingresos.cat_conceptos</code></strong></p>
-      <table class="props-table">
-        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td><code>ci_id</code></td><td><code>SERIAL (PK)</code></td><td>Identificador único del concepto.</td></tr>
-          <tr><td><code>ci_clave</code></td><td><code>VARCHAR(15) (UNIQUE)</code></td><td>Clave interna operativa (Ej. MIN-SEF-01).</td></tr>
-          <tr><td><code>ci_descripcion</code></td><td><code>VARCHAR(250)</code></td><td>Nombre del concepto (Ej. "Ministración Quincenal Gasto Corriente").</td></tr>
-          <tr><td><code>ci_tipo_ingreso</code></td><td><code>CHAR(1)</code></td><td>'M' (Ministración), 'R' (Reintegro), 'F' (Rendimiento Financiero), 'O' (Otros).</td></tr>
-          <tr><td><code>cri_cuenta_id</code></td><td><code>INTEGER (FK)</code></td><td>Foránea a <code>contabilidad.catalogo_cuentas(cc_id)</code>. Define la cuenta de Ingresos CONAC asociada.</td></tr>
-          <tr><td><code>ci_requiere_oficio</code></td><td><code>SMALLINT</code></td><td>1 = Obliga a capturar un folio de oficio de Programación y Presupuesto al usarlo.</td></tr>
-          <tr><td><code>ci_requiere_conciliacion</code></td><td><code>SMALLINT</code></td><td>1 = Pasa al módulo de Conciliación Bancaria.</td></tr>
-          <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>1 = Activo (disponible en UI), 0 = Inactivo (Baja lógica).</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 5. STORED PROCEDURES -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs) y Triggers</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">En un catálogo base (Tipo A), la manipulación se realiza a través de 2 procedimientos principales y reglas aseguradas vía Triggers:</p>
-      <style>
-        .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; }
-        .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-        .sp-tab:hover { color: var(--pjev-verde-oscuro); }
-        .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
-        .sp-panel { display: none; }
-        .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
-      </style>
-
-      <div class="sp-tabs">
-        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_cat_conceptos</button>
-        <button class="sp-tab" onclick="showSP('sp2',this)">fn_crud_cat_conceptos</button>
-        <button class="sp-tab" onclick="showSP('sp3',this)">Triggers</button>
-      </div>
-
-      <!-- TAB 1: LEER -->
-      <div id="sp-sp1" class="sp-panel active">
-        <table class="props-table">
-          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
-          <tbody>
-            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>0: Leer (Consultar)</td></tr>
-            <tr><td><code>@p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario activo en sesión</td></tr>
-            <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>Null/0 para listado, &gt;0 para registro único</td></tr>
-            <tr><td><code>@p_busqueda</code></td><td><code>VARCHAR</code></td><td>Filtro general (por clave o descripción)</td></tr>
-          </tbody>
-        </table>
-        <table class="props-table" style="margin-top: 10px;">
-          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
-          <tbody>
-            <tr><td><code>{ci_id}</code></td><td><code>INT</code></td><td>ID del registro</td></tr>
-            <tr><td><code>{ci_clave}</code></td><td><code>VARCHAR</code></td><td>Clave operativa</td></tr>
-            <tr><td><code>{ci_descripcion}</code></td><td><code>VARCHAR</code></td><td>Descripción del concepto</td></tr>
-            <tr><td><code>{ci_tipo_ingreso}</code></td><td><code>CHAR(1)</code></td><td>Agrupador lógico</td></tr>
-            <tr><td><code>{cri_cuenta_id}</code></td><td><code>INT</code></td><td>ID de la cuenta contable relacionada</td></tr>
-            <tr><td><code>{cc_cuentacompleta}</code></td><td><code>VARCHAR</code></td><td>Cuenta contable formateada (ej. 4.1.1.2.0001)</td></tr>
-            <tr><td><code>{estatus_registro}</code></td><td><code>INT</code></td><td>1: Activo, 0: Baja</td></tr>
-          </tbody>
-        </table>
-        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
-        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
-          <div class="code-block">
-<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">ingresos.fn_leer_cat_conceptos</span>(
-    p_accion <span style="color:#c678dd;">integer</span>, p_usuario <span style="color:#c678dd;">varchar</span>, p_id <span style="color:#c678dd;">integer</span>, p_busqueda <span style="color:#c678dd;">varchar</span> <span style="color:#d1d5db;">DEFAULT NULL</span>
-) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
-<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
-<span style="color:#c678dd;">BEGIN</span>
-    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">THEN</span>
-        <span style="color:#c678dd;">IF</span> p_id > <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">THEN</span>
-            <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">row_to_json</span>(t) <span style="color:#c678dd;">INTO</span> v_resultado <span style="color:#c678dd;">FROM</span> (
-                <span style="color:#c678dd;">SELECT</span> a.*, c.cc_cuentacompleta, c.cc_descripcion 
-                <span style="color:#c678dd;">FROM</span> ingresos.cat_conceptos a 
-                <span style="color:#c678dd;">LEFT JOIN</span> contabilidad.catalogo_cuentas c <span style="color:#c678dd;">ON</span> a.cri_cuenta_id = c.cc_id 
-                <span style="color:#c678dd;">WHERE</span> a.ci_id = p_id
-            ) t;
-        <span style="color:#c678dd;">ELSE</span>
-            <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'registros'</span>, <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>)) <span style="color:#c678dd;">INTO</span> v_resultado
-            <span style="color:#c678dd;">FROM</span> (
-                <span style="color:#c678dd;">SELECT</span> a.*, c.cc_cuentacompleta <span style="color:#c678dd;">FROM</span> ingresos.cat_conceptos a
-                <span style="color:#c678dd;">LEFT JOIN</span> contabilidad.catalogo_cuentas c <span style="color:#c678dd;">ON</span> a.cri_cuenta_id = c.cc_id
-                <span style="color:#c678dd;">WHERE</span> a.estatus_registro = <span style="color:#d19a66;">1</span> 
-                <span style="color:#c678dd;">AND</span> (p_busqueda <span style="color:#c678dd;">IS NULL OR</span> a.ci_descripcion <span style="color:#56b6c2;">ILIKE</span> <span style="color:#98c379;">'%'</span> || p_busqueda || <span style="color:#98c379;">'%'</span> <span style="color:#c678dd;">OR</span> a.ci_clave <span style="color:#56b6c2;">ILIKE</span> <span style="color:#98c379;">'%'</span> || p_busqueda || <span style="color:#98c379;">'%'</span>)
-            ) t;
-        <span style="color:#c678dd;">END IF</span>;
-    <span style="color:#c678dd;">END IF</span>;
-    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
-<span style="color:#c678dd;">END</span>;
-$$;</pre>
-          </div>
+      <div class="callout info" style="background: var(--pjev-crema); padding: 12px; border-left: 4px solid var(--pjev-verde-oscuro); margin-top: 16px;">
+        <span style="display:inline-block; margin-right:8px; font-weight:bold; color:var(--pjev-verde-oscuro);">ℹ</span>
+        <div style="display:inline-block; font-size:13px; color:#475569;">
+          <strong>Impacto Automático:</strong><br>
+          Gracias a esta vinculación, cuando el usuario captura una <em>Ministración</em> o un <em>Cheque Cancelado</em>, el sistema sabe exactamente qué cuentas afectar sin necesidad de que el operador tenga conocimientos contables profundos.
         </div>
       </div>
-
-      <!-- TAB 2: CRUD -->
-      <div id="sp-sp2" class="sp-panel">
-        <table class="props-table">
-          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
-          <tbody>
-            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Alta, 2: Cambio, 3: Baja lógica</td></tr>
-            <tr><td><code>@p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario activo en sesión</td></tr>
-            <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>Identificador único (requerido en cambio y baja)</td></tr>
-            <tr><td><code>@p_clave</code></td><td><code>VARCHAR</code></td><td>Clave operativa única</td></tr>
-            <tr><td><code>@p_descripcion</code></td><td><code>VARCHAR</code></td><td>Descripción del concepto</td></tr>
-            <tr><td><code>@p_tipo_ingreso</code></td><td><code>CHAR(1)</code></td><td>Clasificador de lógica M/R/F/O</td></tr>
-            <tr><td><code>@p_cri_cuenta_id</code></td><td><code>INT</code></td><td>ID de la cuenta en el plan de cuentas</td></tr>
-            <tr><td><code>@p_req_oficio</code></td><td><code>INT</code></td><td>Bandera requiere oficio</td></tr>
-            <tr><td><code>@p_req_conciliacion</code></td><td><code>INT</code></td><td>Bandera requiere conciliación</td></tr>
-          </tbody>
-        </table>
-        <table class="props-table" style="margin-top: 10px;">
-          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
-          <tbody>
-            <tr><td><code>{id}</code></td><td><code>INT</code></td><td>ID del catálogo guardado/actualizado</td></tr>
-          </tbody>
-        </table>
-        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
-        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
-          <div class="code-block">
-<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">ingresos.fn_crud_cat_conceptos</span>(
-    p_accion <span style="color:#c678dd;">integer</span>, p_usuario <span style="color:#c678dd;">varchar</span>, p_id <span style="color:#c678dd;">integer</span>, p_clave <span style="color:#c678dd;">varchar</span>, p_descripcion <span style="color:#c678dd;">varchar</span>, 
-    p_tipo_ingreso <span style="color:#c678dd;">char</span>, p_cri_cuenta_id <span style="color:#c678dd;">integer</span>, p_req_oficio <span style="color:#c678dd;">integer</span>, p_req_conciliacion <span style="color:#c678dd;">integer</span>
-) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
-<span style="color:#c678dd;">DECLARE</span> v_id <span style="color:#c678dd;">integer</span> := p_id;
-<span style="color:#c678dd;">BEGIN</span>
-    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
-        <span style="color:#c678dd;">INSERT INTO</span> ingresos.cat_conceptos(ci_clave, ci_descripcion, ci_tipo_ingreso, cri_cuenta_id, ci_requiere_oficio, ci_requiere_conciliacion, estatus_registro, usuario_c)
-        <span style="color:#c678dd;">VALUES</span> (p_clave, p_descripcion, p_tipo_ingreso, p_cri_cuenta_id, p_req_oficio, p_req_conciliacion, <span style="color:#d19a66;">1</span>, p_usuario) <span style="color:#c678dd;">RETURNING</span> ci_id <span style="color:#c678dd;">INTO</span> v_id;
-    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
-        <span style="color:#c678dd;">UPDATE</span> ingresos.cat_conceptos <span style="color:#c678dd;">SET</span> ci_clave = p_clave, ci_descripcion = p_descripcion, ci_tipo_ingreso = p_tipo_ingreso, cri_cuenta_id = p_cri_cuenta_id, ci_requiere_oficio = p_req_oficio, ci_requiere_conciliacion = p_req_conciliacion, usuario_m = p_usuario, fecha_m = <span style="color:#56b6c2;">now</span>() <span style="color:#c678dd;">WHERE</span> ci_id = p_id;
-    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span>
-        <span style="color:#c678dd;">UPDATE</span> ingresos.cat_conceptos <span style="color:#c678dd;">SET</span> estatus_registro = <span style="color:#d19a66;">0</span>, usuario_m = p_usuario, fecha_m = <span style="color:#56b6c2;">now</span>() <span style="color:#c678dd;">WHERE</span> ci_id = p_id;
-    <span style="color:#c678dd;">END IF</span>;
-    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Guardado'</span>, <span style="color:#98c379;">'data'</span>, <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'id'</span>, v_id));
-<span style="color:#c678dd;">EXCEPTION WHEN OTHERS THEN</span>
-    <span style="color:#c678dd;">IF</span> <span style="color:#56b6c2;">SQLSTATE</span> = <span style="color:#98c379;">'23505'</span> <span style="color:#c678dd;">THEN</span> <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">-1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'La clave ya existe.'</span>); <span style="color:#c678dd;">END IF</span>;
-    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">-2</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#56b6c2;">SQLERRM</span>);
-<span style="color:#c678dd;">END</span>;
-$$;</pre>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: TRIGGERS -->
-      <div id="sp-sp3" class="sp-panel">
-        <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px; margin-top: 10px;">
-          <li style="margin-bottom:8px;"><strong><code>trg_valida_cri_concepto</code>:</strong> BEFORE INSERT/UPDATE. Verifica en <code>catalogo_cuentas</code> que la cuenta asignada pertenezca al Rubro 4 (Ingresos). Si no, aborta.</li>
-          <li><strong><code>trg_protege_integridad_conceptos</code>:</strong> BEFORE UPDATE (cuando acción es baja). Impide la inhabilitación del concepto si se encuentra referenciado en registros transaccionales "Pendientes de Conciliar".</li>
-        </ul>
-      </div>
-
     </div>
 
-    <!-- 6. SERVICIOS REST -->
+    <!-- 3. MODELO DE DATOS -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <div class="section-title"><span class="section-num">3</span> Estructura de Datos Recomendada</div>
       <table class="props-table">
-        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Campo</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><span class="method get">GET</span></td><td><code>/ingresos/conceptos</code></td><td><code>?search, ?page</code></td><td>Lista los conceptos.</td></tr>
-          <tr><td><span class="method post">POST</span></td><td><code>/ingresos/conceptos</code></td><td>JSON del formulario</td><td>Crea un nuevo concepto.</td></tr>
-          <tr><td><span class="method patch">PATCH</span></td><td><code>/ingresos/conceptos/:id</code></td><td>JSON parcial</td><td>Actualiza datos permitidos.</td></tr>
-          <tr><td><span class="method delete">DELETE</span></td><td><code>/ingresos/conceptos/:id</code></td><td>-</td><td>Aplica baja lógica.</td></tr>
+          <tr><td><code>id_concepto</code></td><td>Identificador único del concepto de ingreso.</td></tr>
+          <tr><td><code>descripcion</code></td><td>Nombre del concepto (ej. "RENDIMIENTOS BANCARIOS FASP").</td></tr>
+          <tr><td><code>id_cuenta_ingreso</code></td><td>FK al catálogo de cuentas (Clase 4).</td></tr>
+          <tr><td><code>id_cuenta_activo_cobrar</code></td><td>FK al catálogo de cuentas (Clase 1 - Cuentas por cobrar).</td></tr>
+          <tr><td><code>id_cuenta_banco_default</code></td><td>(Opcional) FK a la cuenta de Bancos si este ingreso siempre entra a la misma cuenta.</td></tr>
+          <tr><td><code>estatus</code></td><td>1 Activo / 0 Inactivo.</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 7. ACCIONES -->
+    <!-- 4. HISTORIAL -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
-      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong>Registro (CRUD):</strong> Formulario para armar el concepto y enlazar a cuenta CRI (Nivel 5 o 6).</li>
-        <li><strong>Especiales:</strong> N/A.</li>
-        <li><strong>Reportes:</strong> Exportar a Excel PDF.</li>
-      </ul>
+      <div class="section-title"><span class="section-num">4</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Autor</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td>2026-06-11</td><td>1.0</td><td>Julio Barrales</td><td>Definición del catálogo y su vinculación a cuentas de ingreso y activo circulante.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-footer">
+      <div class="foot-nav">
+      </div>
+      <div class="foot-center">
+        Manual de Desarrollo SIAF-PJEV<br>
+        <span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026
+      </div>
+      <div class="foot-nav" style="align-items:flex-end;">
+        <span class="foot-nav-label">Siguiente →</span>
+        <a class="foot-nav-link" href="04.1.2-cuentas-recaudadoras.html">04.1.2 · Cuentas Recaudadoras</a>
+      </div>
     </div>
 
 </div>
 <script src="../shared.js"></script>
-<script>
-function showSP(id, btn) {
-  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('sp-' + id).classList.add('active');
-  btn.classList.add('active');
-}
-</script>
 </body>
 </html>
