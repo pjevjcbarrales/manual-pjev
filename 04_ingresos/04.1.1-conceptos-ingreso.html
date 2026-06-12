@@ -118,13 +118,80 @@
   <!-- 5. STORED PROCEDURES -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
-    <table class="props-table" style="margin-bottom: 24px;">
-      <thead><tr><th>Nombre del SP</th><th>Propósito</th></tr></thead>
-      <tbody>
-        <tr><td><code>fn_leer_conceptos</code></td><td>Devuelve la lista de conceptos, con filtros opcionales por ID o estatus, cruzando con la tabla del COA para traer el nombre de las cuentas.</td></tr>
-        <tr><td><code>fn_abc_conceptos</code></td><td>Gestiona el alta (INSERT), edición (UPDATE) y baja lógica (estatus=0). Incluye la validación de unicidad de la clave.</td></tr>
-      </tbody>
-    </table>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">La manipulación de base de datos se realiza a través de 2 procedimientos principales:</p>
+    
+    <style>
+      .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; }
+      .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+      .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+      .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+      .sp-panel { display: none; }
+      .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    </style>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_conceptos</button>
+      <button class="sp-tab" onclick="showSP('sp2',this)">fn_abc_conceptos</button>
+    </div>
+
+    <!-- TAB 1: LEER -->
+    <div id="sp-sp1" class="sp-panel active">
+      <table class="props-table">
+        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>0: Leer listado, 1: Leer un concepto específico</td></tr>
+          <tr><td><code>@p_concepto_id</code></td><td><code>INT</code></td><td>Filtro opcional. Nulo para listado completo</td></tr>
+        </tbody>
+      </table>
+      <table class="props-table" style="margin-top: 10px;">
+        <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>{concepto_id}</code></td><td><code>INT</code></td><td>ID del registro</td></tr>
+          <tr><td><code>{clave}</code></td><td><code>VARCHAR</code></td><td>Clave única</td></tr>
+          <tr><td><code>{descripcion}</code></td><td><code>VARCHAR</code></td><td>Descripción del concepto</td></tr>
+          <tr><td><code>{cuenta_contable_id}</code></td><td><code>INT</code></td><td>ID de la cuenta COA (Clase 4)</td></tr>
+          <tr><td><code>{cuenta_contable_desc}</code></td><td><code>VARCHAR</code></td><td>Nombre descriptivo de la cuenta</td></tr>
+          <tr><td><code>{cuenta_presupuestal_id}</code></td><td><code>INT</code></td><td>ID de la cuenta COA (Clase 8)</td></tr>
+          <tr><td><code>{cuenta_presupuestal_desc}</code></td><td><code>VARCHAR</code></td><td>Nombre descriptivo de la cuenta presupuestal</td></tr>
+          <tr><td><code>{estatus_registro}</code></td><td><code>SMALLINT</code></td><td>1 Activo, 0 Inactivo</td></tr>
+        </tbody>
+      </table>
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Lógica Interna</h3>
+      <div class="code-wrap" style="margin-top: 0;">
+        Devuelve el listado de conceptos con un <code>INNER JOIN</code> a la tabla del COA (Plan de Cuentas) para extraer no solo los IDs sino las descripciones formales de las cuentas vinculadas. Si recibe el <code>p_concepto_id</code>, filtra un solo registro.
+      </div>
+    </div>
+
+    <!-- TAB 2: ABC -->
+    <div id="sp-sp2" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Insertar, 2: Actualizar, 3: Baja Lógica</td></tr>
+          <tr><td><code>@p_concepto_id</code></td><td><code>INT</code></td><td>ID a afectar (nulo en Insert)</td></tr>
+          <tr><td><code>@p_clave</code></td><td><code>VARCHAR</code></td><td>Clave del concepto (MIN-EST)</td></tr>
+          <tr><td><code>@p_descripcion</code></td><td><code>VARCHAR</code></td><td>Nombre del concepto</td></tr>
+          <tr><td><code>@p_cuenta_contable_id</code></td><td><code>INT</code></td><td>Referencia COA 4.X</td></tr>
+          <tr><td><code>@p_cuenta_presupuestal_id</code></td><td><code>INT</code></td><td>Referencia COA 8.1.1.X</td></tr>
+          <tr><td><code>@p_estatus_registro</code></td><td><code>SMALLINT</code></td><td>1 Activo, 0 Inactivo</td></tr>
+          <tr><td><code>@p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario activo en sesión</td></tr>
+        </tbody>
+      </table>
+      <table class="props-table" style="margin-top: 10px;">
+        <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>Código de éxito (1) o error (-1)</td></tr>
+          <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje (Ej. "Guardado correctamente" o "Error: La clave ya existe")</td></tr>
+        </tbody>
+      </table>
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Lógica Interna</h3>
+      <div class="code-wrap" style="margin-top: 0;">
+        <ul style="margin:0; padding-left:20px;">
+          <li><strong>Alta/Edición:</strong> Valida que <code>@p_clave</code> no esté duplicada en la base de datos (excluyendo el propio registro en caso de edición). Inserta o actualiza mapeando las fechas de auditoría y usuario.</li>
+          <li><strong>Baja Lógica:</strong> Marca <code>estatus_registro = 0</code>. Valida previamente en otras tablas transaccionales (Ej. <code>ing_recibos</code>) que este concepto no haya sido ya utilizado para evitar romper integridad referencial.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <!-- 6. SERVICIOS REST -->
