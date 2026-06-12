@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.2.2 Registro de Ingresos (Devengado) — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .code-wrap {
+      background: var(--code-bg); color: var(--code-text);
+      border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+      padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+    }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel, .sp-panel { display: none; }
+    .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+    .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>Ingresos (CxC)</span> ›
+    <span>Registro</span> ›
+    <span>Registro de Ingresos (Devengado)</span>
+  </div>
+
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.2.2</div>
+      <h1 class="elem-title">Registro de Ingresos (Devengado)</h1>
+      <p class="elem-desc">Módulo transaccional para el registro del Oficio de SEFIPLAN que notifica la transferencia de recursos al Poder Judicial.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Modo A — existe en código</span>
+        <span class="mod-badge badge-s">Tipo: Análisis Funcional (DOC-08)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>Este submódulo atiende exclusivamente la fase uno (Tiempo 1) de la captación de recursos. Su objetivo es registrar formalmente en el SIAF-PJEV que se ha recibido una notificación de cobro a favor de la Institución.</p>
+    <p>El analista ingresa los datos del oficio (folio, fecha, importe y concepto). Al autorizar el registro, nace una <strong>Cuenta por Cobrar</strong> en la contabilidad y se devenga la Ley de Ingresos, quedando pendiente de cobro hasta que el área de Caja opere el módulo <code>04.2.3 Registro de Ingresos (Recaudado)</code>.</p>
+  </div>
+
+  <!-- 2. MARCO NORMATIVO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Norma</th>
+          <th>Obligación que genera</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
+          <td>Obliga a registrar el <strong>Ingreso Devengado</strong> en el momento en que existe jurídicamente el derecho de cobro o se notifica oficialmente la transferencia (oficio).</td>
+        </tr>
+        <tr>
+          <td><strong>Norma CONAC</strong></td>
+          <td>Establece que todo ingreso devengado debe reconocerse mediante un Cargo a una Cuenta por Cobrar a Corto Plazo (1.1.2.4) contra un Abono a Ingresos Patrimoniales.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. ROLES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Acción permitida</th>
+          <th>Restricción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Jefe de Presupuesto</strong></td>
+          <td>Genera el Oficio de solicitud de recursos a SEFIPLAN y lo turna a Tesorería para la captura del devengo.</td>
+          <td>Genera la orden documental, pero no realiza la afectación contable directa en el sistema.</td>
+        </tr>
+        <tr>
+          <td><strong>Analista de Ingresos (Tesorería)</strong></td>
+          <td>Recibe el Oficio de Presupuestos y captura el registro de la Ministración esperada.</td>
+          <td>La captura se guarda en estatus "Borrador". No genera póliza.</td>
+        </tr>
+        <tr>
+          <td><strong>Contabilidad (Subdirector)</strong></td>
+          <td>Revisa y Autoriza el oficio capturado.</td>
+          <td>Al autorizar, el registro se bloquea y pasa al módulo de Recaudación (Caja).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Modelo de Datos (Maestro - Detalle)</div>
+    <p>El módulo utiliza un esquema compuesto para permitir distribuir el monto de un oficio entre varias organizaciones y conceptos.</p>
+    
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ing_ingresos (Encabezado)</h3>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>ingreso_id</code></td><td><code>INT (PK)</code></td><td>Identificador único.</td></tr>
+        <tr><td><code>ejercicio</code></td><td><code>INT</code></td><td>Año fiscal (Ej. 2026).</td></tr>
+        <tr><td><code>mes</code></td><td><code>INT</code></td><td>Mes al que corresponde el recurso.</td></tr>
+        <tr><td><code>folio_documento</code></td><td><code>VARCHAR(50)</code></td><td>No. de Oficio de SEFIPLAN.</td></tr>
+        <tr><td><code>fecha_documento</code></td><td><code>DATE</code></td><td>Fecha de recepción o emisión del oficio.</td></tr>
+        <tr><td><code>monto_total</code></td><td><code>DECIMAL(18,2)</code></td><td>Monto total del oficio a cobrar.</td></tr>
+        <tr><td><code>estatus_documento</code></td><td><code>INT</code></td><td>1=Borrador, 2=Devengado Autorizado.</td></tr>
+        <tr><td><code>poliza_devengo_id</code></td><td><code>INT (FK)</code></td><td>ID de la Póliza de Devengo generada.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Default 1. Control lógico.</td></tr>
+        <tr><td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td><td><code>VARCHAR</code> / <code>TIMESTAMPZ</code></td><td>Campos de auditoría.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ing_ingresos_movtos (Detalle)</h3>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>ingreso_movto_id</code></td><td><code>INT (PK)</code></td><td>Identificador único del detalle.</td></tr>
+        <tr><td><code>ingreso_id</code></td><td><code>INT (FK)</code></td><td>Liga al encabezado del oficio.</td></tr>
+        <tr><td><code>centro_costo_id</code></td><td><code>INT (FK)</code></td><td>Organización o Centro de Costo destino.</td></tr>
+        <tr><td><code>concepto_id</code></td><td><code>INT (FK)</code></td><td>Concepto de Ingreso asociado al monto.</td></tr>
+        <tr><td><code>monto_organizacion</code></td><td><code>DECIMAL(18,2)</code></td><td>Fracción del oficio destinada a esta organización.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Default 1. Control lógico.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+    
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_ingresos_devengo_encabezado</button>
+      <button class="sp-tab" onclick="showSP('sp2',this)">fn_leer_ingresos_devengo_movtos</button>
+      <button class="sp-tab" onclick="showSP('sp3',this)">fn_abc_ingresos_devengo_encabezado</button>
+      <button class="sp-tab" onclick="showSP('sp4',this)">fn_abc_ingresos_devengo_movtos</button>
+    </div>
+
+    <!-- TAB 1: LEER ENCABEZADO -->
+    <div id="sp-sp1" class="sp-panel active">
+      <table class="props-table">
+        <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio. Ejercicio contable activo.</td></tr>
+          <tr><td><code>@p_ingreso_id</code></td><td><code>INT</code></td><td>Opcional. Para leer un registro específico.</td></tr>
+          <tr><td><code>@p_fecha_inicio</code></td><td><code>DATE</code></td><td>Opcional. Inicio de rango por fecha de oficio.</td></tr>
+          <tr><td><code>@p_fecha_fin</code></td><td><code>DATE</code></td><td>Opcional. Fin de rango por fecha de oficio.</td></tr>
+          <tr><td><code>@p_estatus_documento</code></td><td><code>INT</code></td><td>Opcional. 1=Borrador, 2=Devengado.</td></tr>
+          <tr><td><code>@p_oficio_sefiplan</code></td><td><code>VARCHAR</code></td><td>Opcional. Búsqueda texto LIKE del número de oficio.</td></tr>
+        </tbody>
+      </table>
+      <table class="props-table" style="margin-top: 10px;">
+        <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>{ingreso_id}</code></td><td><code>INT</code></td><td>ID único.</td></tr>
+          <tr><td><code>{folio_documento}</code></td><td><code>VARCHAR</code></td><td>Folio SEFIPLAN.</td></tr>
+          <tr><td><code>{fecha_documento}</code></td><td><code>DATE</code></td><td>Fecha de recepción.</td></tr>
+          <tr><td><code>{monto_total}</code></td><td><code>DECIMAL</code></td><td>Importe total del oficio.</td></tr>
+          <tr><td><code>{estatus_documento}</code></td><td><code>INT</code></td><td>1 o 2.</td></tr>
+        </tbody>
+      </table>
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+      <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+        <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 1. LEER ENCABEZADO
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">ingresos.fn_leer_ingresos_devengo_encabezado</span>(
+    p_ejercicio <span style="color:#c678dd;">INT</span>,
+    p_ingreso_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_fecha_inicio <span style="color:#c678dd;">DATE</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_fecha_fin <span style="color:#c678dd;">DATE</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_estatus_documento <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_oficio_sefiplan <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> (
+        <span style="color:#c678dd;">SELECT</span> 
+            m.ingreso_id, m.folio_documento, m.fecha_documento, m.monto_total, m.estatus_documento
+        <span style="color:#c678dd;">FROM</span> ingresos.ing_ingresos m
+        <span style="color:#c678dd;">WHERE</span> m.ejercicio = p_ejercicio <span style="color:#c678dd;">AND</span> m.estatus_registro = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">AND</span> m.estatus_documento <span style="color:#c678dd;">IN</span> (<span style="color:#d19a66;">1</span>, <span style="color:#d19a66;">2</span>)
+          <span style="color:#c678dd;">AND</span> (p_ingreso_id <span style="color:#c678dd;">IS NULL OR</span> m.ingreso_id = p_ingreso_id)
+          <span style="color:#c678dd;">AND</span> (p_fecha_inicio <span style="color:#c678dd;">IS NULL OR</span> m.fecha_documento >= p_fecha_inicio)
+          <span style="color:#c678dd;">AND</span> (p_fecha_fin <span style="color:#c678dd;">IS NULL OR</span> m.fecha_documento <= p_fecha_fin)
+          <span style="color:#c678dd;">AND</span> (p_estatus_documento <span style="color:#c678dd;">IS NULL OR</span> m.estatus_documento = p_estatus_documento)
+          <span style="color:#c678dd;">AND</span> (p_oficio_sefiplan <span style="color:#c678dd;">IS NULL OR</span> m.folio_documento <span style="color:#56b6c2;">ILIKE</span> <span style="color:#98c379;">'%'</span> || p_oficio_sefiplan || <span style="color:#98c379;">'%'</span>)
+    ) t;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: LEER MOVTOS -->
+    <div id="sp-sp2" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>@p_ingreso_id</code></td><td><code>INT</code></td><td>Obligatorio. ID del encabezado del oficio.</td></tr>
+        </tbody>
+      </table>
+      <table class="props-table" style="margin-top: 10px;">
+        <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>{ingreso_movto_id}</code></td><td><code>INT</code></td><td>ID del detalle.</td></tr>
+          <tr><td><code>{centro_costo_id}</code></td><td><code>INT</code></td><td>ID de Organización.</td></tr>
+          <tr><td><code>{concepto_id}</code></td><td><code>INT</code></td><td>ID de Concepto de Ingreso.</td></tr>
+          <tr><td><code>{monto_organizacion}</code></td><td><code>DECIMAL</code></td><td>Monto asignado al centro.</td></tr>
+          <tr><td><code>{concepto_desc}</code></td><td><code>VARCHAR</code></td><td>Descripción del concepto.</td></tr>
+          <tr><td><code>{centro_costo_desc}</code></td><td><code>VARCHAR</code></td><td>Descripción de la organización.</td></tr>
+        </tbody>
+      </table>
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+      <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+        <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 2. LEER MOVTOS (DETALLE)
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">ingresos.fn_leer_ingresos_devengo_movtos</span>(
+    p_ingreso_id <span style="color:#c678dd;">INT</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> (
+        <span style="color:#c678dd;">SELECT</span> 
+            d.ingreso_movto_id, d.centro_costo_id, d.concepto_id, d.monto_organizacion,
+            c.descripcion <span style="color:#c678dd;">AS</span> concepto_desc, o.descripcion <span style="color:#c678dd;">AS</span> centro_costo_desc
+        <span style="color:#c678dd;">FROM</span> ingresos.ing_ingresos_movtos d
+        <span style="color:#c678dd;">LEFT JOIN</span> ingresos.ing_conceptos c <span style="color:#c678dd;">ON</span> d.concepto_id = c.concepto_id
+        <span style="color:#c678dd;">LEFT JOIN</span> configuracion.organizaciones o <span style="color:#c678dd;">ON</span> d.centro_costo_id = o.organizacion_id
+        <span style="color:#c678dd;">WHERE</span> d.ingreso_id = p_ingreso_id <span style="color:#c678dd;">AND</span> d.estatus_registro = <span style="color:#d19a66;">1</span>
+    ) t;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ABC ENCABEZADO -->
+    <div id="sp-sp3" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Guardar Borrador, 2: Autorizar (Póliza), 3: Cancelar.</td></tr>
+          <tr><td><code>@p_ingreso_id</code></td><td><code>INT</code></td><td>Nulo para insertar.</td></tr>
+          <tr><td><code>@p_folio_documento</code></td><td><code>VARCHAR</code></td><td>Folio del documento.</td></tr>
+          <tr><td><code>@p_fecha_documento</code></td><td><code>DATE</code></td><td>Fecha.</td></tr>
+          <tr><td><code>@p_monto_total</code></td><td><code>DECIMAL</code></td><td>Importe esperado total.</td></tr>
+        </tbody>
+      </table>
+      <table class="props-table" style="margin-top: 10px;">
+        <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>{id}</code></td><td><code>INT</code></td><td>ID del encabezado.</td></tr>
+          <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1 = Éxito, 0 = Error.</td></tr>
+        </tbody>
+      </table>
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+      <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+        <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 3. ABC ENCABEZADO
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">ingresos.fn_abc_ingresos_devengo_encabezado</span>(
+    p_accion <span style="color:#c678dd;">INT</span>,
+    p_ingreso_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_folio_documento <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_fecha_documento <span style="color:#c678dd;">DATE</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_monto_total <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_usuario <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_id <span style="color:#c678dd;">INT</span>; v_poliza_id <span style="color:#c678dd;">INT</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span> <span style="color:#5c6370;">-- Borrador</span>
+        <span style="color:#c678dd;">IF</span> p_ingreso_id <span style="color:#c678dd;">IS NULL OR</span> p_ingreso_id = <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">THEN</span>
+            <span style="color:#c678dd;">INSERT INTO</span> ingresos.ing_ingresos (ejercicio, folio_documento, fecha_documento, monto_total, estatus_documento, estatus_registro, usuario_c, fecha_c)
+            <span style="color:#c678dd;">VALUES</span> (<span style="color:#56b6c2;">EXTRACT</span>(YEAR <span style="color:#c678dd;">FROM</span> p_fecha_documento), p_folio_documento, p_fecha_documento, p_monto_total, <span style="color:#d19a66;">1</span>, <span style="color:#d19a66;">1</span>, p_usuario, <span style="color:#56b6c2;">CURRENT_TIMESTAMP</span>)
+            <span style="color:#c678dd;">RETURNING</span> ingreso_id <span style="color:#c678dd;">INTO</span> v_id;
+        <span style="color:#c678dd;">ELSE</span>
+            <span style="color:#c678dd;">UPDATE</span> ingresos.ing_ingresos <span style="color:#c678dd;">SET</span> folio_documento = p_folio_documento, fecha_documento = p_fecha_documento, monto_total = p_monto_total, usuario_m = p_usuario, fecha_m = <span style="color:#56b6c2;">CURRENT_TIMESTAMP</span>
+            <span style="color:#c678dd;">WHERE</span> ingreso_id = p_ingreso_id <span style="color:#c678dd;">AND</span> estatus_documento = <span style="color:#d19a66;">1</span>;
+            v_id := p_ingreso_id;
+        <span style="color:#c678dd;">END IF</span>;
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span> <span style="color:#5c6370;">-- Autorizar</span>
+        <span style="color:#c678dd;">UPDATE</span> ingresos.ing_ingresos <span style="color:#c678dd;">SET</span> estatus_documento = <span style="color:#d19a66;">2</span>, usuario_m = p_usuario, fecha_m = <span style="color:#56b6c2;">CURRENT_TIMESTAMP</span>
+        <span style="color:#c678dd;">WHERE</span> ingreso_id = p_ingreso_id <span style="color:#c678dd;">AND</span> estatus_documento = <span style="color:#d19a66;">1</span>;
+        v_id := p_ingreso_id;
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span> <span style="color:#5c6370;">-- Cancelar</span>
+        <span style="color:#c678dd;">UPDATE</span> ingresos.ing_ingresos <span style="color:#c678dd;">SET</span> estatus_registro = <span style="color:#d19a66;">0</span>, usuario_m = p_usuario, fecha_m = <span style="color:#56b6c2;">CURRENT_TIMESTAMP</span> <span style="color:#c678dd;">WHERE</span> ingreso_id = p_ingreso_id;
+        v_id := p_ingreso_id;
+    <span style="color:#c678dd;">END IF</span>;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'id'</span>, v_id);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ABC MOVTOS -->
+    <div id="sp-sp4" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Insertar/Actualizar, 3: Eliminar detalle.</td></tr>
+          <tr><td><code>@p_ingreso_movto_id</code></td><td><code>INT</code></td><td>Nulo para insertar.</td></tr>
+          <tr><td><code>@p_ingreso_id</code></td><td><code>INT</code></td><td>ID del oficio padre.</td></tr>
+          <tr><td><code>@p_centro_costo_id</code></td><td><code>INT</code></td><td>Organización.</td></tr>
+          <tr><td><code>@p_concepto_id</code></td><td><code>INT</code></td><td>Concepto de Ingreso.</td></tr>
+          <tr><td><code>@p_monto_organizacion</code></td><td><code>DECIMAL</code></td><td>Monto parcial.</td></tr>
+        </tbody>
+      </table>
+      <table class="props-table" style="margin-top: 10px;">
+        <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>{id}</code></td><td><code>INT</code></td><td>ID del detalle modificado.</td></tr>
+        </tbody>
+      </table>
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+      <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+        <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 4. ABC MOVTOS (DETALLE)
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">ingresos.fn_abc_ingresos_devengo_movtos</span>(
+    p_accion <span style="color:#c678dd;">INT</span>,
+    p_ingreso_movto_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_ingreso_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_centro_costo_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_concepto_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_monto_organizacion <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_usuario <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_id <span style="color:#c678dd;">INT</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">IF</span> p_ingreso_movto_id <span style="color:#c678dd;">IS NULL OR</span> p_ingreso_movto_id = <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">THEN</span>
+            <span style="color:#c678dd;">INSERT INTO</span> ingresos.ing_ingresos_movtos (ingreso_id, centro_costo_id, concepto_id, monto_organizacion, estatus_registro)
+            <span style="color:#c678dd;">VALUES</span> (p_ingreso_id, p_centro_costo_id, p_concepto_id, p_monto_organizacion, <span style="color:#d19a66;">1</span>)
+            <span style="color:#c678dd;">RETURNING</span> ingreso_movto_id <span style="color:#c678dd;">INTO</span> v_id;
+        <span style="color:#c678dd;">ELSE</span>
+            <span style="color:#c678dd;">UPDATE</span> ingresos.ing_ingresos_movtos <span style="color:#c678dd;">SET</span> centro_costo_id = p_centro_costo_id, concepto_id = p_concepto_id, monto_organizacion = p_monto_organizacion
+            <span style="color:#c678dd;">WHERE</span> ingreso_movto_id = p_ingreso_movto_id;
+            v_id := p_ingreso_movto_id;
+        <span style="color:#c678dd;">END IF</span>;
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">UPDATE</span> ingresos.ing_ingresos_movtos <span style="color:#c678dd;">SET</span> estatus_registro = <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">WHERE</span> ingreso_movto_id = p_ingreso_movto_id;
+        v_id := p_ingreso_movto_id;
+    <span style="color:#c678dd;">END IF</span>;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'id'</span>, v_id);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SERVICIOS REST -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/ingresos/registro/devengo</code></td><td><code>?ejercicio=2026&amp;fecha_inicio=...</code></td><td>Llama a <code>fn_leer_ingresos_devengo_encabezado</code>.</td></tr>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/ingresos/registro/devengo/:id/movtos</code></td><td><code>{}</code></td><td>Llama a <code>fn_leer_ingresos_devengo_movtos</code>.</td></tr>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td><td><code>/api/ingresos/registro/devengo</code></td><td><code>{ folio_documento, fecha_documento, monto_total }</code></td><td>Guarda encabezado (Borrador).</td></tr>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td><td><code>/api/ingresos/registro/devengo/:id/movtos</code></td><td><code>{ centro_costo_id, concepto_id, monto_organizacion }</code></td><td>Agrega o actualiza detalle.</td></tr>
+        <tr><td><span style="font-weight:bold; color:#dc2626;">DELETE</span></td><td><code>/api/ingresos/registro/devengo/movtos/:movto_id</code></td><td><code>{}</code></td><td>Elimina un detalle específico.</td></tr>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td><td><code>/api/ingresos/registro/devengo/:id/autorizar</code></td><td><code>{}</code></td><td>Autoriza y genera póliza.</td></tr>
+        <tr><td><span style="font-weight:bold; color:#dc2626;">DELETE</span></td><td><code>/api/ingresos/registro/devengo/:id</code></td><td><code>{}</code></td><td>Cancela el oficio completo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. ACCIONES DEL MÓDULO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Acciones de la Pantalla</div>
+    <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
+      <li style="margin-bottom: 12px;"><strong>Nuevo Oficio:</strong> Abre el modal para capturar los datos recibidos de SEFIPLAN. Se guarda como Borrador (amarillo).</li>
+      <li style="margin-bottom: 12px;"><strong>Editar:</strong> Modifica la captura. Solo disponible en Borrador.</li>
+      <li style="margin-bottom: 12px;"><strong>Autorizar Devengo:</strong> Fija el monto, genera la Cuenta por Cobrar contable y cambia el estatus a "Devengado" (verde), pasándole la batuta a la caja.</li>
+    </ul>
+  </div>
+
+    <!-- 8. WIREFRAMES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+    
+    <div class="wf-tabs" style="flex-wrap: wrap; gap: 4px;">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">leer_ministracion_encabezado (parametros)</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">leer_ministracion_encabezado (valores)</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">leer_ministracion_movtos (parametros)</button>
+      <button class="wf-tab" onclick="showWF('wf4',this)">leer_ministracion_movtos (valores)</button>
+      <button class="wf-tab" onclick="showWF('wf5',this)">abc_ministracion_encabezado (parametros)</button>
+      <button class="wf-tab" onclick="showWF('wf6',this)">abc_ministracion_encabezado (valores)</button>
+      <button class="wf-tab" onclick="showWF('wf7',this)">abc_ministracion_movtos (parametros)</button>
+      <button class="wf-tab" onclick="showWF('wf8',this)">abc_ministracion_movtos (valores)</button>
+    </div>
+
+    <!-- WF1: leer_ministracion_encabezado (parametros) -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar"><span class="wf-bar-label">leer_ministracion_encabezado (parametros)</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            <!-- Action Bar -->
+            <rect x="20" y="20" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+            <text x="30" y="42" font-size="10" font-weight="bold" fill="#666">Filtros:</text>
+            <rect x="80" y="27" width="120" height="21" fill="#fff" stroke="#ccc" rx="3"/> <text x="85" y="41" fill="#999" font-size="9">Documento Origen...</text>
+            <rect x="210" y="27" width="80" height="21" fill="#1B3A2D" rx="3"/> <text x="250" y="41" fill="#fff" font-size="9" text-anchor="middle">Buscar</text>
+            <!-- Grid Header -->
+            <rect x="20" y="70" width="960" height="25" fill="#1B3A2D"/>
+            <text x="30" y="86" fill="#fff" font-size="10">OFICIO</text>
+            <text x="250" y="86" fill="#fff" font-size="10">FECHA</text>
+            <text x="450" y="86" fill="#fff" font-size="10">MONTO TOTAL</text>
+            <text x="700" y="86" fill="#fff" font-size="10">ESTATUS</text>
+            <text x="880" y="86" fill="#fff" font-size="10">ACCIONES</text>
+            <!-- Empty state -->
+            <text x="500" y="150" fill="#999" font-size="12" text-anchor="middle">Utilice los filtros para buscar registros...</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: leer_ministracion_encabezado (valores) -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span class="wf-bar-label">leer_ministracion_encabezado (valores)</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            <rect x="20" y="20" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+            <text x="30" y="42" font-size="10" font-weight="bold" fill="#666">Filtros:</text>
+            <rect x="80" y="27" width="120" height="21" fill="#fff" stroke="#ccc" rx="3"/> <text x="85" y="41" fill="#333" font-size="9">DOC-2026</text>
+            <rect x="210" y="27" width="80" height="21" fill="#1B3A2D" rx="3"/> <text x="250" y="41" fill="#fff" font-size="9" text-anchor="middle">Buscar</text>
+            
+            <rect x="20" y="70" width="960" height="25" fill="#1B3A2D"/>
+            <text x="30" y="86" fill="#fff" font-size="10">OFICIO</text><text x="250" y="86" fill="#fff" font-size="10">FECHA</text><text x="450" y="86" fill="#fff" font-size="10">MONTO TOTAL</text><text x="700" y="86" fill="#fff" font-size="10">ESTATUS</text><text x="880" y="86" fill="#fff" font-size="10">ACCIONES</text>
+            
+            <rect x="20" y="95" width="960" height="30" fill="#fff" stroke="#eee"/>
+            <text x="30" y="115" font-size="11">DOC-2026-001</text><text x="250" y="115" font-size="11">15/01/2026</text><text x="450" y="115" font-size="11">$ 1,500,000.00</text>
+            <rect x="700" y="100" width="80" height="20" rx="10" fill="#FEF3C7"/> <text x="740" y="114" fill="#92400E" font-size="10" text-anchor="middle">Borrador</text>
+            <rect x="880" y="100" width="60" height="20" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/> <text x="910" y="114" fill="#0f172a" font-size="10" text-anchor="middle">Ver</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: leer_ministracion_movtos (parametros) -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span class="wf-bar-label">leer_ministracion_movtos (parametros)</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1000" height="200" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            <text x="20" y="30" font-size="12" font-weight="bold" fill="#333">Grid Detalle (Vacío)</text>
+            <rect x="20" y="50" width="960" height="25" fill="#f1f5f9" stroke="#cbd5e1"/>
+            <text x="30" y="66" fill="#475569" font-size="10" font-weight="bold">ORGANIZACIÓN (CC)</text>
+            <text x="350" y="66" fill="#475569" font-size="10" font-weight="bold">CONCEPTO</text>
+            <text x="700" y="66" fill="#475569" font-size="10" font-weight="bold">MONTO</text>
+            <text x="880" y="66" fill="#475569" font-size="10" font-weight="bold">ACCIONES</text>
+            <text x="500" y="120" fill="#999" font-size="12" text-anchor="middle">Sin detalles registrados.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF4: leer_ministracion_movtos (valores) -->
+    <div id="wf-wf4" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span class="wf-bar-label">leer_ministracion_movtos (valores)</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1000" height="250" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            <rect x="20" y="20" width="960" height="25" fill="#f1f5f9" stroke="#cbd5e1"/>
+            <text x="30" y="36" fill="#475569" font-size="10" font-weight="bold">ORGANIZACIÓN (CC)</text><text x="350" y="36" fill="#475569" font-size="10" font-weight="bold">CONCEPTO</text><text x="700" y="36" fill="#475569" font-size="10" font-weight="bold">MONTO</text><text x="880" y="36" fill="#475569" font-size="10" font-weight="bold">ACCIONES</text>
+            
+            <rect x="20" y="45" width="960" height="30" fill="#fff" stroke="#eee"/>
+            <text x="30" y="65" font-size="11">100 - TSJ</text>
+            <text x="350" y="65" font-size="11">MIN-EST (Ministración Estatal)</text>
+            <text x="700" y="65" font-size="11" font-weight="bold">$ 1,000,000.00</text>
+            <text x="880" y="65" font-size="10" fill="red">Eliminar</text>
+
+            <rect x="20" y="75" width="960" height="30" fill="#fff" stroke="#eee"/>
+            <text x="30" y="95" font-size="11">101 - JUZGADOS</text>
+            <text x="350" y="95" font-size="11">MIN-EST (Ministración Estatal)</text>
+            <text x="700" y="95" font-size="11" font-weight="bold">$ 500,000.00</text>
+            <text x="880" y="95" font-size="10" fill="red">Eliminar</text>
+
+            <rect x="20" y="105" width="960" height="30" fill="#f8fafc" stroke="#eee"/>
+            <text x="500" y="125" font-size="11" font-weight="bold" fill="#333" text-anchor="end">TOTAL:</text>
+            <text x="700" y="125" font-size="12" font-weight="bold" fill="#15803d">$ 1,500,000.00</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF5: abc_ministracion_encabezado (parametros) -->
+    <div id="wf-wf5" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span class="wf-bar-label">abc_ministracion_encabezado (parametros)</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1000" height="200" fill="#fff" stroke="#ddd"/>
+            <text x="20" y="30" font-size="14" font-weight="bold">Formulario Encabezado (Vacío)</text>
+            
+            <text x="20" y="70" font-size="11" font-weight="bold">Folio Documento *</text>
+            <rect x="20" y="80" width="200" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            
+            <text x="250" y="70" font-size="11" font-weight="bold">Fecha Documento *</text>
+            <rect x="250" y="80" width="150" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            
+            <text x="430" y="70" font-size="11" font-weight="bold">Monto Total *</text>
+            <rect x="430" y="80" width="150" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            
+            <rect x="20" y="140" width="120" height="30" fill="#94a3b8" rx="4"/>
+            <text x="80" y="160" fill="#fff" font-size="11" text-anchor="middle">Guardar Encabezado</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF6: abc_ministracion_encabezado (valores) -->
+    <div id="wf-wf6" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span class="wf-bar-label">abc_ministracion_encabezado (valores)</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1000" height="200" fill="#fff" stroke="#ddd"/>
+            <text x="20" y="30" font-size="14" font-weight="bold">Formulario Encabezado (Capturado)</text>
+            
+            <text x="20" y="70" font-size="11" font-weight="bold">Folio Documento *</text>
+            <rect x="20" y="80" width="200" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            <text x="30" y="100" font-size="12">DOC-2026-001</text>
+            
+            <text x="250" y="70" font-size="11" font-weight="bold">Fecha Documento *</text>
+            <rect x="250" y="80" width="150" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            <text x="260" y="100" font-size="12">2026-01-15</text>
+            
+            <text x="430" y="70" font-size="11" font-weight="bold">Monto Total *</text>
+            <rect x="430" y="80" width="150" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            <text x="440" y="100" font-size="12">$ 1,500,000.00</text>
+            
+            <rect x="20" y="140" width="120" height="30" fill="#1B3A2D" rx="4"/>
+            <text x="80" y="160" fill="#fff" font-size="11" text-anchor="middle">Actualizar Encabezado</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF7: abc_ministracion_movtos (parametros) -->
+    <div id="wf-wf7" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span class="wf-bar-label">abc_ministracion_movtos (parametros)</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 150" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1000" height="150" fill="#f8fafc" stroke="#ddd"/>
+            <text x="20" y="30" font-size="12" font-weight="bold">Agregar Detalle (Vacío)</text>
+            
+            <text x="20" y="60" font-size="10" font-weight="bold">Organización (CC) *</text>
+            <rect x="20" y="70" width="300" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            
+            <text x="340" y="60" font-size="10" font-weight="bold">Concepto *</text>
+            <rect x="340" y="70" width="250" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            
+            <text x="610" y="60" font-size="10" font-weight="bold">Monto *</text>
+            <rect x="610" y="70" width="150" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            
+            <rect x="780" y="70" width="80" height="30" fill="#1B3A2D" rx="4"/>
+            <text x="820" y="89" fill="#fff" font-size="11" text-anchor="middle">+ Agregar</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF8: abc_ministracion_movtos (valores) -->
+    <div id="wf-wf8" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span class="wf-bar-label">abc_ministracion_movtos (valores)</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 150" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1000" height="150" fill="#f8fafc" stroke="#ddd"/>
+            <text x="20" y="30" font-size="12" font-weight="bold">Agregar Detalle (Lleno)</text>
+            
+            <text x="20" y="60" font-size="10" font-weight="bold">Organización (CC) *</text>
+            <rect x="20" y="70" width="300" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            <text x="30" y="90" font-size="11">100 - TSJ</text>
+            
+            <text x="340" y="60" font-size="10" font-weight="bold">Concepto *</text>
+            <rect x="340" y="70" width="250" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            <text x="350" y="90" font-size="11">MIN-EST Ministración Estatal</text>
+            
+            <text x="610" y="60" font-size="10" font-weight="bold">Monto *</text>
+            <rect x="610" y="70" width="150" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+            <text x="620" y="90" font-size="11">$ 1,000,000.00</text>
+            
+            <rect x="780" y="70" width="80" height="30" fill="#1B3A2D" rx="4"/>
+            <text x="820" y="89" fill="#fff" font-size="11" text-anchor="middle">+ Agregar</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 9. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+    <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
+      <li><strong>Inmutabilidad:</strong> Al hacer clic en "Autorizar Devengo", el registro se bloquea. Cualquier error de captura en un oficio ya devengado requiere una cancelación formal (contra-póliza).</li>
+      <li><strong>Visibilidad a Caja:</strong> Un oficio NO aparecerá en el módulo `04.2.3 Registro de Ingresos (Recaudado)` a menos que tenga estatus `2=Devengado`.</li>
+    </ul>
+  </div>
+
+  <!-- 10. FLUJOS DE INTEGRACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
+    <p style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6;">
+      Alimenta directamente al módulo <code>04.2.3</code> informando a la caja central cuánto dinero se espera recibir en los próximos días/horas.
+    </p>
+  </div>
+
+  <!-- 11. AFECTACIÓN CONTABLE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Afectación Contable (Póliza de Devengo)</div>
+    <p style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; margin-bottom: 15px;">
+      Al presionar <strong>"Autorizar Devengo"</strong>, se genera la siguiente póliza automática:
+    </p>
+    <table class="props-table" style="font-size:12px;">
+      <thead>
+        <tr><th>Cargo / Abono</th><th>Tipo de Cuenta</th><th>Cuenta Específica Inyectada</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO</span></td>
+          <td>Activo (Cuentas por Cobrar)</td>
+          <td><code>1.1.2.4.XXXX</code> (Ingresos por Recuperar a Corto Plazo)</td>
+        </tr>
+        <tr>
+          <td><span style="color:#dc2626; font-weight:bold;">ABONO</span></td>
+          <td>Resultados (Ingresos)</td>
+          <td>La cuenta <code>4.2.2.1.XXXX</code> enlazada al Concepto de Ingreso.</td>
+        </tr>
+        <tr>
+          <td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO (Presupuestal)</span></td>
+          <td>Ley de Ingresos Devengada</td>
+          <td>La cuenta de clase <code>8.1.4.X</code> derivada del concepto.</td>
+        </tr>
+        <tr>
+          <td><span style="color:#dc2626; font-weight:bold;">ABONO (Presupuestal)</span></td>
+          <td>Ley de Ingresos Estimada</td>
+          <td>La cuenta de clase <code>8.1.1.X</code> derivada del concepto.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 12. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+    <table class="props-table">
+      <thead><tr><th>Fecha</th><th>Versión</th><th>Autor</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td>11-Jun-2026</td><td>1.0</td><td>Julio C. Barrales</td><td>Creación del Documento Funcional DOC-08 independiente.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+  function showWF(id, btn) {
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('wf-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+  function showSP(id, btn) {
+    document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('sp-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
