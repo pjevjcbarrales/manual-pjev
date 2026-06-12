@@ -90,6 +90,19 @@ function injectToolbar() {
       toolbar.insertBefore(btnConcepts, btnRefresh);
     }
 
+    // Si la página tiene el anexo de cuentas sugeridas, agregamos el botón
+    const accountsContainer = document.getElementById('module-suggested-accounts');
+    if (accountsContainer) {
+      const btnAccounts = document.createElement('button');
+      btnAccounts.innerText = '🏦 Cuentas Detectadas';
+      btnAccounts.style.cssText = btnStyle + " background: #0f766e; color: #fff; border-color: #0f766e;";
+      btnAccounts.onmouseover = () => btnAccounts.style.background = '#115e59';
+      btnAccounts.onmouseout = () => btnAccounts.style.background = '#0f766e';
+      
+      btnAccounts.onclick = () => showModal('Anexo: Cuentas Bancarias Detectadas en el COA', accountsContainer.innerHTML);
+      toolbar.insertBefore(btnAccounts, btnRefresh);
+    }
+
     function showModal(titleText, contentHTML) {
       const modal = document.createElement('div');
       modal.style.position = 'fixed';
