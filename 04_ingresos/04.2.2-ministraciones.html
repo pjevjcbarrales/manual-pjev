@@ -16,6 +16,15 @@
     .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
     .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
     .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel, .sp-panel { display: none; }
+    .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+    .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; }
   </style>
 </head>
 <body>
@@ -31,8 +40,8 @@
   <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <div class="elem-id">04.2.2</div>
-      <h1 class="elem-title">Ministraciones</h1>
-      <p class="elem-desc">Módulo transaccional para el registro y reconocimiento de los recursos financieros transferidos por el Gobierno (Estatal/Federal) al Poder Judicial.</p>
+      <h1 class="elem-title">Ministraciones (Devengo y Recaudado)</h1>
+      <p class="elem-desc">Módulo transaccional de dos etapas para el registro del oficio de notificación de SEFIPLAN (Devengado) y la posterior validación del depósito bancario (Recaudado).</p>
       <div class="mod-header-badges">
         <span class="mod-badge badge-a">Modo A — existe en código</span>
         <span class="mod-badge badge-s">Tipo: Análisis Funcional (DOC-08)</span>
@@ -43,8 +52,11 @@
   <!-- 1. DESCRIPCIÓN GENERAL -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-    <p>El módulo de <strong>Ministraciones</strong> es el corazón de la captación de recursos del PJEV. Aquí se registran los depósitos periódicos (generalmente mensuales) que SEFIPLAN transfiere a las cuentas recaudadoras de la institución para cubrir el presupuesto operativo.</p>
-    <p>Al capturar una ministración, el usuario vincula el depósito con una <strong>Cuenta Recaudadora</strong> (BBVA, Santander) y un <strong>Concepto de Ingreso</strong> (MIN-EST o MIN-FED). Su autorización detona en cascada los momentos contables y presupuestales de Ingreso Devengado e Ingreso Recaudado.</p>
+    <p>La recepción de Ministraciones del Gobierno del Estado (SEFIPLAN) es la principal fuente de ingresos del Poder Judicial. Operativamente, este módulo se divide en dos pantallas independientes que respetan el ciclo de vida contable:</p>
+    <ul>
+      <li><strong>Pantalla 1: Ministraciones (Devengo)</strong>. Aquí el área responsable registra el Oficio de SEFIPLAN que notifica la transferencia inminente de fondos. Este acto genera el derecho de cobro (Ingreso Devengado).</li>
+      <li><strong>Pantalla 2: Ministraciones (Recaudado)</strong>. Aquí el área de Caja/Tesorería busca los oficios devengados pendientes y, con base en su estado de cuenta, vincula el depósito a una Cuenta Bancaria Recaudadora específica. Este acto formaliza la liquidez (Ingreso Recaudado).</li>
+    </ul>
   </div>
 
   <!-- 2. MARCO NORMATIVO -->
@@ -60,11 +72,11 @@
       <tbody>
         <tr>
           <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
-          <td>Obliga a registrar simultáneamente el ingreso devengado (cuando existe el derecho de cobro o se notifica la transferencia) y el ingreso recaudado (cuando el recurso se refleja en la cuenta bancaria).</td>
+          <td>Obliga a registrar y revelar en cuentas separadas los momentos contables de los ingresos: el "Ingreso Devengado" (cuando se tiene derecho jurídico a cobrar) y el "Ingreso Recaudado" (cuando ingresa a bancos).</td>
         </tr>
         <tr>
-          <td><strong>Postulados Básicos (CONAC)</strong></td>
-          <td>"Registro e Integración Presupuestaria". Las ministraciones afectan tanto a la contabilidad financiera (activos/bancos) como a las cuentas de orden presupuestario de ingresos (Clase 8).</td>
+          <td><strong>Norma CONAC (Momentos Contables)</strong></td>
+          <td>Exige que la póliza de Devengado reconozca una Cuenta por Cobrar (Clase 1.1.2) contra el Ingreso Patrimonial (Clase 4), y la póliza de Recaudado cancele esa CxC pasándola a Bancos (1.1.1.2).</td>
         </tr>
       </tbody>
     </table>
@@ -83,14 +95,19 @@
       </thead>
       <tbody>
         <tr>
-          <td><strong>Tesorería (Cajero/Analista)</strong></td>
-          <td>Captura el registro de la ministración basándose en el estado de cuenta bancario y comprobantes de SEFIPLAN.</td>
-          <td>La captura se guarda en estatus "Borrador". No afecta contabilidad.</td>
+          <td><strong>Analista de Ingresos</strong></td>
+          <td>Captura los oficios de SEFIPLAN en la pantalla de Devengo.</td>
+          <td>Solo captura. La afectación contable requiere autorización.</td>
+        </tr>
+        <tr>
+          <td><strong>Cajero / Conciliador</strong></td>
+          <td>Opera la pantalla de Recaudado. Selecciona los oficios pendientes y captura el folio y banco del depósito real.</td>
+          <td>No puede modificar los importes originales del oficio.</td>
         </tr>
         <tr>
           <td><strong>Contabilidad (Subdirector/DGA)</strong></td>
-          <td>Revisa y Autoriza el registro capturado.</td>
-          <td>Una vez autorizado, el registro queda bloqueado. Solo puede hacer cancelaciones mediante contra-pólizas.</td>
+          <td>Autoriza ambas etapas.</td>
+          <td>Una vez autorizado cualquier momento, genera pólizas irrevocables.</td>
         </tr>
       </tbody>
     </table>
@@ -98,21 +115,28 @@
 
   <!-- 4. MODELO DE DATOS -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+    <div class="section-title"><span class="section-num">4</span> Modelo de Datos (Unificado)</div>
+    <p>Ambas pantallas operan sobre la misma tabla para garantizar la trazabilidad del proceso.</p>
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ing_ministraciones</h3>
     <table class="props-table" style="margin-bottom: 24px;">
       <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
       <tbody>
-        <tr><td><code>ministracion_id</code></td><td><code>INT (PK)</code></td><td>Identificador único del registro.</td></tr>
+        <tr><td><code>ministracion_id</code></td><td><code>INT (PK)</code></td><td>Identificador único.</td></tr>
         <tr><td><code>ejercicio</code></td><td><code>INT</code></td><td>Año fiscal (Ej. 2026).</td></tr>
-        <tr><td><code>mes</code></td><td><code>INT</code></td><td>Mes al que corresponde (1 a 12).</td></tr>
-        <tr><td><code>fecha_deposito</code></td><td><code>DATE</code></td><td>Fecha real en la que el dinero cayó al banco.</td></tr>
+        <tr><td><code>mes</code></td><td><code>INT</code></td><td>Mes contable (1 a 12).</td></tr>
         <tr><td><code>concepto_id</code></td><td><code>INT (FK)</code></td><td>Apunta a `ing_conceptos` (Ej. MIN-EST).</td></tr>
-        <tr><td><code>cuenta_recaudadora_id</code></td><td><code>INT (FK)</code></td><td>Apunta a `ing_cuentas_recaudadoras`.</td></tr>
-        <tr><td><code>monto_total</code></td><td><code>DECIMAL(18,2)</code></td><td>Monto exacto transferido.</td></tr>
-        <tr><td><code>folio_comprobante</code></td><td><code>VARCHAR(50)</code></td><td>Referencia SPEI o número de oficio.</td></tr>
-        <tr><td><code>estatus_documento</code></td><td><code>INT</code></td><td>1=Borrador, 2=Autorizado, 3=Cancelado.</td></tr>
-        <tr><td><code>poliza_id</code></td><td><code>INT (FK)</code></td><td>Apunta a la póliza generada al autorizar. Nulo si es borrador.</td></tr>
+        <tr><td colspan="3" style="background:#f1f5f9; text-align:center; font-weight:bold;">T1: Datos del Oficio (Devengo)</td></tr>
+        <tr><td><code>numero_oficio</code></td><td><code>VARCHAR(50)</code></td><td>No. de Oficio de SEFIPLAN.</td></tr>
+        <tr><td><code>fecha_oficio</code></td><td><code>DATE</code></td><td>Fecha de emisión o recepción del oficio.</td></tr>
+        <tr><td><code>monto_oficio</code></td><td><code>DECIMAL(18,2)</code></td><td>Monto notificado a recibir.</td></tr>
+        <tr><td><code>poliza_devengo_id</code></td><td><code>INT (FK)</code></td><td>ID de la póliza de Ingreso Devengado generada.</td></tr>
+        <tr><td colspan="3" style="background:#f1f5f9; text-align:center; font-weight:bold;">T2: Datos del Depósito (Recaudado)</td></tr>
+        <tr><td><code>cuenta_recaudadora_id</code></td><td><code>INT (FK)</code></td><td>Apunta a `ing_cuentas_recaudadoras`. (Nulo inicialmente).</td></tr>
+        <tr><td><code>fecha_deposito</code></td><td><code>DATE</code></td><td>Fecha real en la que el dinero cayó al banco. (Nulo inicialmente).</td></tr>
+        <tr><td><code>folio_operacion</code></td><td><code>VARCHAR(50)</code></td><td>Referencia SPEI o número de rastreo. (Nulo inicialmente).</td></tr>
+        <tr><td><code>poliza_recaudado_id</code></td><td><code>INT (FK)</code></td><td>ID de la póliza de Ingreso Recaudado generada.</td></tr>
+        <tr><td colspan="3" style="background:#f1f5f9; text-align:center; font-weight:bold;">Control</td></tr>
+        <tr><td><code>estatus_documento</code></td><td><code>INT</code></td><td>1=Borrador Devengo, 2=Devengado Autorizado, 3=Borrador Recaudado, 4=Recaudado Autorizado.</td></tr>
       </tbody>
     </table>
   </div>
@@ -121,69 +145,43 @@
   <div class="doc-section">
     <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
     
-    <style>
-      .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; }
-      .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-      .sp-tab:hover { color: var(--pjev-verde-oscuro); }
-      .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
-      .sp-panel { display: none; }
-      .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
-    </style>
-
     <div class="sp-tabs">
-      <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_ministraciones</button>
-      <button class="sp-tab" onclick="showSP('sp2',this)">fn_abc_ministraciones</button>
+      <button class="sp-tab active" onclick="showSP('sp1',this)">fn_abc_ministraciones_devengo</button>
+      <button class="sp-tab" onclick="showSP('sp2',this)">fn_abc_ministraciones_recaudado</button>
     </div>
 
-    <!-- TAB 1: LEER -->
+    <!-- TAB 1: DEVENGO -->
     <div id="sp-sp1" class="sp-panel active">
       <table class="props-table">
-        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio para listar solo el año en curso.</td></tr>
-          <tr><td><code>@p_mes</code></td><td><code>INT</code></td><td>Opcional. Para filtrar un mes específico.</td></tr>
-          <tr><td><code>@p_ministracion_id</code></td><td><code>INT</code></td><td>Opcional. Nulo para listado general.</td></tr>
+          <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Guardar Borrador Oficio, 2: Autorizar Devengo, 3: Cancelar.</td></tr>
+          <tr><td><code>@p_ministracion_id</code></td><td><code>INT</code></td><td>Nulo en Insert.</td></tr>
+          <tr><td><code>@p_numero_oficio</code></td><td><code>VARCHAR</code></td><td>Oficio SEFIPLAN.</td></tr>
+          <tr><td><code>@p_fecha_oficio</code></td><td><code>DATE</code></td><td>Fecha del oficio.</td></tr>
+          <tr><td><code>@p_monto_oficio</code></td><td><code>DECIMAL</code></td><td>Importe esperado.</td></tr>
+          <tr><td><code>@p_concepto_id</code></td><td><code>INT</code></td><td>ID del Concepto.</td></tr>
         </tbody>
       </table>
-      <table class="props-table" style="margin-top: 10px;">
-        <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td><code>{ministracion_id}</code></td><td><code>INT</code></td><td>ID de la tabla</td></tr>
-          <tr><td><code>{fecha_deposito}</code></td><td><code>DATE</code></td><td>Fecha del movimiento</td></tr>
-          <tr><td><code>{concepto_desc}</code></td><td><code>VARCHAR</code></td><td>Nombre del concepto (Ej. Ministraciones Estatales)</td></tr>
-          <tr><td><code>{banco_desc}</code></td><td><code>VARCHAR</code></td><td>Banco y cuenta (Ej. BBVA 0147754337)</td></tr>
-          <tr><td><code>{monto_total}</code></td><td><code>DECIMAL</code></td><td>Monto</td></tr>
-          <tr><td><code>{estatus_documento}</code></td><td><code>INT</code></td><td>1 Borrador, 2 Autorizado, 3 Cancelado</td></tr>
-        </tbody>
-      </table>
+      <div class="code-wrap" style="margin-top: 10px;">
+        <strong>Autorizar Devengo (Acción 2):</strong> Valida que esté en estatus 1. Cambia a estatus 2 (Devengado). Llama a <code>fn_generar_poliza</code> para crear la Póliza de Devengo (CxC vs Ingreso). 
+      </div>
     </div>
 
-    <!-- TAB 2: ABC -->
+    <!-- TAB 2: RECAUDADO -->
     <div id="sp-sp2" class="sp-panel">
       <table class="props-table">
-        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Capturar Borrador, 2: Actualizar, 3: Autorizar (Detona Pólizas), 4: Cancelar</td></tr>
-          <tr><td><code>@p_ministracion_id</code></td><td><code>INT</code></td><td>Nulo en Insert. Obligatorio en Autorizar.</td></tr>
-          <tr><td><code>@p_ejercicio</code>, <code>@p_mes</code></td><td><code>INT</code></td><td>Periodo contable.</td></tr>
-          <tr><td><code>@p_fecha_deposito</code></td><td><code>DATE</code></td><td>Fecha del estado de cuenta.</td></tr>
-          <tr><td><code>@p_concepto_id</code></td><td><code>INT</code></td><td>Referencia al concepto.</td></tr>
-          <tr><td><code>@p_cuenta_recaudadora_id</code></td><td><code>INT</code></td><td>Referencia al banco.</td></tr>
-          <tr><td><code>@p_monto_total</code></td><td><code>DECIMAL</code></td><td>Importe transferido.</td></tr>
-          <tr><td><code>@p_folio_comprobante</code></td><td><code>VARCHAR</code></td><td>Referencia bancaria o de SPEI.</td></tr>
-          <tr><td><code>@p_usuario</code></td><td><code>VARCHAR</code></td><td>Auditoría.</td></tr>
+          <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Autorizar Recaudado, 2: Cancelar Recaudado (revierte estatus a 2).</td></tr>
+          <tr><td><code>@p_ministracion_id</code></td><td><code>INT</code></td><td>Obligatorio. Debe estar en estatus 2.</td></tr>
+          <tr><td><code>@p_cuenta_recaudadora_id</code></td><td><code>INT</code></td><td>Cuenta bancaria seleccionada.</td></tr>
+          <tr><td><code>@p_fecha_deposito</code></td><td><code>DATE</code></td><td>Fecha de afectación bancaria.</td></tr>
+          <tr><td><code>@p_folio_operacion</code></td><td><code>VARCHAR</code></td><td>Clave de rastreo o SPEI.</td></tr>
         </tbody>
       </table>
-      <table class="props-table" style="margin-top: 10px;">
-        <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1 Éxito, -1 Error de validación</td></tr>
-          <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje (Ej. "Autorizado con Póliza ID 450")</td></tr>
-        </tbody>
-      </table>
-      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Lógica Interna</h3>
-      <div class="code-wrap" style="margin-top: 0;">
-        <strong>Autorizar (Acción 3):</strong> Valida que el registro esté en Borrador (1). Cambia estatus a (2). Obtiene la <code>cuenta_contable_id</code> desde <code>ing_conceptos</code> (Abono a Ingresos) y la <code>cuenta_contable_id</code> desde <code>ing_cuentas_recaudadoras</code> (Cargo a Bancos). Genera el asiento contable llamando al SP de contabilidad (<code>fn_generar_poliza</code>) registrando tanto los momentos presupuestales (Devengado y Recaudado) como el efecto financiero.
+      <div class="code-wrap" style="margin-top: 10px;">
+        <strong>Autorizar Recaudado (Acción 1):</strong> Valida estatus 2. Actualiza los campos bancarios. Cambia estatus a 4 (Recaudado). Llama a <code>fn_generar_poliza</code> para matar la CxC y cargar a Bancos, además de afectar presupuestalmente el 8.1.5.
       </div>
     </div>
   </div>
@@ -196,22 +194,26 @@
         <tr><th>Método</th><th>Endpoint</th><th>Descripción</th></tr>
       </thead>
       <tbody>
-        <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/ingresos/ministraciones</code></td><td>Llama a <code>fn_leer_ministraciones</code>. Filtra por <code>?ejercicio=2026&mes=X</code>.</td></tr>
-        <tr><td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td><td><code>/api/ingresos/ministraciones</code></td><td>Crea el Borrador. Llama a <code>fn_abc_ministraciones</code> (Acción 1).</td></tr>
-        <tr><td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td><td><code>/api/ingresos/ministraciones/:id/autorizar</code></td><td>Autoriza y genera pólizas. Llama a <code>fn_abc_ministraciones</code> (Acción 3).</td></tr>
-        <tr><td><span style="font-weight:bold; color:#dc2626;">DELETE</span></td><td><code>/api/ingresos/ministraciones/:id</code></td><td>Cancela la ministración y detona reverso contable si ya estaba autorizada.</td></tr>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/ingresos/ministraciones/devengo</code></td><td>Lista oficios capturados (Estatus 1 y 2).</td></tr>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/ingresos/ministraciones/recaudado</code></td><td>Lista oficios listos para cobro (Estatus 2) y ya cobrados (Estatus 4).</td></tr>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td><td><code>/api/ingresos/ministraciones/devengo</code></td><td>Crea el Oficio Borrador.</td></tr>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td><td><code>/api/ingresos/ministraciones/:id/autorizar-devengo</code></td><td>Genera Póliza de Devengo.</td></tr>
+        <tr><td><span style="font-weight:bold; color:#eab308;">PUT</span></td><td><code>/api/ingresos/ministraciones/:id/autorizar-recaudado</code></td><td>Actualiza datos del banco y Genera Póliza de Recaudado.</td></tr>
       </tbody>
     </table>
   </div>
 
   <!-- 7. ACCIONES DEL MÓDULO -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
-    <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
-      <li style="margin-bottom: 12px;"><strong>+ Registrar Ministración:</strong> Captura de datos básicos. El registro nace como "Borrador" y no toca el Libro Diario.</li>
-      <li style="margin-bottom: 12px;"><strong>Editar:</strong> Solo permitido si el estatus es "Borrador".</li>
-      <li style="margin-bottom: 12px;"><strong>Autorizar (Afectar):</strong> Botón crítico. Sella el registro y detona la póliza múltiple de ingreso devengado/recaudado. El botón desaparece tras el éxito.</li>
-      <li style="margin-bottom: 12px;"><strong>Ver Póliza:</strong> Disponible solo para registros autorizados. Abre en un modal la póliza contable vinculada.</li>
+    <div class="section-title"><span class="section-num">7</span> Acciones de las Pantallas</div>
+    <p><strong>Pantalla 04.2.2.1 (Devengo):</strong></p>
+    <ul style="font-size: 13px; color: var(--pjev-texto-main); padding-left: 20px; margin-bottom:10px;">
+      <li><strong>Registrar Oficio:</strong> Guarda la intención de ingreso en "Borrador".</li>
+      <li><strong>Autorizar Devengo:</strong> Fija el oficio y detona la póliza de cuentas por cobrar.</li>
+    </ul>
+    <p><strong>Pantalla 04.2.2.2 (Recaudado):</strong></p>
+    <ul style="font-size: 13px; color: var(--pjev-texto-main); padding-left: 20px;">
+      <li><strong>Registrar Depósito:</strong> Abre un modal en modo lectura de los datos del oficio, y permite capturar Banco y Fecha. Autoriza inmediatamente el cobro.</li>
     </ul>
   </div>
 
@@ -219,115 +221,143 @@
   <div class="doc-section">
     <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
     
-    <style>
-      .wf-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
-      .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-      .wf-tab:hover { color: var(--pjev-verde-oscuro); }
-      .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
-      .wf-panel { display: none; }
-      .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
-      .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
-      .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
-      .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; }
-    </style>
-
     <div class="wf-tabs">
-      <button class="wf-tab active" onclick="showWF('wf1',this)">Grid de Ministraciones</button>
-      <button class="wf-tab" onclick="showWF('wf2',this)">Modal de Captura</button>
+      <button class="wf-tab active" onclick="showWF('wf1',this)">P1: Grid Devengo</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">P1: Modal Devengo</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">P2: Grid Recaudado</button>
+      <button class="wf-tab" onclick="showWF('wf4',this)">P2: Modal Recaudado</button>
     </div>
 
-    <!-- WF1: GRID PRINCIPAL -->
+    <!-- WF1: GRID DEVENGO -->
     <div id="wf-wf1" class="wf-panel active">
       <div class="wf-box">
-        <div class="wf-bar">Listado Mensual</div>
+        <div class="wf-bar">04.2.2.1 Pantalla de Oficios (Devengo)</div>
         <div class="wf-svg-area">
           <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
             <rect x="20" y="20" width="960" height="60" fill="#fff" rx="4" stroke="#e2e8f0"/>
-            <text x="40" y="55" fill="#1B3A2D" font-family="sans-serif" font-weight="bold" font-size="18">Registro de Ministraciones</text>
-            
-            <rect x="650" y="32" width="180" height="36" fill="#fff" stroke="#ccc" rx="4"/>
-            <text x="660" y="55" fill="#666" font-size="12">Mes: Febrero ▼</text>
-
+            <text x="40" y="55" fill="#1B3A2D" font-family="sans-serif" font-weight="bold" font-size="18">Registro de Ministraciones (Oficios)</text>
             <rect x="850" y="32" width="110" height="36" fill="#1B3A2D" rx="4"/>
-            <text x="905" y="55" fill="#fff" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">+ Registrar</text>
+            <text x="905" y="55" fill="#fff" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">+ Nuevo Oficio</text>
 
             <rect x="20" y="100" width="960" height="35" fill="#f8fafc" stroke="#e2e8f0"/>
-            <text x="40" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">FECHA</text>
-            <text x="140" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">CONCEPTO</text>
-            <text x="360" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">BANCO RECEPTOR</text>
+            <text x="40" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">NO. OFICIO</text>
+            <text x="160" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">FECHA OFICIO</text>
+            <text x="280" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">CONCEPTO</text>
             <text x="600" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">MONTO</text>
             <text x="750" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">ESTATUS</text>
             <text x="850" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">ACCIONES</text>
             
-            <!-- Fila Autorizada -->
             <rect x="20" y="135" width="960" height="40" fill="#fff" stroke="#f1f5f9"/>
-            <text x="40" y="160" fill="#333" font-size="12">15/Feb/2026</text>
-            <text x="140" y="160" fill="#333" font-size="12">Ministración Estatal</text>
-            <text x="360" y="160" fill="#333" font-size="12">BBVA - 0147754337</text>
+            <text x="40" y="160" fill="#333" font-size="12">SEF/001/2026</text>
+            <text x="160" y="160" fill="#333" font-size="12">15/Feb/2026</text>
+            <text x="280" y="160" fill="#333" font-size="12">Ministración Estatal</text>
             <text x="600" y="160" fill="#333" font-size="12" font-weight="bold">$ 12,500,000.00</text>
-            <rect x="750" y="145" width="70" height="20" fill="#dcfce7" rx="10"/>
-            <text x="785" y="159" fill="#166534" font-size="10" font-weight="bold" text-anchor="middle">Autorizado</text>
+            <rect x="750" y="145" width="80" height="20" fill="#dcfce7" rx="10"/>
+            <text x="790" y="159" fill="#166534" font-size="10" font-weight="bold" text-anchor="middle">Devengado</text>
             <text x="850" y="160" fill="#0284c7" font-size="11" text-decoration="underline">Ver Póliza</text>
-
-            <!-- Fila Borrador -->
-            <rect x="20" y="175" width="960" height="40" fill="#f8fafc" stroke="#f1f5f9"/>
-            <text x="40" y="200" fill="#333" font-size="12">28/Feb/2026</text>
-            <text x="140" y="200" fill="#333" font-size="12">Ministración Federal FASP</text>
-            <text x="360" y="200" fill="#333" font-size="12">BBVA - 0126495591</text>
-            <text x="600" y="200" fill="#333" font-size="12" font-weight="bold">$ 3,200,000.00</text>
-            <rect x="750" y="185" width="70" height="20" fill="#fef9c3" rx="10"/>
-            <text x="785" y="199" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">Borrador</text>
-            <rect x="850" y="185" width="70" height="22" fill="#1B3A2D" rx="4"/>
-            <text x="885" y="200" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">✓ Autorizar</text>
           </svg>
         </div>
       </div>
     </div>
 
-    <!-- WF2: MODAL -->
+    <!-- WF2: MODAL DEVENGO -->
     <div id="wf-wf2" class="wf-panel">
       <div class="wf-box">
-        <div class="wf-bar">Formulario de Captura</div>
+        <div class="wf-bar">Modal Alta de Oficio</div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
-            <rect x="200" y="10" width="600" height="360" fill="#fff" rx="8" stroke="#ccc"/>
+          <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+            <rect x="200" y="10" width="600" height="300" fill="#fff" rx="8" stroke="#ccc"/>
             <rect x="200" y="10" width="600" height="40" fill="#1B3A2D" rx="8"/>
-            <text x="220" y="35" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="14">Registro de Ministración</text>
+            <text x="220" y="35" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="14">Registro de Oficio (Devengo)</text>
             
-            <text x="230" y="80" fill="#475569" font-size="12" font-weight="bold">Fecha de Depósito *</text>
+            <text x="230" y="80" fill="#475569" font-size="12" font-weight="bold">Número de Oficio *</text>
             <rect x="230" y="90" width="200" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
-            <text x="240" y="110" fill="#333" font-size="12">28/02/2026</text>
 
-            <text x="450" y="80" fill="#475569" font-size="12" font-weight="bold">Monto Transferido *</text>
+            <text x="450" y="80" fill="#475569" font-size="12" font-weight="bold">Fecha de Oficio *</text>
             <rect x="450" y="90" width="320" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
-            <text x="460" y="110" fill="#333" font-size="12">$ 3,200,000.00</text>
 
-            <text x="230" y="150" fill="#475569" font-size="12" font-weight="bold">Concepto (Origen) *</text>
+            <text x="230" y="150" fill="#475569" font-size="12" font-weight="bold">Concepto *</text>
             <rect x="230" y="160" width="540" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
-            <text x="240" y="180" fill="#333" font-size="12">🔍 MIN-FED Ministraciones del Gobierno Federal</text>
+            <text x="240" y="180" fill="#94a3b8" font-size="12">🔍 Buscar concepto de ingreso...</text>
 
-            <text x="230" y="220" fill="#475569" font-size="12" font-weight="bold">Cuenta Bancaria Receptora *</text>
+            <text x="230" y="220" fill="#475569" font-size="12" font-weight="bold">Monto Esperado *</text>
             <rect x="230" y="230" width="540" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
-            <text x="240" y="250" fill="#333" font-size="12">🔍 BBVA 0126495591 - FASP 2026</text>
-            
-            <text x="230" y="290" fill="#475569" font-size="12" font-weight="bold">Folio / Referencia SPEI</text>
-            <rect x="230" y="300" width="540" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
 
-            <rect x="680" y="340" width="90" height="30" fill="#1B3A2D" rx="4"/>
-            <text x="725" y="360" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Guardar</text>
+            <rect x="680" y="280" width="90" height="30" fill="#1B3A2D" rx="4"/>
+            <text x="725" y="300" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Guardar</text>
           </svg>
         </div>
       </div>
     </div>
+
+    <!-- WF3: GRID RECAUDADO -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">04.2.2.2 Pantalla de Cobros (Recaudado)</div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+            <rect x="20" y="20" width="960" height="60" fill="#fff" rx="4" stroke="#e2e8f0"/>
+            <text x="40" y="55" fill="#1B3A2D" font-family="sans-serif" font-weight="bold" font-size="18">Recepción de Ministraciones (Depósitos)</text>
+
+            <rect x="20" y="100" width="960" height="35" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="40" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">NO. OFICIO PENDIENTE</text>
+            <text x="200" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">CONCEPTO</text>
+            <text x="500" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">MONTO A COBRAR</text>
+            <text x="650" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">BANCO DE DEPÓSITO</text>
+            <text x="850" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">ACCIONES</text>
+            
+            <rect x="20" y="135" width="960" height="40" fill="#fff" stroke="#f1f5f9"/>
+            <text x="40" y="160" fill="#333" font-size="12">SEF/001/2026</text>
+            <text x="200" y="160" fill="#333" font-size="12">Ministración Estatal</text>
+            <text x="500" y="160" fill="#333" font-size="12" font-weight="bold">$ 12,500,000.00</text>
+            <text x="650" y="160" fill="#94a3b8" font-size="12"><i>Pendiente...</i></text>
+            <rect x="850" y="145" width="85" height="22" fill="#0f766e" rx="4"/>
+            <text x="892" y="160" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">Vincular Banco</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF4: MODAL RECAUDADO -->
+    <div id="wf-wf4" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">Modal Captura de Depósito</div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 380" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+            <rect x="200" y="10" width="600" height="340" fill="#fff" rx="8" stroke="#ccc"/>
+            <rect x="200" y="10" width="600" height="40" fill="#0f766e" rx="8"/>
+            <text x="220" y="35" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="14">Vincular Depósito Bancario</text>
+            
+            <!-- Resumen Lectura -->
+            <rect x="230" y="60" width="540" height="50" fill="#f8fafc" rx="4" stroke="#e2e8f0"/>
+            <text x="240" y="80" fill="#64748b" font-size="11">Resumen del Oficio Devengado:</text>
+            <text x="240" y="100" fill="#333" font-size="12" font-weight="bold">SEF/001/2026 - Ministración Estatal - $12,500,000.00</text>
+
+            <text x="230" y="150" fill="#475569" font-size="12" font-weight="bold">Cuenta Bancaria Receptora *</text>
+            <rect x="230" y="160" width="540" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
+            <text x="240" y="180" fill="#333" font-size="12">🔍 BBVA 0126495591 - FASP 2026</text>
+
+            <text x="230" y="220" fill="#475569" font-size="12" font-weight="bold">Fecha Real del Depósito *</text>
+            <rect x="230" y="230" width="200" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
+
+            <text x="450" y="220" fill="#475569" font-size="12" font-weight="bold">Folio de Rastreo Bancario</text>
+            <rect x="450" y="230" width="320" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
+
+            <rect x="650" y="300" width="120" height="30" fill="#0f766e" rx="4"/>
+            <text x="710" y="320" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Autorizar Depósito</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- 9. REGLAS DE NEGOCIO -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
     <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
-      <li><strong>Filtros de Catálogo:</strong> El select de "Concepto" debe mostrar únicamente aquellos dados de alta en el módulo <code>04.1.1</code>. El select de "Cuenta Receptora" debe mostrar las cuentas activas de <code>04.1.2</code>.</li>
-      <li><strong>Búsqueda Inteligente:</strong> Ambos selects deben implementar `SiafSelectSearch` para agilizar la captura de claves largas.</li>
-      <li><strong>Restricción de Autorización:</strong> Un registro en "Borrador" no forma parte de los reportes oficiales. Para que impacte los estados financieros, requiere obligatoriamente hacer clic en "Autorizar" (generación de póliza).</li>
+      <li><strong>Bloqueo de Importes:</strong> En la pantalla de Recaudado, el usuario no puede alterar el importe del oficio originario. Si hay una discrepancia en el dinero que cayó al banco, se debe cancelar el oficio y capturar uno nuevo con el importe correcto.</li>
+      <li><strong>Filtro en Recaudado:</strong> El Grid de recaudado <strong>solo</strong> muestra oficios cuyo estatus sea igual o mayor a 2 (Devengado). Jamás mostrará borradores (1).</li>
     </ul>
   </div>
 
@@ -335,45 +365,37 @@
   <div class="doc-section">
     <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
     <p style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6;">
-      Al autorizarse, inyecta saldo a los tableros de <strong>Disponibilidad Financiera</strong> del PJEV y resta automáticamente la meta de recaudación en la pantalla de <strong>Ley de Ingresos (04.2.1)</strong>.
+      Al autorizarse la Fase 2 (Recaudado), el sistema inyecta saldo final disponible a los tableros de <strong>Disponibilidad Financiera</strong> del PJEV.
     </p>
   </div>
 
   <!-- 11. AFECTACIÓN CONTABLE -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
-    <p style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; margin-bottom: 15px;">
-      Al presionar <strong>"Autorizar"</strong>, el sistema detona la interfaz con Contabilidad y genera una <strong>Póliza de Ingresos</strong> automática con los siguientes asientos:
-    </p>
-    <table class="props-table" style="font-size:12px;">
+    <div class="section-title"><span class="section-num">11</span> Afectación Contable (Dos Momentos CONAC)</div>
+    
+    <p style="font-size: 13px; font-weight:bold; color:var(--pjev-texto-main);">Momento A: Póliza de Devengo (Al autorizar Oficio)</p>
+    <table class="props-table" style="font-size:12px; margin-bottom: 20px;">
       <thead>
-        <tr>
-          <th>Cargo / Abono</th>
-          <th>Tipo de Cuenta</th>
-          <th>Cuenta Específica Inyectada</th>
-        </tr>
+        <tr><th>Cargo / Abono</th><th>Cuenta Específica Inyectada</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO</span></td>
-          <td>Activo (Bancos)</td>
-          <td>La cuenta <code>1.1.1.2.XXXX</code> enlazada a la Cuenta Recaudadora seleccionada.</td>
-        </tr>
-        <tr>
-          <td><span style="color:#dc2626; font-weight:bold;">ABONO</span></td>
-          <td>Resultados (Ingresos)</td>
-          <td>La cuenta <code>4.2.2.1.XXXX</code> enlazada al Concepto de Ingreso seleccionado.</td>
-        </tr>
-        <tr>
-          <td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO (Presupuestal)</span></td>
-          <td>Ley de Ingresos Recaudada</td>
-          <td>La cuenta de clase <code>8.1.5.X</code> derivada del concepto.</td>
-        </tr>
-        <tr>
-          <td><span style="color:#dc2626; font-weight:bold;">ABONO (Presupuestal)</span></td>
-          <td>Ley de Ingresos Estimada/Devengada</td>
-          <td>La cuenta de clase <code>8.1.1.X</code> o <code>8.1.4.X</code> derivada del concepto.</td>
-        </tr>
+        <tr><td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO</span></td><td><code>1.1.2.4.XXXX</code> (Cuentas por Cobrar - Ingresos)</td></tr>
+        <tr><td><span style="color:#dc2626; font-weight:bold;">ABONO</span></td><td><code>4.2.2.1.XXXX</code> (Ingresos Patrimoniales / Transferencias)</td></tr>
+        <tr><td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO Presupuestal</span></td><td><code>8.1.4.X</code> (Ley de Ingresos Devengada)</td></tr>
+        <tr><td><span style="color:#dc2626; font-weight:bold;">ABONO Presupuestal</span></td><td><code>8.1.1.X</code> (Ley de Ingresos Estimada)</td></tr>
+      </tbody>
+    </table>
+
+    <p style="font-size: 13px; font-weight:bold; color:var(--pjev-texto-main);">Momento B: Póliza de Recaudado (Al autorizar Depósito Bancario)</p>
+    <table class="props-table" style="font-size:12px;">
+      <thead>
+        <tr><th>Cargo / Abono</th><th>Cuenta Específica Inyectada</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO</span></td><td><code>1.1.1.2.XXXX</code> (Bancos) <i>De la Cuenta Recaudadora</i></td></tr>
+        <tr><td><span style="color:#dc2626; font-weight:bold;">ABONO</span></td><td><code>1.1.2.4.XXXX</code> (Cuentas por Cobrar - Cancelación)</td></tr>
+        <tr><td><span style="color:var(--pjev-success-text); font-weight:bold;">CARGO Presupuestal</span></td><td><code>8.1.5.X</code> (Ley de Ingresos Recaudada)</td></tr>
+        <tr><td><span style="color:#dc2626; font-weight:bold;">ABONO Presupuestal</span></td><td><code>8.1.4.X</code> (Ley de Ingresos Devengada)</td></tr>
       </tbody>
     </table>
   </div>
@@ -384,7 +406,8 @@
     <table class="props-table">
       <thead><tr><th>Fecha</th><th>Versión</th><th>Autor</th><th>Descripción</th></tr></thead>
       <tbody>
-        <tr><td>11-Jun-2026</td><td>1.0</td><td>Julio C. Barrales</td><td>Creación del Documento Funcional DOC-08</td></tr>
+        <tr><td>11-Jun-2026</td><td>1.1</td><td>Julio C. Barrales</td><td>Separación lógica del módulo en dos pantallas: Devengo y Recaudado, a solicitud de los procesos de Tesorería.</td></tr>
+        <tr><td>11-Jun-2026</td><td>1.0</td><td>Julio C. Barrales</td><td>Creación inicial.</td></tr>
       </tbody>
     </table>
   </div>
