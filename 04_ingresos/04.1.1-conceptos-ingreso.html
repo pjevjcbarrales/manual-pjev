@@ -2,263 +2,231 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>04.1.1 Conceptos de Ingreso</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.1.1 Conceptos de Ingreso — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
   <style>
-    body { font-family: 'Inter', sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; color: #333; }
-    .doc-header { background: linear-gradient(135deg, #1B3A2D 0%, #2a5a46 100%); color: white; padding: 30px; border-radius: 8px 8px 0 0; }
-    .doc-title { font-size: 24px; font-weight: 700; margin: 0 0 10px 0; }
-    .doc-meta { font-size: 14px; opacity: 0.9; }
-    .doc-section { background: white; padding: 30px; margin-bottom: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .section-title { font-size: 18px; font-weight: 600; color: #1B3A2D; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #DEAC50; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-    .section-num { background: #DEAC50; color: #1B3A2D; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
-    
-    .props-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-    .props-table th { background-color: #f8f9fa; color: #1B3A2D; text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; font-weight: 600; }
-    .props-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
-    .props-table tr:hover { background-color: #f8fafc; }
-    
-    .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
-    .badge-blue { background: #e0f2fe; color: #0369a1; }
-    .badge-green { background: #dcfce7; color: #15803d; }
-    .badge-gray { background: #f1f5f9; color: #475569; }
-
-    /* Estilos para Wireframes Interactivos */
-    .wf-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #cbd5e1; padding-bottom: 10px; }
-    .wf-tab { padding: 8px 16px; border: none; background: #f1f5f9; color: #475569; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .wf-tab:hover { background: #e2e8f0; }
-    .wf-tab.active { background: #1B3A2D; color: white; }
-    .wf-panel { display: none; }
-    .wf-panel.active { display: block; animation: fadeIn 0.3s; }
-    
-    .wf-box { border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc; }
-    .wf-bar { background: #e2e8f0; padding: 8px 15px; font-size: 12px; color: #64748b; font-family: monospace; border-bottom: 1px solid #cbd5e1; display: flex; justify-content: space-between; }
-    .wf-svg-area { padding: 20px; display: flex; justify-content: center; background: #fff; }
-    
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .code-wrap {
+      background: var(--code-bg); color: var(--code-text);
+      border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+      padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+    }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
   </style>
 </head>
 <body>
+<div class="doc-main-inner">
 
-  <div class="doc-header">
-    <h1 class="doc-title">Análisis Funcional: Catálogo de Conceptos de Ingreso</h1>
-    <div class="doc-meta">Módulo: 04. Ingresos > 04.1 Catálogos | Versión: 1.0 | Fecha: 11-Jun-2026</div>
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>Ingresos (CxC)</span> ›
+    <span>Catálogos</span> ›
+    <span>Conceptos de Ingreso</span>
   </div>
 
-  <!-- 1. DATOS GENERALES -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">1</span> Datos Generales del Módulo</div>
-    <table class="props-table">
-      <tbody>
-        <tr><td style="width: 25%;"><strong>ID / Código:</strong></td><td><code>04.1.1-CRI</code></td></tr>
-        <tr><td><strong>Nombre del Módulo:</strong></td><td>Mantenimiento de Conceptos de Ingreso (CRI)</td></tr>
-        <tr><td><strong>Objetivo Principal:</strong></td><td>Administrar el catálogo de conceptos por los cuales el Poder Judicial percibe ingresos (ej. Ministraciones, Copias Certificadas, Intereses), mapeándolos a sus respectivas cuentas contables de resultados y cuentas de orden presupuestal.</td></tr>
-        <tr><td><strong>Frecuencia de Uso:</strong></td><td>Baja (Solo cuando hay modificaciones normativas al Plan de Cuentas o Ley de Ingresos).</td></tr>
-      </tbody>
-    </table>
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.1.1</div>
+      <h1 class="elem-title">Conceptos de Ingreso</h1>
+      <p class="elem-desc">Catálogo maestro para clasificar normativamente el origen y naturaleza económica de los ingresos.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Modo A — existe en código</span>
+        <span class="mod-badge badge-s">Tipo: Análisis Funcional (DOC-08)</span>
+      </div>
+    </div>
   </div>
 
-  <!-- 2. DESCRIPCIÓN DEL PROCESO -->
+  <!-- 1. DESCRIPCIÓN GENERAL -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">2</span> Descripción del Proceso</div>
-    <p style="font-size: 14px; line-height: 1.6; color: #475569;">
-      Este catálogo permite a las áreas de Tesorería y Contabilidad definir la naturaleza económica de cada recurso que ingresa a las cuentas bancarias institucionales. Al dar de alta un "Concepto de Ingreso", el usuario debe obligatoriamente vincularlo a una cuenta contable de ingresos (Nivel 5, ej. <code>4.2.2.1.9101</code>) y a una cuenta presupuestal (ej. <code>8.1.1.4.4220</code>). Esta configuración es el corazón para la automatización de la "Póliza de Ingreso Recaudado".
-    </p>
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El catálogo de <strong>Conceptos de Ingreso</strong> permite a la institución registrar los distintos motivos o rubros por los cuales recauda fondos (ej. Ministraciones, Intereses Ganados, Venta de Bases). Es el cimiento normativo donde cada concepto "traduce" una operación administrativa al lenguaje contable del CONAC.</p>
+    <p>Al registrar un concepto, se define a qué <strong>Cuenta Contable de Ingresos (4.X.X.X)</strong> y a qué <strong>Cuenta Presupuestal (8.1.1.X)</strong> afectará, permitiendo que la captura operativa de recibos fluya de forma automática hacia los libros de contabilidad sin requerir que los usuarios conozcan de contabilidad gubernamental.</p>
   </div>
 
-  <!-- 3. ROLES Y PERMISOS -->
+  <!-- 2. MARCO NORMATIVO -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">3</span> Roles y Permisos</div>
-    <table class="props-table">
-      <thead><tr><th>Rol de Usuario</th><th>Permisos</th><th>Restricciones</th></tr></thead>
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Norma</th>
+          <th>Obligación que genera</th>
+        </tr>
+      </thead>
       <tbody>
         <tr>
-          <td><span class="badge badge-gray">Contabilidad / Tesorería</span></td>
-          <td>Lectura, Alta, Edición, Baja Lógica</td>
-          <td>No puede eliminar físicamente registros si ya fueron utilizados en una Póliza de Ingreso.</td>
+          <td><strong>Clasificador por Rubros de Ingresos (CRI) - CONAC</strong></td>
+          <td>El sistema debe clasificar cada ingreso en las cuentas oficiales del CRI (Impuestos, Cuotas, Contribuciones, Derechos, Productos, Aprovechamientos, Transferencias, etc.).</td>
         </tr>
         <tr>
-          <td><span class="badge badge-gray">Consulta (Auditores)</span></td>
-          <td>Lectura</td>
-          <td>No puede modificar ni dar de alta.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- 4. ENTRADAS -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">4</span> Entradas (Formulario de Captura)</div>
-    <table class="props-table">
-      <thead><tr><th>Campo</th><th>Tipo de Dato</th><th>Obligatorio</th><th>Descripción / Validación</th></tr></thead>
-      <tbody>
-        <tr><td>Clave (CRI)</td><td>Alfanumérico (10)</td><td>Sí</td><td>Identificador corto del concepto (ej. <code>MIN-EST</code>, <code>CRI-9101</code>). Debe ser único.</td></tr>
-        <tr><td>Descripción</td><td>Texto (150)</td><td>Sí</td><td>Nombre descriptivo (ej. <code>1a Ministración del mes (Estatal)</code>).</td></tr>
-        <tr><td>Cuenta Contable (4.x)</td><td>Lookup (Catálogo COA)</td><td>Sí</td><td>Cuenta de resultados acreedora (Ej. <code>4.2.2.1.9101 PROVENIENTES DE GOBIERNO ESTATAL</code>).</td></tr>
-        <tr><td>Cuenta Presupuestal (8.x)</td><td>Lookup (Catálogo COA)</td><td>Sí</td><td>Cuenta de orden para control presupuestal (Ej. <code>8.1.1.4.4220 TRANSFERENCIAS ESTIMADAS</code>).</td></tr>
-        <tr><td>Estatus</td><td>Booleano</td><td>Sí</td><td>Activo (1) o Inactivo (0).</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- 5. SALIDAS -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">5</span> Salidas (Outputs)</div>
-    <table class="props-table">
-      <thead><tr><th>Salida / Pantalla</th><th>Descripción</th></tr></thead>
-      <tbody>
-        <tr><td>Listado (Grid)</td><td>Pantalla principal con la lista de conceptos configurados, filtrable por clave, descripción o estatus.</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- 6. ACCIONES -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">6</span> Acciones (Botones y Disparadores)</div>
-    <table class="props-table">
-      <thead><tr><th>Acción</th><th>Nivel de Acceso</th><th>Comportamiento esperado</th></tr></thead>
-      <tbody>
-        <tr><td><code>[+ Nuevo]</code></td><td>Tesorería / Contabilidad</td><td>Abre el modal en blanco para capturar un nuevo concepto.</td></tr>
-        <tr><td><code>[✎ Editar]</code></td><td>Tesorería / Contabilidad</td><td>Carga los datos actuales del concepto en el modal para modificarlos.</td></tr>
-        <tr><td><code>[Guardar]</code></td><td>Tesorería / Contabilidad</td><td>Ejecuta las validaciones (RN-CAT-01, etc.) y persiste los datos en la tabla <code>ing_conceptos</code>.</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- 7. MATRIZ DE PROCESO FUNCIONAL -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">7</span> Matriz de Proceso Funcional</div>
-    <table class="props-table">
-      <thead><tr><th>Área Operativa (Tesorería)</th><th>Área Normativa (Contabilidad)</th><th>SIAF-PJEV (Sistema)</th></tr></thead>
-      <tbody>
-        <tr>
-          <td>Solicita o requiere un nuevo concepto de ingreso para clasificar un cobro (ej. "Venta de Bases"). Captura la Clave y Descripción.</td>
-          <td>Identifica y selecciona la cuenta de Ingresos (4.x) y Presupuestal (8.x) correspondiente en el COA.</td>
-          <td>Valida unicidad, guarda el registro y lo hace disponible inmediatamente en los combos de captura de Recibos.</td>
+          <td><strong>Plan de Cuentas (COA)</strong></td>
+          <td>Todo concepto debe estar obligatoriamente vinculado a una cuenta de clase 4 (Ingresos) de último nivel en el COA.</td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- 3. ROLES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Acción permitida</th>
+          <th>Restricción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Contabilidad / Normatividad</strong></td>
+          <td>Dar de alta, editar y definir el mapeo contable de los conceptos.</td>
+          <td>No puede dar de baja física si ya existen recibos ligados.</td>
+        </tr>
+        <tr>
+          <td><strong>Tesorería (Operativo)</strong></td>
+          <td>Visualización del catálogo y uso en recibos.</td>
+          <td>No puede modificar las cuentas contables vinculadas.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ing_conceptos</h3>
+    <p style="font-size: 13px; color: var(--pjev-texto-muted); margin-bottom: 8px;">Tabla maestra de conceptos.</p>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>concepto_id</code></td><td><code>INT (PK)</code></td><td>Identificador único.</td></tr>
+        <tr><td><code>clave</code></td><td><code>VARCHAR(20)</code></td><td>Clave corta y única (ej. MIN-EST).</td></tr>
+        <tr><td><code>descripcion</code></td><td><code>VARCHAR(250)</code></td><td>Nombre del concepto.</td></tr>
+        <tr><td><code>cuenta_contable_id</code></td><td><code>INT (FK)</code></td><td>Apunta a la cuenta clase 4.x del COA.</td></tr>
+        <tr><td><code>cuenta_presupuestal_id</code></td><td><code>INT (FK)</code></td><td>Apunta a la cuenta clase 8.1.1.x del COA.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>1=Activo, 0=Inactivo.</td></tr>
+        <tr><td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td><td><code>VARCHAR</code> / <code>TIMESTAMPZ</code></td><td>Auditoría.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead><tr><th>Nombre del SP</th><th>Propósito</th></tr></thead>
+      <tbody>
+        <tr><td><code>fn_leer_conceptos</code></td><td>Devuelve la lista de conceptos, con filtros opcionales por ID o estatus, cruzando con la tabla del COA para traer el nombre de las cuentas.</td></tr>
+        <tr><td><code>fn_abc_conceptos</code></td><td>Gestiona el alta (INSERT), edición (UPDATE) y baja lógica (estatus=0). Incluye la validación de unicidad de la clave.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. SERVICIOS REST -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Método</th><th>Endpoint</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/ingresos/conceptos</code></td><td>Lista los conceptos. Llama a <code>fn_leer_conceptos</code>.</td></tr>
+        <tr><td><span style="font-weight:bold; color:var(--pjev-success-text);">POST</span></td><td><code>/api/ingresos/conceptos</code></td><td>Crea un nuevo concepto. Llama a <code>fn_abc_conceptos</code>.</td></tr>
+        <tr><td><span style="font-weight:bold; color:#eab308;">PUT</span></td><td><code>/api/ingresos/conceptos/:id</code></td><td>Actualiza datos. Llama a <code>fn_abc_conceptos</code>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. ACCIONES DEL MÓDULO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+    <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
+      <li style="margin-bottom: 12px;"><strong>+ Nuevo:</strong> Abre un modal para registrar un concepto.</li>
+      <li style="margin-bottom: 12px;"><strong>Editar:</strong> Permite modificar la descripción o remapear las cuentas.</li>
+      <li style="margin-bottom: 12px;"><strong>Desactivar:</strong> Oculta el concepto de los listados operativos sin borrarlo de la base de datos (preserva el histórico).</li>
+    </ul>
   </div>
 
   <!-- 8. WIREFRAMES -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">8</span> Wireframes (Bocetos de Interfaz)</div>
+    <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
     
+    <style>
+      .wf-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+      .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+      .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+      .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+      .wf-panel { display: none; }
+      .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+      .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+      .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+      .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; }
+    </style>
+
     <div class="wf-tabs">
-      <button class="wf-tab active" onclick="showWF('wf1', this)">1. Grid Principal</button>
-      <button class="wf-tab" onclick="showWF('wf2', this)">2. Modal (Alta/Edición)</button>
+      <button class="wf-tab active" onclick="showWF('wf1',this)">Grid Principal</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">Modal Formulario</button>
     </div>
 
     <!-- WF1: GRID PRINCIPAL -->
     <div id="wf-wf1" class="wf-panel active">
       <div class="wf-box">
-        <div class="wf-bar">Grid Principal (SiafDataGrid)</div>
+        <div class="wf-bar">Listado de Conceptos</div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
-            <!-- Contenedor General -->
-            <rect x="0" y="0" width="1000" height="400" fill="#f4f7f6"/>
-            
+          <svg viewBox="0 0 1000 250" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
             <!-- Header Page -->
             <rect x="20" y="20" width="960" height="60" fill="#fff" rx="4" stroke="#e2e8f0"/>
             <text x="40" y="55" fill="#1B3A2D" font-family="sans-serif" font-weight="bold" font-size="18">Catálogo de Conceptos de Ingreso</text>
-            
-            <!-- Botón Nuevo -->
             <rect x="850" y="32" width="110" height="36" fill="#1B3A2D" rx="4"/>
             <text x="905" y="55" fill="#fff" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">+ Nuevo</text>
 
-            <!-- Grid Container -->
-            <rect x="20" y="100" width="960" height="250" fill="#fff" rx="4" stroke="#e2e8f0"/>
-            
             <!-- Grid Header -->
-            <path d="M 20 104 Q 20 100 24 100 L 976 100 Q 980 100 980 104 L 980 140 L 20 140 Z" fill="#f8fafc"/>
-            <text x="40" y="125" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">CLAVE</text>
-            <text x="140" y="125" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">DESCRIPCIÓN</text>
-            <text x="450" y="125" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">CUENTA CONTABLE</text>
-            <text x="680" y="125" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">CTA. PRESUPUESTAL</text>
-            <text x="880" y="125" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">ESTATUS</text>
-            <text x="940" y="125" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">ACCIONES</text>
-            <line x1="20" y1="140" x2="980" y2="140" stroke="#e2e8f0"/>
-
+            <rect x="20" y="100" width="960" height="35" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="40" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">CLAVE</text>
+            <text x="140" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">DESCRIPCIÓN</text>
+            <text x="450" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">CUENTA CONTABLE</text>
+            <text x="750" y="122" fill="#64748b" font-family="sans-serif" font-size="11" font-weight="bold">ESTATUS</text>
+            
             <!-- Fila 1 -->
-            <text x="40" y="170" fill="#333" font-family="sans-serif" font-size="12">MIN-EST</text>
-            <text x="140" y="170" fill="#333" font-family="sans-serif" font-size="12">Ministraciones del Gobierno Estatal</text>
-            <text x="450" y="170" fill="#333" font-family="sans-serif" font-size="12">4.2.2.1.9101 PROVENIENTES...</text>
-            <text x="680" y="170" fill="#333" font-family="sans-serif" font-size="12">8.1.1.4.4220 TRANSFERENC...</text>
-            <rect x="880" y="158" width="50" height="18" fill="#dcfce7" rx="9"/>
-            <text x="905" y="171" fill="#15803d" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle">Activo</text>
-            <text x="955" y="171" fill="#0369a1" font-family="sans-serif" font-size="14" cursor="pointer" text-anchor="middle">✎</text>
-            <line x1="20" y1="185" x2="980" y2="185" stroke="#f1f5f9"/>
-
-            <!-- Fila 2 -->
-            <text x="40" y="215" fill="#333" font-family="sans-serif" font-size="12">MIN-FED</text>
-            <text x="140" y="215" fill="#333" font-family="sans-serif" font-size="12">Ministraciones del Gobierno Federal</text>
-            <text x="450" y="215" fill="#333" font-family="sans-serif" font-size="12">4.2.2.1.9102 PROVENIENTES...</text>
-            <text x="680" y="215" fill="#333" font-family="sans-serif" font-size="12">8.1.1.4.4220 TRANSFERENC...</text>
-            <rect x="880" y="203" width="50" height="18" fill="#dcfce7" rx="9"/>
-            <text x="905" y="216" fill="#15803d" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle">Activo</text>
-            <text x="955" y="216" fill="#0369a1" font-family="sans-serif" font-size="14" cursor="pointer" text-anchor="middle">✎</text>
-            <line x1="20" y1="230" x2="980" y2="230" stroke="#f1f5f9"/>
-
-            <!-- Fila 3 -->
-            <text x="40" y="260" fill="#333" font-family="sans-serif" font-size="12">INT-BBVA</text>
-            <text x="140" y="260" fill="#333" font-family="sans-serif" font-size="12">Intereses Ganados BBVA</text>
-            <text x="450" y="260" fill="#333" font-family="sans-serif" font-size="12">4.3.1.1.0001 INTERESES...</text>
-            <text x="680" y="260" fill="#333" font-family="sans-serif" font-size="12">8.1.1.4.4310 INGRESOS FINA...</text>
-            <rect x="880" y="248" width="50" height="18" fill="#dcfce7" rx="9"/>
-            <text x="905" y="261" fill="#15803d" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle">Activo</text>
-            <text x="955" y="261" fill="#0369a1" font-family="sans-serif" font-size="14" cursor="pointer" text-anchor="middle">✎</text>
+            <rect x="20" y="135" width="960" height="30" fill="#fff" stroke="#f1f5f9"/>
+            <text x="40" y="155" fill="#333" font-family="sans-serif" font-size="12">MIN-EST</text>
+            <text x="140" y="155" fill="#333" font-family="sans-serif" font-size="12">Ministraciones del Gobierno Estatal</text>
+            <text x="450" y="155" fill="#333" font-family="sans-serif" font-size="12">4.2.2.1.9101 PROVENIENTES...</text>
+            <text x="750" y="155" fill="#15803d" font-family="sans-serif" font-size="12" font-weight="bold">Activo</text>
           </svg>
         </div>
       </div>
     </div>
 
-    <!-- WF2: MODAL FORM -->
+    <!-- WF2: MODAL -->
     <div id="wf-wf2" class="wf-panel">
       <div class="wf-box">
-        <div class="wf-bar">Modal de Edición (SiafModal)</div>
+        <div class="wf-bar">Modal Alta/Edición</div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
-            <!-- Fondo Oscurecido -->
-            <rect x="0" y="0" width="1000" height="450" fill="rgba(0,0,0,0.4)"/>
+          <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+            <rect x="200" y="10" width="600" height="320" fill="#fff" rx="8" stroke="#ccc"/>
+            <rect x="200" y="10" width="600" height="40" fill="#1B3A2D" rx="8"/>
+            <text x="220" y="35" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="14">Concepto de Ingreso</text>
             
-            <!-- Modal Box -->
-            <rect x="200" y="30" width="600" height="360" fill="#fff" rx="8" stroke="#ccc"/>
-            
-            <!-- Header Modal -->
-            <path d="M 200 38 Q 200 30 208 30 L 792 30 Q 800 30 800 38 L 800 70 L 200 70 Z" fill="#1B3A2D"/>
-            <text x="220" y="52" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="14">Concepto de Ingreso</text>
-            <rect x="730" y="40" width="50" height="20" fill="transparent" stroke="#fff" rx="4"/>
-            <text x="755" y="54" fill="#fff" font-family="sans-serif" font-size="10" text-anchor="middle">Cerrar</text>
+            <text x="230" y="80" fill="#475569" font-size="12" font-weight="bold">Clave</text>
+            <rect x="230" y="90" width="150" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
+            <text x="240" y="110" fill="#333" font-size="12">MIN-EST</text>
 
-            <!-- Formulario -->
-            <text x="230" y="100" fill="#475569" font-family="sans-serif" font-size="12" font-weight="bold">Clave del Concepto *</text>
-            <rect x="230" y="110" width="200" height="35" fill="#fff" stroke="#cbd5e1" rx="4"/>
-            <text x="240" y="132" fill="#333" font-family="sans-serif" font-size="13">MIN-EST</text>
+            <text x="230" y="140" fill="#475569" font-size="12" font-weight="bold">Cuenta Contable (Clase 4) *</text>
+            <rect x="230" y="150" width="540" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
+            <text x="240" y="170" fill="#333" font-size="12">4.2.2.1.9101 - PROVENIENTES DE GOBIERNO ESTATAL</text>
 
-            <text x="230" y="170" fill="#475569" font-family="sans-serif" font-size="12" font-weight="bold">Descripción del Concepto *</text>
-            <rect x="230" y="180" width="540" height="35" fill="#fff" stroke="#cbd5e1" rx="4"/>
-            <text x="240" y="202" fill="#333" font-family="sans-serif" font-size="13">Ministraciones del Gobierno Estatal</text>
+            <text x="230" y="210" fill="#475569" font-size="12" font-weight="bold">Cuenta Presupuestal (Clase 8) *</text>
+            <rect x="230" y="220" width="540" height="30" fill="#fff" stroke="#cbd5e1" rx="4"/>
+            <text x="240" y="240" fill="#333" font-size="12">8.1.1.4.4220 - TRANSFERENCIAS ESTIMADAS</text>
 
-            <text x="230" y="240" fill="#475569" font-family="sans-serif" font-size="12" font-weight="bold">Cuenta Contable (Clase 4) *</text>
-            <rect x="230" y="250" width="540" height="35" fill="#fff" stroke="#cbd5e1" rx="4"/>
-            <text x="240" y="272" fill="#333" font-family="sans-serif" font-size="13">4.2.2.1.9101 - PROVENIENTES DE GOBIERNO ESTATAL</text>
-            <!-- Dropdown Icon -->
-            <polygon points="750,265 760,265 755,272" fill="#64748b"/>
-
-            <text x="230" y="310" fill="#475569" font-family="sans-serif" font-size="12" font-weight="bold">Cuenta Presupuestal (Clase 8) *</text>
-            <rect x="230" y="320" width="540" height="35" fill="#fff" stroke="#cbd5e1" rx="4"/>
-            <text x="240" y="342" fill="#333" font-family="sans-serif" font-size="13">8.1.1.4.4220 - TRANSFERENCIAS ESTIMADAS</text>
-            <polygon points="750,335 760,335 755,342" fill="#64748b"/>
-
-            <!-- Separator -->
-            <line x1="200" y1="380" x2="800" y2="380" stroke="#e2e8f0" />
-            
-            <!-- Buttons -->
-            <rect x="680" y="390" width="100" height="32" fill="#1B3A2D" rx="4"/>
-            <text x="730" y="411" fill="#fff" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Guardar</text>
-            <text x="630" y="411" fill="#64748b" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Cancelar</text>
-
+            <rect x="680" y="280" width="90" height="30" fill="#1B3A2D" rx="4"/>
+            <text x="725" y="300" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Guardar</text>
           </svg>
         </div>
       </div>
@@ -268,74 +236,54 @@
   <!-- 9. REGLAS DE NEGOCIO -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
-    <table class="props-table">
-      <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><strong>RN-CAT-01</strong></td>
-          <td><strong>Unicidad de la Clave:</strong> La Clave del Concepto no puede repetirse.</td>
-          <td>El sistema rechaza el guardado y muestra alerta de duplicidad.</td>
-        </tr>
-        <tr>
-          <td><strong>RN-CAT-02</strong></td>
-          <td><strong>Restricción de Cuentas:</strong> El <em>Lookup</em> de Cuenta Contable debe filtrar exclusivamente cuentas afectables (último nivel) que comiencen con <code>4.</code> (Ingresos). El <em>Lookup</em> Presupuestal debe filtrar cuentas afectables <code>8.1.1.x</code>.</td>
-          <td>Evita errores de clasificación al generar la póliza automatizada.</td>
-        </tr>
-        <tr>
-          <td><strong>RN-CAT-03</strong></td>
-          <td><strong>Bloqueo de Baja Física:</strong> Si un concepto ya fue asignado a un "Recibo de Ingreso" o Póliza, no se permite su eliminación, únicamente cambiar su estatus a Inactivo.</td>
-          <td>Mantiene la integridad referencial histórica en la base de datos.</td>
-        </tr>
-      </tbody>
-    </table>
+    <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
+      <li><strong>Unicidad:</strong> La clave debe ser única.</li>
+      <li><strong>Filtro COA:</strong> Los comboboxes de Cuenta Contable y Presupuestal solo mostrarán cuentas afectables de último nivel.</li>
+    </ul>
   </div>
 
   <!-- 10. FLUJOS DE INTEGRACIÓN -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
-    <p style="font-size: 14px; line-height: 1.6; color: #475569;">
-      Este catálogo tiene un impacto transversal crítico: alimenta directamente los menús desplegables (comboboxes) en el módulo de <strong>04.2 Registro de Ingresos</strong>. Sin la correcta vinculación de cuentas en este catálogo, las pólizas automáticas de recaudación fallarían.
+    <p style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6;">
+      Alimenta los comboboxes de "Concepto" en el módulo de Registro de Ingresos (Recibos, Rendimientos, Ministraciones).
     </p>
   </div>
 
   <!-- 11. AFECTACIÓN CONTABLE -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
-    <table class="props-table">
-      <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><strong>NO</strong></td>
-          <td>Este módulo es de configuración maestra. Dar de alta o editar un concepto <strong>no genera ninguna póliza contable ni movimiento en libros</strong> por sí mismo. Solo establece la matriz de mapeo.</td>
-        </tr>
-      </tbody>
-    </table>
+    <p style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6;">
+      Este módulo es de mantenimiento de catálogo. Por sí solo no detona pólizas, pero establece la regla contable para las pólizas de ingreso recaudado.
+    </p>
   </div>
 
   <!-- 12. HISTORIAL DE CAMBIOS -->
-  <div class="doc-section" style="margin-bottom:40px;">
+  <div class="doc-section">
     <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
     <table class="props-table">
-      <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+      <thead><tr><th>Fecha</th><th>Versión</th><th>Autor</th><th>Descripción</th></tr></thead>
       <tbody>
-        <tr>
-          <td>11 Jun 2026</td>
-          <td>1.0</td>
-          <td>Creación del Análisis Funcional DOC-08 para Catálogo de Conceptos.</td>
-          <td>Julio César Barrales Flores</td>
-        </tr>
+        <tr><td>11-Jun-2026</td><td>1.0</td><td>Julio C. Barrales</td><td>Creación del Documento Funcional DOC-08</td></tr>
       </tbody>
     </table>
   </div>
 
-  <script src="../shared.js"></script>
-  <script>
+</div>
+<script src="../shared.js"></script>
+<script>
   function showWF(id, btn) {
     document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
     document.getElementById('wf-' + id).classList.add('active');
     btn.classList.add('active');
   }
-  </script>
+  function showSP(id, btn) {
+    document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('sp-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
 </body>
 </html>
