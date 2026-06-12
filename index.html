@@ -94,8 +94,15 @@
   .sidebar-subgroup-label:hover { color: var(--pjev-verde-oscuro); }
   .sidebar-subgroup-label::after { content: '▼'; font-size: 8px; transition: transform 0.2s; color: var(--pjev-dorado); }
   .sidebar-subgroup.collapsed .sidebar-subgroup-label::after { transform: rotate(-90deg); }
-  .sidebar-subgroup.collapsed .sidebar-link, .sidebar-subgroup.collapsed .sidebar-subgroup-label:not(:first-of-type) { display: none; }
+  .sidebar-subgroup.collapsed .sidebar-link, .sidebar-subgroup.collapsed .sidebar-subsubgroup, .sidebar-subgroup.collapsed .sidebar-subgroup-label:not(:first-of-type) { display: none; }
   .sidebar-subgroup .sidebar-link { padding-left: 28px; }
+
+  .sidebar-subsubgroup-label { cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; transition: color 0.15s; font-size: 8px; font-weight: 700; color: #9ca3af; padding: 6px 16px 4px 28px; text-transform: uppercase; letter-spacing: 1px; }
+  .sidebar-subsubgroup-label:hover { color: var(--pjev-verde-oscuro); }
+  .sidebar-subsubgroup-label::after { content: '▼'; font-size: 7px; transition: transform 0.2s; color: var(--pjev-dorado); }
+  .sidebar-subsubgroup.collapsed .sidebar-subsubgroup-label::after { transform: rotate(-90deg); }
+  .sidebar-subsubgroup.collapsed .sidebar-link { display: none; }
+  .sidebar-subsubgroup .sidebar-link { padding-left: 36px; }
 </style>
 </head>
 <body>
@@ -257,14 +264,18 @@
       <div class="sidebar-subgroup">
         <div class="sidebar-subgroup-label">03.4 · Reportes</div>
         
-        <div class="sidebar-subgroup-label" style="margin-top: 8px; color: #9ca3af; font-size: 8px;">REPORTES CONTABLES</div>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Libro Auxiliar  <span class="sidebar-id">03.4.1.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Libro Diario  <span class="sidebar-id">03.4.1.2</span></a>
+        <div class="sidebar-subsubgroup">
+          <div class="sidebar-subsubgroup-label">03.4.1 · Reportes Contables</div>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Libro Auxiliar  <span class="sidebar-id">03.4.1.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Libro Diario  <span class="sidebar-id">03.4.1.2</span></a>
+        </div>
         
-        <div class="sidebar-subgroup-label" style="margin-top: 8px; color: #9ca3af; font-size: 8px;">REPORTES FINANCIEROS</div>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Balanza de Comprobación  <span class="sidebar-id">03.4.2.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Panel de Reportes Financieros  <span class="sidebar-id">03.4.2.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Panel de Reportes Fin. (CONAC)  <span class="sidebar-id">03.4.2.3</span></a>
+        <div class="sidebar-subsubgroup">
+          <div class="sidebar-subsubgroup-label">03.4.2 · Reportes Financieros</div>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Balanza de Comprobación  <span class="sidebar-id">03.4.2.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Panel de Reportes Financieros  <span class="sidebar-id">03.4.2.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Panel de Reportes Fin. (CONAC)  <span class="sidebar-id">03.4.2.3</span></a>
+        </div>
       </div>
     </div>
     <div class="sidebar-group">
@@ -368,8 +379,22 @@
       subgroup.classList.add('collapsed');
       const label = subgroup.querySelector('.sidebar-subgroup-label');
       if (label) {
-        label.addEventListener('click', () => {
+        label.addEventListener('click', (e) => {
+          e.stopPropagation();
           subgroup.classList.toggle('collapsed');
+        });
+      }
+    });
+
+    // 2.5 Lógica del Acordeón para Sub-subgrupos
+    const subsubgroups = document.querySelectorAll('.sidebar-subsubgroup');
+    subsubgroups.forEach((subsubgroup) => {
+      subsubgroup.classList.add('collapsed');
+      const label = subsubgroup.querySelector('.sidebar-subsubgroup-label');
+      if (label) {
+        label.addEventListener('click', (e) => {
+          e.stopPropagation();
+          subsubgroup.classList.toggle('collapsed');
         });
       }
     });
