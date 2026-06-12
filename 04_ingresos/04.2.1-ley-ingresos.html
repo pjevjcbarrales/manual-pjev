@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04.2.1-ley-ingresos.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  
+  .flujo-box {
+    background:var(--code-bg); border-radius:8px;
+    padding:20px; font-family:var(--font-mono); font-size:12px;
+    color:var(--code-text); line-height:1.8; overflow-x:auto; margin-bottom: 16px;
+  }
+  
+  .table-custom {
+    width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px;
+  }
+  .table-custom th {
+    background: var(--pjev-dorado); color: white; padding: 8px 12px; text-align: left; font-weight: 600;
+  }
+  .table-custom td {
+    border: 1px solid var(--pjev-borde); padding: 8px 12px; background: white; color: var(--pjev-texto-main);
+  }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Manual Dev</a> ›
+      <span>Ingresos (CxC)</span> ›
+      <span>Registro</span> ›
+      <span>Ley de Ingresos Automática</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">04.2.1</div>
+        <h1 class="elem-title">Ley de Ingresos Automática</h1>
+        <p class="elem-desc">Módulo encargado de generar automáticamente el presupuesto de ingresos aprobado (Ley de Ingresos Estimada) y su respectiva póliza presupuestal a partir del Presupuesto de Egresos.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Modo A — existe en código</span>
+          <span class="mod-badge badge-s">Tipo: Proceso Automatizado</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">ing / registro / ley_ingresos_auto</code></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Principio y Justificación</div>
+      <p>El Poder Judicial del Estado de Veracruz opera bajo un modelo en el que la <strong>Ley de Ingresos Estimada</strong> debe ser un reflejo exacto del <strong>Presupuesto de Egresos Aprobado</strong> (Principio de Equilibrio Presupuestal).</p>
+      <p>A diferencia de la captura manual tradicional, el SIAF-PJEV infiere automáticamente la composición del ingreso a través de una <strong>Tabla de Mapeo (Matriz)</strong>. Esta tabla correlaciona los distintos sub-programas o rubros del Clasificador por Objeto del Gasto (Ej. Nómina, Operación) directamente con el Clasificador por Rubro de Ingresos (CRI), manteniendo intacta la <strong>Organización</strong> o Centro de Costo (Ej. <code>1NOM-1</code>, <code>1OPE-1</code>).</p>
+    </div>
+
+    <!-- 2. DIAGRAMA -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Flujo de Inferencia</div>
+      <p>El proceso sigue estos pasos cada vez que se aprueba o se carga un Presupuesto de Egresos:</p>
+      <div class="flujo-box">
+┌─────────────────────────┐      ┌─────────────────────────┐      ┌──────────────────────────┐
+│ 1. PRESUPUESTO EGRESOS  │      │ 2. MATRIZ DE CONVERSIÓN │      │ 3. LEY DE INGRESOS (CRI) │
+│ - Organización: 1NOM-1  │ ───► │ Si (Capítulo 1000) ───► │ ───► │ - Organización: 1NOM-1   │
+│ - Partida: Sueldos      │      │ Convertir a Rubro 90    │      │ - CRI: Subsidios / Trans.│
+│ - Monto: $X             │      │                         │      │ - Monto: $X              │
+└─────────────────────────┘      └─────────────────────────┘      └──────────────────────────┘
+      </div>
+    </div>
+
+    <!-- 3. PÓLIZA PRESUPUESTAL -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Póliza Presupuestal de Apertura</div>
+      <p>Una vez procesada la tabla de equivalencias, el sistema genera de manera completamente automática la póliza de apertura para todos los centros de costo involucrados (Organizaciones). Este registro afecta simultáneamente los momentos de estimación y asignación:</p>
+      
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Cuenta CONAC</th>
+            <th>Nombre de la Cuenta</th>
+            <th>Naturaleza</th>
+            <th>Efecto (Apertura)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>8110</code></td>
+            <td>Ley de Ingresos Estimada</td>
+            <td>Deudora</td>
+            <td><strong>Cargo</strong> por el Monto Total Aprobado</td>
+          </tr>
+          <tr>
+            <td><code>8120</code></td>
+            <td>Ley de Ingresos por Ejecutar</td>
+            <td>Acreedora</td>
+            <td><strong>Abono</strong> por el Monto Total Aprobado</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <p style="margin-top: 12px; font-size: 13px; color: #4b5563;">
+        <em>Nota: El asiento contable se desglosará a último nivel (Cuenta Contable a 5 o más niveles) dependiendo de las Fuentes de Financiamiento y los CRIs configurados en el catálogo central.</em>
+      </p>
+    </div>
+
+    <!-- 4. VALIDACIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Reglas de Validación del SIAF</div>
+      <ul style="font-size: 13px; color: var(--pjev-texto-main); line-height: 1.6; padding-left: 20px;">
+        <li>El sistema <strong>bloqueará</strong> cualquier modificación manual a los montos de la Ley de Ingresos Estimada. Cualquier ajuste deberá realizarse mediante Ampliaciones/Reducciones Presupuestales.</li>
+        <li>Debe existir coherencia matemática estricta: Total Ingresos (8110) = Total Egresos (8210).</li>
+        <li>Si se detecta una partida de Egresos que no tiene una equivalencia de CRI definida en la Matriz de Conversión, el sistema emitirá una alerta a la DGA antes de detonar la póliza automática.</li>
+      </ul>
+    </div>
+
+</div>
+</body>
+</html>
