@@ -323,140 +323,149 @@
       .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
       .wf-panel { display: none; }
       .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+      
+      /* ui-pjev-main references */
+      .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+      .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+      .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; }
     </style>
 
     <div class="wf-tabs">
       <button class="wf-tab active" onclick="showWF('wf1',this)">Grid Principal</button>
-      <button class="wf-tab" onclick="showWF('wf2',this)">Modal: Avance de Importación</button>
-      <button class="wf-tab" onclick="showWF('wf3',this)">Modal: Historial</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">Modal de Importación</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">Historial</button>
     </div>
 
     <!-- WF1: GRID -->
     <div id="wf-wf1" class="wf-panel active">
-      <div style="background:#fff; border:1px solid #ccc; border-radius:8px; padding:20px; box-shadow:0 4px 6px rgba(0,0,0,0.05); margin-bottom:20px; overflow-x:auto;">
-        <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:600px; height:auto;">
-          <!-- Navbar -->
-          <rect x="0" y="0" width="800" height="50" fill="#1B3A2D" rx="4"/>
-          <text x="20" y="30" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="16">SIAF - Ley de Ingresos</text>
-          <rect x="700" y="15" width="80" height="20" fill="#D4C9B5" rx="10"/>
-          <text x="740" y="29" fill="#1B3A2D" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle">EJERCICIO 2026</text>
-          
-          <!-- Botonera -->
-          <rect x="20" y="70" width="120" height="30" fill="#0284c7" rx="4"/>
-          <text x="80" y="89" fill="#fff" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Cargar Presupuesto</text>
-          
-          <rect x="150" y="70" width="100" height="30" fill="#166534" rx="4"/>
-          <text x="200" y="89" fill="#fff" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Autorizar (DGA)</text>
+      <div class="wf-box">
+        <div class="wf-bar">Grid View (SiafDataGrid + SiafPageHeader)</div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+            <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            
+            <!-- Filtros (SiafInput / Select) -->
+            <rect x="20" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="25" y="37" font-size="10">Ejercicio 2026</text>
+            <rect x="230" y="20" width="300" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="235" y="37" font-size="10">Todos los Centros de Costo...</text>
+            
+            <!-- Toolbar (SiafPageHeader actions) -->
+            <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+            
+            <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Registro:</text>
+            <rect x="80" y="62" width="130" height="21" fill="#1B3A2D" rx="3"/> <text x="145" y="76" fill="#fff" font-size="9" text-anchor="middle">+ CARGAR PRESUPUESTO</text>
+            
+            <line x1="220" y1="60" x2="220" y2="85" stroke="#ccc" />
+            <text x="230" y="77" font-size="10" font-weight="bold" fill="#666">Especiales:</text>
+            <rect x="290" y="62" width="120" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="350" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">✓ AUTORIZAR LOTE</text>
+            <rect x="420" y="62" width="80" height="21" fill="#fff" stroke="#dc2626" rx="3"/> <text x="460" y="76" fill="#dc2626" font-size="9" text-anchor="middle">✖ CANCELAR</text>
 
-          <rect x="260" y="70" width="80" height="30" fill="#fff" stroke="#ccc" rx="4"/>
-          <text x="300" y="89" fill="#333" font-family="sans-serif" font-size="12" text-anchor="middle">🖨 Imprimir</text>
+            <line x1="510" y1="60" x2="510" y2="85" stroke="#ccc" />
+            <text x="520" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
+            <rect x="570" y="62" width="90" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="615" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR</text>
+            <rect x="670" y="62" width="90" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="715" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">HISTORIAL</text>
 
-          <rect x="350" y="70" width="90" height="30" fill="#fff" stroke="#ccc" rx="4"/>
-          <text x="395" y="89" fill="#333" font-family="sans-serif" font-size="12" text-anchor="middle">Ver Historial</text>
+            <!-- Grid Header -->
+            <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
+            <text x="30" y="121" fill="#fff" font-size="10">ORGANIZACIÓN</text>
+            <text x="250" y="121" fill="#fff" font-size="10">CRI</text>
+            <text x="550" y="121" fill="#fff" font-size="10">MONTO ANUAL</text>
+            <text x="700" y="121" fill="#fff" font-size="10">ESTATUS</text>
+            <text x="850" y="121" fill="#fff" font-size="10">ACCIONES_FILA</text>
 
-          <rect x="690" y="70" width="90" height="30" fill="#fff" stroke="#dc2626" rx="4"/>
-          <text x="735" y="89" fill="#dc2626" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Cancelar</text>
+            <!-- Grid Row 1 -->
+            <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
+            <text x="30" y="150" font-size="11">1NOM-1 Dirección Gral. de Administración</text>
+            <text x="250" y="150" font-size="11">8110-91-01 Transferencias y Asignaciones</text>
+            <text x="550" y="150" font-size="11" font-weight="bold">$ 15,000,000.00</text>
+            <rect x="700" y="135" width="80" height="20" rx="10" fill="#FEF3C7"/> <text x="740" y="149" fill="#92400E" font-size="10" text-anchor="middle">En Captura</text>
+            <text x="850" y="150" font-size="10" fill="blue">Ver Meses</text>
 
-          <!-- Status badge -->
-          <rect x="20" y="120" width="120" height="20" fill="#fef08a" stroke="#ca8a04" rx="10"/>
-          <text x="80" y="134" fill="#854d0e" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle">ESTATUS: BORRADOR</text>
-
-          <!-- Grid -->
-          <rect x="20" y="150" width="760" height="30" fill="#f3f4f6" rx="4"/>
-          <text x="30" y="170" fill="#6b7280" font-family="sans-serif" font-size="11" font-weight="bold">ORGANIZACIÓN</text>
-          <text x="250" y="170" fill="#6b7280" font-family="sans-serif" font-size="11" font-weight="bold">CRI</text>
-          <text x="550" y="170" fill="#6b7280" font-family="sans-serif" font-size="11" font-weight="bold">MONTO ANUAL</text>
-          <text x="700" y="170" fill="#6b7280" font-family="sans-serif" font-size="11" font-weight="bold">DETALLE</text>
-
-          <!-- Row 1 -->
-          <line x1="20" y1="180" x2="780" y2="180" stroke="#e5e7eb" stroke-width="1"/>
-          <text x="30" y="200" fill="#374151" font-family="sans-serif" font-size="12" font-weight="bold">1NOM-1</text>
-          <text x="250" y="200" fill="#374151" font-family="sans-serif" font-size="12">8110-91-01 Transferencias y Asign.</text>
-          <text x="550" y="200" fill="#166534" font-family="sans-serif" font-size="12" font-weight="bold">$ 15,000,000.00</text>
-          <rect x="700" y="185" width="60" height="20" fill="#f3f4f6" stroke="#ccc" rx="4"/>
-          <text x="730" y="199" fill="#374151" font-family="sans-serif" font-size="10" text-anchor="middle">Ver Meses</text>
-
-          <!-- Row 2 -->
-          <line x1="20" y1="210" x2="780" y2="210" stroke="#e5e7eb" stroke-width="1"/>
-          <text x="30" y="230" fill="#374151" font-family="sans-serif" font-size="12" font-weight="bold">1OPE-1</text>
-          <text x="250" y="230" fill="#374151" font-family="sans-serif" font-size="12">8110-91-01 Transferencias y Asign.</text>
-          <text x="550" y="230" fill="#166534" font-family="sans-serif" font-size="12" font-weight="bold">$ 2,500,000.00</text>
-          <rect x="700" y="215" width="60" height="20" fill="#f3f4f6" stroke="#ccc" rx="4"/>
-          <text x="730" y="229" fill="#374151" font-family="sans-serif" font-size="10" text-anchor="middle">Ver Meses</text>
-
-          <!-- Footer -->
-          <line x1="20" y1="260" x2="780" y2="260" stroke="#9ca3af" stroke-width="2"/>
-          <text x="30" y="285" fill="#111827" font-family="sans-serif" font-size="14" font-weight="bold">TOTAL INGRESO ESTIMADO</text>
-          <text x="550" y="285" fill="#111827" font-family="sans-serif" font-size="14" font-weight="bold">$ 17,500,000.00</text>
-        </svg>
+            <!-- Grid Row 2 -->
+            <rect x="20" y="160" width="960" height="30" fill="#fafafa" stroke="#eee"/>
+            <text x="30" y="180" font-size="11">1OPE-1 Dirección Gral. de Administración</text>
+            <text x="250" y="180" font-size="11">8110-91-01 Transferencias y Asignaciones</text>
+            <text x="550" y="180" font-size="11" font-weight="bold">$ 2,500,000.00</text>
+            <rect x="700" y="165" width="80" height="20" rx="10" fill="#D1FAE5"/> <text x="740" y="179" fill="#065F46" font-size="10" text-anchor="middle">Autorizado</text>
+            <text x="850" y="180" font-size="10" fill="blue">Ver Meses</text>
+            
+            <!-- Grid Totals (SiafDataGrid totalRow) -->
+            <rect x="20" y="190" width="960" height="30" fill="#f4f6f5" stroke="#ccc"/>
+            <text x="30" y="210" font-size="11" font-weight="bold" fill="#1B3A2D">TOTAL INGRESO ESTIMADO</text>
+            <text x="550" y="210" font-size="11" font-weight="bold" fill="#1B3A2D">$ 17,500,000.00</text>
+          </svg>
+        </div>
       </div>
     </div>
 
     <!-- WF2: AVANCE IMPORTACIÓN -->
     <div id="wf-wf2" class="wf-panel">
-      <div style="background:#fff; border:1px solid #ccc; border-radius:8px; padding:20px; box-shadow:0 4px 6px rgba(0,0,0,0.05); margin-bottom:20px; overflow-x:auto;">
-        <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:600px; height:auto;">
-          <!-- Fondo Oscurecido -->
-          <rect x="0" y="0" width="800" height="400" fill="rgba(0,0,0,0.4)"/>
-          
-          <!-- Modal Box -->
-          <rect x="200" y="100" width="400" height="180" fill="#fff" rx="8"/>
-          <text x="400" y="130" fill="#1B3A2D" font-family="sans-serif" font-weight="bold" font-size="16" text-anchor="middle">Importando de Egresos...</text>
-          
-          <!-- Barra de progreso fondo -->
-          <rect x="230" y="160" width="340" height="20" fill="#f3f4f6" rx="10"/>
-          <!-- Barra de progreso activa -->
-          <rect x="230" y="160" width="220" height="20" fill="#0284c7" rx="10"/>
-          
-          <!-- Porcentaje -->
-          <text x="400" y="174" fill="#fff" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">65%</text>
-          
-          <!-- Texto informativo -->
-          <text x="400" y="210" fill="#6b7280" font-family="sans-serif" font-size="12" text-anchor="middle">Procesando matriz de conversión para Partida 3000...</text>
-          
-          <!-- Boton cancelar operacion -->
-          <rect x="350" y="235" width="100" height="25" fill="#f3f4f6" stroke="#ccc" rx="4"/>
-          <text x="400" y="252" fill="#374151" font-family="sans-serif" font-size="11" text-anchor="middle">Abortar</text>
-        </svg>
+      <div class="wf-box">
+        <div class="wf-bar">Loading Modal (SiafModal)</div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+            <!-- Fondo Oscurecido -->
+            <rect x="0" y="0" width="1000" height="350" fill="rgba(0,0,0,0.4)"/>
+            
+            <!-- Modal Box -->
+            <rect x="300" y="80" width="400" height="190" fill="#fff" rx="8" stroke="#ccc"/>
+            <rect x="300" y="80" width="400" height="40" fill="#f9f9f9" rx="8"/>
+            <line x1="300" y1="120" x2="700" y2="120" stroke="#eee" />
+            <text x="320" y="105" fill="#1B3A2D" font-family="sans-serif" font-weight="bold" font-size="14">Cargar Presupuesto</text>
+            
+            <!-- Spinner / Progress -->
+            <circle cx="500" cy="160" r="16" fill="none" stroke="#e5e7eb" stroke-width="4"/>
+            <path d="M 500 144 A 16 16 0 0 1 516 160" fill="none" stroke="#0284c7" stroke-width="4" stroke-linecap="round"/>
+            <text x="500" y="200" fill="#333" font-family="sans-serif" font-size="12" text-anchor="middle">Procesando matriz de conversión...</text>
+            <text x="500" y="220" fill="#666" font-family="sans-serif" font-size="10" text-anchor="middle">Por favor espere. Esto puede tardar unos minutos.</text>
+          </svg>
+        </div>
       </div>
     </div>
 
     <!-- WF3: HISTORIAL -->
     <div id="wf-wf3" class="wf-panel">
-      <div style="background:#fff; border:1px solid #ccc; border-radius:8px; padding:20px; box-shadow:0 4px 6px rgba(0,0,0,0.05); margin-bottom:20px; overflow-x:auto;">
-        <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:600px; height:auto;">
-          <!-- Fondo Oscurecido -->
-          <rect x="0" y="0" width="800" height="400" fill="rgba(0,0,0,0.4)"/>
-          
-          <!-- Modal Box -->
-          <rect x="150" y="50" width="500" height="300" fill="#fff" rx="8"/>
-          
-          <!-- Header Modal -->
-          <rect x="150" y="50" width="500" height="40" fill="#1B3A2D" rx="8"/>
-          <text x="170" y="75" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="14">Historial de Operaciones</text>
-          <text x="620" y="75" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="14" cursor="pointer">✖</text>
+      <div class="wf-box">
+        <div class="wf-bar">Timeline Modal (SiafModal + Custom Timeline)</div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px; height:auto;">
+            <!-- Fondo Oscurecido -->
+            <rect x="0" y="0" width="1000" height="350" fill="rgba(0,0,0,0.4)"/>
+            
+            <!-- Modal Box -->
+            <rect x="250" y="40" width="500" height="270" fill="#fff" rx="8" stroke="#ccc"/>
+            
+            <!-- Header Modal -->
+            <rect x="250" y="40" width="500" height="40" fill="#f9f9f9" rx="8"/>
+            <line x1="250" y1="80" x2="750" y2="80" stroke="#eee" />
+            <text x="270" y="65" fill="#1B3A2D" font-family="sans-serif" font-weight="bold" font-size="14">Historial de Operaciones</text>
+            <text x="720" y="65" fill="#666" font-family="sans-serif" font-size="14" cursor="pointer">✖</text>
 
-          <!-- Timeline item 1 -->
-          <circle cx="190" cy="120" r="6" fill="#166534"/>
-          <line x1="190" y1="126" x2="190" y2="160" stroke="#e5e7eb" stroke-width="2"/>
-          <text x="210" y="124" fill="#374151" font-family="sans-serif" font-size="12" font-weight="bold">Autorizado por DGA</text>
-          <text x="450" y="124" fill="#6b7280" font-family="sans-serif" font-size="11">02/Ene/2026 14:30 hrs</text>
-          <text x="210" y="140" fill="#6b7280" font-family="sans-serif" font-size="11">Usuario: dir_admin</text>
+            <!-- Timeline item 1 -->
+            <circle cx="290" cy="110" r="6" fill="#166534"/>
+            <line x1="290" y1="116" x2="290" y2="150" stroke="#e5e7eb" stroke-width="2"/>
+            <text x="310" y="114" fill="#333" font-family="sans-serif" font-size="12" font-weight="bold">Autorizado por DGA</text>
+            <text x="580" y="114" fill="#666" font-family="sans-serif" font-size="10">02/Ene/2026 14:30 hrs</text>
+            <text x="310" y="130" fill="#666" font-family="sans-serif" font-size="11">Usuario: dir_admin</text>
 
-          <!-- Timeline item 2 -->
-          <circle cx="190" cy="170" r="6" fill="#0284c7"/>
-          <line x1="190" y1="176" x2="190" y2="210" stroke="#e5e7eb" stroke-width="2"/>
-          <text x="210" y="174" fill="#374151" font-family="sans-serif" font-size="12" font-weight="bold">Presupuesto Cargado Exitosamente</text>
-          <text x="450" y="174" fill="#6b7280" font-family="sans-serif" font-size="11">02/Ene/2026 10:15 hrs</text>
-          <text x="210" y="190" fill="#6b7280" font-family="sans-serif" font-size="11">Usuario: sub_presupuesto</text>
+            <!-- Timeline item 2 -->
+            <circle cx="290" cy="160" r="6" fill="#0284c7"/>
+            <line x1="290" y1="166" x2="290" y2="200" stroke="#e5e7eb" stroke-width="2"/>
+            <text x="310" y="164" fill="#333" font-family="sans-serif" font-size="12" font-weight="bold">Presupuesto Cargado Exitosamente</text>
+            <text x="580" y="164" fill="#666" font-family="sans-serif" font-size="10">02/Ene/2026 10:15 hrs</text>
+            <text x="310" y="180" fill="#666" font-family="sans-serif" font-size="11">Usuario: sub_presupuesto</text>
 
-          <!-- Timeline item 3 -->
-          <circle cx="190" cy="220" r="6" fill="#dc2626"/>
-          <text x="210" y="224" fill="#374151" font-family="sans-serif" font-size="12" font-weight="bold">Cancelado por Corrección</text>
-          <text x="450" y="224" fill="#6b7280" font-family="sans-serif" font-size="11">01/Ene/2026 18:00 hrs</text>
-          <text x="210" y="240" fill="#6b7280" font-family="sans-serif" font-size="11">Usuario: dir_admin</text>
+            <!-- Timeline item 3 -->
+            <circle cx="290" cy="210" r="6" fill="#dc2626"/>
+            <text x="310" y="214" fill="#333" font-family="sans-serif" font-size="12" font-weight="bold">Cancelado por Corrección</text>
+            <text x="580" y="214" fill="#666" font-family="sans-serif" font-size="10">01/Ene/2026 18:00 hrs</text>
+            <text x="310" y="230" fill="#666" font-family="sans-serif" font-size="11">Usuario: dir_admin</text>
 
-        </svg>
+            <!-- Footer Modal -->
+            <line x1="250" y1="260" x2="750" y2="260" stroke="#eee" />
+            <rect x="650" y="270" width="80" height="26" fill="#1B3A2D" rx="4"/>
+            <text x="690" y="287" fill="#fff" font-size="11" text-anchor="middle">Cerrar</text>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
