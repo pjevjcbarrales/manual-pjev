@@ -102,6 +102,45 @@
     </table>
   </div>
 
+  <!-- 5. SALIDAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Salidas (Outputs)</div>
+    <table class="props-table">
+      <thead><tr><th>Salida / Pantalla</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td>Listado (Grid)</td><td>Pantalla principal con la lista de conceptos configurados, filtrable por clave, descripción o estatus.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. ACCIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Acciones (Botones y Disparadores)</div>
+    <table class="props-table">
+      <thead><tr><th>Acción</th><th>Nivel de Acceso</th><th>Comportamiento esperado</th></tr></thead>
+      <tbody>
+        <tr><td><code>[+ Nuevo]</code></td><td>Tesorería / Contabilidad</td><td>Abre el modal en blanco para capturar un nuevo concepto.</td></tr>
+        <tr><td><code>[✎ Editar]</code></td><td>Tesorería / Contabilidad</td><td>Carga los datos actuales del concepto en el modal para modificarlos.</td></tr>
+        <tr><td><code>[Guardar]</code></td><td>Tesorería / Contabilidad</td><td>Ejecuta las validaciones (RN-CAT-01, etc.) y persiste los datos en la tabla <code>ing_conceptos</code>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. MATRIZ DE PROCESO FUNCIONAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Matriz de Proceso Funcional</div>
+    <table class="props-table">
+      <thead><tr><th>Área Operativa (Tesorería)</th><th>Área Normativa (Contabilidad)</th><th>SIAF-PJEV (Sistema)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Solicita o requiere un nuevo concepto de ingreso para clasificar un cobro (ej. "Venta de Bases"). Captura la Clave y Descripción.</td>
+          <td>Identifica y selecciona la cuenta de Ingresos (4.x) y Presupuestal (8.x) correspondiente en el COA.</td>
+          <td>Valida unicidad, guarda el registro y lo hace disponible inmediatamente en los combos de captura de Recibos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <!-- 8. WIREFRAMES -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">8</span> Wireframes (Bocetos de Interfaz)</div>
@@ -246,6 +285,44 @@
           <td><strong>RN-CAT-03</strong></td>
           <td><strong>Bloqueo de Baja Física:</strong> Si un concepto ya fue asignado a un "Recibo de Ingreso" o Póliza, no se permite su eliminación, únicamente cambiar su estatus a Inactivo.</td>
           <td>Mantiene la integridad referencial histórica en la base de datos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 10. FLUJOS DE INTEGRACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
+    <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+      Este catálogo tiene un impacto transversal crítico: alimenta directamente los menús desplegables (comboboxes) en el módulo de <strong>04.2 Registro de Ingresos</strong>. Sin la correcta vinculación de cuentas en este catálogo, las pólizas automáticas de recaudación fallarían.
+    </p>
+  </div>
+
+  <!-- 11. AFECTACIÓN CONTABLE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+    <table class="props-table">
+      <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>NO</strong></td>
+          <td>Este módulo es de configuración maestra. Dar de alta o editar un concepto <strong>no genera ninguna póliza contable ni movimiento en libros</strong> por sí mismo. Solo establece la matriz de mapeo.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 12. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section" style="margin-bottom:40px;">
+    <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+    <table class="props-table">
+      <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>11 Jun 2026</td>
+          <td>1.0</td>
+          <td>Creación del Análisis Funcional DOC-08 para Catálogo de Conceptos.</td>
+          <td>Julio César Barrales Flores</td>
         </tr>
       </tbody>
     </table>
