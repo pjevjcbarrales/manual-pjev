@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tablero de Control de Proyecto (PM) - SIAF-PJEV</title>
+  <style>
+    :root {
+      --pjev-dorado: #DEAC50;
+      --pjev-verde-oscuro: #1B3A2D;
+      --pjev-verde-claro: #A3B18A;
+      --pjev-crema: #F4F1EA;
+      --pjev-blanco: #FFFFFF;
+      --pjev-texto: #333333;
+      --pjev-texto-muted: #666666;
+      --font-main: 'Segoe UI', system-ui, sans-serif;
+    }
+    body {
+      font-family: var(--font-main);
+      background-color: var(--pjev-crema);
+      margin: 0; padding: 20px; color: var(--pjev-texto);
+    }
+    .header {
+      background: var(--pjev-verde-oscuro);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .header h1 { margin: 0; font-size: 24px; color: var(--pjev-dorado); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card h3 { margin-top: 0; color: var(--pjev-verde-oscuro); font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .metric {
+      font-size: 32px; font-weight: bold; color: var(--pjev-dorado); margin-top: 10px;
+    }
+    .sub-metric { font-size: 13px; color: #666; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: var(--pjev-verde-oscuro); color: white; font-weight: bold; }
+    tr:hover { background: #f9f9f9; }
+    .badge { padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
+    .badge.A { background: #dcfce7; color: #166534; }
+    .badge.B { background: #fef3c7; color: #92400e; }
+    .badge.C { background: #fee2e2; color: #991b1b; }
+    
+    .prog-bar { width: 100%; background: #eee; border-radius: 4px; height: 8px; margin-top: 6px; overflow: hidden;}
+    .prog-fill { height: 100%; background: var(--pjev-dorado); }
+    
+    .siaf-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      padding: 8px 18px; border-radius: 6px; border: 1px solid transparent;
+      cursor: pointer; line-height: 1; white-space: nowrap; user-select: none;
+      transition: all 0.15s;
+    }
+    .siaf-btn-primary { background: var(--pjev-verde-oscuro); color: #fff; border-color: var(--pjev-verde-oscuro); }
+    .siaf-btn-primary:hover { background: #254a37; border-color: #254a37; box-shadow: 0 2px 6px rgba(24,49,37,0.28); }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <h1>Tablero de Control de Proyecto (PM)</h1>
+      <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Estadísticas en tiempo real de Análisis y Desarrollo</p>
+    </div>
+    <div style="text-align: right;">
+      <span style="font-size: 12px; opacity: 0.8;">Total Módulos</span><br>
+      <span id="tot-modulos" style="font-size: 28px; font-weight: bold; color: white;">0</span>
+    </div>
+  </div>
+
+
+
+  <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 style="color: var(--pjev-verde-oscuro); margin: 0;">Gráficas de Proyecto</h2>
+    <button onclick="location.reload()" class="siaf-btn siaf-btn-primary">🔄 Refrescar Tablero</button>
+  </div>
+  <div class="grid" style="grid-template-columns: 45% 55%; margin-bottom: 20px;">
+    <div class="card" style="min-height: 250px;">
+      <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Gestión de Tiempos (EVM)</h3>
+      <div style="font-size: 13px; color: #333;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+           <span>Inicio del proyecto:</span> <strong style="color:var(--pjev-verde-oscuro);">15 de Mar, 2026</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+           <span>Días transcurridos reales (AC):</span> <strong id="kpi-ac">0 días</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+           <span>Días transcurridos calculados por tareas (EV):</span> <strong id="kpi-ev" style="color:var(--pjev-verde-oscuro);">0 días</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+           <span>Días por transcurrir del proyecto (BAC):</span> <strong id="kpi-bac">0 días</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+           <span>SPI (Rendimiento de Cronograma):</span> <strong id="kpi-spi">1.0</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-top:1px solid #eee; padding-top:10px;">
+           <span>Esfuerzo restante estimado (ETC):</span> <strong id="kpi-etc">0 días</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+           <span>Fecha esperada de término:</span> <strong id="kpi-eac-date" style="color:#d97706;">--</strong>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card" style="min-height: 250px;">
+      <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Indicadores de Tareas</h3>
+      
+      <div style="margin-bottom: 20px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; margin-bottom:4px;">
+           <span>AVANCE TOTAL PROYECTO (EV)</span>
+           <span id="kpi-tot-pct">0%</span>
+        </div>
+        <div style="width:100%; background:#eee; height:12px; border-radius:6px; overflow:hidden;">
+           <div id="kpi-tot-bar" style="height:100%; background:var(--pjev-dorado); width:0%;"></div>
+        </div>
+      </div>
+      
+      <div id="kpi-devs-container" style="max-height: 180px; overflow-y: auto;">
+         <!-- Dinámico -->
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Inventario de Módulos</h3>
+    <table id="tbl-modulos">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Sistema</th>
+          <th>Desarrollador</th>
+          <th>Modo</th>
+          <th>Formulario</th>
+          <th>Avance Análisis</th>
+          <th>Avance Dev.</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="pm_data.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modulos = pmData.modulos;
+        
+        document.getElementById('tot-modulos').innerText = modulos.length;
+        
+        let sumAnalisis = 0;
+        let sumDesarrollo = 0;
+        let countA = 0, countB = 0, countC = 0;
+        let diasBase = 0;
+        let diasExtra = 0;
+        
+        let sistMap = {};
+
+        const tbody = document.querySelector('#tbl-modulos tbody');
+
+        let grouped = {};
+        
+        modulos.forEach(m => {
+          // Analisis
+          sumAnalisis += m.analisis_funcional;
+          // Desarrollo
+          sumDesarrollo += m.avance_desarrollo;
+          
+          // Tiempos
+          let dias = 0;
+          if (m.peso_dias) {
+              dias = m.peso_dias;
+              if(m.tipo_formulario === 'Simple') countA++; else countC++;
+          } else if(m.tipo_formulario === 'Simple') { 
+              countA++; dias = 1; 
+          } else if(m.tipo_formulario === 'Compuesto') { 
+              countC++; dias = 3; 
+          }
+          diasBase += dias;
+          
+          if(m.visitas) {
+             m.visitas.forEach(v => {
+                 if(v.dias_retraso_agregados) diasExtra += v.dias_retraso_agregados;
+             });
+          }
+          
+          if(!sistMap[m.sistema]) sistMap[m.sistema] = {tot:0, dev:0};
+          sistMap[m.sistema].tot += 1;
+          sistMap[m.sistema].dev += m.avance_desarrollo;
+
+          // Agrupamiento
+          if(!grouped[m.sistema]) grouped[m.sistema] = {};
+          let sub = m.subsistema || '';
+          if(!grouped[m.sistema][sub]) grouped[m.sistema][sub] = [];
+          grouped[m.sistema][sub].push({modulo: m, dias: dias});
+        });
+
+        // Render table
+        for (const [sysName, subsysMap] of Object.entries(grouped)) {
+           const sysId = sysName.replace(/[\s\.]+/g, '-').toLowerCase();
+           
+           // System Header
+           const sysTr = document.createElement('tr');
+           sysTr.style.cursor = 'pointer';
+           sysTr.className = 'sys-header collapsed';
+           sysTr.innerHTML = `<td colspan="8" style="background:var(--pjev-crema); font-weight:bold; font-size:14px; color:var(--pjev-verde-oscuro); text-transform:uppercase; border-top:2px solid var(--pjev-verde-oscuro);">
+               <span class="chevron" style="display:inline-block; transition:transform 0.2s; transform:rotate(-90deg); font-size:10px; margin-right:6px; color:var(--pjev-dorado);">▼</span> ${sysName}
+             </td>`;
+           
+           sysTr.addEventListener('click', () => {
+               const isCollapsed = sysTr.classList.toggle('collapsed');
+               const chevron = sysTr.querySelector('.chevron');
+               if(chevron) chevron.style.transform = isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
+               
+               const relatedRows = tbody.querySelectorAll(`.sys-${sysId}`);
+               relatedRows.forEach(r => {
+                   if(isCollapsed) {
+                       r.style.display = 'none';
+                   } else {
+                       if(r.classList.contains('sub-header')) {
+                           r.style.display = '';
+                       } else {
+                           const subIdMatch = Array.from(r.classList).find(c => c.startsWith('sub-'));
+                           if(subIdMatch) {
+                               const subHeader = tbody.querySelector(`.sub-header.${subIdMatch}`);
+                               if(!subHeader || !subHeader.classList.contains('collapsed')) {
+                                   r.style.display = '';
+                               }
+                           } else {
+                               r.style.display = '';
+                           }
+                       }
+                   }
+               });
+           });
+           tbody.appendChild(sysTr);
+
+           for (const [subName, items] of Object.entries(subsysMap)) {
+               const subId = subName === '' ? '' : subName.replace(/[\s\.]+/g, '-').toLowerCase() + '-' + sysId;
+               
+               // Subsystem Header
+               if (subName !== '') {
+                   const subTr = document.createElement('tr');
+                   subTr.className = `sub-header sys-${sysId} sub-${subId} collapsed`;
+                   subTr.style.cursor = 'pointer';
+                   subTr.style.display = 'none';
+                   subTr.innerHTML = `<td colspan="8" style="background:#f9fafb; font-weight:bold; font-size:11px; color:#4b5563; padding-left:20px; border-left:3px solid var(--pjev-dorado); text-transform:uppercase;">
+                       <span class="chevron" style="display:inline-block; transition:transform 0.2s; transform:rotate(-90deg); font-size:9px; margin-right:4px; color:var(--pjev-verde-oscuro);">▼</span> Subsistema: ${subName}
+                     </td>`;
+                     
+                   subTr.addEventListener('click', () => {
+                       const isCollapsed = subTr.classList.toggle('collapsed');
+                       const chevron = subTr.querySelector('.chevron');
+                       if(chevron) chevron.style.transform = isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
+                       
+                       const relatedRows = tbody.querySelectorAll(`.mod-row.sub-${subId}`);
+                       relatedRows.forEach(r => {
+                           r.style.display = isCollapsed ? 'none' : '';
+                       });
+                   });
+                   tbody.appendChild(subTr);
+               }
+               
+               // Rows
+               items.forEach(item => {
+                 const m = item.modulo;
+                 const dias = item.dias;
+                 const tr = document.createElement('tr');
+                 tr.className = `mod-row sys-${sysId} ${subId !== '' ? 'sub-'+subId : ''}`;
+                 tr.style.display = 'none';
+                 tr.innerHTML = `
+                   <td style="padding-left: ${subName !== '' ? '30px' : '12px'};"><strong>${m.id}</strong></td>
+                   <td>${m.nombre}</td>
+                   <td>${m.sistema}</td>
+                   <td style="color: var(--pjev-texto-muted); font-size: 11px;">${m.desarrollador_asignado || 'Sin asignar'}</td>
+                   <td><span class="badge ${m.modo_codigo === 'A' ? 'A' : 'B'}">Modo ${m.modo_codigo || 'B'}</span></td>
+                   <td><span class="badge ${m.tipo_formulario === 'Simple' ? 'A' : 'C'}">${m.tipo_formulario} (${dias}d)</span></td>
+                   <td>${(m.analisis_funcional * 100).toFixed(0)}%</td>
+                   <td>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="width:30px;">${(m.avance_desarrollo * 100).toFixed(0)}%</span>
+                        <div class="prog-bar" style="margin:0; width:50px; background:#ddd;"><div class="prog-fill" style="width:${m.avance_desarrollo*100}%; background:#166534;"></div></div>
+                        ${(m.iteracion_desarrollo === 2 || m.estado === '2da Iteración') ? 
+                          (m.avance_desarrollo === 1.0 && m.estado === 'Terminado' ? 
+                            '<span style="font-size: 9px; background: #DCFCE7; color: #166534; padding: 2px 6px; border-radius: 4px; border: 1px solid #86EFAC; font-weight: bold; white-space: nowrap;">✅ 2da Iter. Lista</span>' : 
+                            '<span style="font-size: 9px; background: #FEF3C7; color: #92400E; padding: 2px 6px; border-radius: 4px; border: 1px solid #FDE68A; font-weight: bold; white-space: nowrap;">🔨 2da Iteración</span>'
+                          ) : ''}
+                      </div>
+                   </td>
+                 `;
+                 tbody.appendChild(tr);
+               });
+           }
+        }
+
+        // ----------------------------------------------------
+        // LOGICA EVM PMP
+        // ----------------------------------------------------
+        const startDate = new Date('2026-03-15T00:00:00');
+        const today = new Date();
+        
+        function getBusinessDays(start, end) {
+            let count = 0;
+            let cur = new Date(start.getTime());
+            while(cur <= end) {
+                const day = cur.getDay();
+                if(day !== 0 && day !== 6) count++;
+                cur.setDate(cur.getDate() + 1);
+            }
+            return count;
+        }
+
+        function addBusinessDays(start, daysToAdd) {
+            let cur = new Date(start.getTime());
+            let added = 0;
+            // Assuming 0 is Sunday and 6 is Saturday
+            while(added < daysToAdd) {
+                cur.setDate(cur.getDate() + 1);
+                const day = cur.getDay();
+                if(day !== 0 && day !== 6) added++;
+            }
+            return cur;
+        }
+        
+        let ac = getBusinessDays(startDate, today);
+        let ev = 0;
+        let bac = 0;
+        let devStats = {};
+        
+        modulos.forEach(m => {
+            let dDev = m.peso_dias || (m.tipo_formulario === 'Simple' ? 1 : 3);
+            let dAna = 0.5;
+            
+            bac += (dDev + dAna);
+            ev += (dDev * m.avance_desarrollo) + (dAna * m.analisis_funcional);
+            
+            // Stats por desarrollador (Desarrollo)
+            let dev = m.desarrollador_asignado || 'Sin asignar';
+            if(!devStats[dev]) devStats[dev] = { bac: 0, ev: 0, iter2: 0, tasks: 0 };
+            devStats[dev].bac += dDev;
+            devStats[dev].ev += (dDev * m.avance_desarrollo);
+            devStats[dev].tasks++;
+            
+            if(m.iteracion_desarrollo && m.iteracion_desarrollo > 1 && m.estado !== 'Terminado') {
+                devStats[dev].iter2++;
+            }
+            
+            // Stats por analista (Análisis Funcional)
+            let ana = m.analista_asignado;
+            if(ana) {
+                if(!devStats[ana]) devStats[ana] = { bac: 0, ev: 0, iter2: 0, tasks: 0 };
+                devStats[ana].bac += dAna;
+                devStats[ana].ev += (dAna * m.analisis_funcional);
+                devStats[ana].tasks++;
+            }
+        });
+        
+        let spi = ac > 0 ? (ev / ac) : 1;
+        if(isNaN(spi) || !isFinite(spi)) spi = 1;
+        
+        let maxRemaining = 0;
+        Object.values(devStats).forEach(s => {
+            let rem = s.bac - s.ev;
+            if(rem > maxRemaining) maxRemaining = rem;
+        });
+        
+        let etc = maxRemaining;
+        let remainingDays = spi > 0 ? etc / spi : etc;
+        
+        let eacDate = new Date(today.getTime());
+        let daysToAdd = Math.ceil(remainingDays);
+        while(daysToAdd > 0) {
+            eacDate.setDate(eacDate.getDate() + 1);
+            const day = eacDate.getDay();
+            if(day !== 0 && day !== 6) daysToAdd--;
+        }
+        
+        document.getElementById('kpi-ac').innerText = ac + ' días';
+        document.getElementById('kpi-bac').innerText = bac + ' días';
+        document.getElementById('kpi-ev').innerText = ev.toFixed(1) + ' días';
+        
+        const spiEl = document.getElementById('kpi-spi');
+        spiEl.innerText = spi.toFixed(2);
+        spiEl.style.color = spi >= 1 ? 'var(--pjev-verde-oscuro)' : '#dc2626';
+        
+        document.getElementById('kpi-etc').innerText = etc.toFixed(1) + ' días';
+        document.getElementById('kpi-eac-date').innerText = isNaN(eacDate.getTime()) ? '--' : eacDate.toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' });
+        
+        let totPct = bac > 0 ? (ev / bac * 100) : 0;
+        document.getElementById('kpi-tot-pct').innerText = totPct.toFixed(1) + '%';
+        document.getElementById('kpi-tot-bar').style.width = totPct + '%';
+        
+        const devsContainer = document.getElementById('kpi-devs-container');
+        Object.keys(devStats).sort().forEach(dev => {
+            let stat = devStats[dev];
+            let pct = stat.bac > 0 ? (stat.ev / stat.bac * 100) : 0;
+            
+            let taskBadge = `<span style="font-size:10px; color:#555; background:#e5e7eb; padding:2px 6px; border-radius:10px; margin-left:6px; font-weight:600;">${stat.tasks} tareas</span>`;
+            let iterBadge = stat.iter2 > 0 ? `<span style="font-size:10px; background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:10px; margin-left:6px; font-weight:600;">${stat.iter2} en 2da iter</span>` : '';
+            
+            // Calculate finish date
+            let finishDate = addBusinessDays(startDate, Math.ceil(stat.bac));
+            let dateStr = isNaN(finishDate.getTime()) ? '--' : finishDate.toLocaleDateString('es-MX', { month: 'short', day: 'numeric' });
+
+            let html = `
+              <div style="margin-bottom: 12px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; align-items:flex-end;">
+                   <div>
+                       <strong>${dev}</strong> ${taskBadge} ${iterBadge}<br>
+                       <span style="font-size:10px; color:#666;">Carga: <strong>${stat.bac} días</strong> | Est. Término: <strong>${dateStr}</strong></span>
+                   </div>
+                   <span style="font-weight:bold;">${pct.toFixed(1)}%</span>
+                </div>
+                <div style="width:100%; background:#eee; height:8px; border-radius:4px; overflow:hidden;">
+                   <div style="height:100%; background:var(--pjev-verde-claro); width:${pct}%;"></div>
+                </div>
+              </div>
+            `;
+            devsContainer.innerHTML += html;
+        });
+    });
+  </script>
+</body>
+</html>

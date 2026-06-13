@@ -164,4 +164,112 @@ function injectToolbar() {
 document.addEventListener('DOMContentLoaded', () => {
   markActiveSidebarLink();
   injectToolbar();
+  
+  // No inyectar en el index o dashboard
+  if (window.self !== window.top && location.pathname.indexOf('dashboard') === -1) {
+    loadPMDataAndInject();
+  }
 });
+
+function loadPMDataAndInject() {
+  const isRoot = location.pathname.split('/').pop() === 'home.html' || location.pathname.split('/').pop() === 'en_construccion.html';
+  const scriptPath = isRoot ? 'pm_data.js' : '../pm_data.js';
+  
+  const script = document.createElement('script');
+  script.src = scriptPath;
+  script.onload = () => {
+    if (typeof pmData !== 'undefined') injectPMCard();
+  };
+  document.head.appendChild(script);
+}
+
+function injectPMCard() {
+  const filename = location.pathname.split('/').pop();
+  const match = filename.match(/^(\d+\.\d+(\.\d+)?(\.\d+)?)/);
+  if (!match) return; // No es un modulo con ID estándar en el nombre
+  
+  const moduleId = match[1];
+  const mod = pmData.modulos.find(m => m.id === moduleId);
+  
+  if (!mod) return;
+  
+  const devName = mod.desarrollador_asignado || 'Sin asignar';
+  const avance = (mod.avance_desarrollo * 100).toFixed(0);
+  const iteraciones = mod.iteracion_desarrollo || 1;
+  const dias = mod.tipo_formulario === 'Simple' ? 1 : 3;
+  
+  const pmBanner = document.createElement('div');
+  pmBanner.style.background = '#F4F1EA';
+  pmBanner.style.border = '1px solid #DEAC50';
+  pmBanner.style.borderLeft = '4px solid #DEAC50';
+  pmBanner.style.padding = '10px 15px';
+  pmBanner.style.borderRadius = '4px';
+  pmBanner.style.margin = '20px 0 0 0'; // Ajustado para estar dentro de la sección
+  pmBanner.style.fontFamily = 'var(--font-main, sans-serif)';
+  pmBanner.style.fontSize = '12px';
+  pmBanner.style.display = 'block';
+  pmBanner.style.color = '#333';
+  
+  let visitasHtml = '';
+  if (mod.visitas && mod.visitas.length > 0) {
+    visitasHtml = `
+      <div style="margin-top: 15px; border-top: 1px dashed #DEAC50; padding-top: 10px;">
+        <strong style="color: #1B3A2D; font-size: 11px; text-transform: uppercase;">Detalle de Iteraciones</strong>
+        <table style="width: 100%; margin-top: 8px; font-size: 11px; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid #d1d5db; color: #4b5563; text-align: left;">
+              <th style="padding-bottom: 4px;">Fecha</th>
+              <th style="padding-bottom: 4px;">Desarrollador</th>
+              <th style="padding-bottom: 4px;">Avance</th>
+              <th style="padding-bottom: 4px;">Notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${mod.visitas.map(v => `
+              <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 4px 0;">${v.fecha || ''}</td>
+                <td style="padding: 4px 0;"><strong>${v.desarrollador || ''}</strong></td>
+                <td style="padding: 4px 0; color: #166534; font-weight: bold;">${((v.avance_reportado || 0) * 100).toFixed(0)}%</td>
+                <td style="padding: 4px 0; color: #4b5563;">${v.notas || ''}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+  
+  pmBanner.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong style="color: #1B3A2D; font-size: 13px;">📋 Estatus de Desarrollo (PM: ${mod.id})</strong>
+        <div style="margin-top: 4px; color: #666;">
+          <b>Asignado actual:</b> ${devName} &nbsp;|&nbsp;
+          <b>Iteraciones:</b> ${iteraciones} &nbsp;|&nbsp;
+          <b>Proyectado:</b> ${dias} días
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-weight: bold; color: #1B3A2D;">Avance Global</div>
+        <div style="font-size: 18px; color: #DEAC50; font-weight: bold;">${avance}%</div>
+      </div>
+    </div>
+    ${visitasHtml}
+  `;
+  
+  // Buscar la sección de Historial de Cambios (usualmente la última)
+  const sections = document.querySelectorAll('.doc-section');
+  let targetSection = sections.length > 0 ? sections[sections.length - 1] : null;
+  
+  if (targetSection) {
+    targetSection.appendChild(pmBanner);
+  } else {
+    const docMain = document.querySelector('.doc-main');
+    if (docMain) {
+      docMain.appendChild(pmBanner);
+    } else {
+      document.body.appendChild(pmBanner);
+    }
+  }
+}
+

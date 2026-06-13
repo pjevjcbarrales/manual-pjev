@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>02.3.5-eaepe-clasif-admin.html</title>
+<title>02.3.4.5-eaepe-clasif-func.html</title>
 <link rel="stylesheet" href="../shared.css">
 <style>
   body { padding: 36px 44px 80px; background: var(--pjev-crema); }
@@ -19,50 +19,42 @@
 <body>
 <div class="doc-main-inner">
     <div class="elem-breadcrumb">
-      <a href="../index.html">Análisis Funcional</a> › <span>Presupuesto</span> › <span>Imprimir</span> › <span>EAepe - Clasif. Admin.</span>
+      <a href="../index.html">Análisis Funcional</a> › <span>Presupuesto</span> › <span>Imprimir</span> › <span>EAepe - Funcional</span>
     </div>
     <div class="elem-header">
       <div>
-        <div class="elem-id">02.3.5</div>
-        <h1 class="elem-title">Estado Analítico del Ejercicio del Presupuesto de Egresos<br>Clasificación Administrativa</h1>
-        <p class="elem-desc">Reporte normativo CONAC que agrupa el avance del gasto de acuerdo a los ejecutores directos (Órganos, Direcciones, Juzgados).</p>
+        <div class="elem-id">02.3.4.5</div>
+        <h1 class="elem-title">EAepe - Clasif. Funcional</h1>
         <div class="mod-header-badges"><span class="mod-badge badge-p" style="background:#e0e7ff; color:#3730a3; border-color:#c7d2fe;">Reporte CONAC LGCG</span></div>
       </div>
     </div>
     <div class="doc-section">
       <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-      <p>Este reporte se genera directamente desde la Tabla Temporal de la Consola. Agrupa las afectaciones utilizando únicamente el segmento de Unidad Administrativa de la clave presupuestal.</p>
+      <p>Agrupa el avance financiero según el propósito de estado del gasto (ej. Gobierno, Justicia, Seguridad Nacional).</p>
     </div>
     <!-- 3. LÓGICA DE NEGOCIO Y PERSISTENCIA -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">3</span> Lógica de Negocio y Persistencia</div>
-      <p><strong>Origen de Datos:</strong> Tabla Temporal de la Consola <code>tmp_rep_avance_presup_{uuid}</code>.</p>
-      <table class="props-table">
-        <thead><tr><th>Regla de Agrupación</th><th>Columnas CONAC</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>
-              <code>GROUP BY unidad_administrativa_id, desc_unidad</code><br>
-              Se omiten los segmentos de Programa, Proyecto, y Partida Genérica.
-            </td>
-            <td>
-              Se realiza un <code>SUM()</code> de las columnas: Aprobado, Ampliaciones, Reducciones, Modificado, Devengado, Pagado y Subejercicio sobre todas las partidas de esa Unidad Administrativa.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <p><strong>Origen de Datos:</strong> Tabla Temporal <code>tmp_rep_avance_presup_{uuid}</code>.</p>
+      <p><strong>Lógica de Agrupación:</strong> Basado en el segmento "Funcional" de la Clave Presupuestal. Agrupa en los niveles:</p>
+      <ul class="role-list" style="margin-left: 20px;">
+        <li><strong>Finalidad:</strong> Ej. "1 Gobierno".</li>
+        <li><strong>Función:</strong> Ej. "1.2 Justicia".</li>
+        <li><strong>Subfunción:</strong> Ej. "1.2.1 Impartición de Justicia".</li>
+      </ul>
+      <p>Cruza los IDs del segmento funcional con el catálogo <code>cat_finalidad_funcion</code> para traer la descripción normativa de CONAC.</p>
     </div>
 
     <div class="doc-section">
       <div class="section-title"><span class="section-num">4a</span> Visualización Aproximada del Reporte</div>
       <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Output (CONAC Administrativo)</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Output (CONAC Funcional)</span></div>
           <div class="wf-svg-area" style="background:#fff;">
             <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg">
               <text x="500" y="30" fill="#1B3A2D" font-size="12" font-weight="bold" text-anchor="middle">ESTADO ANALÍTICO DEL EJERCICIO DEL PRESUPUESTO DE EGRESOS</text>
-              <text x="500" y="45" fill="#333" font-size="11" font-weight="bold" text-anchor="middle">CLASIFICACIÓN ADMINISTRATIVA</text>
+              <text x="500" y="45" fill="#333" font-size="11" font-weight="bold" text-anchor="middle">CLASIFICACIÓN FUNCIONAL (FINALIDAD Y FUNCIÓN)</text>
               <rect x="20" y="80" width="960" height="30" fill="#1B3A2D" rx="2"/>
-              <text x="30" y="99" fill="#fff" font-size="9" font-weight="bold">CONCEPTO (UNIDAD ADMINISTRATIVA)</text>
+              <text x="30" y="99" fill="#fff" font-size="9" font-weight="bold">CONCEPTO</text>
               <text x="380" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">APROBADO</text>
               <text x="470" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">AMP/RED</text>
               <text x="560" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">MODIFICADO</text>
@@ -71,12 +63,12 @@
               <text x="850" y="99" fill="#fff" font-size="9" font-weight="bold" text-anchor="end">SUBEJERCICIO</text>
               
               <rect x="20" y="110" width="960" height="24" fill="#f0f7f3"/>
-              <text x="30" y="126" fill="#1B3A2D" font-size="10">Órgano de Fiscalización Superior</text>
+              <text x="30" y="126" fill="#1B3A2D" font-size="10">1 Gobierno</text>
               <text x="380" y="126" fill="#333" font-size="10" text-anchor="end">1,000,000.00</text>
               <text x="470" y="126" fill="#333" font-size="10" text-anchor="end">0.00</text>
               <text x="560" y="126" fill="#333" font-size="10" text-anchor="end">1,000,000.00</text>
               <text x="650" y="126" fill="#333" font-size="10" text-anchor="end">500,000.00</text>
-              <text x="740" y="126" fill="#333" font-size="10" text-anchor="end">400,000.00</text>
+              <text x="740" y="126" fill="#333" font-size="10" text-anchor="end">500,000.00</text>
               <text x="850" y="126" fill="#1B3A2D" font-size="10" font-weight="bold" text-anchor="end">500,000.00</text>
             </svg>
           </div>
