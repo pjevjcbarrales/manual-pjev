@@ -138,7 +138,15 @@
     </div>
   </div>
   <div class="card">
-    <h3>Inventario de Módulos</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+      <h3 style="margin: 0; border: none; padding: 0;">Inventario de Módulos</h3>
+      <div>
+        <label for="filtro-dev" style="font-size: 12px; font-weight: bold; color: var(--pjev-verde-oscuro);">Filtrar por Programador:</label>
+        <select id="filtro-dev" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; margin-left: 8px;">
+          <option value="ALL">Todos los desarrolladores</option>
+        </select>
+      </div>
+    </div>
     <table id="tbl-modulos">
       <thead>
         <tr>
@@ -288,7 +296,7 @@
                    <td style="padding-left: ${subName !== '' ? '30px' : '12px'};"><strong>${m.id}</strong></td>
                    <td>${m.nombre}</td>
                    <td>${m.sistema}</td>
-                   <td style="color: var(--pjev-texto-muted); font-size: 11px;">${m.desarrollador_asignado || 'Sin asignar'}</td>
+                   <td class="dev-name-cell" style="color: var(--pjev-texto-muted); font-size: 11px;">${m.desarrollador_asignado || 'Sin asignar'}</td>
                    <td><span class="badge ${m.modo_codigo === 'A' ? 'A' : 'B'}">Modo ${m.modo_codigo || 'B'}</span></td>
                    <td><span class="badge ${m.tipo_formulario === 'Simple' ? 'A' : 'C'}">${m.tipo_formulario} (${dias}d)</span></td>
                    <td>${(m.analisis_funcional * 100).toFixed(0)}%</td>
@@ -434,6 +442,92 @@
             `;
             devsContainer.innerHTML += html;
         });
+        
+
+        // Populate Developer Filter
+        const filtroDev = document.getElementById('filtro-dev');
+        Object.keys(devStats).sort().forEach(dev => {
+            if (dev !== 'Sin asignar') {
+                const opt = document.createElement('option');
+                opt.value = dev;
+                opt.innerText = dev;
+                filtroDev.appendChild(opt);
+            }
+        });
+        
+        // Add "Sin asignar" at the end if it exists
+        if (devStats['Sin asignar']) {
+            const opt = document.createElement('option');
+            opt.value = 'Sin asignar';
+            opt.innerText = 'Sin asignar';
+            filtroDev.appendChild(opt);
+        }
+        
+        // Filter logic
+        filtroDev.addEventListener('change', (e) => {
+            const selectedDev = e.target.value;
+            const rows = document.querySelectorAll('.mod-row');
+            
+            rows.forEach(row => {
+                const devCell = row.querySelector('.dev-name-cell');
+                if (!devCell) return;
+                
+                const devName = devCell.innerText.trim();
+                if (selectedDev === 'ALL' || devName === selectedDev) {
+                    row.classList.remove('filtered-out');
+                } else {
+                    row.classList.add('filtered-out');
+                }
+            });
+            
+            // Adjust visibility of rows and headers
+            const sysHeaders = document.querySelectorAll('.sys-header');
+            const subHeaders = document.querySelectorAll('.sub-header');
+            
+            sysHeaders.forEach(header => {
+                const sysId = header.className.match(/sys-([^ ]+)/)[1];
+                const relatedRows = document.querySelectorAll(`.mod-row.sys-${sysId}:not(.filtered-out)`);
+                if (relatedRows.length === 0) {
+                    header.style.display = 'none';
+                } else {
+                    header.style.display = '';
+                    if (selectedDev !== 'ALL') {
+                        header.classList.remove('collapsed');
+                        header.querySelector('.chevron').style.transform = 'rotate(0deg)';
+                    }
+                }
+            });
+            
+            subHeaders.forEach(header => {
+                const subId = header.className.match(/sub-([^ ]+)/)[1];
+                const relatedRows = document.querySelectorAll(`.mod-row.sub-${subId}:not(.filtered-out)`);
+                if (relatedRows.length === 0) {
+                    header.style.display = 'none';
+                } else {
+                    header.style.display = '';
+                    if (selectedDev !== 'ALL') {
+                        header.classList.remove('collapsed');
+                        header.querySelector('.chevron').style.transform = 'rotate(0deg)';
+                        relatedRows.forEach(r => r.style.display = '');
+                    }
+                }
+            });
+            
+            // Re-apply display none to rows inside collapsed headers if ALL is selected
+            if (selectedDev === 'ALL') {
+                subHeaders.forEach(header => {
+                    const subId = header.className.match(/sub-([^ ]+)/)[1];
+                    const isCollapsed = header.classList.contains('collapsed');
+                    const relatedRows = document.querySelectorAll(`.mod-row.sub-${subId}`);
+                    relatedRows.forEach(r => r.style.display = isCollapsed ? 'none' : '');
+                });
+            } else {
+                // If specific dev, show all their rows
+                document.querySelectorAll('.mod-row:not(.filtered-out)').forEach(r => r.style.display = '');
+                document.querySelectorAll('.mod-row.filtered-out').forEach(r => r.style.display = 'none');
+            }
+        });
+        
     });
   </script>
 </body>
