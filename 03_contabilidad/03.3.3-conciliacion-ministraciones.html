@@ -7,19 +7,24 @@
 <link rel="stylesheet" href="../shared.css">
 <style>
   body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
   .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
   .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
   .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
   
-  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
-  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
-  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
-  .wf-panel { display:none; }
-  .wf-panel.active { display:block; }
-  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
-  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
-  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
-  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  .wireframe-tabs, .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+  .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; text-align:center; }
 </style>
 </head>
 <body>
@@ -75,15 +80,18 @@
     <!-- 4. Modelo de Datos -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p>El esquema obtiene los datos de <code>ingresos.ing_ministraciones</code> cruzados contra lo efectivamente recaudado en SIAF.</p>
+      <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ing_ministraciones</h3>
       <table class="props-table">
         <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-        <tr><td><code>MINIST_ID</code></td><td><code>BIGINT (PK)</code></td><td>ID del registro del calendario.</td></tr>
-        <tr><td><code>MES</code> / <code>ANIO</code></td><td><code>INT</code></td><td>Mes correspondiente a la partida.</td></tr>
-        <tr><td><code>MONTO_AUTORIZADO</code></td><td><code>NUMERIC(18,2)</code></td><td>Lo que la Gaceta Oficial dice que debería llegar.</td></tr>
-        <tr><td><code>MONTO_RECAUDADO</code></td><td><code>NUMERIC(18,2)</code></td><td>Lo que realmente está contabilizado en SIAF (Pólizas de Ingreso).</td></tr>
-        <tr><td><code>DIFERENCIA</code></td><td><code>NUMERIC(18,2)</code></td><td>Campo calculado (Autorizado - Recaudado).</td></tr>
-        <tr><td><code>OBSERVACIONES</code></td><td><code>TEXT</code></td><td>Justificación si existe diferencia (Ej. Recorte estatal).</td></tr>
+        <tr><td><code>ministracion_id</code></td><td><code>INT (PK)</code></td><td>ID del registro del calendario.</td></tr>
+        <tr><td><code>ejercicio</code></td><td><code>INT</code></td><td>Año fiscal (Ej. 2026).</td></tr>
+        <tr><td><code>mes</code></td><td><code>INT</code></td><td>Mes al que corresponde (1 a 12).</td></tr>
+        <tr><td><code>monto_autorizado</code></td><td><code>DECIMAL(18,2)</code></td><td>Lo que la Gaceta Oficial dice que debería llegar.</td></tr>
+        <tr><td><code>observaciones</code></td><td><code>TEXT</code></td><td>Justificación si existe diferencia (Ej. Recorte estatal).</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Default 1. Control lógico.</td></tr>
+        <tr><td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td><td><code>VARCHAR</code> / <code>TIMESTAMPZ</code></td><td>Campos de auditoría por defecto.</td></tr>
         </tbody>
       </table>
     </div>
@@ -91,17 +99,107 @@
     <!-- 5. Stored Procedures -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
-      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong><code>fn_leer_conciliacion_ministraciones</code></strong>
-          <br><span style="color:#666">IN:</span> <code>@ejercicio_fiscal</code>
-          <br><span style="color:#666">OUT:</span> Array de 12 meses cruzando tabla de Autorizado vs Tabla de Pólizas de Ingreso de Subsidio.
-        </li>
-        <li><strong><code>fn_guardar_observaciones_ministracion</code></strong>
-          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@minist_id</code>, <code>@observaciones</code>
-          <br><span style="color:#666">OUT:</span> <code>{status}</code>. Actualiza la narrativa del acta de cierre.
-        </li>
-      </ul>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_conciliacion_ministraciones</button>
+        <button class="sp-tab" onclick="showSP('sp2',this)">fn_guardar_observaciones_ministracion</button>
+      </div>
+
+      <!-- TAB 1: LEER -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Ejercicio fiscal (Ej. 2026).</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{mes}</code></td><td><code>INT</code></td><td>Mes de 1 a 12.</td></tr>
+            <tr><td><code>{monto_autorizado}</code></td><td><code>DECIMAL</code></td><td>De la tabla ing_ministraciones.</td></tr>
+            <tr><td><code>{monto_recaudado}</code></td><td><code>DECIMAL</code></td><td>Suma de pólizas recaudadas en ese mes.</td></tr>
+            <tr><td><code>{diferencia}</code></td><td><code>DECIMAL</code></td><td>Autorizado menos Recaudado.</td></tr>
+            <tr><td><code>{observaciones}</code></td><td><code>TEXT</code></td><td>Justificación.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 1. LEER CONCILIACIÓN DE MINISTRACIONES
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">contabilidad.fn_leer_conciliacion_ministraciones</span>(
+    p_ejercicio <span style="color:#c678dd;">INT</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> (
+        <span style="color:#c678dd;">SELECT</span> 
+            m.mes,
+            m.monto_autorizado,
+            <span style="color:#56b6c2;">COALESCE</span>(r.monto_recaudado, <span style="color:#d19a66;">0</span>) <span style="color:#c678dd;">AS</span> monto_recaudado,
+            (m.monto_autorizado - <span style="color:#56b6c2;">COALESCE</span>(r.monto_recaudado, <span style="color:#d19a66;">0</span>)) <span style="color:#c678dd;">AS</span> diferencia,
+            m.observaciones
+        <span style="color:#c678dd;">FROM</span> ingresos.ing_ministraciones m
+        <span style="color:#c678dd;">LEFT JOIN</span> (
+            <span style="color:#5c6370;">-- Subconsulta que suma las pólizas de recaudo agrupadas por mes</span>
+            <span style="color:#c678dd;">SELECT</span> <span style="color:#c678dd;">EXTRACT</span>(MONTH <span style="color:#c678dd;">FROM</span> i.fecha_deposito) <span style="color:#c678dd;">AS</span> mes_rec, <span style="color:#c678dd;">SUM</span>(i.monto_total) <span style="color:#c678dd;">AS</span> monto_recaudado
+            <span style="color:#c678dd;">FROM</span> ingresos.ing_ingresos i
+            <span style="color:#c678dd;">WHERE</span> i.ejercicio = p_ejercicio <span style="color:#c678dd;">AND</span> i.estatus_documento = <span style="color:#d19a66;">4</span>
+            <span style="color:#c678dd;">GROUP BY</span> <span style="color:#d19a66;">1</span>
+        ) r <span style="color:#c678dd;">ON</span> m.mes = r.mes_rec
+        <span style="color:#c678dd;">WHERE</span> m.ejercicio = p_ejercicio
+        <span style="color:#c678dd;">ORDER BY</span> m.mes
+    ) t;
+    
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: GUARDAR OBS -->
+      <div id="sp-sp2" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_ministracion_id</code></td><td><code>INT</code></td><td>ID de la ministración.</td></tr>
+            <tr><td><code>@p_observaciones</code></td><td><code>TEXT</code></td><td>Justificación.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1 para éxito.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 2. GUARDAR OBSERVACIONES
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">contabilidad.fn_guardar_observaciones_ministracion</span>(
+    p_ministracion_id <span style="color:#c678dd;">INT</span>,
+    p_observaciones <span style="color:#c678dd;">TEXT</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">UPDATE</span> ingresos.ing_ministraciones
+    <span style="color:#c678dd;">SET</span> observaciones = p_observaciones,
+        fecha_m = <span style="color:#c678dd;">CURRENT_TIMESTAMP</span>
+    <span style="color:#c678dd;">WHERE</span> ministracion_id = p_ministracion_id;
+    
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Observación guardada'</span>);
+<span style="color:#c678dd;">END</span>;
+$$;
+</pre>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 6. Servicios REST -->
@@ -421,6 +519,12 @@ function showWF(id, btn) {
   document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
   btn.classList.add('active');
 }
 </script>

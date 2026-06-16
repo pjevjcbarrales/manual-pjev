@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.4.1.2 Libro Diario Contable — SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs, .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+  .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; text-align:center; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.4.1.2 Libro Diario Contable</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.4.1.2</div>
+        <h1 class="elem-title">Libro Diario Contable</h1>
+        <p class="elem-desc">Reporte oficial exigido por el CONAC (Normativa SIAF) que detalla analíticamente los movimientos de cada cuenta contable en un periodo determinado.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Reporte Financiero (DOC-08)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El <strong>Libro Diario</strong> es el registro contable principal donde se asientan, en orden cronológico, todas las operaciones económicas (pólizas) realizadas por la institución durante un periodo determinado.</p>
+      <p>Este reporte permite visualizar de manera resumida o detallada cada evento contable, asegurando la aplicación del principio de partida doble (Sumas Iguales) en cada póliza antes de su pase al Libro Mayor o Libro Auxiliar.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table" style="margin-bottom: 24px;">
+        <thead><tr><th>Norma</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td><strong>LGCG (Art. 33 y 34)</strong></td><td>La contabilidad gubernamental deberá llevarse, como mínimo, en un Libro Diario y un Libro Mayor.</td></tr>
+          <tr><td><strong>CONAC</strong></td><td>Emitir reportes diarios o por periodo que evidencien el registro cronológico de los asientos contables indicando cuentas, cargos y abonos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Director de Contabilidad</strong></td><td>Consulta sin restricciones de fechas ni centros de costo. Emite el Libro Diario Oficial para la Cuenta Pública.</td></tr>
+          <tr><td><strong>Analista Contable</strong></td><td>Consulta el Libro Diario para conciliaciones diarias de su unidad o centro de costo asignado.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p>El reporte extrae información transaccional principalmente de la tabla de Pólizas y sus Movimientos. Estas tablas incluyen por defecto los 4 valores de auditoría estándar del PJEV.</p>
+      
+      <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">Tabla de Encabezado: contabilidad.cont_polizas</h3>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo (PG)</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>poliza_id</code></td><td><code>SERIAL</code></td><td>PK.</td></tr>
+        <tr><td><code>ejercicio</code></td><td><code>INT</code></td><td>Ejercicio fiscal.</td></tr>
+        <tr><td><code>fecha</code></td><td><code>DATE</code></td><td>Fecha contable.</td></tr>
+        <tr><td><code>tipo</code></td><td><code>VARCHAR(5)</code></td><td>PD, PE, PI, PCH.</td></tr>
+        <tr><td><code>numero</code></td><td><code>INT</code></td><td>Consecutivo por tipo.</td></tr>
+        <tr><td><code>folio</code></td><td><code>VARCHAR(20)</code></td><td>Folio alfanumérico.</td></tr>
+        <tr><td><code>descripcion</code></td><td><code>TEXT</code></td><td>Concepto general.</td></tr>
+        <tr><td><code>estatus_codigo</code></td><td><code>SMALLINT</code></td><td>0=Registrada, 1=Enviada, 2=Autorizada, 3=Afectada.</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR</code> / <code>TIMESTAMP</code></td><td>Auditoría Creación.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR</code> / <code>TIMESTAMP</code></td><td>Auditoría Modificación.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Estatus lógico (1=Activo).</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-top: 15px; margin-bottom: 8px;">Tabla de Detalle: contabilidad.cont_polizas_detalles</h3>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo (PG)</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code>movimiento_id</code></td><td><code>SERIAL</code></td><td>PK.</td></tr>
+        <tr><td><code>poliza_id</code></td><td><code>INT</code></td><td>FK a cont_polizas.</td></tr>
+        <tr><td><code>cuenta_contable_id</code></td><td><code>INT</code></td><td>FK a cat_cuentas_contables.</td></tr>
+        <tr><td><code>debe</code></td><td><code>NUMERIC(18,2)</code></td><td>Monto cargo.</td></tr>
+        <tr><td><code>haber</code></td><td><code>NUMERIC(18,2)</code></td><td>Monto abono.</td></tr>
+        <tr><td><code>centro_costo_id</code></td><td><code>INT</code></td><td>Filtro opcional.</td></tr>
+        <tr><td><code>fuente_fin_id</code></td><td><code>INT</code></td><td>Filtro opcional.</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR</code> / <code>TIMESTAMP</code></td><td>Auditoría Creación.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR</code> / <code>TIMESTAMP</code></td><td>Auditoría Modificación.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Estatus lógico (1=Activo).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures (SPs) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">sp_cont_leer_libro_diario</button>
+      </div>
+
+      <!-- TAB 1: GENERAR -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio a consultar.</td></tr>
+            <tr><td><code>p_fecha_ini</code> / <code>_fin</code></td><td><code>DATE</code></td><td>Rango de Fechas.</td></tr>
+            <tr><td><code>p_tipos</code></td><td><code>TEXT</code></td><td>'PD,PE,PI,PCH'.</td></tr>
+            <tr><td><code>p_folio_ini</code> / <code>_fin</code></td><td><code>TEXT</code></td><td>Rango de folios opcional.</td></tr>
+            <tr><td><code>p_centro_costo_id</code></td><td><code>INTEGER</code></td><td>Filtro Centro Costo.</td></tr>
+            <tr><td><code>p_fuente_fin_id</code></td><td><code>INTEGER</code></td><td>Filtro Fuente Fin.</td></tr>
+            <tr><td><code>p_estatus</code></td><td><code>TEXT</code></td><td>'3'.</td></tr>
+            <tr><td><code>p_modo</code></td><td><code>TEXT</code></td><td>'RESUMEN' o 'DETALLE'.</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición Funcional (PostgreSQL PL/pgSQL Completo)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- Genera Libro Diario Contable
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">contabilidad.sp_cont_leer_libro_diario</span>(
+    p_ejercicio <span style="color:#c678dd;">INTEGER</span>,
+    p_fecha_ini <span style="color:#c678dd;">DATE</span>,
+    p_fecha_fin <span style="color:#c678dd;">DATE</span>,
+    p_tipos <span style="color:#c678dd;">TEXT DEFAULT</span> <span style="color:#98c379;">'PD,PE,PI,PCH'</span>,
+    p_folio_ini <span style="color:#c678dd;">TEXT DEFAULT NULL</span>,
+    p_folio_fin <span style="color:#c678dd;">TEXT DEFAULT NULL</span>,
+    p_centro_costo_id <span style="color:#c678dd;">INTEGER DEFAULT NULL</span>,
+    p_fuente_fin_id <span style="color:#c678dd;">INTEGER DEFAULT NULL</span>,
+    p_estatus <span style="color:#c678dd;">TEXT DEFAULT</span> <span style="color:#98c379;">'3'</span>,
+    p_modo <span style="color:#c678dd;">TEXT DEFAULT</span> <span style="color:#98c379;">'RESUMEN'</span>
+) <span style="color:#c678dd;">RETURNS TABLE</span> (...) <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">BEGIN</span>
+  <span style="color:#5c6370;">-- Lógica interna:</span>
+  <span style="color:#5c6370;">-- 1. Validar parámetros requeridos y convertir texto delimitado por comas a arreglos.</span>
+  <span style="color:#5c6370;">-- 2. IF p_modo = 'DETALLE', cruzar cont_polizas con cont_polizas_detalles, filtrando estatus y fechas.</span>
+  <span style="color:#5c6370;">-- 3. IF p_modo = 'RESUMEN', agrupar cont_polizas_detalles a nivel de póliza (sumando debe y haber).</span>
+  <span style="color:#5c6370;">-- 4. Ordenar salida por pol_fecha ASC, pol_tipo ASC, pol_numero ASC.</span>
+<span style="color:#c678dd;">END</span>;
+$$ <span style="color:#c678dd;">LANGUAGE</span> plpgsql;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <p>El frontend se comunica con el backend mediante <code>LibroDiarioService.getLibroDiario()</code>, enviando el siguiente DTO.</p>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/contabilidad/libro-diario</code></td><td><code>?fechaInicio=...&fechaFinal=...&modo=RESUMEN&tipos=PD,PE,PI,PCH&estatus=3</code></td><td>Consulta mediante <code>sp_cont_leer_libro_diario</code>.</td></tr>
+          <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/contabilidad/libro-diario/reporte</code></td><td><code>?fechaInicio=...</code></td><td>Impresión PDF (Jasper).</td></tr>
+          <tr><td><span style="font-weight:bold; color:var(--pjev-info-text);">GET</span></td><td><code>/api/contabilidad/libro-diario/excel</code></td><td><code>?fechaInicio=...</code></td><td>Exportación a CSV/Excel.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li><strong>Filtros Complejos:</strong> El usuario puede cruzar filtros por: Rango de Fechas, Tipos de Póliza, Estatus, Folios o Centro de Costo.</li>
+        <li><strong>Modo Detalle / Resumen:</strong> Permite ver la sumatoria total por póliza (resumen) o desglose por cuenta contable (detalle).</li>
+        <li><strong>Alertas visuales:</strong> Informa si la consulta incluye pólizas no afectadas.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wf-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">Filtros (Desarrollo API)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">Resultados (Visor Limpio)</button>
+      </div>
+
+      <!-- WF1: Filtros (Desarrollo API) -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Libro Diario (Parámetros)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Header -->
+              <rect width="1000" height="40" fill="#1B3A2D" rx="4"/>
+              <rect y="20" width="1000" height="20" fill="#1B3A2D"/> 
+              <text x="20" y="26" fill="#fff" font-size="14" font-weight="bold">Libro Diario</text>
+
+              <!-- Panel Filtros -->
+              <rect x="20" y="60" width="960" height="150" fill="#fff" stroke="#ccc" rx="4"/>
+              
+              <!-- Row 1 -->
+              <text x="40" y="85" font-size="10" font-weight="bold" fill="#34423b">Fecha desde</text>
+              <rect x="40" y="90" width="140" height="26" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="50" y="108" font-size="11" fill="#2563eb">@p_fecha_ini</text>
+
+              <text x="200" y="85" font-size="10" font-weight="bold" fill="#34423b">Fecha hasta</text>
+              <rect x="200" y="90" width="140" height="26" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="210" y="108" font-size="11" fill="#2563eb">@p_fecha_fin</text>
+
+              <text x="360" y="85" font-size="10" font-weight="bold" fill="#34423b">Modo</text>
+              <rect x="360" y="90" width="140" height="26" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="370" y="108" font-size="11" fill="#2563eb">@p_modo (RES/DET)</text>
+
+              <text x="520" y="85" font-size="10" font-weight="bold" fill="#34423b">Centro de costo</text>
+              <rect x="520" y="90" width="160" height="26" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="530" y="108" font-size="11" fill="#2563eb">@p_centro_costo_id</text>
+
+              <text x="700" y="85" font-size="10" font-weight="bold" fill="#34423b">Fuente de financiamiento</text>
+              <rect x="700" y="90" width="160" height="26" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="710" y="108" font-size="11" fill="#2563eb">@p_fuente_fin_id</text>
+
+              <!-- Row 2 -->
+              <text x="40" y="145" font-size="10" font-weight="bold" fill="#34423b">Folio desde</text>
+              <rect x="40" y="150" width="140" height="26" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="50" y="168" font-size="11" fill="#2563eb">@p_folio_ini</text>
+
+              <text x="200" y="145" font-size="10" font-weight="bold" fill="#34423b">Folio hasta</text>
+              <rect x="200" y="150" width="140" height="26" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="210" y="168" font-size="11" fill="#2563eb">@p_folio_fin</text>
+
+              <text x="360" y="145" font-size="10" font-weight="bold" fill="#34423b">Tipos de poliza</text>
+              <rect x="360" y="150" width="300" height="26" fill="#dcefe7" stroke="#b6dccb" rx="13"/>
+              <text x="370" y="168" font-size="11" fill="#0f3c2c">@p_tipos (PD, PE, PI, PCH)</text>
+
+              <text x="680" y="145" font-size="10" font-weight="bold" fill="#34423b">Estatus</text>
+              <rect x="680" y="150" width="180" height="26" fill="#dcefe7" stroke="#b6dccb" rx="13"/>
+              <text x="690" y="168" font-size="11" fill="#0f3c2c">@p_estatus (3=Afectada)</text>
+
+              <!-- Botones -->
+              <rect x="20" y="230" width="100" height="30" fill="#1a3c2f" rx="6"/>
+              <text x="70" y="250" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Consultar</text>
+
+              <rect x="130" y="230" width="100" height="30" fill="#fff" stroke="#ccc" rx="6"/>
+              <text x="180" y="250" fill="#1a3c2f" font-size="11" font-weight="bold" text-anchor="middle">Imprimir PDF</text>
+
+              <rect x="240" y="230" width="100" height="30" fill="#fff" stroke="#ccc" rx="6"/>
+              <text x="290" y="250" fill="#1a3c2f" font-size="11" font-weight="bold" text-anchor="middle">Exportar CSV</text>
+              
+              <!-- Alerta Warning -->
+              <rect x="20" y="280" width="960" height="40" fill="#fff8df" stroke="#f0d27c" rx="6"/>
+              <text x="35" y="305" font-size="11" fill="#66500f">La consulta incluye polizas no afectadas. Para emisión oficial usa solo estatus Afectada.</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- WF2: Visor de Resultados -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Libro Diario - Grid de Detalles</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="350" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Header Secundario -->
+              <rect x="20" y="20" width="960" height="35" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="35" y="42" font-size="11" fill="#31443b"><b>2 registro(s) encontrado(s)</b></text>
+              <text x="750" y="42" font-size="11" font-weight="bold" fill="#1a3c2f">Cargo: $ 15,000.00</text>
+              <text x="860" y="42" font-size="11" font-weight="bold" fill="#1a3c2f">Abono: $ 15,000.00</text>
+
+              <!-- Tabla -->
+              <rect x="20" y="70" width="960" height="25" fill="#f4f6f5" stroke="#d8e4de"/>
+              <text x="30" y="86" font-size="9" font-weight="bold" fill="#46534d">FECHA</text>
+              <text x="90" y="86" font-size="9" font-weight="bold" fill="#46534d">EVENTO</text>
+              <text x="140" y="86" font-size="9" font-weight="bold" fill="#46534d">ASIENTO</text>
+              <text x="190" y="86" font-size="9" font-weight="bold" fill="#46534d">FOLIO</text>
+              <text x="260" y="86" font-size="9" font-weight="bold" fill="#46534d">CUENTA</text>
+              <text x="400" y="86" font-size="9" font-weight="bold" fill="#46534d">CONCEPTO</text>
+              <text x="600" y="86" font-size="9" font-weight="bold" fill="#46534d">ESTATUS</text>
+              <text x="800" y="86" font-size="9" font-weight="bold" fill="#46534d">CARGO</text>
+              <text x="880" y="86" font-size="9" font-weight="bold" fill="#46534d">ABONO</text>
+
+              <!-- Fila 1 -->
+              <text x="30" y="115" font-size="10" fill="#444">10 Ene 2026</text>
+              <text x="100" y="115" font-size="10" fill="#444" text-anchor="middle">1</text>
+              <text x="150" y="115" font-size="10" fill="#444" text-anchor="middle">1</text>
+              <text x="190" y="115" font-size="10" font-weight="bold" font-family="monospace">PD-00001</text>
+              <text x="260" y="112" font-size="10" font-weight="bold" fill="#444">1.1.1.2</text>
+              <text x="260" y="125" font-size="9" fill="#69756f">Bancos Tesorería</text>
+              <text x="400" y="115" font-size="10" fill="#444">Fondeo de cuenta operativa</text>
+              
+              <rect x="600" y="103" width="60" height="18" fill="#e8f5e9" rx="9"/>
+              <text x="630" y="115" font-size="9" font-weight="bold" fill="#1b6b33" text-anchor="middle">Afectada</text>
+
+              <text x="830" y="115" font-size="10" fill="#444" text-anchor="end">$ 10,000.00</text>
+              <text x="910" y="115" font-size="10" fill="#444" text-anchor="end">$ 0.00</text>
+              <rect x="20" y="135" width="960" height="1" fill="#edf1ef"/>
+
+              <!-- Fila 2 -->
+              <text x="30" y="155" font-size="10" fill="#444">10 Ene 2026</text>
+              <text x="100" y="155" font-size="10" fill="#444" text-anchor="middle">1</text>
+              <text x="150" y="155" font-size="10" fill="#444" text-anchor="middle">2</text>
+              <text x="190" y="155" font-size="10" font-weight="bold" font-family="monospace">PD-00001</text>
+              <text x="260" y="152" font-size="10" font-weight="bold" fill="#444">4.1.1.1</text>
+              <text x="260" y="165" font-size="9" fill="#69756f">Ingresos de Gestión</text>
+              <text x="400" y="155" font-size="10" fill="#444">Fondeo de cuenta operativa</text>
+              
+              <rect x="600" y="143" width="60" height="18" fill="#e8f5e9" rx="9"/>
+              <text x="630" y="155" font-size="9" font-weight="bold" fill="#1b6b33" text-anchor="middle">Afectada</text>
+
+              <text x="830" y="155" font-size="10" fill="#444" text-anchor="end">$ 0.00</text>
+              <text x="910" y="155" font-size="10" fill="#444" text-anchor="end">$ 10,000.00</text>
+              <rect x="20" y="175" width="960" height="1" fill="#edf1ef"/>
+              
+              <!-- Total row for visual Partida Doble effect -->
+              <rect x="20" y="176" width="960" height="25" fill="#fcfcfc"/>
+              <text x="750" y="193" font-size="10" font-weight="bold" fill="#1a3c2f" text-anchor="end">Sumas Iguales PD-00001:</text>
+              <text x="830" y="193" font-size="10" font-weight="bold" fill="#1a3c2f" text-anchor="end">$ 10,000.00</text>
+              <text x="910" y="193" font-size="10" font-weight="bold" fill="#1a3c2f" text-anchor="end">$ 10,000.00</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <ul>
+        <li>El reporte debe listar los movimientos cronológicamente. No calcula saldos iniciales o finales de cuentas.</li>
+        <li>El sistema debe mostrar una alerta si se incluyen pólizas con estatus distinto a "Afectada".</li>
+        <li>La seguridad por Centro de Costo u Organización restringe los movimientos que el usuario puede ver, pero siempre asegurando la advertencia visual de que la partida doble podría no cuadrar si solo se ven fracciones de una póliza.</li>
+      </ul>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
+      <p>El Libro Diario interactúa transversalmente leyendo información de:</p>
+      <ul>
+        <li><strong>Nómina y Padrón de Proveedores:</strong> De donde surgen muchas de las pólizas automáticas.</li>
+        <li><strong>Presupuesto:</strong> Para los filtros y desglose de Centro de Costo y Fuentes de Financiamiento.</li>
+      </ul>
+    </div>
+
+    <!-- 11. Entregables / Reportes -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Entregables / Reportes</div>
+      <ul>
+        <li><strong>Grid Interactivo (Pantalla):</strong> Muestra los movimientos (RESUMEN o DETALLE) directamente en la UI.</li>
+        <li><strong>PDF (Formato CONAC):</strong> Reporte oficial con sellos y encabezados institucionales para archivo físico.</li>
+        <li><strong>CSV / EXCEL:</strong> Archivo de datos planos para conciliación manual.</li>
+      </ul>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="data-table">
+        <tr><th>Fecha</th><th>Versión</th><th>Autor</th><th>Descripción de Cambios</th></tr>
+        <tr><td>Junio 2026</td><td>1.0</td><td>Analista PJEV</td><td>Creación del documento basado en código existente.</td></tr>
+      </table>
+    </div>
+
+    <!-- Estatus de Desarrollo -->
+    <div style="margin-top: 40px; padding: 20px; border: 1px solid var(--pjev-borde); border-radius: 8px; background: #fff;">
+      <div style="font-size: 14px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 15px;">Estatus de Desarrollo (PM: Julio Barrales)</div>
+      <table class="props-table">
+        <tr><th>Actividad</th><th>Estatus</th><th>Responsable</th></tr>
+        <tr><td>Análisis Funcional y UX</td><td><span style="color:green; font-weight:bold;">Completado</span></td><td>Analista Funcional</td></tr>
+        <tr><td>Diseño de Base de Datos (SP)</td><td><span style="color:green; font-weight:bold;">Completado</span></td><td>DBA / Arquitecto</td></tr>
+        <tr><td>Desarrollo Backend (API)</td><td><span style="color:green; font-weight:bold;">Completado</span></td><td>Backend Developer</td></tr>
+        <tr><td>Desarrollo Frontend (UI)</td><td><span style="color:green; font-weight:bold;">Completado</span></td><td>Frontend Developer</td></tr>
+      </table>
+    </div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

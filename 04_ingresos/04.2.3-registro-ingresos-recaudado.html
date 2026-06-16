@@ -114,6 +114,22 @@
         <tr><td><code>folio_operacion</code></td><td><code>VARCHAR(50)</code></td><td>Referencia alfanumérica del depósito.</td></tr>
         <tr><td><code>poliza_recaudado_id</code></td><td><code>INT (FK)</code></td><td>ID de la póliza de ingresos generada automáticamente.</td></tr>
         <tr><td><code>estatus_documento</code></td><td><code>INT</code></td><td>Cambia de 2 (Devengado) a 4 (Recaudado).</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Default 1. Control lógico.</td></tr>
+        <tr><td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td><td><code>VARCHAR</code> / <code>TIMESTAMPZ</code></td><td>Campos de auditoría.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">ing_ministraciones (Calendario Autorizado)</h3>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>ministracion_id</code></td><td><code>INT (PK)</code></td><td>Identificador único del mes en el calendario.</td></tr>
+        <tr><td><code>ejercicio</code></td><td><code>INT</code></td><td>Año fiscal (Ej. 2026).</td></tr>
+        <tr><td><code>mes</code></td><td><code>INT</code></td><td>Mes al que corresponde (1 a 12).</td></tr>
+        <tr><td><code>monto_autorizado</code></td><td><code>DECIMAL(18,2)</code></td><td>Monto autorizado según Gaceta Oficial.</td></tr>
+        <tr><td><code>observaciones</code></td><td><code>TEXT</code></td><td>Justificación de diferencias en la conciliación.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Default 1. Control lógico.</td></tr>
+        <tr><td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td><td><code>VARCHAR</code> / <code>TIMESTAMPZ</code></td><td>Campos de auditoría.</td></tr>
       </tbody>
     </table>
   </div>

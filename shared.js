@@ -27,12 +27,16 @@ function injectToolbar() {
     const toolbar = document.createElement('div');
     toolbar.style.position = 'fixed';
     toolbar.style.top = '20px';
-    toolbar.style.right = '40px';
+    toolbar.style.right = '45px';
     toolbar.style.display = 'flex';
+    toolbar.style.flexWrap = 'wrap';
+    toolbar.style.justifyContent = 'flex-end';
+    toolbar.style.alignItems = 'center';
     toolbar.style.gap = '10px';
     toolbar.style.zIndex = '9999';
+    toolbar.style.maxWidth = 'calc(100vw - 60px)';
 
-    const btnStyle = "padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid #D4C9B5; border-radius: 6px; background: #fff; color: #1B3A2D; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: background 0.2s;";
+    const btnStyle = "padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid #D4C9B5; border-radius: 6px; background: #fff; color: #1B3A2D; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;";
 
     const btnRefresh = document.createElement('button');
     btnRefresh.innerText = '⟳ Refrescar';
