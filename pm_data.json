@@ -100,20 +100,6 @@
         },
         {
             "id": "01.2.5",
-            "nombre": "CUCOP",
-            "sistema": "Configuración Base",
-            "tipo_formulario": "B",
-            "analisis_funcional": 1,
-            "iteracion_desarrollo": 2,
-            "avance_desarrollo": 1,
-            "visitas": [],
-            "desarrollador_asignado": "Daryl",
-            "subsistema": "",
-            "estado": "Terminado",
-            "analista_asignado": "Julio César"
-        },
-        {
-            "id": "01.2.6",
             "nombre": "Subprogramas",
             "sistema": "Configuración Base",
             "tipo_formulario": "B",
@@ -127,7 +113,7 @@
             "analista_asignado": "Julio César"
         },
         {
-            "id": "01.2.7",
+            "id": "01.2.6",
             "nombre": "CRI",
             "sistema": "Configuración Base",
             "tipo_formulario": "B",
@@ -141,7 +127,7 @@
             "analista_asignado": "Julio César"
         },
         {
-            "id": "01.2.8",
+            "id": "01.2.7",
             "nombre": "Proyectos",
             "sistema": "Configuración Base",
             "tipo_formulario": "B",
@@ -155,7 +141,7 @@
             "analista_asignado": "Julio César"
         },
         {
-            "id": "01.2.9",
+            "id": "01.2.8",
             "nombre": "Centros Costos",
             "sistema": "Configuración Base",
             "tipo_formulario": "B",
@@ -1423,6 +1409,33 @@
             "avance_desarrollo": 0
         },
         {
+            "id": "07.1.1",
+            "nombre": "Contexto de catálogos",
+            "estado": "Terminado",
+            "programador": "Backend Developer",
+            "progreso": 100
+        },
+        {
+            "id": "07.1.2",
+            "nombre": "CUCOP",
+            "tipo_formulario": "B",
+            "analisis_funcional": 1,
+            "iteracion_desarrollo": 2,
+            "avance_desarrollo": 1,
+            "visitas": [],
+            "desarrollador_asignado": "Daryl",
+            "estado": "Terminado",
+            "analista_asignado": "Julio César",
+            "progreso": 100
+        },
+        {
+            "id": "07.1.3",
+            "nombre": "Checklist por tipo de contratación",
+            "estado": "Pendiente",
+            "programador": "Backend Developer",
+            "progreso": 0
+        },
+        {
             "id": "07.2.1",
             "nombre": "Suficiencia Presupuestal",
             "estado": "Pendiente",
@@ -1430,22 +1443,64 @@
             "progreso": 0
         },
         {
-            "id": "07.2.2",
+            "id": "07.2.2.1",
             "nombre": "Adjudicación Directa",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
         },
         {
-            "id": "07.2.3",
-            "nombre": "Contratos",
+            "id": "07.2.2.2",
+            "nombre": "Invitación < 3",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
         },
         {
-            "id": "07.2.4",
-            "nombre": "Pedidos",
+            "id": "07.2.2.3",
+            "nombre": "Licitación",
+            "estado": "Pendiente",
+            "programador": "Backend Developer",
+            "progreso": 0
+        },
+        {
+            "id": "07.2.3.1",
+            "nombre": "Pedido",
+            "estado": "Pendiente",
+            "programador": "Backend Developer",
+            "progreso": 0
+        },
+        {
+            "id": "07.2.3.2",
+            "nombre": "Contrato",
+            "estado": "Pendiente",
+            "programador": "Backend Developer",
+            "progreso": 0
+        },
+        {
+            "id": "07.2.3.3",
+            "nombre": "Servicio",
+            "estado": "Pendiente",
+            "programador": "Backend Developer",
+            "progreso": 0
+        },
+        {
+            "id": "07.2.4.1",
+            "nombre": "Registro de Factura",
+            "estado": "Pendiente",
+            "programador": "Backend Developer",
+            "progreso": 0
+        },
+        {
+            "id": "07.3.1",
+            "nombre": "Interfaz de Pólizas de Almacén",
+            "estado": "Pendiente",
+            "programador": "Backend Developer",
+            "progreso": 0
+        },
+        {
+            "id": "07.3.2",
+            "nombre": "Recepción de Depreciación",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0

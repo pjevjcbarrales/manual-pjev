@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contexto de Catálogos (Daryl)</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  
+  .hero {
+    background: var(--pjev-verde-oscuro);
+    border-radius: 10px; padding: 36px 40px; margin-bottom: 36px;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: 'DARYL';
+    position: absolute; right: -10px; top: -20px;
+    font-size: 140px; font-weight: 900; color: rgba(222,172,80,0.05);
+    line-height: 1; pointer-events: none; user-select: none;
+  }
+  .hero-tag   { font-size: 11px; font-weight: 700; color: var(--pjev-dorado); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .hero-title { font-size: 30px; font-weight: 700; color: #fff; line-height: 1.15; margin-bottom: 10px; }
+  .hero-desc  { font-size: 14px; color: rgba(255,255,255,0.7); max-width: 650px; line-height: 1.6; margin-bottom: 24px; }
+  .hero-meta  { display: flex; gap: 28px; flex-wrap: wrap; }
+  .hero-stat  { display: flex; flex-direction: column; gap: 2px; }
+  .hero-stat-num   { font-size: 22px; font-weight: 700; color: var(--pjev-dorado); }
+  .hero-stat-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  .section-h2  { font-size: 17px; font-weight: 700; color: var(--pjev-verde-oscuro); margin-bottom: 6px; }
+  .section-sub { font-size: 13px; color: var(--pjev-texto-muted); margin-bottom: 20px; line-height: 1.5; }
+
+  /* Tarjetas de catálogo */
+  .catalog-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 40px; }
+  .catalog-card {
+    background: var(--pjev-blanco); border: 1px solid var(--pjev-borde); border-radius: 8px;
+    padding: 24px; text-decoration: none; color: inherit;
+    transition: box-shadow 0.15s, transform 0.15s;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .catalog-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); transform: translateY(-2px); }
+  
+  .catalog-header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--pjev-crema); padding-bottom: 12px;
+  }
+  .catalog-name { font-size: 16px; font-weight: 700; color: var(--pjev-verde-oscuro); display: flex; align-items: center; gap: 10px;}
+  .catalog-id { font-family: var(--font-mono); font-size: 12px; color: var(--pjev-texto-muted); background: var(--pjev-crema); padding: 4px 8px; border-radius: 4px;}
+  
+  .data-point { display: flex; flex-direction: column; gap: 4px; }
+  .data-label { font-size: 11px; font-weight: 700; color: var(--pjev-dorado-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .data-value { font-size: 14px; color: var(--pjev-texto); line-height: 1.6; }
+  
+  .data-value code { background: #f1f5f9; color: #0f172a; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; }
+
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-tag">Documentación Backend · Módulo 07</div>
+      <h1 class="hero-title">Contexto de Catálogos para<br>Recursos Materiales</h1>
+      <p class="hero-desc">Este documento es una guía directa y literal diseñada específicamente para explicar a <strong>Daryl</strong> los catálogos base necesarios para construir las opciones del menú de Registros (Suficiencia Presupuestal, Compras, Comprometido y Devengado). Cada catálogo listado aquí ya existe en el submódulo de Configuración Inicial.</p>
+      <div class="hero-meta">
+        <div class="hero-stat">
+          <span class="hero-stat-num">6</span>
+          <span class="hero-stat-label">Catálogos base</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">Literal</span>
+          <span class="hero-stat-label">Nivel de lenguaje</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MÓDULOS / CATÁLOGOS -->
+    <div class="section-h2">Diccionario de Tablas de Referencia</div>
+    <p class="section-sub">Tu objetivo como desarrollador Backend es utilizar estos catálogos como tablas de referencia (Llaves Foráneas / Foreign Keys) cuando crees las tablas transaccionales (operacionalización).</p>
+
+    <div class="catalog-grid">
+
+      <div class="catalog-card">
+        <div class="catalog-header">
+          <div class="catalog-name">Catálogo de Proveedores</div>
+          <div class="catalog-id">01.3.1 Proveedores</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Función Específica</div>
+          <div class="data-value">Almacenar la lista oficial de todas las empresas o personas físicas a las que el Poder Judicial les compra bienes o servicios. Contiene sus datos legales (RFC, Razón Social) y sus datos bancarios (Cuenta CLABE).</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Cómo interactúa con las tablas de operacionalización</div>
+          <div class="data-value">Las tablas transaccionales como <code>rm_adjudicaciones</code>, <code>rm_contratos</code> y <code>rm_pedidos</code> deben tener una columna llamada <code>id_proveedor</code>. Esta columna debe ser una llave foránea (Foreign Key) que apunte a la llave primaria (Primary Key) de la tabla de Proveedores.</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Por qué interactúa</div>
+          <div class="data-value">Porque es imposible registrar un Pedido o un Contrato sin saber a quién se le va a pagar. En el momento del "Devengado" (Registro de Factura), el sistema usará este enlace para decirle al departamento de Finanzas a qué cuenta bancaria debe transferir el dinero.</div>
+        </div>
+      </div>
+
+      <div class="catalog-card">
+        <div class="catalog-header">
+          <div class="catalog-name">Clasificador Único de las Contrataciones Públicas</div>
+          <div class="catalog-id">07.1.2 CUCOP</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Función Específica</div>
+          <div class="data-value">Es una lista nacional estandarizada por el gobierno que contiene todas las claves posibles de artículos y servicios que se pueden comprar (ejemplo: "Lápices", "Computadoras", "Servicio de Limpieza").</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Cómo interactúa con las tablas de operacionalización</div>
+          <div class="data-value">La tabla de detalles transaccionales, como <code>rm_pedidos_detalle</code> (donde se guardan los renglones de los artículos comprados), debe tener una columna llamada <code>cve_cucop</code>. Esta columna debe apuntar como llave foránea a la tabla del CUCOP.</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Por qué interactúa</div>
+          <div class="data-value">Porque la ley gubernamental exige que cada artículo comprado tenga una clave estandarizada. Esto permite generar reportes exactos de qué insumos se compraron en el año, sin importar si un usuario escribió "Lápiz" o "Lápices de madera".</div>
+        </div>
+      </div>
+
+      <div class="catalog-card">
+        <div class="catalog-header">
+          <div class="catalog-name">Clasificador por Objeto del Gasto</div>
+          <div class="catalog-id">01.2.2 COG</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Función Específica</div>
+          <div class="data-value">Es una lista jerárquica de partidas presupuestales que clasifica "en qué" se gasta el dinero (ejemplo: Partida 21101 = Materiales y útiles de oficina; Partida 33801 = Servicios de vigilancia).</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Cómo interactúa con las tablas de operacionalización</div>
+          <div class="data-value">Las tablas como <code>rm_suficiencias</code> (Suficiencia Presupuestal) y <code>rm_pedidos_detalle</code> deben tener una columna llamada <code>cve_partida_cog</code> que funcione como llave foránea hacia la tabla del COG.</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Por qué interactúa</div>
+          <div class="data-value">Porque antes de comprar algo, el sistema debe revisar si hay dinero disponible. La revisión de dinero (Suficiencia Presupuestal) no se hace por artículo, sino agrupada por la partida del COG. Si compras "Lápices" (CUCOP), el sistema resta dinero a la bolsa de "Materiales de Oficina" (COG).</div>
+        </div>
+      </div>
+
+      <div class="catalog-card">
+        <div class="catalog-header">
+          <div class="catalog-name">Unidades Administrativas y Centros de Costos</div>
+          <div class="catalog-id">01.2.1 / 01.2.9</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Función Específica</div>
+          <div class="data-value">Almacenar el organigrama del Poder Judicial (juzgados, direcciones, departamentos). Sirve para saber qué área física está solicitando la compra y qué área tiene el presupuesto asignado.</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Cómo interactúa con las tablas de operacionalización</div>
+          <div class="data-value">Las tablas de encabezado como <code>rm_suficiencias</code> y <code>rm_pedidos</code> deben tener una columna llamada <code>id_centro_costo</code> que apunte como llave foránea a estos catálogos.</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Por qué interactúa</div>
+          <div class="data-value">Porque cada área tiene un límite de dinero asignado. El sistema necesita saber quién originó la "Requisición" (Solicitud) para descontar el dinero exclusivamente de la bolsa (presupuesto) asignada a ese juzgado o departamento en particular, y no del presupuesto general.</div>
+        </div>
+      </div>
+
+      <div class="catalog-card">
+        <div class="catalog-header">
+          <div class="catalog-name">Fuentes de Financiamiento</div>
+          <div class="catalog-id">01.2.4 Fuentes Finan.</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Función Específica</div>
+          <div class="data-value">Identificar el origen del dinero. El dinero del gobierno puede venir de recursos federales, recursos estatales o ingresos propios.</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Cómo interactúa con las tablas de operacionalización</div>
+          <div class="data-value">Las tablas transaccionales de compromisos (<code>rm_pedidos</code>, <code>rm_contratos</code>) deben incluir una columna <code>id_fuente_financiamiento</code> como llave foránea.</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Por qué interactúa</div>
+          <div class="data-value">Porque el departamento de Finanzas no junta todo el dinero en una sola cuenta de banco. Al registrar un Contrato o un Pedido (momento del Comprometido), el sistema debe etiquetar con qué "tipo de dinero" se va a pagar, para que el sistema contable sepa de qué cuenta bancaria sacar el recurso.</div>
+        </div>
+      </div>
+
+      <div class="catalog-card">
+        <div class="catalog-header">
+          <div class="catalog-name">Checklist por Tipo de Contratación</div>
+          <div class="catalog-id">07.1.3 Checklist</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Función Específica</div>
+          <div class="data-value">Es una lista de requisitos y documentos obligatorios que el usuario debe cumplir dependiendo de si la compra es por "Adjudicación Directa", "Invitación a 3 personas" o "Licitación".</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Cómo interactúa con las tablas de operacionalización</div>
+          <div class="data-value">La tabla <code>rm_compras</code> o la tabla de expediente debe cruzarse con este catálogo para generar dinámicamente casillas de verificación (checkboxes) en la pantalla.</div>
+        </div>
+        <div class="data-point">
+          <div class="data-label">Por qué interactúa</div>
+          <div class="data-value">Para evitar errores humanos. El sistema usará este catálogo para impedir que el usuario avance al "Registro de Contrato" si no ha verificado físicamente que entregó todos los documentos requeridos por la ley para ese tipo de compra.</div>
+        </div>
+      </div>
+
+    </div>
+</div>
+</body>
+</html>

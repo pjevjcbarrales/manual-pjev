@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.2.1 Suficiencia Presupuestal — SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+  .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; }
+</style>
+</head>
+<body>
+<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999; max-width: calc(-60px + 100vw);"><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(27, 58, 45); border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; background: rgb(27, 58, 45); color: rgb(255, 255, 255);">📊 Ver Diagrama</button><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(153, 27, 27); border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; background: rgb(153, 27, 27); color: rgb(255, 255, 255);">📋 Proceso Funcional</button><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.location.reload()">⟳ Refrescar</button><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.print()">🖨 Imprimir</button></div>
+<div class="doc-main-inner">
+
+    <!-- BREADCRUMB -->
+            <div class="elem-breadcrumb">
+        <a href="../index.html">Inicio</a> ›
+      <span>Recursos Materiales</span> ›
+      <span>Registros</span> ›
+      <span>07.2.1 Solicitud de Suficiencia Presupuestal</span>
+    </div>
+
+<!-- ENCABEZADO Y TÍTULO -->
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">07.2.1</div>
+        <h1 class="elem-title">Solicitud de Suficiencia Presupuestal</h1>
+        <p class="elem-desc">Módulo transaccional operado por el Área de Adquisiciones para verificar el saldo mensual, capturar las partidas a afectar y emitir el Oficio de Requerimiento hacia Recursos Financieros.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Fase 1: Petición</span>
+          <span class="mod-badge badge-s">Tipo: Registro / Transaccional</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">rm / registros / suficiencia</code></span>
+        </div>
+        
+        <div style="background: rgb(244, 241, 234); border-width: 1px 1px 1px 4px; border-style: solid; border-color: rgb(222, 172, 80); border-image: initial; padding: 10px 15px; border-radius: 4px; margin: 20px 0px 0px; font-family: var(--font-main, sans-serif); font-size: 12px; display: block; color: rgb(51, 51, 51);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: #1B3A2D; font-size: 13px;">📋 Estatus de Desarrollo (PM: 07.2.1)</strong>
+              <div style="margin-top: 4px; color: #666;">
+                <b>Asignado actual:</b> Daryl &nbsp;|&nbsp;
+                <b>Iteraciones:</b> 0 &nbsp;|&nbsp;
+                <b>Proyectado:</b> 3 días
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: bold; color: #1B3A2D;">Avance Global</div>
+              <div style="font-size: 18px; color: #DEAC50; font-weight: bold;">0%</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>La opción de <strong>Suficiencia Presupuestal</strong> es el primer eslabón obligatorio en la cadena de suministros del Poder Judicial. Permite al área de Recursos Materiales consultar en tiempo real el saldo de las partidas presupuestales (COG) solicitadas por las Unidades Administrativas. Su objetivo principal es asegurar que exista dinero líquido disponible antes de firmar cualquier pedido o contrato, separando los fondos de manera preventiva.</p>
+      <p>Si la partida cuenta con saldo suficiente, se genera un trámite de <strong>Confirmación</strong>. Si el saldo es insuficiente en el mes actual pero existe en meses futuros, se solicita una <strong>Recalendarización</strong>. Si no existe saldo anual, se solicita una <strong>Transferencia</strong> o <strong>Apertura</strong> de partida.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo (SIAF / CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>LGCG Art. 25</strong></td>
+            <td>Garantizar la armonización contable-presupuestal. Ninguna adquisición o servicio puede ser comprometido sin estar respaldado previamente por disponibilidad presupuestal confirmada en la partida correspondiente.</td>
+          </tr>
+          <tr>
+            <td><strong>Reglamento Interior del PJEV</strong></td>
+            <td>Obliga a la generación de un <em>Oficio de Requerimiento</em> firmado para que la Subdirección de Recursos Financieros avale que los recursos no exceden el Presupuesto Modificado Autorizado.</td>
+          </tr>
+          <tr>
+            <td><strong>Control Interno (Auditoría)</strong></td>
+            <td>En el caso de adjudicaciones directas menores, exige la formulación y validación de una "Tarjeta DGA" interna antes de avanzar a la orden de compra.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Analista Presupuestal (Creador)</strong></td>
+            <td>Crear la solicitud, seleccionar la partida y montos, y turnarla a firma.</td>
+            <td>No puede autorizar su propio trámite ni enviarlo directamente a Recursos Financieros.</td>
+          </tr>
+          <tr>
+            <td><strong>Jefe / Subdirector de Rec. Materiales</strong></td>
+            <td>Revisar y firmar digitalmente la solicitud y la Tarjeta DGA. Turnar a Recursos Financieros.</td>
+            <td>Una vez turnado a Finanzas, no puede modificar los montos solicitados.</td>
+          </tr>
+          <tr>
+            <td><strong>Recursos Financieros (Validador)</strong></td>
+            <td>Aprobar o Rechazar el oficio de requerimiento.</td>
+            <td>Solo puede autorizar si el motor contable confirma saldo positivo en la cuenta bancaria / partida.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos (Propuesta Modernizada)</div>
+      <p>A partir del análisis de la base de datos heredada, se propone una refactorización hacia <strong>3 tablas normalizadas</strong>. Esta propuesta mantiene intacta la <strong>arquitectura de dos tiempos (Fases)</strong> y las reglas de <strong>Ampliación de Contratos</strong>, pero traslada la carga del historial de firmas a una bitácora independiente para sanear la cabecera.</p>
+      
+      <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">1. Tabla Cabecera: rm_suficiencias</h3>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">FASE 1: SOLICITUD (Recursos Materiales)</td></tr>
+          <tr><td><code>ejercicio</code></td><td><code>INT PK</code></td><td>Ejercicio fiscal (Año). Llave de partición.</td></tr>
+          <tr><td><code>id_suficiencia</code></td><td><code>INT PK</code></td><td>Identificador único del registro (Sustituye a <em>r_IDReserva</em> y <em>r_Solicitud</em>).</td></tr>
+          <tr><td><code>folio_solicitud</code></td><td><code>VARCHAR(50)</code></td><td>Folio alfanumérico de la petición (Ej. RM-SUF-2026-001).</td></tr>
+          <tr><td><code>fecha_solicitud</code></td><td><code>DATETIME</code></td><td>Fecha de creación de la solicitud.</td></tr>
+          
+          <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">DATOS GENERALES</td></tr>
+          <tr><td><code>id_centro_costo</code></td><td><code>INT FK</code></td><td>Unidad Administrativa (UA) que solicita.</td></tr>
+          <tr><td><code>monto_total</code></td><td><code>NUMERIC(18,2)</code></td><td>Suma total del requerimiento.</td></tr>
+          <tr><td><code>concepto</code></td><td><code>VARCHAR(500)</code></td><td>Justificación de la suficiencia.</td></tr>
+          <tr><td><code>id_tiposuficiencia</code></td><td><code>INT FK</code></td><td>Tipo de trámite (Confirmación, Transferencia, Recalendarización, Apertura).</td></tr>
+          <tr><td><code>estatus_actual</code></td><td><code>SMALLINT</code></td><td>Estado global (0=Borrador, 1=Enviado a Finanzas, 2=Autorizado, etc.).</td></tr>
+
+          <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">AMPLIACIÓN DE CONTRATOS</td></tr>
+          <tr><td><code>id_contrato_origen</code></td><td><code>INT FK</code></td><td>Apunta al contrato original si se trata de una ampliación. (NULL si es nueva).</td></tr>
+          <tr><td><code>porcentaje_ampliacion</code></td><td><code>DECIMAL(5,2)</code></td><td>Topeado legalmente al 20%.</td></tr>
+
+          <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">AUDITORÍA (COLUMNAS POR DEFECTO)</td></tr>
+          <tr><td><code>fecha_registro</code></td><td><code>DATETIME</code></td><td>Fecha de creación de la petición.</td></tr>
+          <tr><td><code>usuario_registro</code></td><td><code>INT FK</code></td><td>Usuario creador de la cabecera.</td></tr>
+          <tr><td><code>fecha_actualizacion</code></td><td><code>DATETIME</code></td><td>Fecha de última modificación.</td></tr>
+          <tr><td><code>usuario_actualizacion</code></td><td><code>INT FK</code></td><td>Usuario que realizó la última modificación.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-top: 15px; margin-bottom: 8px;">2. Tabla Detalle (Meses): rm_suficiencias_partidas</h3>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>ejercicio</code></td><td><code>INT PK/FK</code></td><td>Ejercicio fiscal (Partición).</td></tr>
+          <tr><td><code>id_detalle</code></td><td><code>INT PK</code></td><td>Identificador de la afectación.</td></tr>
+          <tr><td><code>id_suficiencia</code></td><td><code>INT FK</code></td><td>Vinculación a la cabecera.</td></tr>
+          <tr><td><code>cve_partida_cog</code></td><td><code>VARCHAR(10)</code></td><td>Partida del gasto (Ej. 3614).</td></tr>
+          <tr><td><code>monto_enero</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Enero.</td></tr>
+          <tr><td><code>monto_febrero</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Febrero.</td></tr>
+          <tr><td><code>monto_marzo</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Marzo.</td></tr>
+          <tr><td><code>monto_abril</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Abril.</td></tr>
+          <tr><td><code>monto_mayo</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Mayo.</td></tr>
+          <tr><td><code>monto_junio</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Junio.</td></tr>
+          <tr><td><code>monto_julio</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Julio.</td></tr>
+          <tr><td><code>monto_agosto</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Agosto.</td></tr>
+          <tr><td><code>monto_septiembre</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Septiembre.</td></tr>
+          <tr><td><code>monto_octubre</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Octubre.</td></tr>
+          <tr><td><code>monto_noviembre</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Noviembre.</td></tr>
+          <tr><td><code>monto_diciembre</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Diciembre.</td></tr>
+
+          <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">AUDITORÍA (COLUMNAS POR DEFECTO)</td></tr>
+          <tr><td><code>fecha_registro</code></td><td><code>DATETIME</code></td><td>Fecha de inserción de la partida.</td></tr>
+          <tr><td><code>usuario_registro</code></td><td><code>INT FK</code></td><td>Usuario creador del detalle.</td></tr>
+          <tr><td><code>fecha_actualizacion</code></td><td><code>DATETIME</code></td><td>Fecha de última modificación de los montos.</td></tr>
+          <tr><td><code>usuario_actualizacion</code></td><td><code>INT FK</code></td><td>Usuario que modificó los montos.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-top: 15px; margin-bottom: 8px;">3. Tabla Workflow (Bitácora): rm_suficiencias_historial</h3>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>ejercicio</code></td><td><code>INT PK/FK</code></td><td>Ejercicio fiscal (Partición).</td></tr>
+          <tr><td><code>id_historial</code></td><td><code>INT PK</code></td><td>Identificador del movimiento.</td></tr>
+          <tr><td><code>id_suficiencia</code></td><td><code>INT FK</code></td><td>Suficiencia afectada.</td></tr>
+          <tr><td><code>id_usuario_ejecutor</code></td><td><code>INT FK</code></td><td>Quién realizó la acción.</td></tr>
+          <tr><td><code>rol_accion</code></td><td><code>VARCHAR(50)</code></td><td>Rol bajo el cual se actuó (Reemplaza a <em>r_RolActual</em>).</td></tr>
+          <tr><td><code>estatus_proceso</code></td><td><code>SMALLINT</code></td><td>Nuevo estado asignado tras la acción.</td></tr>
+          <tr><td><code>observaciones</code></td><td><code>TEXT</code></td><td>Notas de rechazo o aprobación. Reemplaza a <em>r_Observaciones</em> de la cabecera.</td></tr>
+          <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">AUDITORÍA (INMUTABLE)</td></tr>
+          <tr><td><code>fecha_registro</code></td><td><code>DATETIME</code></td><td>Cuándo ocurrió el cambio de estatus.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_suficiencia_encabezado</button>
+        <button class="sp-tab" onclick="showSP('sp2',this)">fn_leer_suficiencia_partidas</button>
+        <button class="sp-tab" onclick="showSP('sp3',this)">fn_abc_suficiencia_encabezado</button>
+        <button class="sp-tab" onclick="showSP('sp4',this)">fn_abc_suficiencia_partidas</button>
+      </div>
+
+      <!-- TAB 1: LEER ENCABEZADO -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio. Ejercicio fiscal activo.</td></tr>
+            <tr><td><code>@p_id_suficiencia</code></td><td><code>INT</code></td><td>Opcional. Leer un registro específico.</td></tr>
+            <tr><td><code>@p_id_centro_costo</code></td><td><code>INT</code></td><td>Opcional. Filtrar por Unidad requirente.</td></tr>
+            <tr><td><code>@p_fecha_inicio</code></td><td><code>DATE</code></td><td>Opcional. Fecha de solicitud Inicial.</td></tr>
+            <tr><td><code>@p_fecha_fin</code></td><td><code>DATE</code></td><td>Opcional. Fecha de solicitud Final.</td></tr>
+            <tr><td><code>@p_folio_solicitud</code></td><td><code>VARCHAR</code></td><td>Opcional. Búsqueda por Oficio de solicitud.</td></tr>
+            <tr><td><code>@p_tipo_reserva</code></td><td><code>INT</code></td><td>Opcional. Filtro por Tipo de reserva.</td></tr>
+            <tr><td><code>@p_estatus_reserva</code></td><td><code>INT</code></td><td>Opcional. Filtro por Estatus de la reserva.</td></tr>
+            <tr><td><code>@p_estatus_proceso</code></td><td><code>INT</code></td><td>Opcional. Filtro por Estatus del proceso.</td></tr>
+            <tr><td><code>@p_estatus_vigencia</code></td><td><code>INT</code></td><td>Opcional. Filtro por Estatus de la vigencia.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{id_suficiencia}</code></td><td><code>INT</code></td><td>ID único de la Fase 1.</td></tr>
+            <tr><td><code>{folio_solicitud}</code></td><td><code>VARCHAR</code></td><td>Folio de petición (Ej. RM-SUF-...).</td></tr>
+            <tr><td><code>{fecha_solicitud}</code></td><td><code>DATETIME</code></td><td>Fecha de captura en RM.</td></tr>
+            <tr><td><code>{folio_oficio_reserva}</code></td><td><code>VARCHAR</code></td><td>Oficio de autorización financiera (Fase 2).</td></tr>
+            <tr><td><code>{fecha_autorizacion}</code></td><td><code>DATETIME</code></td><td>Fecha en que Finanzas congeló el recurso.</td></tr>
+            <tr><td><code>{id_centro_costo}</code></td><td><code>INT</code></td><td>Unidad Administrativa asociada.</td></tr>
+            <tr><td><code>{concepto}</code></td><td><code>VARCHAR</code></td><td>Justificación de la adquisición.</td></tr>
+            <tr><td><code>{monto_total}</code></td><td><code>DECIMAL</code></td><td>Importe total amparado.</td></tr>
+            <tr><td><code>{id_contrato_origen}</code></td><td><code>INT</code></td><td>Vínculo con contrato previo (si aplica).</td></tr>
+            <tr><td><code>{porcentaje_ampliacion}</code></td><td><code>DECIMAL</code></td><td>Porcentaje de ampliación sobre el contrato.</td></tr>
+            <tr><td><code>{estatus_actual}</code></td><td><code>INT</code></td><td>0=Borrador, 1=Validación, etc.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 1. LEER ENCABEZADO
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">rm.fn_leer_suficiencia_encabezado</span>(
+    p_ejercicio <span style="color:#c678dd;">INT</span>,
+    p_id_suficiencia <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_centro_costo <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_fecha_inicio <span style="color:#c678dd;">DATE</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_fecha_fin <span style="color:#c678dd;">DATE</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_folio_solicitud <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_tipo_reserva <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_estatus_reserva <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_estatus_proceso <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_estatus_vigencia <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> (
+        <span style="color:#c678dd;">SELECT</span> 
+            m.id_suficiencia, m.folio_solicitud, m.fecha_solicitud, 
+            p.folio_oficio_reserva, p.fecha_autorizacion,
+            m.id_centro_costo, m.concepto, m.monto_total, 
+            m.id_contrato_origen, m.porcentaje_ampliacion, 
+            m.estatus_actual
+        <span style="color:#c678dd;">FROM</span> rm.rm_suficiencias m
+        <span style="color:#c678dd;">LEFT JOIN</span> pr.pr_reservas p <span style="color:#c678dd;">ON</span> p.id_suficiencia = m.id_suficiencia
+        <span style="color:#c678dd;">WHERE</span> m.estatus_actual >= <span style="color:#d19a66;">0</span>
+          <span style="color:#c678dd;">AND</span> (p_id_suficiencia <span style="color:#c678dd;">IS NULL OR</span> m.id_suficiencia = p_id_suficiencia)
+          <span style="color:#c678dd;">AND</span> (p_id_centro_costo <span style="color:#c678dd;">IS NULL OR</span> m.id_centro_costo = p_id_centro_costo)
+          <span style="color:#c678dd;">AND</span> (p_fecha_inicio <span style="color:#c678dd;">IS NULL OR</span> <span style="color:#56b6c2;">DATE</span>(m.fecha_solicitud) >= p_fecha_inicio)
+          <span style="color:#c678dd;">AND</span> (p_fecha_fin <span style="color:#c678dd;">IS NULL OR</span> <span style="color:#56b6c2;">DATE</span>(m.fecha_solicitud) <= p_fecha_fin)
+          <span style="color:#c678dd;">AND</span> (p_folio_solicitud <span style="color:#c678dd;">IS NULL OR</span> m.folio_solicitud <span style="color:#56b6c2;">ILIKE</span> <span style="color:#98c379;">'%'</span> || p_folio_solicitud || <span style="color:#98c379;">'%'</span>)
+          <span style="color:#5c6370;">-- Se asume que estos campos existirán en la tabla final o cruzarán con el historial</span>
+          <span style="color:#c678dd;">AND</span> (p_tipo_reserva <span style="color:#c678dd;">IS NULL OR</span> m.tipo_reserva = p_tipo_reserva)
+          <span style="color:#c678dd;">AND</span> (p_estatus_reserva <span style="color:#c678dd;">IS NULL OR</span> m.estatus_actual = p_estatus_reserva)
+          <span style="color:#c678dd;">AND</span> (p_estatus_proceso <span style="color:#c678dd;">IS NULL OR</span> m.estatus_proceso = p_estatus_proceso)
+          <span style="color:#c678dd;">AND</span> (p_estatus_vigencia <span style="color:#c678dd;">IS NULL OR</span> m.estatus_vigencia = p_estatus_vigencia)
+    ) t;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: LEER PARTIDAS -->
+      <div id="sp-sp2" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_id_suficiencia</code></td><td><code>INT</code></td><td>Obligatorio. ID del encabezado.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{id_detalle}</code></td><td><code>INT</code></td><td>ID de la afectación.</td></tr>
+            <tr><td><code>{cve_partida_cog}</code></td><td><code>VARCHAR</code></td><td>Partida contable afectada.</td></tr>
+            <tr><td><code>{monto_enero}...{monto_diciembre}</code></td><td><code>DECIMAL</code></td><td>Calendarización mensual.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 2. LEER MOVTOS (DETALLE)
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">rm.fn_leer_suficiencia_partidas</span>(
+    p_id_suficiencia <span style="color:#c678dd;">INT</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> (
+        <span style="color:#c678dd;">SELECT</span> 
+            d.id_detalle, d.cve_partida_cog, d.monto_enero, d.monto_febrero, d.monto_marzo, d.monto_abril, d.monto_mayo, d.monto_junio, d.monto_julio, d.monto_agosto, d.monto_septiembre, d.monto_octubre, d.monto_noviembre, d.monto_diciembre
+        <span style="color:#c678dd;">FROM</span> rm.rm_suficiencias_partidas d
+        <span style="color:#c678dd;">WHERE</span> d.id_suficiencia = p_id_suficiencia
+    ) t;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ABC ENCABEZADO -->
+      <div id="sp-sp3" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Insertar, 2: Actualizar, 3: Eliminar Lógica.</td></tr>
+            <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio. Ejercicio fiscal en sesión.</td></tr>
+            <tr><td><code>@p_id_suficiencia</code></td><td><code>INT</code></td><td>Obligatorio para Acción 2 y 3.</td></tr>
+            <tr><td><code>@p_id_centro_costo</code></td><td><code>INT</code></td><td>Obligatorio para Acción 1 y 2.</td></tr>
+            <tr><td><code>@p_concepto</code></td><td><code>VARCHAR</code></td><td>Obligatorio para Acción 1 y 2.</td></tr>
+            <tr><td><code>@p_monto_total</code></td><td><code>DECIMAL</code></td><td>Monto total calculado del requerimiento.</td></tr>
+            <tr><td><code>@p_id_contrato_origen</code></td><td><code>INT</code></td><td>Opcional. Si es ampliación de un contrato.</td></tr>
+            <tr><td><code>@p_porcentaje_ampliacion</code></td><td><code>DECIMAL</code></td><td>Opcional. Si es ampliación, topeado al 20%.</td></tr>
+            <tr><td><code>@p_id_tiposuficiencia</code></td><td><code>INT</code></td><td>Opcional. Para homologación futura.</td></tr>
+            <tr><td><code>@p_id_usuario</code></td><td><code>INT</code></td><td>Obligatorio. ID del usuario que ejecuta.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1: Éxito, -1: Error de integridad o validación.</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Descripción del éxito o motivo del rechazo.</td></tr>
+            <tr><td><code>{id_generado}</code></td><td><code>INT</code></td><td>El id_suficiencia resultante si la acción fue Insertar.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 3. ABC ENCABEZADO
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">rm.fn_abc_suficiencia_encabezado</span>(
+    p_accion <span style="color:#c678dd;">INT</span>,
+    p_ejercicio <span style="color:#c678dd;">INT</span>,
+    p_id_suficiencia <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_centro_costo <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_concepto <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_monto_total <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_contrato_origen <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_porcentaje_ampliacion <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_tiposuficiencia <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_usuario <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">1</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> 
+    v_id_gen <span style="color:#c678dd;">INT</span>;
+    v_folio <span style="color:#c678dd;">VARCHAR</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#5c6370;">-- ACCION 1: INSERTAR NUEVA SOLICITUD (FASE 1)</span>
+        v_folio := <span style="color:#98c379;">'RM-SUF-'</span> || <span style="color:#56b6c2;">to_char</span>(<span style="color:#56b6c2;">now</span>(), <span style="color:#98c379;">'YYYY'</span>) || <span style="color:#98c379;">'-'</span> || <span style="color:#56b6c2;">LPAD</span>(<span style="color:#56b6c2;">CAST</span>(<span style="color:#56b6c2;">nextval</span>(<span style="color:#98c379;">'rm.seq_suficiencias'</span>) <span style="color:#c678dd;">AS</span> <span style="color:#c678dd;">VARCHAR</span>), <span style="color:#d19a66;">3</span>, <span style="color:#98c379;">'0'</span>);
+        <span style="color:#c678dd;">INSERT INTO</span> rm.rm_suficiencias(ejercicio, folio_solicitud, fecha_solicitud, id_centro_costo, concepto, monto_total, estatus_actual, id_contrato_origen, porcentaje_ampliacion, id_tiposuficiencia, fecha_registro, usuario_registro)
+        <span style="color:#c678dd;">VALUES</span>(p_ejercicio, v_folio, <span style="color:#56b6c2;">now</span>(), p_id_centro_costo, p_concepto, p_monto_total, <span style="color:#d19a66;">0</span>, p_id_contrato_origen, p_porcentaje_ampliacion, p_id_tiposuficiencia, <span style="color:#56b6c2;">now</span>(), p_id_usuario)
+        <span style="color:#c678dd;">RETURNING</span> id_suficiencia <span style="color:#c678dd;">INTO</span> v_id_gen;
+        
+        <span style="color:#5c6370;">-- REGISTRAR EN BITÁCORA</span>
+        <span style="color:#c678dd;">INSERT INTO</span> rm.rm_suficiencias_historial(ejercicio, id_suficiencia, id_usuario_ejecutor, rol_accion, estatus_proceso, fecha_registro)
+        <span style="color:#c678dd;">VALUES</span>(p_ejercicio, v_id_gen, p_id_usuario, <span style="color:#98c379;">'ANALISTA_RM'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#56b6c2;">now</span>());
+        
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Solicitud de Suficiencia creada con éxito.'</span>, <span style="color:#98c379;">'id_generado'</span>, v_id_gen);
+    
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#5c6370;">-- ACCION 2: ACTUALIZAR BORRADOR</span>
+        <span style="color:#c678dd;">UPDATE</span> rm.rm_suficiencias
+        <span style="color:#c678dd;">SET</span> id_centro_costo = p_id_centro_costo,
+            concepto = p_concepto,
+            monto_total = p_monto_total,
+            id_contrato_origen = p_id_contrato_origen,
+            porcentaje_ampliacion = p_porcentaje_ampliacion,
+            id_tiposuficiencia = p_id_tiposuficiencia,
+            fecha_actualizacion = <span style="color:#56b6c2;">now</span>(),
+            usuario_actualizacion = p_id_usuario
+        <span style="color:#c678dd;">WHERE</span> ejercicio = p_ejercicio <span style="color:#c678dd;">AND</span> id_suficiencia = p_id_suficiencia <span style="color:#c678dd;">AND</span> estatus_actual = <span style="color:#d19a66;">0</span>;
+        
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Solicitud actualizada correctamente.'</span>);
+    <span style="color:#c678dd;">END IF</span>;
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ABC PARTIDAS -->
+      <div id="sp-sp4" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Insertar, 2: Actualizar, 3: Eliminar Partida.</td></tr>
+            <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio. Ejercicio en curso.</td></tr>
+            <tr><td><code>@p_id_detalle</code></td><td><code>INT</code></td><td>Obligatorio para Acción 2 y 3.</td></tr>
+            <tr><td><code>@p_id_suficiencia</code></td><td><code>INT</code></td><td>Obligatorio para Acción 1.</td></tr>
+            <tr><td><code>@p_cve_partida_cog</code></td><td><code>VARCHAR</code></td><td>Obligatorio para Acción 1 y 2.</td></tr>
+            <tr><td><code>@p_monto_enero</code> al <code>@p_monto_diciembre</code></td><td><code>DECIMAL</code></td><td>Monto calendarizado de cada mes respectivo.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1: Éxito, -1: Error de validación (Ej. Excede saldo SAFPOJ).</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje detallado.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 4. ABC PARTIDAS (CALENDARIZACIÓN)
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">rm.fn_abc_suficiencia_partidas</span>(
+    p_accion <span style="color:#c678dd;">INT</span>,
+    p_ejercicio <span style="color:#c678dd;">INT</span>,
+    p_id_detalle <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_suficiencia <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_cve_partida_cog <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_monto_enero <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_febrero <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_marzo <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_abril <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_mayo <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_junio <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_julio <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_agosto <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_septiembre <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_octubre <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_noviembre <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_diciembre <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#5c6370;">-- TODO: Ejecutar verificación previa con fn_rm_suficiencias_saldo_partida para validar el REGLA-SUF-03</span>
+        <span style="color:#c678dd;">INSERT INTO</span> rm.rm_suficiencias_partidas(ejercicio, id_suficiencia, cve_partida_cog, monto_enero, monto_febrero, monto_marzo, monto_abril, monto_mayo, monto_junio, monto_julio, monto_agosto, monto_septiembre, monto_octubre, monto_noviembre, monto_diciembre)
+        <span style="color:#c678dd;">VALUES</span>(p_ejercicio, p_id_suficiencia, p_cve_partida_cog, p_monto_enero, p_monto_febrero, p_monto_marzo, p_monto_abril, p_monto_mayo, p_monto_junio, p_monto_julio, p_monto_agosto, p_monto_septiembre, p_monto_octubre, p_monto_noviembre, p_monto_diciembre);
+        
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Partida calendarizada agregada con éxito.'</span>);
+    
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">DELETE FROM</span> rm.rm_suficiencias_partidas <span style="color:#c678dd;">WHERE</span> ejercicio = p_ejercicio <span style="color:#c678dd;">AND</span> id_detalle = p_id_detalle;
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Partida eliminada correctamente.'</span>);
+    <span style="color:#c678dd;">END IF</span>;
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <p>Endpoints expuestos por el Backend para el Frontend:</p>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Ruta (Endpoint)</th><th>Propósito</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method get" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e8f5e9; color:#1b5e20;">GET</span></td><td><code>/api/v1/rm/suficiencias</code></td><td>Obtiene la lista de suficiencias (SP: fn_leer_suficiencia_encabezado).</td></tr>
+          <tr><td><span class="method get" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e8f5e9; color:#1b5e20;">GET</span></td><td><code>/api/v1/rm/suficiencias/{id}</code></td><td>Obtiene el detalle (encabezado, partidas e historial).</td></tr>
+          <tr><td><span class="method post" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e3f2fd; color:#0d47a1;">POST</span></td><td><code>/api/v1/rm/suficiencias</code></td><td>Crea una nueva solicitud (Fase 1).</td></tr>
+          <tr><td><span class="method put" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#fff3e0; color:#e65100;">PUT</span></td><td><code>/api/v1/rm/suficiencias/{id}</code></td><td>Actualiza datos de la solicitud (si está en Borrador).</td></tr>
+          <tr><td><span class="method post" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e3f2fd; color:#0d47a1;">POST</span></td><td><code>/api/v1/rm/suficiencias/{id}/partidas</code></td><td>Añade o actualiza la calendarización de una partida.</td></tr>
+          <tr><td><span class="method delete" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#ffebee; color:#b71c1c;">DEL</span></td><td><code>/api/v1/rm/suficiencias/partidas/{id_detalle}</code></td><td>Elimina una partida calendarizada.</td></tr>
+          <tr><td><span class="method post" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e3f2fd; color:#0d47a1;">POST</span></td><td><code>/api/v1/rm/suficiencias/{id}/enviar</code></td><td>Envía el trámite a Finanzas (Cambia estatus a 1).</td></tr>
+          <tr><td><span class="method get" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e8f5e9; color:#1b5e20;">GET</span></td><td><code>/api/v1/rm/suficiencias/{id}/pdf/oficio</code></td><td>Descarga el Oficio de Requerimiento.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Botón / Acción</th>
+            <th>Descripción funcional</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Refrescar</strong></td>
+            <td><em>(Acción Compartida)</em> Actualiza el listado de registros en la pantalla principal.</td>
+          </tr>
+          <tr>
+            <td><strong>Imprimir</strong></td>
+            <td><em>(Acción Compartida)</em> Imprime el reporte del listado actual que se visualiza en pantalla.</td>
+          </tr>
+          <tr>
+            <td><strong>Guardar</strong></td>
+            <td>Guardar suficiencia presupuestal (crea o actualiza el borrador localmente en RM).</td>
+          </tr>
+          <tr>
+            <td><strong>Oficio suficiencia</strong></td>
+            <td>Generar oficio de suficiencia presupuestal en PDF para firma física o revisión.</td>
+          </tr>
+          <tr>
+            <td><strong>Enviar</strong></td>
+            <td>Enviar suficiencia presupuestal a tesorería (Finanzas) para su revisión, autorización y congelamiento de fondos.</td>
+          </tr>
+          <tr>
+            <td><strong>Historia</strong></td>
+            <td>Consultar historia de reserva (despliega la bitácora unificada de acciones tomadas).</td>
+          </tr>
+          <tr>
+            <td><strong>Eliminar / Cancelar</strong></td>
+            <td><em>(Recomendada por proceso)</em> Eliminar borrador de suficiencia presupuestal en caso de error de captura (solo permitido si no ha sido enviada).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI / Wireframes) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <p style="margin-top:10px; font-size:13px; color:#475569;">
+        <strong>Formulario Compuesto:</strong> Los wireframes se dividen en Parámetros (mapeo con Stored Procedures) y Valores (datos de ejemplo).
+      </p>
+
+      <!-- 8.1 Pantalla Principal: Leer (Parámetros) -->
+      
+      <div class="wf-tabs" style="margin-top: 15px;">
+        <button class="wf-tab active" onclick="switchWfTab(this, 'wf1')">1. Pantalla Principal (Parámetros)</button>
+        <button class="wf-tab" onclick="switchWfTab(this, 'wf2')">2. Pantalla Principal (Valores)</button>
+        <button class="wf-tab" onclick="switchWfTab(this, 'wf3')">3. Modal ABC (Parámetros)</button>
+        <button class="wf-tab" onclick="switchWfTab(this, 'wf4')">4. Modal ABC (Valores)</button>
+      </div>
+
+      <div id="wf1" class="wf-panel active">
+        <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">1. Pantalla Principal: Leer (Parámetros)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #fff; overflow-x: auto; text-align: center;">
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+  <rect width="1000" height="500" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+  
+  <rect x="20" y="20" width="120" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+  <text x="25" y="37" font-size="10" font-weight="bold" fill="#0f172a">@p_ejercicio</text>
+
+  <rect x="150" y="20" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+  <text x="155" y="37" font-size="10" font-weight="bold" fill="#0f172a">@p_id_tiposuficiencia</text>
+
+  <rect x="320" y="20" width="220" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+  <text x="325" y="37" font-size="10" font-weight="bold" fill="#0f172a">@p_folio_solicitud</text>
+
+  <rect x="20" y="60" width="960" height="40" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+  <rect x="40" y="70" width="100" height="24" fill="#1B3A2D" rx="3"/> 
+  <text x="90" y="86" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">+ NUEVO</text>
+
+  <rect x="20" y="120" width="960" height="30" fill="#1B3A2D"/>
+  <text x="30" y="140" fill="#fff" font-size="11" font-weight="bold">FOLIO SOLICITUD</text>
+  <text x="200" y="140" fill="#fff" font-size="11" font-weight="bold">FECHA</text>
+  <text x="320" y="140" fill="#fff" font-size="11" font-weight="bold">CENTRO COSTO</text>
+  <text x="550" y="140" fill="#fff" font-size="11" font-weight="bold">TIPO TRÁMITE</text>
+  <text x="750" y="140" fill="#fff" font-size="11" font-weight="bold">MONTO TOTAL</text>
+  <text x="880" y="140" fill="#fff" font-size="11" font-weight="bold">ESTATUS</text>
+
+  <rect x="20" y="150" width="960" height="35" fill="#fff" stroke="#e2e8f0"/>
+  <text x="30" y="172" fill="#2563eb" font-size="11">@folio_solicitud</text>
+  <text x="200" y="172" fill="#2563eb" font-size="11">@fecha_solicitud</text>
+  <text x="320" y="172" fill="#2563eb" font-size="11">@id_centro_costo</text>
+  <text x="550" y="172" fill="#2563eb" font-size="11">@id_tiposuficiencia</text>
+  <text x="750" y="172" fill="#2563eb" font-size="11">@monto_total</text>
+  <rect x="880" y="155" width="70" height="25" fill="#fef08a" rx="12"/>
+  <text x="915" y="172" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">@estatus</text>
+</svg>
+        </div>
+      </div>
+      </div>
+      <div id="wf2" class="wf-panel">
+        <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">2. Pantalla Principal: Leer (Valores)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #fff; overflow-x: auto; text-align: center;">
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+  <rect width="1000" height="500" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+  
+  <rect x="20" y="20" width="120" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
+  <text x="25" y="37" font-size="10" font-weight="bold" fill="#0f172a">2026</text>
+
+  <rect x="150" y="20" width="160" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
+  <text x="155" y="37" font-size="10" font-weight="bold" fill="#0f172a">01 - NUEVA SUFICIENCIA</text>
+
+  <rect x="320" y="20" width="220" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
+  <text x="325" y="37" font-size="10" font-weight="bold" fill="#0f172a">RM-SUF-2026-001</text>
+
+  <rect x="20" y="60" width="960" height="40" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+  <rect x="40" y="70" width="100" height="24" fill="#1B3A2D" rx="3"/> 
+  <text x="90" y="86" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">+ NUEVO</text>
+
+  <rect x="20" y="120" width="960" height="30" fill="#1B3A2D"/>
+  <text x="30" y="140" fill="#fff" font-size="11" font-weight="bold">FOLIO SOLICITUD</text>
+  <text x="200" y="140" fill="#fff" font-size="11" font-weight="bold">FECHA</text>
+  <text x="320" y="140" fill="#fff" font-size="11" font-weight="bold">CENTRO COSTO</text>
+  <text x="550" y="140" fill="#fff" font-size="11" font-weight="bold">TIPO TRÁMITE</text>
+  <text x="750" y="140" fill="#fff" font-size="11" font-weight="bold">MONTO TOTAL</text>
+  <text x="880" y="140" fill="#fff" font-size="11" font-weight="bold">ESTATUS</text>
+
+  <rect x="20" y="150" width="960" height="35" fill="#fff" stroke="#e2e8f0"/>
+  <text x="30" y="172" fill="#2563eb" font-size="11">RM-SUF-2026-001</text>
+  <text x="200" y="172" fill="#2563eb" font-size="11">2026-01-10 10:30</text>
+  <text x="320" y="172" fill="#2563eb" font-size="11">01 - DIR. ADQUISICIONES</text>
+  <text x="550" y="172" fill="#2563eb" font-size="11">01 - NUEVA SUFICIENCIA</text>
+  <text x="750" y="172" fill="#2563eb" font-size="11">$ 105,000.00</text>
+  <rect x="880" y="155" width="70" height="25" fill="#fef08a" rx="12"/>
+  <text x="915" y="172" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">Borrador</text>
+</svg>
+        </div>
+      </div>
+      </div>
+      <div id="wf3" class="wf-panel">
+      <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">3. Modal: ABC (Parámetros)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+<svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+  <rect width="1000" height="800" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+  <rect width="1000" height="800" fill="rgba(0,0,0,0.6)" />
+  
+  <rect x="20" y="20" width="960" height="760" fill="#fff" rx="6" stroke="#999" />
+  
+  <rect x="20" y="20" width="960" height="40" fill="#1B3A2D" rx="6" />
+  <rect x="20" y="40" width="960" height="20" fill="#1B3A2D" />
+  <text x="40" y="45" fill="#fff" font-size="14" font-weight="bold">Formulario Compuesto: Solicitud de Suficiencia y Partidas</text>
+  <text x="950" y="45" fill="#fff" font-size="14" font-weight="bold" cursor="pointer">X</text>
+  
+  <!-- SECCIÓN 1: ENCABEZADO -->
+  <text x="40" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 1: DATOS DEL ENCABEZADO (rm_suficiencias)</text>
+  <rect x="40" y="100" width="920" height="140" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
+  
+  <text x="50" y="130" font-size="11" font-weight="bold" fill="#666">Folio Solicitud:</text>
+  <rect x="50" y="135" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_folio_solicitud</text>
+
+  <text x="230" y="130" font-size="11" font-weight="bold" fill="#666">Ejercicio:</text>
+  <rect x="230" y="135" width="100" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="235" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_ejercicio</text>
+
+  <text x="350" y="130" font-size="11" font-weight="bold" fill="#666">Centro Costo (UA):</text>
+  <rect x="350" y="135" width="280" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="355" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_id_centro_costo</text>
+
+  <text x="650" y="130" font-size="11" font-weight="bold" fill="#666">Tipo Trámite:</text>
+  <rect x="650" y="135" width="290" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="655" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_id_tiposuficiencia</text>
+
+  <text x="50" y="180" font-size="11" font-weight="bold" fill="#666">Concepto / Justificación:</text>
+  <rect x="50" y="185" width="480" height="30" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="205" font-size="10" font-weight="bold" fill="#0f172a">@p_concepto</text>
+
+  <text x="550" y="180" font-size="11" font-weight="bold" fill="#666">Contrato Origen:</text>
+  <rect x="550" y="185" width="130" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="555" y="202" font-size="10" font-weight="bold" fill="#0f172a">@p_id_contrato_origen</text>
+
+  <text x="700" y="180" font-size="11" font-weight="bold" fill="#666">% Amp:</text>
+  <rect x="700" y="185" width="80" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="705" y="202" font-size="10" font-weight="bold" fill="#0f172a">@p_porc</text>
+
+  <text x="800" y="180" font-size="11" font-weight="bold" fill="#666">Monto Total:</text>
+  <rect x="800" y="185" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="805" y="202" font-size="10" font-weight="bold" fill="#0f172a">@p_monto_total</text>
+
+  <!-- SECCIÓN 2: BOTONES DE ACCIONES -->
+  <text x="40" y="270" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 2: ACCIONES</text>
+  <rect x="40" y="280" width="920" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
+  
+  <rect x="50" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="120" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Guardar Cabecera</text>
+
+  <rect x="210" y="290" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
+  <text x="280" y="310" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">Eliminar Solicitud</text>
+
+  <rect x="650" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="720" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Imprimir Oficio</text>
+
+  <rect x="810" y="290" width="140" height="30" fill="#1B3A2D" rx="4"/>
+  <text x="880" y="310" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Enviar a Finanzas</text>
+
+  <!-- SECCIÓN 3: MOVIMIENTOS EN MODO GRID -->
+  <text x="40" y="360" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 3: CAPTURA DE MOVIMIENTOS EN MODO GRID (rm_suficiencias_partidas)</text>
+  
+  <!-- Grid Header -->
+  <rect x="40" y="375" width="920" height="25" fill="#1B3A2D" />
+  <text x="45" y="392" fill="#fff" font-size="9" font-weight="bold">COG</text>
+  <text x="100" y="392" fill="#fff" font-size="9" font-weight="bold">ENE</text>
+  <text x="160" y="392" fill="#fff" font-size="9" font-weight="bold">FEB</text>
+  <text x="220" y="392" fill="#fff" font-size="9" font-weight="bold">MAR</text>
+  <text x="280" y="392" fill="#fff" font-size="9" font-weight="bold">ABR</text>
+  <text x="340" y="392" fill="#fff" font-size="9" font-weight="bold">MAY</text>
+  <text x="400" y="392" fill="#fff" font-size="9" font-weight="bold">JUN</text>
+  <text x="460" y="392" fill="#fff" font-size="9" font-weight="bold">JUL</text>
+  <text x="520" y="392" fill="#fff" font-size="9" font-weight="bold">AGO</text>
+  <text x="580" y="392" fill="#fff" font-size="9" font-weight="bold">SEP</text>
+  <text x="640" y="392" fill="#fff" font-size="9" font-weight="bold">OCT</text>
+  <text x="700" y="392" fill="#fff" font-size="9" font-weight="bold">NOV</text>
+  <text x="760" y="392" fill="#fff" font-size="9" font-weight="bold">DIC</text>
+  <text x="820" y="392" fill="#fff" font-size="9" font-weight="bold">TOTAL</text>
+  <text x="900" y="392" fill="#fff" font-size="9" font-weight="bold">ACCIÓN</text>
+
+  <!-- Grid Row 1 (Existing Data) -->
+  <rect x="40" y="400" width="920" height="30" fill="#fff" stroke="#e2e8f0" />
+  <text x="45" y="418" fill="#2563eb" font-size="9">@p_cog_1</text>
+  <text x="100" y="418" fill="#2563eb" font-size="9">@p_e_1</text>
+  <text x="160" y="418" fill="#2563eb" font-size="9">@p_f_1</text>
+  <text x="220" y="418" fill="#2563eb" font-size="9">@p_m_1</text>
+  <text x="280" y="418" fill="#2563eb" font-size="9">@p_a_1</text>
+  <text x="340" y="418" fill="#2563eb" font-size="9">@p_m2_1</text>
+  <text x="400" y="418" fill="#2563eb" font-size="9">@p_j_1</text>
+  <text x="460" y="418" fill="#2563eb" font-size="9">@p_j2_1</text>
+  <text x="520" y="418" fill="#2563eb" font-size="9">@p_a2_1</text>
+  <text x="580" y="418" fill="#2563eb" font-size="9">@p_s_1</text>
+  <text x="640" y="418" fill="#2563eb" font-size="9">@p_o_1</text>
+  <text x="700" y="418" fill="#2563eb" font-size="9">@p_n_1</text>
+  <text x="760" y="418" fill="#2563eb" font-size="9">@p_d_1</text>
+  <text x="820" y="418" fill="#1B3A2D" font-size="9" font-weight="bold">@p_tot_1</text>
+  
+  <rect x="900" y="405" width="40" height="20" fill="#ef4444" rx="3" />
+  <text x="920" y="418" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">X</text>
+
+  <!-- Grid Row 2 (Input Row) -->
+  <rect x="40" y="430" width="920" height="35" fill="#f8fafc" stroke="#e2e8f0" />
+  <rect x="43" y="435" width="50" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="98" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="158" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="218" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="278" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="338" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="398" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="458" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="518" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="578" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="638" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="698" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="758" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  
+  <text x="820" y="452" fill="#666" font-size="9" font-style="italic">Auto</text>
+  
+  <rect x="890" y="437" width="60" height="21" fill="#1B3A2D" rx="3" />
+  <text x="920" y="451" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">+ ADD</text>
+
+  <!-- SECCIÓN 4: TOTAL DE PARTIDAS -->
+  <text x="40" y="520" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 4: TOTAL DE PARTIDAS PRESUPUESTALES</text>
+  <rect x="600" y="530" width="360" height="50" fill="#fdfdfd" stroke="#1B3A2D" stroke-width="2" rx="4" />
+  <text x="620" y="560" font-size="14" font-weight="bold" fill="#1B3A2D">Suma Total Partidas: @p_suma_total</text>
+
+  <!-- CERRAR MODAL -->
+  <rect x="400" y="620" width="200" height="40" fill="#e2e8f0" rx="4" />
+  <text x="500" y="645" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
+
+</svg>
+        </div>
+      </div>
+      </div>
+      <div id="wf4" class="wf-panel">
+      <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">4. Modal: ABC (Valores)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+<svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+  <rect width="1000" height="800" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+  <rect width="1000" height="800" fill="rgba(0,0,0,0.6)" />
+  
+  <rect x="20" y="20" width="960" height="760" fill="#fff" rx="6" stroke="#999" />
+  
+  <rect x="20" y="20" width="960" height="40" fill="#1B3A2D" rx="6" />
+  <rect x="20" y="40" width="960" height="20" fill="#1B3A2D" />
+  <text x="40" y="45" fill="#fff" font-size="14" font-weight="bold">Formulario Compuesto: Solicitud de Suficiencia y Partidas</text>
+  <text x="950" y="45" fill="#fff" font-size="14" font-weight="bold" cursor="pointer">X</text>
+  
+  <!-- SECCIÓN 1: ENCABEZADO -->
+  <text x="40" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 1: DATOS DEL ENCABEZADO (rm_suficiencias)</text>
+  <rect x="40" y="100" width="920" height="140" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
+  
+  <text x="50" y="130" font-size="11" font-weight="bold" fill="#666">Folio Solicitud:</text>
+  <rect x="50" y="135" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="152" font-size="10" font-weight="bold" fill="#0f172a">RM-SUF-2026-001</text>
+
+  <text x="230" y="130" font-size="11" font-weight="bold" fill="#666">Ejercicio:</text>
+  <rect x="230" y="135" width="100" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="235" y="152" font-size="10" font-weight="bold" fill="#0f172a">2026</text>
+
+  <text x="350" y="130" font-size="11" font-weight="bold" fill="#666">Centro Costo (UA):</text>
+  <rect x="350" y="135" width="280" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="355" y="152" font-size="10" font-weight="bold" fill="#0f172a">01 - DIR. RECURSOS MATERIALES</text>
+
+  <text x="650" y="130" font-size="11" font-weight="bold" fill="#666">Tipo Trámite:</text>
+  <rect x="650" y="135" width="290" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="655" y="152" font-size="10" font-weight="bold" fill="#0f172a">01 - NUEVA SUFICIENCIA</text>
+
+  <text x="50" y="180" font-size="11" font-weight="bold" fill="#666">Concepto / Justificación:</text>
+  <rect x="50" y="185" width="480" height="30" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="205" font-size="10" font-weight="bold" fill="#0f172a">Suministros de oficina para dependencias.</text>
+
+  <text x="550" y="180" font-size="11" font-weight="bold" fill="#666">Contrato Origen:</text>
+  <rect x="550" y="185" width="130" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="555" y="202" font-size="10" font-weight="bold" fill="#0f172a">N/A</text>
+
+  <text x="700" y="180" font-size="11" font-weight="bold" fill="#666">% Amp:</text>
+  <rect x="700" y="185" width="80" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="705" y="202" font-size="10" font-weight="bold" fill="#0f172a">0%</text>
+
+  <text x="800" y="180" font-size="11" font-weight="bold" fill="#666">Monto Total:</text>
+  <rect x="800" y="185" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="805" y="202" font-size="10" font-weight="bold" fill="#0f172a">$ 105,000.00</text>
+
+  <!-- SECCIÓN 2: BOTONES DE ACCIONES -->
+  <text x="40" y="270" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 2: ACCIONES</text>
+  <rect x="40" y="280" width="920" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
+  
+  <rect x="50" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="120" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Guardar Cabecera</text>
+
+  <rect x="210" y="290" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
+  <text x="280" y="310" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">Eliminar Solicitud</text>
+
+  <rect x="650" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="720" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Imprimir Oficio</text>
+
+  <rect x="810" y="290" width="140" height="30" fill="#1B3A2D" rx="4"/>
+  <text x="880" y="310" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Enviar a Finanzas</text>
+
+  <!-- SECCIÓN 3: MOVIMIENTOS EN MODO GRID -->
+  <text x="40" y="360" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 3: CAPTURA DE MOVIMIENTOS EN MODO GRID (rm_suficiencias_partidas)</text>
+  
+  <!-- Grid Header -->
+  <rect x="40" y="375" width="920" height="25" fill="#1B3A2D" />
+  <text x="45" y="392" fill="#fff" font-size="9" font-weight="bold">COG</text>
+  <text x="100" y="392" fill="#fff" font-size="9" font-weight="bold">ENE</text>
+  <text x="160" y="392" fill="#fff" font-size="9" font-weight="bold">FEB</text>
+  <text x="220" y="392" fill="#fff" font-size="9" font-weight="bold">MAR</text>
+  <text x="280" y="392" fill="#fff" font-size="9" font-weight="bold">ABR</text>
+  <text x="340" y="392" fill="#fff" font-size="9" font-weight="bold">MAY</text>
+  <text x="400" y="392" fill="#fff" font-size="9" font-weight="bold">JUN</text>
+  <text x="460" y="392" fill="#fff" font-size="9" font-weight="bold">JUL</text>
+  <text x="520" y="392" fill="#fff" font-size="9" font-weight="bold">AGO</text>
+  <text x="580" y="392" fill="#fff" font-size="9" font-weight="bold">SEP</text>
+  <text x="640" y="392" fill="#fff" font-size="9" font-weight="bold">OCT</text>
+  <text x="700" y="392" fill="#fff" font-size="9" font-weight="bold">NOV</text>
+  <text x="760" y="392" fill="#fff" font-size="9" font-weight="bold">DIC</text>
+  <text x="820" y="392" fill="#fff" font-size="9" font-weight="bold">TOTAL</text>
+  <text x="900" y="392" fill="#fff" font-size="9" font-weight="bold">ACCIÓN</text>
+
+  <!-- Grid Row 1 (Existing Data) -->
+  <rect x="40" y="400" width="920" height="30" fill="#fff" stroke="#e2e8f0" />
+  <text x="45" y="418" fill="#2563eb" font-size="9">21111</text>
+  <text x="100" y="418" fill="#2563eb" font-size="9">25,000</text>
+  <text x="160" y="418" fill="#2563eb" font-size="9">25,000</text>
+  <text x="220" y="418" fill="#2563eb" font-size="9">25,000</text>
+  <text x="280" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="340" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="400" y="418" fill="#2563eb" font-size="9">15,000</text>
+  <text x="460" y="418" fill="#2563eb" font-size="9">15,000</text>
+  <text x="520" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="580" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="640" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="700" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="760" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="820" y="418" fill="#1B3A2D" font-size="9" font-weight="bold">$ 105,000</text>
+  
+  <rect x="900" y="405" width="40" height="20" fill="#ef4444" rx="3" />
+  <text x="920" y="418" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">X</text>
+
+  <!-- Grid Row 2 (Input Row) -->
+  <rect x="40" y="430" width="920" height="35" fill="#f8fafc" stroke="#e2e8f0" />
+  <rect x="43" y="435" width="50" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="98" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="158" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="218" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="278" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="338" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="398" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="458" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="518" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="578" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="638" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="698" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="758" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  
+  <text x="820" y="452" fill="#666" font-size="9" font-style="italic">Auto</text>
+  
+  <rect x="890" y="437" width="60" height="21" fill="#1B3A2D" rx="3" />
+  <text x="920" y="451" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">+ ADD</text>
+
+  <!-- SECCIÓN 4: TOTAL DE PARTIDAS -->
+  <text x="40" y="520" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 4: TOTAL DE PARTIDAS PRESUPUESTALES</text>
+  <rect x="600" y="530" width="360" height="50" fill="#fdfdfd" stroke="#1B3A2D" stroke-width="2" rx="4" />
+  <text x="620" y="560" font-size="14" font-weight="bold" fill="#1B3A2D">Suma Total Partidas: $ 105,000.00</text>
+
+  <!-- CERRAR MODAL -->
+  <rect x="400" y="620" width="200" height="40" fill="#e2e8f0" rx="4" />
+  <text x="500" y="645" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
+
+</svg>
+        </div>
+      </div>
+      </div>
+
+      <script>
+      function switchWfTab(btn, panelId) {
+        const container = btn.closest('.doc-section');
+        container.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+        container.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        container.querySelector('#' + panelId).classList.add('active');
+      }
+      </script>
+
+    <!-- 9. Reglas Críticas de Negocio -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas Críticas de Negocio</div>
+      
+      <p style="margin-top:10px; font-size:13px; color:#475569;">
+        <strong>Importante para Desarrollo (Daryl):</strong> Las siguientes validaciones técnicas son de carácter normativo y deben implementarse estrictamente tanto en el Frontend (bloqueos visuales) como en el Backend (Stored Procedures).
+      </p>
+
+      <ul style="margin-top: 15px; font-size: 13px; color: #334155; line-height: 1.6; padding-left: 20px;">
+        <li style="margin-bottom: 10px;"><strong>REGLA-SUF-01 (Congruencia de Montos):</strong> El UI y el SP <code>fn_abc_suficiencia_partidas</code> deben asegurar matemáticamente que la suma <code>(monto_enero + monto_febrero + ... + monto_diciembre)</code> <strong>sea menor o igual</strong> al <code>monto_total</code> capturado en la cabecera (<code>rm_suficiencias</code>).</li>
+        
+        <li style="margin-bottom: 10px;"><strong>REGLA-SUF-02 (Validación Estricta de Saldo SAFPOJ):</strong> Esta es la regla crítica. El SP <code>fn_rm_suficiencias_saldo_partida</code> debe invocarse en 2 momentos: al <em>Guardar</em> la Partida y al Dar clic en <em>Enviar</em>. Debe hacer un <code>SELECT</code> a la tabla externa <code>safpoj_saldos</code> filtrando por <code>p_ejercicio</code> y <code>cve_partida_cog</code>. Si el monto requerido es superior al <code>saldo_disponible</code>, lanzar un <code>RAISE EXCEPTION</code> devolviendo <code>-1</code> y el mensaje detallado del saldo libre para que el UI bloquee la acción.</li>
+        
+        <li style="margin-bottom: 10px;"><strong>REGLA-SUF-03 (Candado de Edición):</strong> La acción de Actualizar o Eliminar (Inputs habilitados y llamadas al ABC) solo es permitida si el <code>estatus_actual</code> en base de datos es <code>0</code> (Borrador) o <code>3</code> (Rechazado). Si <code>estatus_actual IN (1, 2)</code>, el UI debe bloquearse (Read-Only) y los SP deben abortar cualquier instrucción.</li>
+        
+        <li style="margin-bottom: 10px;"><strong>REGLA-SUF-04 (Pre-condición de Envío):</strong> Para poder accionar el botón "Enviar a Finanzas", el frontend debe validar que exista por lo menos <strong>una (1)</strong> partida guardada en la grilla inferior (<code>rm_suficiencias_partidas</code>).</li>
+      </ul>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
+      <p style="margin-top:10px; font-size:13px; color:#475569;">La Solicitud de Suficiencia Presupuestal es el gatillo inicial de la cadena de suministro y detona los siguientes impactos transversales:</p>
+      <ul style="margin-top: 15px; font-size: 13px; color: #334155; line-height: 1.6; padding-left: 20px;">
+        <li style="margin-bottom: 10px;"><strong>Impacto hacia Presupuesto (Finanzas):</strong> Al accionar "Enviar", el registro aparece automáticamente en la bandeja del módulo <code>02.2.8</code> de la Subdirección de Recursos Financieros. Los montos solicitados entran en un estado de "Pre-reserva" (no utilizables por otras áreas mientras se dictamina).</li>
+        <li style="margin-bottom: 10px;"><strong>Impacto hacia Compras (Adquisiciones):</strong> Una suficiencia con <code>estatus_actual = 2</code> (Autorizado) se convierte en el insumo obligatorio para el módulo <code>07.2.2 Registro de Pedidos/Contratos</code>. Sin una suficiencia autorizada, el sistema bloquea cualquier intento de compromiso de compra.</li>
+      </ul>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Aplica</th>
+            <th>Descripción Contable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>No Aplica</strong></td>
+            <td>Esta operación es estrictamente de control <strong>Presupuestal</strong>. No genera pólizas automáticas ni afecta cuentas de balance o resultados en la matriz de conversión contable.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Versión</th>
+            <th>Descripción del Cambio</th>
+            <th>Autor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>15/06/2026</td>
+            <td>1.0</td>
+            <td>Creación del documento de análisis funcional y reglas de negocio.</td>
+            <td>Consultoría DIX</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- 3. ANEXOS IMPRESOS -->
+    <style>
+      .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.6); z-index: 10000;
+        display: none; align-items: center; justify-content: center;
+        backdrop-filter: blur(2px);
+      }
+      .modal-overlay.active { display: flex !important; }
+      .modal-box {
+        background: #fff; width: 90%; max-width: 1000px; max-height: 90vh;
+        border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        display: flex; flex-direction: column; overflow: hidden;
+      }
+      .modal-header {
+        padding: 16px 24px; border-bottom: 1px solid #eee;
+        display: flex; justify-content: space-between; align-items: center;
+        background: #fff;
+      }
+      .modal-title { margin: 0; color: #183125; font-size: 16px; font-weight: bold; }
+      .modal-close {
+        background: #e11d48; color: #fff; border: none; padding: 8px 16px;
+        border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s;
+      }
+      .modal-close:hover { background: #be123c; }
+      .modal-body { padding: 24px; overflow-y: auto; flex: 1; background: #fafafa; }
+      
+      @media print {
+        .modal-overlay {
+          position: static; width: auto; height: auto; background: none; display: block !important; backdrop-filter: none;
+        }
+        .modal-box { box-shadow: none; border-radius: 0; max-height: none; width: 100%; }
+        .modal-header { display: none; }
+        .modal-body { padding: 0; background: none; overflow-y: visible; }
+      }
+    </style>
+    
+    <div id="modal-diagrama" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title">Diagrama Interfuncional del Procedimiento</div>
+          <button class="modal-close" onclick="document.getElementById('modal-diagrama').classList.remove('active')">✖ Cerrar</button>
+        </div>
+        <div class="modal-body">
+          <div class="doc-section">
+            <div class="section-title"><span class="section-num">13</span> Anexos Obligatorios (Diseño para Impresión)</div>
+            <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px; margin-top: 10px;">Anexo 1: Diagrama Interfuncional del Procedimiento</h3>
+            <div id="module-flowchart">
+<svg viewBox="0 0 1000 780" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff; border-radius: 8px;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; letter-spacing: 1px; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      .sep-line { stroke: #e5e7eb; stroke-width: 3; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#991B1B"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="250" height="40" class="header-area"/>
+  <text x="175" y="45" class="header-text">ÁREA RESPONSABLE</text>
+  
+  <rect x="300" y="20" width="300" height="40" class="header-proceso"/>
+  <text x="450" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="760" class="lane-line" stroke-dasharray="none"/>
+  <line x1="300" y1="60" x2="300" y2="760" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="760" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="760" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="760" x2="950" y2="760" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril ÁREA -->
+  <text x="75" y="220" transform="rotate(-90 75 220)" font-weight="bold" font-size="20" fill="#e5e7eb" text-anchor="middle" letter-spacing="4">RECURSOS MATERIALES</text>
+  
+  <!-- Divisor Horizontal entre RM y Finanzas -->
+  <line x1="50" y1="360" x2="950" y2="360" class="sep-line"/>
+  
+  <text x="75" y="560" transform="rotate(-90 75 560)" font-weight="bold" font-size="20" fill="#e5e7eb" text-anchor="middle" letter-spacing="4">SUBDIRECCIÓN DE FINANZAS</text>
+
+  <!-- Nodos -->
+  <!-- 1. Inicio -->
+  <rect x="410" y="80" width="80" height="25" class="node-term" />
+  <text x="450" y="96" class="node-term-text">INICIO</text>
+  <path d="M 450 105 L 450 125" class="path-line"/>
+
+  <!-- 1. Captura de Solicitud -->
+  <polygon points="350,125 550,125 535,175 335,175" class="node-data"/>
+  <text x="450" y="145" class="node-text">1. Captura de Solicitud</text>
+  <text x="450" y="160" class="node-sub">Ingresa Partidas</text>
+  <path d="M 450 175 L 450 205" class="path-line"/>
+
+  <!-- 2. Envío de Oficio -->
+  <path d="M 350 205 L 550 205 L 550 245 C 500 265, 400 225, 350 245 Z" class="node-doc"/>
+  <text x="450" y="225" class="node-text">2. Genera y Envía Oficio</text>
+  <text x="450" y="240" class="node-sub">Solicitud de Reserva</text>
+  <path d="M 550 225 L 710 225" class="path-line"/>
+
+  <!-- 3. Validación SAFPOJ -->
+  <polygon points="775,195 840,225 775,255 710,225" class="node-rombo"/>
+  <text x="775" y="220" class="node-text">¿Saldo en</text>
+  <text x="775" y="235" class="node-text">SAFPOJ?</text>
+
+  <!-- Rechazo por Saldo -->
+  <path d="M 775 195 L 775 150" class="path-red"/>
+  <text x="790" y="180" font-size="10" fill="#991B1B" font-weight="bold">No</text>
+  
+  <!-- Bloqueo -->
+  <path d="M 695 130 C 695 120, 855 120, 855 130 L 855 170 C 855 180, 695 180, 695 170 Z" class="node-db" />
+  <path d="M 695 130 C 695 140, 855 140, 855 130" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="150" class="node-text">Bloqueo Automático</text>
+  <text x="775" y="163" class="node-sub">Falta de liquidez</text>
+  <path d="M 695 150 L 535 150" class="path-line"/>
+
+  <!-- Saldo OK -> Pre Reserva -->
+  <path d="M 775 255 L 775 290" class="path-green"/>
+  <text x="790" y="275" font-size="10" font-weight="bold">Sí</text>
+  
+  <path d="M 695 290 C 695 280, 855 280, 855 290 L 855 330 C 855 340, 695 340, 695 330 Z" class="node-db" />
+  <path d="M 695 290 C 695 300, 855 300, 855 290" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="312" class="node-text">Pre-Reserva Creada</text>
+  <text x="775" y="325" class="node-sub">Estatus = 1</text>
+  
+  <path d="M 775 330 L 775 385 L 450 385 L 450 405" class="path-line"/>
+
+  <!-- 3. Dictamen de Suficiencia -->
+  <polygon points="340,405 560,405 545,455 325,455" class="node-data"/>
+  <text x="450" y="425" class="node-text">3. Dictamen de Suficiencia</text>
+  <text x="450" y="440" class="node-sub">Evalúa Bandeja 02.2.8</text>
+  <path d="M 450 455 L 450 480" class="path-line"/>
+
+  <!-- ¿Autoriza? -->
+  <polygon points="450,480 510,510 450,540 390,510" class="node-rombo"/>
+  <text x="450" y="515" class="node-text">¿Autoriza?</text>
+
+  <!-- Rechazo Finanzas -->
+  <path d="M 510 510 L 695 510" class="path-red"/>
+  <text x="600" y="505" font-size="10" fill="#991B1B" font-weight="bold">No (Rechaza)</text>
+
+  <path d="M 695 490 C 695 480, 855 480, 855 490 L 855 530 C 855 540, 695 540, 695 530 Z" class="node-db" />
+  <path d="M 695 490 C 695 500, 855 500, 855 490" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="512" class="node-text">Libera Saldos</text>
+  <text x="775" y="525" class="node-sub">Estatus = 3</text>
+  
+  <path d="M 775 530 L 775 550 L 360 550 L 360 620" class="path-line"/>
+
+  <!-- Autoriza Finanzas -->
+  <path d="M 450 540 L 450 580 L 685 580" class="path-green"/>
+  <text x="560" y="575" font-size="10" font-weight="bold">Sí (Autoriza)</text>
+
+  <path d="M 685 560 C 685 550, 865 550, 865 560 L 865 600 C 865 610, 685 610, 685 600 Z" class="node-db" />
+  <path d="M 685 560 C 685 570, 865 570, 865 560" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="582" class="node-text">Reserva Contable M-XX</text>
+  <text x="775" y="595" class="node-sub">Afecta Balance</text>
+
+  <path d="M 775 600 L 775 610 L 540 610 L 540 620" class="path-line"/>
+
+  <!-- 4. Notifica Rechazo -->
+  <path d="M 300 620 L 420 620 L 420 655 C 390 670, 330 640, 300 655 Z" class="node-doc"/>
+  <text x="360" y="635" class="node-text">4. Notifica Rechazo</text>
+  <text x="360" y="648" class="node-sub">Oficio Negativo</text>
+
+  <!-- 4. Notifica Autoriza -->
+  <path d="M 480 620 L 600 620 L 600 655 C 570 670, 510 640, 480 655 Z" class="node-doc"/>
+  <text x="540" y="635" class="node-text">4. Notifica Autoriza.</text>
+  <text x="540" y="648" class="node-sub">Oficio Positivo</text>
+
+  <!-- FIN -->
+  <rect x="410" y="710" width="80" height="30" class="node-term" />
+  <text x="450" y="730" class="node-term-text">FIN</text>
+
+  <path d="M 360 655 L 360 690 L 430 690 L 430 710" class="path-line"/>
+  <path d="M 540 655 L 540 690 L 470 690 L 470 710" class="path-line"/>
+
+</svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="modal-proceso" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title">Flujograma de Procesos y Descripción</div>
+          <button class="modal-close" onclick="document.getElementById('modal-proceso').classList.remove('active')">✖ Cerrar</button>
+        </div>
+        <div class="modal-body">
+          <div class="doc-section">
+            <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">Anexo 2: Flujograma de Procesos y Descripción</h3>
+            <div id="module-process-table">
+              <table class="props-table">
+                <thead>
+                  <tr style="background: var(--pjev-verde-oscuro); color: white;">
+                    <th>ÁREA RESPONSABLE</th>
+                    <th>PASO / ETAPA</th>
+                    <th>PROCESO OPERATIVO</th>
+                    <th>SIAF-PJEV</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Recursos Materiales</strong></td>
+                    <td><strong>1. Captura de Solicitud</strong></td>
+                    <td>Detecta la necesidad de una compra, genera una Petición de Suficiencia y captura las partidas a afectar.</td>
+                    <td>Carga el listado de partidas activas (COG) permitiendo seleccionar sólo las pertinentes al ejercicio fiscal.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Recursos Materiales</strong></td>
+                    <td><strong>2. Generación y Envío de Oficio</strong></td>
+                    <td>Genera el Oficio de Solicitud de Reserva Presupuestal y envía formalmente la solicitud para evaluación.</td>
+                    <td>Valida saldos matemáticamente contra SAFPOJ. Si existe saldo disponible, "pre-reserva" (Estatus 1). Si no hay saldo, bloquea e impide el envío.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Subdirección de Finanzas</strong></td>
+                    <td><strong>3. Dictamen de Suficiencia</strong></td>
+                    <td>Revisa la bandeja operativa (Módulo 02.2.8) y decide Rechazar o Autorizar las partidas solicitadas.</td>
+                    <td>Actualiza estatus. En caso de Rechazo, libera inmediatamente los saldos pre-reservados. En caso de Autorización, descuenta los saldos definitivamente.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Subdirección de Finanzas</strong></td>
+                    <td><strong>4. Notificación de Resolución</strong></td>
+                    <td>Notifica formalmente por oficio la autorización (o rechazo) de la suficiencia presupuestal a Recursos Materiales para continuar la adjudicación.</td>
+                    <td>Genera el Folio Automático M-XX de Reserva Contable y permite la exportación del PDF Oficial con sellos institucionales.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(b => {
+        if (b.innerText.includes('Ver Diagrama')) {
+          b.onclick = () => {
+            document.getElementById('modal-diagrama').classList.add('active');
+          };
+        }
+        if (b.innerText.includes('Proceso Funcional')) {
+          b.onclick = () => {
+            document.getElementById('modal-proceso').classList.add('active');
+          };
+        }
+      });
+    </script>
+    <script>
+      <style>
+      #anexos-impresos {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.6); z-index: 10000;
+        display: none; align-items: center; justify-content: center;
+        backdrop-filter: blur(2px);
+      }
+      #anexos-impresos.active { display: flex !important; }
+      .modal-box {
+        background: #fff; width: 90%; max-width: 1000px; max-height: 90vh;
+        border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        display: flex; flex-direction: column; overflow: hidden;
+      }
+      .modal-header {
+        padding: 16px 24px; border-bottom: 1px solid #eee;
+        display: flex; justify-content: space-between; align-items: center;
+        background: #fff;
+      }
+      .modal-title { margin: 0; color: #183125; font-size: 16px; font-weight: bold; }
+      .modal-close {
+        background: #e11d48; color: #fff; border: none; padding: 8px 16px;
+        border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s;
+      }
+      .modal-close:hover { background: #be123c; }
+      .modal-body { padding: 24px; overflow-y: auto; flex: 1; background: #fafafa; }
+      
+      @media print {
+        #anexos-impresos {
+          position: static; width: auto; height: auto; background: none; display: block !important; backdrop-filter: none;
+        }
+        .modal-box { box-shadow: none; border-radius: 0; max-height: none; width: 100%; }
+        .modal-header { display: none; }
+        .modal-body { padding: 0; background: none; overflow-y: visible; }
+      }
+    </style>
+    <script>
+      const anexosDiv = document.getElementById('anexos-impresos');
+      // Envolver el contenido existente en la caja del modal si no está envuelto
+      if (!anexosDiv.querySelector('.modal-box')) {
+        const content = anexosDiv.innerHTML;
+        anexosDiv.innerHTML = `
+          <div class="modal-box">
+            <div class="modal-header">
+              <div class="modal-title">Diagrama Interfuncional del Procedimiento</div>
+              <button class="modal-close" onclick="document.getElementById('anexos-impresos').classList.remove('active')">✖ Cerrar</button>
+            </div>
+            <div class="modal-body">${content}</div>
+          </div>
+        `;
+      }
+
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(b => {
+        if (b.innerText.includes('Ver Diagrama') || b.innerText.includes('Proceso Funcional')) {
+          b.onclick = () => {
+            anexosDiv.classList.add('active');
+          };
+        }
+      });
+    </script>
+
+</div>
+</body>
+</html>

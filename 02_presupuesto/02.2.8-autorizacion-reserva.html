@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.2.8 Autorización de Reserva — SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+  .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; }
+</style>
+</head>
+<body>
+<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999; max-width: calc(-60px + 100vw);"><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(27, 58, 45); border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; background: rgb(27, 58, 45); color: rgb(255, 255, 255);">📊 Ver Diagrama</button><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(153, 27, 27); border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; background: rgb(153, 27, 27); color: rgb(255, 255, 255);">📋 Proceso Funcional</button><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.location.reload()">⟳ Refrescar</button><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.print()">🖨 Imprimir</button></div>
+<div class="doc-main-inner">
+
+    <!-- BREADCRUMB -->
+            <div class="elem-breadcrumb">
+        <a href="../index.html">Inicio</a> ›
+      <span>Presupuesto</span> ›
+      <span>Proceso</span> ›
+      <span>02.2.8 Autorización de Reserva</span>
+    </div>
+
+<!-- ENCABEZADO Y TÍTULO -->
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.2.8</div>
+        <h1 class="elem-title">Autorización de Reserva Presupuestal</h1>
+        <p class="elem-desc">Módulo exclusivo de la Subdirección de Recursos Financieros para recibir solicitudes de Recursos Materiales, realizar movimientos en el sistema y emitir el Oficio de Confirmación para asegurar fondos.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Fase 2: Autorización</span>
+          <span class="mod-badge badge-s">Tipo: Aprobación / Bandeja</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">pr / autorizacion / reserva</code></span>
+        </div>
+        
+        <div style="background: rgb(244, 241, 234); border-width: 1px 1px 1px 4px; border-style: solid; border-color: rgb(222, 172, 80); border-image: initial; padding: 10px 15px; border-radius: 4px; margin: 20px 0px 0px; font-family: var(--font-main, sans-serif); font-size: 12px; display: block; color: rgb(51, 51, 51);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: #1B3A2D; font-size: 13px;">📋 Estatus de Desarrollo (PM: 02.2.8)</strong>
+              <div style="margin-top: 4px; color: #666;">
+                <b>Asignado actual:</b> Daryl &nbsp;|&nbsp;
+                <b>Iteraciones:</b> 0 &nbsp;|&nbsp;
+                <b>Proyectado:</b> 3 días
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: bold; color: #1B3A2D;">Avance Global</div>
+              <div style="font-size: 18px; color: #DEAC50; font-weight: bold;">0%</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Este módulo sirve como la <strong>Bandeja de Entrada</strong> de la Subdirección de Recursos Financieros. Aquí se reciben todas las peticiones (Suficiencias) que captura previamente Recursos Materiales (Adquisiciones).</p>
+      <p>El Analista de Presupuesto analiza la solicitud, realiza los movimientos contables requeridos (Confirmación, Transferencia, Recalendarización o Apertura) en el sistema financiero y, finalmente, captura el Folio y la Fecha Oficial de Autorización para devolver el trámite a Adquisiciones.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo (SIAF / CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>LGCG Art. 25</strong></td>
+            <td>Garantizar la armonización contable-presupuestal. Ninguna adquisición o servicio puede ser comprometido sin estar respaldado previamente por disponibilidad presupuestal confirmada en la partida correspondiente.</td>
+          </tr>
+          <tr>
+            <td><strong>Reglamento Interior del PJEV</strong></td>
+            <td>Obliga a la generación de un <em>Oficio de Requerimiento</em> firmado para que la Subdirección de Recursos Financieros avale que los recursos no exceden el Presupuesto Modificado Autorizado.</td>
+          </tr>
+          <tr>
+            <td><strong>Control Interno (Auditoría)</strong></td>
+            <td>En el caso de adjudicaciones directas menores, exige la formulación y validación de una "Tarjeta DGA" interna antes de avanzar a la orden de compra.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Analista Presupuestal (Creador)</strong></td>
+            <td>Crear la solicitud, seleccionar la partida y montos, y turnarla a firma.</td>
+            <td>No puede autorizar su propio trámite ni enviarlo directamente a Recursos Financieros.</td>
+          </tr>
+          <tr>
+            <td><strong>Jefe / Subdirector de Rec. Materiales</strong></td>
+            <td>Revisar y firmar digitalmente la solicitud y la Tarjeta DGA. Turnar a Recursos Financieros.</td>
+            <td>Una vez turnado a Finanzas, no puede modificar los montos solicitados.</td>
+          </tr>
+          <tr>
+            <td><strong>Recursos Financieros (Validador)</strong></td>
+            <td>Aprobar o Rechazar el oficio de requerimiento.</td>
+            <td>Solo puede autorizar si el motor contable confirma saldo positivo en la cuenta bancaria / partida.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos (Propuesta Modernizada)</div>
+      <p>A partir del análisis de la base de datos heredada, se propone una refactorización hacia <strong>3 tablas normalizadas</strong>. Esta propuesta mantiene intacta la <strong>arquitectura de dos tiempos (Fases)</strong> y las reglas de <strong>Ampliación de Contratos</strong>, pero traslada la carga del historial de firmas a una bitácora independiente para sanear la cabecera.</p>
+      
+      <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">1. Tabla Autorización: pr_reservas (Exclusiva de Finanzas)</h3>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">DATOS DE LA RESERVA (FASE 2)</td></tr>
+          <tr><td><code>ejercicio</code></td><td><code>INT PK/FK</code></td><td>Ejercicio fiscal (Partición).</td></tr>
+          <tr><td><code>id_reserva</code></td><td><code>INT PK</code></td><td>Identificador único de la autorización.</td></tr>
+          <tr><td><code>id_suficiencia</code></td><td><code>INT FK</code></td><td>Relación 1 a 1 con la petición original de Recursos Materiales.</td></tr>
+          <tr><td><code>folio_oficio_reserva</code></td><td><code>VARCHAR(50)</code></td><td>Número oficial de la autorización contable/presupuestal.</td></tr>
+          <tr><td><code>fecha_autorizacion</code></td><td><code>DATETIME</code></td><td>Fecha en la que Finanzas emite y congela el recurso.</td></tr>
+          <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">AUDITORÍA (COLUMNAS POR DEFECTO)</td></tr>
+          <tr><td><code>fecha_registro</code></td><td><code>DATETIME</code></td><td>Fecha de creación de la reserva.</td></tr>
+          <tr><td><code>usuario_registro</code></td><td><code>INT FK</code></td><td>Usuario creador (Analista de Presupuesto).</td></tr>
+          <tr><td><code>fecha_actualizacion</code></td><td><code>DATETIME</code></td><td>Fecha de última modificación.</td></tr>
+          <tr><td><code>usuario_actualizacion</code></td><td><code>INT FK</code></td><td>Usuario que realizó la última modificación.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-top: 15px; margin-bottom: 8px;">2. Tabla Cabecera: rm_suficiencias (Solo Lectura para Finanzas)</h3>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>ejercicio</code></td><td><code>INT PK</code></td><td>Ejercicio fiscal (Partición).</td></tr>
+          <tr><td><code>id_suficiencia</code></td><td><code>INT PK</code></td><td>Identificador de la petición.</td></tr>
+          <tr><td><code>folio_solicitud</code></td><td><code>VARCHAR(50)</code></td><td>Folio alfanumérico generado por Adquisiciones.</td></tr>
+          <tr><td><code>fecha_solicitud</code></td><td><code>DATETIME</code></td><td>Fecha de creación de la solicitud.</td></tr>
+          <tr><td><code>id_centro_costo</code></td><td><code>INT FK</code></td><td>Unidad Administrativa (UA) que solicita.</td></tr>
+          <tr><td><code>monto_total</code></td><td><code>NUMERIC(18,2)</code></td><td>Suma total del requerimiento.</td></tr>
+          <tr><td><code>id_tiposuficiencia</code></td><td><code>INT FK</code></td><td>Tipo de trámite (Confirmación, Transferencia, Recalendarización, Apertura).</td></tr>
+          <tr><td><code>estatus_actual</code></td><td><code>SMALLINT</code></td><td>Estado global (Finanzas actualiza esto a 2: Autorizado o 3: Rechazado).</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-top: 15px; margin-bottom: 8px;">3. Tabla Workflow (Bitácora Global): rm_suficiencias_historial</h3>
+      <p style="margin-bottom: 10px;">Esta tabla es utilizada tanto por RM como por Finanzas para registrar inmutablemente quién creó, envió, revisó y autorizó o rechazó el trámite.</p>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>ejercicio</code></td><td><code>INT PK/FK</code></td><td>Ejercicio fiscal (Partición).</td></tr>
+          <tr><td><code>id_historial</code></td><td><code>INT PK</code></td><td>Identificador del movimiento.</td></tr>
+          <tr><td><code>id_suficiencia</code></td><td><code>INT FK</code></td><td>Suficiencia afectada.</td></tr>
+          <tr><td><code>id_usuario_ejecutor</code></td><td><code>INT FK</code></td><td>Quién realizó la acción (ej. el Analista de Finanzas).</td></tr>
+          <tr><td><code>rol_accion</code></td><td><code>VARCHAR(50)</code></td><td>Rol bajo el cual se actuó (ej. 'ANALISTA_FINANZAS').</td></tr>
+          <tr><td><code>estatus_proceso</code></td><td><code>SMALLINT</code></td><td>Nuevo estado asignado tras la acción (2 o 3).</td></tr>
+          <tr><td><code>observaciones</code></td><td><code>TEXT</code></td><td>Notas de rechazo (si aplica) u observaciones de aprobación.</td></tr>
+          <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">AUDITORÍA (INMUTABLE)</td></tr>
+          <tr><td><code>fecha_registro</code></td><td><code>DATETIME</code></td><td>Cuándo ocurrió el cambio de estatus.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1')">fn_leer_suficiencias_pendientes</button>
+        <button class="sp-tab" onclick="showSP('sp2')">fn_autorizar_reserva</button>
+      </div>
+
+      <!-- TAB 1: LEER PENDIENTES -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio. Ejercicio fiscal activo.</td></tr>
+            <tr><td><code>@p_folio_solicitud</code></td><td><code>VARCHAR</code></td><td>Opcional. Búsqueda por folio.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{id_suficiencia}</code></td><td><code>INT</code></td><td>ID único de la petición.</td></tr>
+            <tr><td><code>{folio_solicitud}</code></td><td><code>VARCHAR</code></td><td>Folio generado por Recursos Materiales.</td></tr>
+            <tr><td><code>{fecha_solicitud}</code></td><td><code>DATETIME</code></td><td>Fecha de envío.</td></tr>
+            <tr><td><code>{concepto}</code></td><td><code>VARCHAR</code></td><td>Justificación de la adquisición.</td></tr>
+            <tr><td><code>{monto_total}</code></td><td><code>DECIMAL</code></td><td>Importe total a autorizar.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 1. LEER BANDEJA DE PENDIENTES
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">pr.fn_leer_suficiencias_pendientes</span>(
+    p_ejercicio <span style="color:#c678dd;">INT</span>,
+    p_folio_solicitud <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> (
+        <span style="color:#c678dd;">SELECT</span> 
+            m.id_suficiencia, m.folio_solicitud, m.fecha_solicitud, 
+            m.id_centro_costo, m.concepto, m.monto_total
+        <span style="color:#c678dd;">FROM</span> rm.rm_suficiencias m
+        <span style="color:#c678dd;">WHERE</span> m.estatus_actual = <span style="color:#d19a66;">1</span> <span style="color:#5c6370;">-- 1: Enviado a Finanzas</span>
+          <span style="color:#c678dd;">AND</span> (p_folio_solicitud <span style="color:#c678dd;">IS NULL OR</span> m.folio_solicitud <span style="color:#56b6c2;">ILIKE</span> <span style="color:#98c379;">'%'</span> || p_folio_solicitud || <span style="color:#98c379;">'%'</span>)
+    ) t;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: AUTORIZAR / RECHAZAR -->
+      <div id="sp-sp2" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Autorizar, 2: Rechazar.</td></tr>
+            <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio. Ejercicio en curso.</td></tr>
+            <tr><td><code>@p_id_suficiencia</code></td><td><code>INT</code></td><td>Obligatorio. ID del trámite.</td></tr>
+            <tr><td><code>@p_folio_oficio_reserva</code></td><td><code>VARCHAR</code></td><td>Obligatorio si Acción=1. Folio de Finanzas.</td></tr>
+            <tr><td><code>@p_observaciones</code></td><td><code>VARCHAR</code></td><td>Obligatorio si Acción=2. Motivo de rechazo.</td></tr>
+            <tr><td><code>@p_id_usuario</code></td><td><code>INT</code></td><td>Obligatorio. ID del Analista de Finanzas.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1: Éxito, -1: Error.</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje detallado.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- ==========================================
+-- 2. AUTORIZAR O RECHAZAR RESERVA
+-- ==========================================</span>
+<span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">pr.fn_autorizar_reserva_presupuestal</span>(
+    p_accion <span style="color:#c678dd;">INT</span>,
+    p_id_suficiencia <span style="color:#c678dd;">INT</span>,
+    p_folio_oficio_reserva <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_observaciones <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_usuario <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">1</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#5c6370;">-- AUTORIZAR (Fase 2 finalizada)</span>
+        <span style="color:#c678dd;">UPDATE</span> rm.rm_suficiencias
+        <span style="color:#c678dd;">SET</span> estatus_actual = <span style="color:#d19a66;">2</span> <span style="color:#5c6370;">-- 2: Autorizado/Congelado</span>
+        <span style="color:#c678dd;">WHERE</span> id_suficiencia = p_id_suficiencia <span style="color:#c678dd;">AND</span> estatus_actual = <span style="color:#d19a66;">1</span>;
+
+        <span style="color:#5c6370;">-- REGISTRAR EN TABLA EXCLUSIVA DE FINANZAS</span>
+        <span style="color:#c678dd;">INSERT INTO</span> pr.pr_reservas(id_suficiencia, folio_oficio_reserva, fecha_autorizacion, fecha_registro, usuario_registro)
+        <span style="color:#c678dd;">VALUES</span>(p_id_suficiencia, p_folio_oficio_reserva, <span style="color:#56b6c2;">now</span>(), <span style="color:#56b6c2;">now</span>(), p_id_usuario);
+        
+        <span style="color:#5c6370;">-- REGISTRAR EN BITÁCORA</span>
+        <span style="color:#c678dd;">INSERT INTO</span> rm.rm_suficiencias_historial(id_suficiencia, id_usuario_ejecutor, rol_accion, estatus_proceso, observaciones, fecha_registro)
+        <span style="color:#c678dd;">VALUES</span>(p_id_suficiencia, p_id_usuario, <span style="color:#98c379;">'ANALISTA_FINANZAS'</span>, <span style="color:#d19a66;">2</span>, <span style="color:#98c379;">'Reserva Autorizada'</span>, <span style="color:#56b6c2;">now</span>());
+        
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Reserva Presupuestal Autorizada con éxito.'</span>);
+    
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#5c6370;">-- RECHAZAR (Devolver a RM)</span>
+        <span style="color:#c678dd;">UPDATE</span> rm.rm_suficiencias
+        <span style="color:#c678dd;">SET</span> estatus_actual = <span style="color:#d19a66;">3</span> <span style="color:#5c6370;">-- 3: Rechazado</span>
+        <span style="color:#c678dd;">WHERE</span> id_suficiencia = p_id_suficiencia;
+        
+        <span style="color:#5c6370;">-- REGISTRAR MOTIVO EN BITÁCORA</span>
+        <span style="color:#c678dd;">INSERT INTO</span> rm.rm_suficiencias_historial(id_suficiencia, id_usuario_ejecutor, rol_accion, estatus_proceso, observaciones, fecha_registro)
+        <span style="color:#c678dd;">VALUES</span>(p_id_suficiencia, p_id_usuario, <span style="color:#98c379;">'ANALISTA_FINANZAS'</span>, <span style="color:#d19a66;">3</span>, p_observaciones, <span style="color:#56b6c2;">now</span>());
+        
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Trámite devuelto a Adquisiciones.'</span>);
+    <span style="color:#c678dd;">END IF</span>;
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <p>Endpoints expuestos por el Backend para el Frontend:</p>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Ruta (Endpoint)</th><th>Propósito</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method get" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e8f5e9; color:#1b5e20;">GET</span></td><td><code>/api/v1/pr/reservas/pendientes</code></td><td>Obtiene trámites enviados por RM (SP: fn_leer_suficiencias_pendientes).</td></tr>
+          <tr><td><span class="method post" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e3f2fd; color:#0d47a1;">POST</span></td><td><code>/api/v1/pr/reservas/{id}/autorizar</code></td><td>Autoriza y asigna folio (SP: fn_autorizar_reserva_presupuestal - Acción 1).</td></tr>
+          <tr><td><span class="method post" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e3f2fd; color:#0d47a1;">POST</span></td><td><code>/api/v1/pr/reservas/{id}/rechazar</code></td><td>Rechaza y devuelve a RM (SP: fn_autorizar_reserva_presupuestal - Acción 2).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Botón / Acción</th>
+            <th>Descripción funcional</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Refrescar</strong></td>
+            <td><em>(Acción Compartida)</em> Actualiza la bandeja de entrada para verificar si hay nuevas solicitudes de suficiencia.</td>
+          </tr>
+          <tr>
+            <td><strong>Autorizar</strong></td>
+            <td>Autorizar reserva presupuestal (asigna folio contable y congela definitivamente los fondos).</td>
+          </tr>
+          <tr>
+            <td><strong>Rechazar</strong></td>
+            <td>Rechazar suficiencia presupuestal (devuelve el trámite a Adquisiciones con motivo de rechazo).</td>
+          </tr>
+          <tr>
+            <td><strong>Historia</strong></td>
+            <td>Consultar historia de reserva (despliega la bitácora unificada de acciones tomadas).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI / Wireframes) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <p style="margin-top:10px; font-size:13px; color:#475569;">
+        <strong>Formulario Compuesto:</strong> Los wireframes se dividen en Parámetros (mapeo con Stored Procedures) y Valores (datos de ejemplo).
+      </p>
+
+      <!-- 8.1 Bandeja Principal: Leer (Parámetros) -->
+      
+      <div class="wf-tabs" style="margin-top: 15px;">
+        <button class="wf-tab active" onclick="switchWfTab(this, 'wf1')">1. Bandeja/Principal (Parámetros)</button>
+        <button class="wf-tab" onclick="switchWfTab(this, 'wf2')">2. Bandeja/Principal (Valores)</button>
+        <button class="wf-tab" onclick="switchWfTab(this, 'wf3')">3. Modal ABC (Parámetros)</button>
+        <button class="wf-tab" onclick="switchWfTab(this, 'wf4')">4. Modal ABC (Valores)</button>
+      </div>
+
+      <div id="wf1" class="wf-panel active">
+        <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">1. Bandeja de Entrada Finanzas: Leer (Parámetros)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #fff; overflow-x: auto; text-align: center;">
+          <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+            <rect width="1000" height="500" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            
+            <!-- Filters -->
+            <rect x="40" y="20" width="120" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+            <text x="45" y="37" font-size="10" font-weight="bold" fill="#0f172a">@p_ejercicio</text>
+
+            <rect x="170" y="20" width="220" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+            <text x="175" y="37" font-size="10" font-weight="bold" fill="#0f172a">Buscador Local (Frontend)</text>
+
+            <!-- Toolbar -->
+            <rect x="40" y="55" width="920" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+            <text x="50" y="77" font-size="10" font-weight="bold" fill="#666">Acciones:</text>
+            <rect x="100" y="62" width="100" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> 
+            <text x="150" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">REFRESCAR</text>
+
+            <!-- Grid Header -->
+            <rect x="40" y="105" width="920" height="25" fill="#1B3A2D"/>
+            <text x="50" y="121" fill="#fff" font-size="10">FOLIO SOLICITUD</text>
+            <text x="180" y="121" fill="#fff" font-size="10">FECHA RM</text>
+            <text x="280" y="121" fill="#fff" font-size="10">CENTRO COSTO (UA)</text>
+            <text x="500" y="121" fill="#fff" font-size="10">TIPO TRÁMITE</text>
+            <text x="650" y="121" fill="#fff" font-size="10">MONTO TOTAL</text>
+            <text x="800" y="121" fill="#fff" font-size="10">ACCIÓN</text>
+
+            <!-- Row Parameter Mapping -->
+            <rect x="40" y="130" width="920" height="30" fill="#fff" stroke="#eee"/>
+            <text x="50" y="150" font-size="11" fill="#2563eb" font-family="monospace">{folio_solicitud}</text>
+            <text x="180" y="150" font-size="11" fill="#2563eb" font-family="monospace">{fecha_solicitud}</text>
+            <text x="280" y="150" font-size="11" fill="#2563eb" font-family="monospace">{cve_centro_costo}</text>
+            <text x="500" y="150" font-size="11" fill="#2563eb" font-family="monospace">{id_tiposuficiencia}</text>
+            <text x="650" y="150" font-size="11" fill="#2563eb" font-family="monospace">{monto_total}</text>
+            
+            <rect x="800" y="135" width="70" height="20" fill="#dbeafe" rx="10"/>
+            <text x="835" y="149" font-size="10" font-weight="bold" fill="#1e40af" text-anchor="middle">DICTAMINAR</text>
+          </svg>
+        </div>
+      </div>
+      </div>
+      <div id="wf2" class="wf-panel">
+        <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">2. Bandeja de Entrada Finanzas: Leer (Valores)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #fff; overflow-x: auto; text-align: center;">
+          <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+            <rect width="1000" height="500" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            
+            <rect x="40" y="20" width="120" height="25" fill="#fff" stroke="#ccc" rx="3"/> 
+            <text x="45" y="37" font-size="10">2026</text>
+
+            <rect x="170" y="20" width="220" height="25" fill="#fff" stroke="#ccc" rx="3"/> 
+            <text x="175" y="37" font-size="10">Buscar...</text>
+
+            <!-- Toolbar -->
+            <rect x="40" y="55" width="920" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+            <text x="50" y="77" font-size="10" font-weight="bold" fill="#666">Acciones:</text>
+            <rect x="100" y="62" width="100" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> 
+            <text x="150" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">REFRESCAR</text>
+
+            <!-- Grid Header -->
+            <rect x="40" y="105" width="920" height="25" fill="#1B3A2D"/>
+            <text x="50" y="121" fill="#fff" font-size="10">FOLIO SOLICITUD</text>
+            <text x="180" y="121" fill="#fff" font-size="10">FECHA RM</text>
+            <text x="280" y="121" fill="#fff" font-size="10">CENTRO COSTO (UA)</text>
+            <text x="500" y="121" fill="#fff" font-size="10">TIPO TRÁMITE</text>
+            <text x="650" y="121" fill="#fff" font-size="10">MONTO TOTAL</text>
+            <text x="800" y="121" fill="#fff" font-size="10">ACCIÓN</text>
+
+            <!-- Row 1 Values -->
+            <rect x="40" y="130" width="920" height="30" fill="#fff" stroke="#eee"/>
+            <text x="50" y="150" font-size="11" fill="#0f172a">RM-SUF-2026-001</text>
+            <text x="180" y="150" font-size="11" fill="#0f172a">15/06/2026</text>
+            <text x="280" y="150" font-size="11" fill="#0f172a">102 - Dirección Gral.</text>
+            <text x="500" y="150" font-size="11" fill="#0f172a">Confirmación</text>
+            <text x="650" y="150" font-size="11" fill="#0f172a" font-weight="bold">$ 15,400.00</text>
+            <rect x="800" y="135" width="70" height="20" fill="#dbeafe" rx="10"/>
+            <text x="835" y="149" font-size="10" font-weight="bold" fill="#1e40af" text-anchor="middle">DICTAMINAR</text>
+          </svg>
+        </div>
+      </div>
+      </div>
+      <div id="wf3" class="wf-panel">
+        <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">3. Modal: Autorizar / Rechazar Reserva (Parámetros)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+          <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+            <!-- Modal Box -->
+            <rect x="250" y="50" width="500" height="350" fill="#fff" rx="6" stroke="#999" filter="drop-shadow(0 10px 15px rgba(0,0,0,0.5))"/>
+            <rect x="250" y="50" width="500" height="40" fill="#1B3A2D" rx="6"/>
+            <rect x="250" y="80" width="500" height="10" fill="#1B3A2D"/>
+            <text x="270" y="75" fill="#fff" font-size="14" font-weight="bold">Autorizar / Rechazar Reserva (Parámetros)</text>
+
+            <text x="270" y="120" font-size="11" font-weight="bold" fill="#0f172a">Acción a realizar</text>
+            <rect x="270" y="130" width="200" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+            <text x="275" y="147" font-size="11" font-weight="bold" fill="#0f172a">@p_accion (1 o 2)</text>
+
+            <text x="270" y="180" font-size="11" font-weight="bold" fill="#0f172a">Folio de Oficio de Autorización (Si Aprueba)</text>
+            <rect x="270" y="190" width="460" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+            <text x="275" y="207" font-size="11" font-weight="bold" fill="#0f172a">@p_folio_oficio_reserva</text>
+
+            <text x="270" y="240" font-size="11" font-weight="bold" fill="#0f172a">Observaciones (Requerido si Rechaza)</text>
+            <rect x="270" y="250" width="460" height="60" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+            <text x="275" y="267" font-size="11" font-weight="bold" fill="#0f172a">@p_observaciones</text>
+
+            <!-- Actions -->
+            <line x1="250" y1="340" x2="750" y2="340" stroke="#ddd" />
+            <rect x="630" y="355" width="100" height="30" fill="#1B3A2D" rx="4"/>
+            <text x="680" y="374" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">PROCESAR</text>
+          </svg>
+        </div>
+      </div>
+      </div>
+      <div id="wf4" class="wf-panel">
+        <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">4. Modal: Autorizar / Rechazar Reserva (Valores)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+          <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+            <!-- Modal Box -->
+            <rect x="250" y="50" width="500" height="350" fill="#fff" rx="6" stroke="#999" filter="drop-shadow(0 10px 15px rgba(0,0,0,0.5))"/>
+            <rect x="250" y="50" width="500" height="40" fill="#1B3A2D" rx="6"/>
+            <rect x="250" y="80" width="500" height="10" fill="#1B3A2D"/>
+            <text x="270" y="75" fill="#fff" font-size="14" font-weight="bold">Dictaminar Reserva: RM-SUF-2026-001</text>
+
+            <text x="270" y="120" font-size="11" font-weight="bold" fill="#0f172a">Acción a realizar</text>
+            <rect x="270" y="130" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> 
+            <circle cx="280" cy="142" r="4" fill="#16a34a"/>
+            <text x="290" y="146" font-size="11" fill="#0f172a">Autorizar Trámite</text>
+
+            <text x="270" y="180" font-size="11" font-weight="bold" fill="#0f172a">Folio de Oficio de Autorización (SAFPOJ)</text>
+            <rect x="270" y="190" width="460" height="25" fill="#fff" stroke="#ccc" rx="3"/> 
+            <text x="275" y="207" font-size="11" fill="#0f172a">PR-AUT-2026-89892</text>
+
+            <text x="270" y="240" font-size="11" font-weight="bold" fill="#0f172a">Observaciones</text>
+            <rect x="270" y="250" width="460" height="60" fill="#fff" stroke="#ccc" rx="3"/> 
+            <text x="275" y="267" font-size="11" fill="#0f172a">Se autoriza la reserva tras revisar suficiencia presupuestal.</text>
+
+            <!-- Actions -->
+            <line x1="250" y1="340" x2="750" y2="340" stroke="#ddd" />
+            <rect x="630" y="355" width="100" height="30" fill="#1B3A2D" rx="4"/>
+            <text x="680" y="374" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">CONFIRMAR</text>
+          </svg>
+        </div>
+      </div>
+      </div>
+
+      <script>
+      function switchWfTab(btn, panelId) {
+        const container = btn.closest('.doc-section');
+        container.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+        container.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        container.querySelector('#' + panelId).classList.add('active');
+      }
+      </script>
+
+    
+    <!-- 9. Reglas Críticas de Negocio -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas Críticas de Negocio</div>
+      
+      <p style="margin-top:10px; font-size:13px; color:#475569;">
+        <strong>Importante para Desarrollo (Daryl):</strong> Las siguientes validaciones técnicas son de carácter normativo y deben implementarse estrictamente tanto en el Frontend (bloqueos visuales) como en el Backend (Stored Procedures).
+      </p>
+
+      <ul style="margin-top: 15px; font-size: 13px; color: #334155; line-height: 1.6; padding-left: 20px;">
+        <li style="margin-bottom: 10px;"><strong>REGLA-FIN-01 (Obligatoriedad de Folio SAFPOJ):</strong> En el modal "Dictaminar", si se selecciona la acción "Autorizar" (<code>p_accion = 1</code>), el parámetro <code>@p_folio_oficio_reserva</code> es <strong>estrictamente requerido</strong>. Si viene nulo o vacío, el SP <code>fn_autorizar_reserva_presupuestal</code> debe rebotar la petición devolviendo un error de validación, ya que este es el campo llave que ata el proceso al ERP contable.</li>
+        
+        <li style="margin-bottom: 10px;"><strong>REGLA-FIN-02 (Motivo de Rechazo):</strong> Si se selecciona "Rechazar" (<code>p_accion = 2</code>), el parámetro <code>@p_observaciones</code> se vuelve obligatorio para que Recursos Materiales sepa exactamente por qué le regresaron el trámite.</li>
+        
+        <li style="margin-bottom: 10px;"><strong>REGLA-FIN-03 (Actualización Cruzada e Inmutabilidad):</strong> Al detonar "Autorizar", el SP debe insertar el folio en <code>pr.pr_reservas</code> (haciendo inmutable la reserva del dinero) y actualizar inmediatamente la tabla master <code>rm.rm_suficiencias</code> seteando <code>estatus_actual = 2</code>. Todo debe correr bajo una misma transacción (<code>BEGIN...COMMIT</code>) para evitar inconsistencias de estatus entre áreas.</li>
+      </ul>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
+      <p style="margin-top:10px; font-size:13px; color:#475569;">El dictamen de la reserva presupuestal funge como el puente oficial entre el flujo operativo y el flujo contable del Poder Judicial:</p>
+      <ul style="margin-top: 15px; font-size: 13px; color: #334155; line-height: 1.6; padding-left: 20px;">
+        <li style="margin-bottom: 10px;"><strong>Impacto hacia Contabilidad (SAFPOJ):</strong> Al dictaminar como "Autorizado", el sistema enlaza el <code>folio_oficio_reserva</code> con el ERP Contable, congelando formalmente el recurso en la tabla <code>safpoj_saldos</code>. Este momento garantiza que el dinero apartado no pueda ser asignado a ninguna otra partida o requisición del año fiscal en curso.</li>
+        <li style="margin-bottom: 10px;"><strong>Impacto hacia Recursos Materiales (Retorno):</strong> La decisión de Autorizar o Rechazar actualiza la bandeja operativa de RM. Si se rechaza, libera inmediatamente el monto pre-reservado y notifica al comprador; si se autoriza, detona la bandera verde para la adjudicación.</li>
+      </ul>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Aplica</th>
+            <th>Descripción Contable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>No Aplica</strong></td>
+            <td>Esta operación es estrictamente de control <strong>Presupuestal</strong>. No genera pólizas automáticas ni afecta cuentas de balance o resultados en la matriz de conversión contable.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Versión</th>
+            <th>Descripción del Cambio</th>
+            <th>Autor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>15/06/2026</td>
+            <td>1.0</td>
+            <td>Creación del documento de análisis funcional y reglas de negocio.</td>
+            <td>Consultoría DIX</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- 3. ANEXOS IMPRESOS -->
+    <style>
+      .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.6); z-index: 10000;
+        display: none; align-items: center; justify-content: center;
+        backdrop-filter: blur(2px);
+      }
+      .modal-overlay.active { display: flex !important; }
+      .modal-box {
+        background: #fff; width: 90%; max-width: 1000px; max-height: 90vh;
+        border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        display: flex; flex-direction: column; overflow: hidden;
+      }
+      .modal-header {
+        padding: 16px 24px; border-bottom: 1px solid #eee;
+        display: flex; justify-content: space-between; align-items: center;
+        background: #fff;
+      }
+      .modal-title { margin: 0; color: #183125; font-size: 16px; font-weight: bold; }
+      .modal-close {
+        background: #e11d48; color: #fff; border: none; padding: 8px 16px;
+        border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s;
+      }
+      .modal-close:hover { background: #be123c; }
+      .modal-body { padding: 24px; overflow-y: auto; flex: 1; background: #fafafa; }
+      
+      @media print {
+        .modal-overlay {
+          position: static; width: auto; height: auto; background: none; display: block !important; backdrop-filter: none;
+        }
+        .modal-box { box-shadow: none; border-radius: 0; max-height: none; width: 100%; }
+        .modal-header { display: none; }
+        .modal-body { padding: 0; background: none; overflow-y: visible; }
+      }
+    </style>
+    
+    <div id="modal-diagrama" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title">Diagrama Interfuncional del Procedimiento</div>
+          <button class="modal-close" onclick="document.getElementById('modal-diagrama').classList.remove('active')">✖ Cerrar</button>
+        </div>
+        <div class="modal-body">
+          <div class="doc-section">
+            <div class="section-title"><span class="section-num">13</span> Anexos Obligatorios (Diseño para Impresión)</div>
+            <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px; margin-top: 10px;">Anexo 1: Diagrama Interfuncional del Procedimiento</h3>
+            <div id="module-flowchart">
+<svg viewBox="0 0 1000 780" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff; border-radius: 8px;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; letter-spacing: 1px; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      .sep-line { stroke: #e5e7eb; stroke-width: 3; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#991B1B"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="250" height="40" class="header-area"/>
+  <text x="175" y="45" class="header-text">ÁREA RESPONSABLE</text>
+  
+  <rect x="300" y="20" width="300" height="40" class="header-proceso"/>
+  <text x="450" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="760" class="lane-line" stroke-dasharray="none"/>
+  <line x1="300" y1="60" x2="300" y2="760" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="760" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="760" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="760" x2="950" y2="760" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril ÁREA -->
+  <text x="75" y="220" transform="rotate(-90 75 220)" font-weight="bold" font-size="20" fill="#e5e7eb" text-anchor="middle" letter-spacing="4">RECURSOS MATERIALES</text>
+  
+  <!-- Divisor Horizontal entre RM y Finanzas -->
+  <line x1="50" y1="360" x2="950" y2="360" class="sep-line"/>
+  
+  <text x="75" y="560" transform="rotate(-90 75 560)" font-weight="bold" font-size="20" fill="#e5e7eb" text-anchor="middle" letter-spacing="4">SUBDIRECCIÓN DE FINANZAS</text>
+
+  <!-- Nodos -->
+  <!-- 1. Inicio -->
+  <rect x="410" y="80" width="80" height="25" class="node-term" />
+  <text x="450" y="96" class="node-term-text">INICIO</text>
+  <path d="M 450 105 L 450 125" class="path-line"/>
+
+  <!-- 1. Captura de Solicitud -->
+  <polygon points="350,125 550,125 535,175 335,175" class="node-data"/>
+  <text x="450" y="145" class="node-text">1. Captura de Solicitud</text>
+  <text x="450" y="160" class="node-sub">Ingresa Partidas</text>
+  <path d="M 450 175 L 450 205" class="path-line"/>
+
+  <!-- 2. Envío de Oficio -->
+  <path d="M 350 205 L 550 205 L 550 245 C 500 265, 400 225, 350 245 Z" class="node-doc"/>
+  <text x="450" y="225" class="node-text">2. Genera y Envía Oficio</text>
+  <text x="450" y="240" class="node-sub">Solicitud de Reserva</text>
+  <path d="M 550 225 L 710 225" class="path-line"/>
+
+  <!-- 3. Validación SAFPOJ -->
+  <polygon points="775,195 840,225 775,255 710,225" class="node-rombo"/>
+  <text x="775" y="220" class="node-text">¿Saldo en</text>
+  <text x="775" y="235" class="node-text">SAFPOJ?</text>
+
+  <!-- Rechazo por Saldo -->
+  <path d="M 775 195 L 775 150" class="path-red"/>
+  <text x="790" y="180" font-size="10" fill="#991B1B" font-weight="bold">No</text>
+  
+  <!-- Bloqueo -->
+  <path d="M 695 130 C 695 120, 855 120, 855 130 L 855 170 C 855 180, 695 180, 695 170 Z" class="node-db" />
+  <path d="M 695 130 C 695 140, 855 140, 855 130" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="150" class="node-text">Bloqueo Automático</text>
+  <text x="775" y="163" class="node-sub">Falta de liquidez</text>
+  <path d="M 695 150 L 535 150" class="path-line"/>
+
+  <!-- Saldo OK -> Pre Reserva -->
+  <path d="M 775 255 L 775 290" class="path-green"/>
+  <text x="790" y="275" font-size="10" font-weight="bold">Sí</text>
+  
+  <path d="M 695 290 C 695 280, 855 280, 855 290 L 855 330 C 855 340, 695 340, 695 330 Z" class="node-db" />
+  <path d="M 695 290 C 695 300, 855 300, 855 290" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="312" class="node-text">Pre-Reserva Creada</text>
+  <text x="775" y="325" class="node-sub">Estatus = 1</text>
+  
+  <path d="M 775 330 L 775 385 L 450 385 L 450 405" class="path-line"/>
+
+  <!-- 3. Dictamen de Suficiencia -->
+  <polygon points="340,405 560,405 545,455 325,455" class="node-data"/>
+  <text x="450" y="425" class="node-text">3. Dictamen de Suficiencia</text>
+  <text x="450" y="440" class="node-sub">Evalúa Bandeja 02.2.8</text>
+  <path d="M 450 455 L 450 480" class="path-line"/>
+
+  <!-- ¿Autoriza? -->
+  <polygon points="450,480 510,510 450,540 390,510" class="node-rombo"/>
+  <text x="450" y="515" class="node-text">¿Autoriza?</text>
+
+  <!-- Rechazo Finanzas -->
+  <path d="M 510 510 L 695 510" class="path-red"/>
+  <text x="600" y="505" font-size="10" fill="#991B1B" font-weight="bold">No (Rechaza)</text>
+
+  <path d="M 695 490 C 695 480, 855 480, 855 490 L 855 530 C 855 540, 695 540, 695 530 Z" class="node-db" />
+  <path d="M 695 490 C 695 500, 855 500, 855 490" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="512" class="node-text">Libera Saldos</text>
+  <text x="775" y="525" class="node-sub">Estatus = 3</text>
+  
+  <path d="M 775 530 L 775 550 L 360 550 L 360 620" class="path-line"/>
+
+  <!-- Autoriza Finanzas -->
+  <path d="M 450 540 L 450 580 L 685 580" class="path-green"/>
+  <text x="560" y="575" font-size="10" font-weight="bold">Sí (Autoriza)</text>
+
+  <path d="M 685 560 C 685 550, 865 550, 865 560 L 865 600 C 865 610, 685 610, 685 600 Z" class="node-db" />
+  <path d="M 685 560 C 685 570, 865 570, 865 560" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="582" class="node-text">Reserva Contable M-XX</text>
+  <text x="775" y="595" class="node-sub">Afecta Balance</text>
+
+  <path d="M 775 600 L 775 610 L 540 610 L 540 620" class="path-line"/>
+
+  <!-- 4. Notifica Rechazo -->
+  <path d="M 300 620 L 420 620 L 420 655 C 390 670, 330 640, 300 655 Z" class="node-doc"/>
+  <text x="360" y="635" class="node-text">4. Notifica Rechazo</text>
+  <text x="360" y="648" class="node-sub">Oficio Negativo</text>
+
+  <!-- 4. Notifica Autoriza -->
+  <path d="M 480 620 L 600 620 L 600 655 C 570 670, 510 640, 480 655 Z" class="node-doc"/>
+  <text x="540" y="635" class="node-text">4. Notifica Autoriza.</text>
+  <text x="540" y="648" class="node-sub">Oficio Positivo</text>
+
+  <!-- FIN -->
+  <rect x="410" y="710" width="80" height="30" class="node-term" />
+  <text x="450" y="730" class="node-term-text">FIN</text>
+
+  <path d="M 360 655 L 360 690 L 430 690 L 430 710" class="path-line"/>
+  <path d="M 540 655 L 540 690 L 470 690 L 470 710" class="path-line"/>
+
+</svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="modal-proceso" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title">Flujograma de Procesos y Descripción</div>
+          <button class="modal-close" onclick="document.getElementById('modal-proceso').classList.remove('active')">✖ Cerrar</button>
+        </div>
+        <div class="modal-body">
+          <div class="doc-section">
+            <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">Anexo 2: Flujograma de Procesos y Descripción</h3>
+            <div id="module-process-table">
+              <table class="props-table">
+                <thead>
+                  <tr style="background: var(--pjev-verde-oscuro); color: white;">
+                    <th>ÁREA RESPONSABLE</th>
+                    <th>PASO / ETAPA</th>
+                    <th>PROCESO OPERATIVO</th>
+                    <th>SIAF-PJEV</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Recursos Materiales</strong></td>
+                    <td><strong>1. Captura de Solicitud</strong></td>
+                    <td>Detecta la necesidad de una compra, genera una Petición de Suficiencia y captura las partidas a afectar.</td>
+                    <td>Carga el listado de partidas activas (COG) permitiendo seleccionar sólo las pertinentes al ejercicio fiscal.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Recursos Materiales</strong></td>
+                    <td><strong>2. Generación y Envío de Oficio</strong></td>
+                    <td>Genera el Oficio de Solicitud de Reserva Presupuestal y envía formalmente la solicitud para evaluación.</td>
+                    <td>Valida saldos matemáticamente contra SAFPOJ. Si existe saldo disponible, "pre-reserva" (Estatus 1). Si no hay saldo, bloquea e impide el envío.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Subdirección de Finanzas</strong></td>
+                    <td><strong>3. Dictamen de Suficiencia</strong></td>
+                    <td>Revisa la bandeja operativa (Módulo 02.2.8) y decide Rechazar o Autorizar las partidas solicitadas.</td>
+                    <td>Actualiza estatus. En caso de Rechazo, libera inmediatamente los saldos pre-reservados. En caso de Autorización, descuenta los saldos definitivamente.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Subdirección de Finanzas</strong></td>
+                    <td><strong>4. Notificación de Resolución</strong></td>
+                    <td>Notifica formalmente por oficio la autorización (o rechazo) de la suficiencia presupuestal a Recursos Materiales para continuar la adjudicación.</td>
+                    <td>Genera el Folio Automático M-XX de Reserva Contable y permite la exportación del PDF Oficial con sellos institucionales.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(b => {
+        if (b.innerText.includes('Ver Diagrama')) {
+          b.onclick = () => {
+            document.getElementById('modal-diagrama').classList.add('active');
+          };
+        }
+        if (b.innerText.includes('Proceso Funcional')) {
+          b.onclick = () => {
+            document.getElementById('modal-proceso').classList.add('active');
+          };
+        }
+      });
+    </script>
+    <script>
+      <style>
+      #anexos-impresos {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.6); z-index: 10000;
+        display: none; align-items: center; justify-content: center;
+        backdrop-filter: blur(2px);
+      }
+      #anexos-impresos.active { display: flex !important; }
+      .modal-box {
+        background: #fff; width: 90%; max-width: 1000px; max-height: 90vh;
+        border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        display: flex; flex-direction: column; overflow: hidden;
+      }
+      .modal-header {
+        padding: 16px 24px; border-bottom: 1px solid #eee;
+        display: flex; justify-content: space-between; align-items: center;
+        background: #fff;
+      }
+      .modal-title { margin: 0; color: #183125; font-size: 16px; font-weight: bold; }
+      .modal-close {
+        background: #e11d48; color: #fff; border: none; padding: 8px 16px;
+        border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s;
+      }
+      .modal-close:hover { background: #be123c; }
+      .modal-body { padding: 24px; overflow-y: auto; flex: 1; background: #fafafa; }
+      
+      @media print {
+        #anexos-impresos {
+          position: static; width: auto; height: auto; background: none; display: block !important; backdrop-filter: none;
+        }
+        .modal-box { box-shadow: none; border-radius: 0; max-height: none; width: 100%; }
+        .modal-header { display: none; }
+        .modal-body { padding: 0; background: none; overflow-y: visible; }
+      }
+    </style>
+    <script>
+      const anexosDiv = document.getElementById('anexos-impresos');
+      // Envolver el contenido existente en la caja del modal si no está envuelto
+      if (!anexosDiv.querySelector('.modal-box')) {
+        const content = anexosDiv.innerHTML;
+        anexosDiv.innerHTML = `
+          <div class="modal-box">
+            <div class="modal-header">
+              <div class="modal-title">Diagrama Interfuncional del Procedimiento</div>
+              <button class="modal-close" onclick="document.getElementById('anexos-impresos').classList.remove('active')">✖ Cerrar</button>
+            </div>
+            <div class="modal-body">${content}</div>
+          </div>
+        `;
+      }
+
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(b => {
+        if (b.innerText.includes('Ver Diagrama') || b.innerText.includes('Proceso Funcional')) {
+          b.onclick = () => {
+            anexosDiv.classList.add('active');
+          };
+        }
+      });
+    </script>
+
+</div>
+</body>
+</html>

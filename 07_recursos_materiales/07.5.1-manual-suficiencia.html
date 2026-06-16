@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.5.1 Manual de Usuario — SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); }
+  .wf-svg-area { padding: 20px; background: #fff; overflow-x: auto; }
+</style>
+</head>
+<body>
+<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999; max-width: calc(-60px + 100vw);"><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(27, 58, 45); border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; background: rgb(27, 58, 45); color: rgb(255, 255, 255);">📊 Ver Diagrama</button><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(153, 27, 27); border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; background: rgb(153, 27, 27); color: rgb(255, 255, 255);">📋 Proceso Funcional</button><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.location.reload()">⟳ Refrescar</button><button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.print()">🖨 Imprimir</button></div>
+<div class="doc-main-inner">
+
+    <!-- 1. Título -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Título del Módulo</div>
+      <div class="section-content">
+        <p style="font-size: 16px; font-weight: bold; color: var(--pjev-verde-oscuro);">Módulo de Suficiencia Presupuestal y Autorización de Reserva Contable</p>
+      </div>
+    </div>
+
+    <!-- 2. Objetivo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Objetivo del Módulo</div>
+      <div class="section-content">
+        <p style="margin-bottom: 10px;">Proporcionar una guía detallada y muy específica para los usuarios finales de Recursos Materiales y la Subdirección de Finanzas.</p>
+        <p><strong>Recursos Materiales:</strong> Aprenderán a ingresar a la pantalla principal, visualizar sus peticiones y abrir el Formulario ABC de Partidas para capturar el requerimiento y emitir formalmente el Oficio de Solicitud de Reserva.</p>
+        <p><strong>Subdirección de Finanzas:</strong> Aprenderán a ingresar a la Bandeja de Operación, revisar los dictámenes pendientes, analizar los saldos del ERP (SAFPOJ) y Autorizar o Rechazar formalmente la reserva de fondos, emitiendo el Folio M-XX.</p>
+      </div>
+    </div>
+
+    <!-- 3. Normatividad -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Normatividad y Reglas de Negocio del Módulo</div>
+      <div class="section-content">
+        <ul style="list-style-type: disc; margin-left: 20px; line-height: 1.8; color: #444;">
+          <li><strong>Regla de Afectación Presupuestal:</strong> Este módulo no genera un asiento contable automático en el balance general de inmediato. La afectación es puramente presupuestal; el registro contable se detonará hasta la etapa del devengo (ej. Póliza de Diario Manual).</li>
+          <li><strong>Regla de Control de Saldos (SAFPOJ):</strong> Conforme a las reglas del CONAC y el Manual de Procedimientos, <strong>el sistema bloquea e impide guardar o enviar</strong> solicitudes si el monto de las partidas capturadas supera el saldo disponible actual de la partida. No hay excepciones.</li>
+          <li><strong>Regla de Pre-reserva:</strong> En el momento en que RM presiona "Enviar", el sistema congela (pre-reserva) los saldos solicitados (Estatus = 1) para garantizar liquidez mientras Finanzas dictamina.</li>
+          <li><strong>Regla de Liberación de Saldos:</strong> Si Finanzas rechaza la solicitud (Estatus = 3), el sistema libera de inmediato la pre-reserva, retornando la liquidez a la partida.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 4. Procesos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Procesos del Módulo (Paso a Paso con Pantallas)</div>
+      <div class="section-content">
+        
+        <h3 style="color: var(--pjev-verde-oscuro); margin-bottom: 10px; font-size: 14px;">Paso 1. Captura de Solicitud (Pantalla Principal y Formulario ABC)</h3>
+        <p style="margin-bottom: 15px; color: #555;"><strong>Responsable: Recursos Materiales.</strong> El usuario ingresa a la Pantalla Principal (Grid) para consultar el historial de peticiones de su dependencia.</p>
+        <div style="margin-bottom:20px; padding: 20px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+        <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">2. Pantalla Principal: Leer (Valores)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #fff; overflow-x: auto; text-align: center;">
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+  <rect width="1000" height="500" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+  
+  <rect x="20" y="20" width="120" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
+  <text x="25" y="37" font-size="10" font-weight="bold" fill="#0f172a">2026</text>
+
+  <rect x="150" y="20" width="160" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
+  <text x="155" y="37" font-size="10" font-weight="bold" fill="#0f172a">01 - NUEVA SUFICIENCIA</text>
+
+  <rect x="320" y="20" width="220" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
+  <text x="325" y="37" font-size="10" font-weight="bold" fill="#0f172a">RM-SUF-2026-001</text>
+
+  <rect x="20" y="60" width="960" height="40" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+  <rect x="40" y="70" width="100" height="24" fill="#1B3A2D" rx="3"/> 
+  <text x="90" y="86" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">+ NUEVO</text>
+
+  <rect x="20" y="120" width="960" height="30" fill="#1B3A2D"/>
+  <text x="30" y="140" fill="#fff" font-size="11" font-weight="bold">FOLIO SOLICITUD</text>
+  <text x="200" y="140" fill="#fff" font-size="11" font-weight="bold">FECHA</text>
+  <text x="320" y="140" fill="#fff" font-size="11" font-weight="bold">CENTRO COSTO</text>
+  <text x="550" y="140" fill="#fff" font-size="11" font-weight="bold">TIPO TRÁMITE</text>
+  <text x="750" y="140" fill="#fff" font-size="11" font-weight="bold">MONTO TOTAL</text>
+  <text x="880" y="140" fill="#fff" font-size="11" font-weight="bold">ESTATUS</text>
+
+  <rect x="20" y="150" width="960" height="35" fill="#fff" stroke="#e2e8f0"/>
+  <text x="30" y="172" fill="#2563eb" font-size="11">RM-SUF-2026-001</text>
+  <text x="200" y="172" fill="#2563eb" font-size="11">2026-01-10 10:30</text>
+  <text x="320" y="172" fill="#2563eb" font-size="11">01 - DIR. ADQUISICIONES</text>
+  <text x="550" y="172" fill="#2563eb" font-size="11">01 - NUEVA SUFICIENCIA</text>
+  <text x="750" y="172" fill="#2563eb" font-size="11">$ 105,000.00</text>
+  <rect x="880" y="155" width="70" height="25" fill="#fef08a" rx="12"/>
+  <text x="915" y="172" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">Borrador</text>
+</svg>
+        </div>
+      </div>
+        <p style="margin-top: 15px; margin-bottom: 15px; color: #555;">Para crear un requerimiento nuevo o editar uno existente, el usuario hace clic en un registro y abre el Formulario Modal ABC, donde captura la Clave Presupuestal, Importe Solicitado y Justificación.</p>
+        <div style="margin-bottom:20px; padding: 20px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+      <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">4. Modal: ABC (Valores)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+<svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+  <rect width="1000" height="800" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+  <rect width="1000" height="800" fill="rgba(0,0,0,0.6)" />
+  
+  <rect x="20" y="20" width="960" height="760" fill="#fff" rx="6" stroke="#999" />
+  
+  <rect x="20" y="20" width="960" height="40" fill="#1B3A2D" rx="6" />
+  <rect x="20" y="40" width="960" height="20" fill="#1B3A2D" />
+  <text x="40" y="45" fill="#fff" font-size="14" font-weight="bold">Formulario Compuesto: Solicitud de Suficiencia y Partidas</text>
+  <text x="950" y="45" fill="#fff" font-size="14" font-weight="bold" cursor="pointer">X</text>
+  
+  <!-- SECCIÓN 1: ENCABEZADO -->
+  <text x="40" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 1: DATOS DEL ENCABEZADO (rm_suficiencias)</text>
+  <rect x="40" y="100" width="920" height="140" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
+  
+  <text x="50" y="130" font-size="11" font-weight="bold" fill="#666">Folio Solicitud:</text>
+  <rect x="50" y="135" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="152" font-size="10" font-weight="bold" fill="#0f172a">RM-SUF-2026-001</text>
+
+  <text x="230" y="130" font-size="11" font-weight="bold" fill="#666">Ejercicio:</text>
+  <rect x="230" y="135" width="100" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="235" y="152" font-size="10" font-weight="bold" fill="#0f172a">2026</text>
+
+  <text x="350" y="130" font-size="11" font-weight="bold" fill="#666">Centro Costo (UA):</text>
+  <rect x="350" y="135" width="280" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="355" y="152" font-size="10" font-weight="bold" fill="#0f172a">01 - DIR. RECURSOS MATERIALES</text>
+
+  <text x="650" y="130" font-size="11" font-weight="bold" fill="#666">Tipo Trámite:</text>
+  <rect x="650" y="135" width="290" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="655" y="152" font-size="10" font-weight="bold" fill="#0f172a">01 - NUEVA SUFICIENCIA</text>
+
+  <text x="50" y="180" font-size="11" font-weight="bold" fill="#666">Concepto / Justificación:</text>
+  <rect x="50" y="185" width="480" height="30" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="205" font-size="10" font-weight="bold" fill="#0f172a">Suministros de oficina para dependencias.</text>
+
+  <text x="550" y="180" font-size="11" font-weight="bold" fill="#666">Contrato Origen:</text>
+  <rect x="550" y="185" width="130" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="555" y="202" font-size="10" font-weight="bold" fill="#0f172a">N/A</text>
+
+  <text x="700" y="180" font-size="11" font-weight="bold" fill="#666">% Amp:</text>
+  <rect x="700" y="185" width="80" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="705" y="202" font-size="10" font-weight="bold" fill="#0f172a">0%</text>
+
+  <text x="800" y="180" font-size="11" font-weight="bold" fill="#666">Monto Total:</text>
+  <rect x="800" y="185" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="805" y="202" font-size="10" font-weight="bold" fill="#0f172a">$ 105,000.00</text>
+
+  <!-- SECCIÓN 2: BOTONES DE ACCIONES -->
+  <text x="40" y="270" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 2: ACCIONES</text>
+  <rect x="40" y="280" width="920" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
+  
+  <rect x="50" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="120" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Guardar Cabecera</text>
+
+  <rect x="210" y="290" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
+  <text x="280" y="310" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">Eliminar Solicitud</text>
+
+  <rect x="650" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="720" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Imprimir Oficio</text>
+
+  <rect x="810" y="290" width="140" height="30" fill="#1B3A2D" rx="4"/>
+  <text x="880" y="310" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Enviar a Finanzas</text>
+
+  <!-- SECCIÓN 3: MOVIMIENTOS EN MODO GRID -->
+  <text x="40" y="360" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 3: CAPTURA DE MOVIMIENTOS EN MODO GRID (rm_suficiencias_partidas)</text>
+  
+  <!-- Grid Header -->
+  <rect x="40" y="375" width="920" height="25" fill="#1B3A2D" />
+  <text x="45" y="392" fill="#fff" font-size="9" font-weight="bold">COG</text>
+  <text x="100" y="392" fill="#fff" font-size="9" font-weight="bold">ENE</text>
+  <text x="160" y="392" fill="#fff" font-size="9" font-weight="bold">FEB</text>
+  <text x="220" y="392" fill="#fff" font-size="9" font-weight="bold">MAR</text>
+  <text x="280" y="392" fill="#fff" font-size="9" font-weight="bold">ABR</text>
+  <text x="340" y="392" fill="#fff" font-size="9" font-weight="bold">MAY</text>
+  <text x="400" y="392" fill="#fff" font-size="9" font-weight="bold">JUN</text>
+  <text x="460" y="392" fill="#fff" font-size="9" font-weight="bold">JUL</text>
+  <text x="520" y="392" fill="#fff" font-size="9" font-weight="bold">AGO</text>
+  <text x="580" y="392" fill="#fff" font-size="9" font-weight="bold">SEP</text>
+  <text x="640" y="392" fill="#fff" font-size="9" font-weight="bold">OCT</text>
+  <text x="700" y="392" fill="#fff" font-size="9" font-weight="bold">NOV</text>
+  <text x="760" y="392" fill="#fff" font-size="9" font-weight="bold">DIC</text>
+  <text x="820" y="392" fill="#fff" font-size="9" font-weight="bold">TOTAL</text>
+  <text x="900" y="392" fill="#fff" font-size="9" font-weight="bold">ACCIÓN</text>
+
+  <!-- Grid Row 1 (Existing Data) -->
+  <rect x="40" y="400" width="920" height="30" fill="#fff" stroke="#e2e8f0" />
+  <text x="45" y="418" fill="#2563eb" font-size="9">21111</text>
+  <text x="100" y="418" fill="#2563eb" font-size="9">25,000</text>
+  <text x="160" y="418" fill="#2563eb" font-size="9">25,000</text>
+  <text x="220" y="418" fill="#2563eb" font-size="9">25,000</text>
+  <text x="280" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="340" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="400" y="418" fill="#2563eb" font-size="9">15,000</text>
+  <text x="460" y="418" fill="#2563eb" font-size="9">15,000</text>
+  <text x="520" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="580" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="640" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="700" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="760" y="418" fill="#2563eb" font-size="9">0</text>
+  <text x="820" y="418" fill="#1B3A2D" font-size="9" font-weight="bold">$ 105,000</text>
+  
+  <rect x="900" y="405" width="40" height="20" fill="#ef4444" rx="3" />
+  <text x="920" y="418" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">X</text>
+
+  <!-- Grid Row 2 (Input Row) -->
+  <rect x="40" y="430" width="920" height="35" fill="#f8fafc" stroke="#e2e8f0" />
+  <rect x="43" y="435" width="50" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="98" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="158" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="218" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="278" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="338" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="398" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="458" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="518" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="578" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="638" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="698" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="758" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  
+  <text x="820" y="452" fill="#666" font-size="9" font-style="italic">Auto</text>
+  
+  <rect x="890" y="437" width="60" height="21" fill="#1B3A2D" rx="3" />
+  <text x="920" y="451" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">+ ADD</text>
+
+  <!-- SECCIÓN 4: TOTAL DE PARTIDAS -->
+  <text x="40" y="520" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 4: TOTAL DE PARTIDAS PRESUPUESTALES</text>
+  <rect x="600" y="530" width="360" height="50" fill="#fdfdfd" stroke="#1B3A2D" stroke-width="2" rx="4" />
+  <text x="620" y="560" font-size="14" font-weight="bold" fill="#1B3A2D">Suma Total Partidas: $ 105,000.00</text>
+
+  <!-- CERRAR MODAL -->
+  <rect x="400" y="620" width="200" height="40" fill="#e2e8f0" rx="4" />
+  <text x="500" y="645" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
+
+</svg>
+        </div>
+      </div>
+        
+        <div style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;"></div>
+        
+        <h3 style="color: var(--pjev-verde-oscuro); margin-bottom: 10px; font-size: 14px;">Paso 2. Generación y Envío de Oficio</h3>
+        <p style="margin-bottom: 15px; color: #555;"><strong>Responsable: Recursos Materiales.</strong> Una vez validados visualmente los montos en la Pantalla Principal, el usuario presiona el botón "Enviar a Finanzas". En este momento, el SIAF valida silenciosamente contra SAFPOJ que exista saldo para CADA renglón.</p>
+        <p style="margin-bottom: 15px; color: #555;">Si el saldo es suficiente, el sistema "Pre-reserva" los fondos y emite en pantalla el borrador formal del <strong>Oficio de Solicitud de Reserva Presupuestal</strong>. La petición viaja hacia la Subdirección de Finanzas y su estatus cambia a "Enviado".</p>
+
+        <div style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;"></div>
+
+        <h3 style="color: var(--pjev-verde-oscuro); margin-bottom: 10px; font-size: 14px;">Paso 3. Dictamen de Suficiencia (Bandeja de Autorización)</h3>
+        <p style="margin-bottom: 15px; color: #555;"><strong>Responsable: Subdirección de Finanzas.</strong> El analista de Finanzas entra a su Bandeja Operativa. Esta pantalla lista todas las peticiones de fondos (Folio Solicitud) que provienen de Recursos Materiales con estatus "Pendiente". Selecciona el renglón deseado y presiona el botón azul "Dictaminar".</p>
+        <div style="margin-bottom:20px; padding: 20px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+        <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">2. Bandeja de Entrada Finanzas: Leer (Valores)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #fff; overflow-x: auto; text-align: center;">
+          <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+            <rect width="1000" height="500" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            
+            <rect x="40" y="20" width="120" height="25" fill="#fff" stroke="#ccc" rx="3"/> 
+            <text x="45" y="37" font-size="10">2026</text>
+
+            <rect x="170" y="20" width="220" height="25" fill="#fff" stroke="#ccc" rx="3"/> 
+            <text x="175" y="37" font-size="10">Buscar...</text>
+
+            <!-- Toolbar -->
+            <rect x="40" y="55" width="920" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
+            <text x="50" y="77" font-size="10" font-weight="bold" fill="#666">Acciones:</text>
+            <rect x="100" y="62" width="100" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> 
+            <text x="150" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">REFRESCAR</text>
+
+            <!-- Grid Header -->
+            <rect x="40" y="105" width="920" height="25" fill="#1B3A2D"/>
+            <text x="50" y="121" fill="#fff" font-size="10">FOLIO SOLICITUD</text>
+            <text x="180" y="121" fill="#fff" font-size="10">FECHA RM</text>
+            <text x="280" y="121" fill="#fff" font-size="10">CENTRO COSTO (UA)</text>
+            <text x="500" y="121" fill="#fff" font-size="10">TIPO TRÁMITE</text>
+            <text x="650" y="121" fill="#fff" font-size="10">MONTO TOTAL</text>
+            <text x="800" y="121" fill="#fff" font-size="10">ACCIÓN</text>
+
+            <!-- Row 1 Values -->
+            <rect x="40" y="130" width="920" height="30" fill="#fff" stroke="#eee"/>
+            <text x="50" y="150" font-size="11" fill="#0f172a">RM-SUF-2026-001</text>
+            <text x="180" y="150" font-size="11" fill="#0f172a">15/06/2026</text>
+            <text x="280" y="150" font-size="11" fill="#0f172a">102 - Dirección Gral.</text>
+            <text x="500" y="150" font-size="11" fill="#0f172a">Confirmación</text>
+            <text x="650" y="150" font-size="11" fill="#0f172a" font-weight="bold">$ 15,400.00</text>
+            <rect x="800" y="135" width="70" height="20" fill="#dbeafe" rx="10"/>
+            <text x="835" y="149" font-size="10" font-weight="bold" fill="#1e40af" text-anchor="middle">DICTAMINAR</text>
+          </svg>
+        </div>
+      </div>
+
+        <div style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;"></div>
+
+        <h3 style="color: var(--pjev-verde-oscuro); margin-bottom: 10px; font-size: 14px;">Paso 4. Notificación de Resolución (Modal Operativo)</h3>
+        <p style="margin-bottom: 15px; color: #555;"><strong>Responsable: Subdirección de Finanzas.</strong> Al dar clic en "Dictaminar", se abre un Modal Desglosado que muestra el detalle de cada partida. Aquí, Finanzas tiene el poder de decisión absoluto. Puede Rechazar la solicitud (presionando la 'X' roja) o Autorizarla definitivamente (presionando la paloma verde).</p>
+        <div style="margin-bottom:20px; padding: 20px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+        <div class="wf-box" style="margin-top: 15px;">
+        <div class="wf-bar" style="background:var(--pjev-crema); padding:8px 16px; border-bottom:1px solid var(--pjev-borde); font-size:11px; font-weight:bold; color:var(--pjev-texto-muted);">4. Modal: Autorizar / Rechazar Reserva (Valores)</div>
+        <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+          <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+            <!-- Modal Box -->
+            <rect x="250" y="50" width="500" height="350" fill="#fff" rx="6" stroke="#999" filter="drop-shadow(0 10px 15px rgba(0,0,0,0.5))"/>
+            <rect x="250" y="50" width="500" height="40" fill="#1B3A2D" rx="6"/>
+            <rect x="250" y="80" width="500" height="10" fill="#1B3A2D"/>
+            <text x="270" y="75" fill="#fff" font-size="14" font-weight="bold">Dictaminar Reserva: RM-SUF-2026-001</text>
+
+            <text x="270" y="120" font-size="11" font-weight="bold" fill="#0f172a">Acción a realizar</text>
+            <rect x="270" y="130" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> 
+            <circle cx="280" cy="142" r="4" fill="#16a34a"/>
+            <text x="290" y="146" font-size="11" fill="#0f172a">Autorizar Trámite</text>
+
+            <text x="270" y="180" font-size="11" font-weight="bold" fill="#0f172a">Folio de Oficio de Autorización (SAFPOJ)</text>
+            <rect x="270" y="190" width="460" height="25" fill="#fff" stroke="#ccc" rx="3"/> 
+            <text x="275" y="207" font-size="11" fill="#0f172a">PR-AUT-2026-89892</text>
+
+            <text x="270" y="240" font-size="11" font-weight="bold" fill="#0f172a">Observaciones</text>
+            <rect x="270" y="250" width="460" height="60" fill="#fff" stroke="#ccc" rx="3"/> 
+            <text x="275" y="267" font-size="11" fill="#0f172a">Se autoriza la reserva tras revisar suficiencia presupuestal.</text>
+
+            <!-- Actions -->
+            <line x1="250" y1="340" x2="750" y2="340" stroke="#ddd" />
+            <rect x="630" y="355" width="100" height="30" fill="#1B3A2D" rx="4"/>
+            <text x="680" y="374" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">CONFIRMAR</text>
+          </svg>
+        </div>
+      </div>
+        <p style="margin-top: 15px; color: #555;">Si la Autoriza, el sistema consolida el cargo en la base de datos, descuenta el saldo formalmente y emite el **Folio de Reserva M-XX**. Finalmente, permite exportar el documento PDF con sellos oficiales para notificar por oficio a Recursos Materiales.</p>
+      </div>
+    </div>
+
+    <!-- 5. Acciones -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Acciones Específicas del Sistema</div>
+      <div class="section-content">
+        <ul style="list-style-type: disc; margin-left: 20px; line-height: 1.8; color: #444;">
+          <li><strong>Botón GUARDAR CAPTURA (RM):</strong> Asigna el Estatus 0 (Borrador). Guarda localmente los montos capturados en la pantalla ABC para evitar pérdida de información. No afecta saldos, permitiendo reanudar el trabajo al día siguiente.</li>
+          <li><strong>Botón ENVIAR A FINANZAS (RM):</strong> Asigna el Estatus 1 (Pre-reserva). Activa la comunicación inter-sistemas con SAFPOJ. Si la respuesta es exitosa, bloquea la edición del documento para RM y lo hace visible en la bandeja de Finanzas.</li>
+          <li><strong>Botón DICTAMINAR (Finanzas):</strong> Lanza el formulario modal Modal-ABC desde la Bandeja. Expande el consolidado a nivel de Partida Genérica/Específica.</li>
+          <li><strong>Botón AUTORIZAR RESERVA (Finanzas):</strong> Asigna el Estatus 2 (Autorizado). Detona la transacción atómica que afecta definitivamente la cuenta y genera el código consecutivo de Reserva Contable M-XX (visible en pólizas).</li>
+          <li><strong>Botón RECHAZAR (Finanzas):</strong> Asigna el Estatus 3 (Rechazado). Ejecuta un Rollback contable, restaurando el monto a la Partida de Origen y notificando al emisor el rechazo en su bandeja de entrada.</li>
+          <li><strong>Botón IMPRIMIR / PDF (Ambas Áreas):</strong> Invoca el motor de reporteo para generar el documento oficial (Oficio de Solicitud u Oficio de Autorización) formateado para impresión o firma autógrafa.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 6. Diagrama de Flujo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Diagrama de Flujo Interfuncional</div>
+      <div class="section-content">
+        <div id="module-flowchart">
+<svg viewBox="0 0 1000 780" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff; border-radius: 8px;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; letter-spacing: 1px; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      .sep-line { stroke: #e5e7eb; stroke-width: 3; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
+      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#991B1B"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="250" height="40" class="header-area"/>
+  <text x="175" y="45" class="header-text">ÁREA RESPONSABLE</text>
+  
+  <rect x="300" y="20" width="300" height="40" class="header-proceso"/>
+  <text x="450" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="760" class="lane-line" stroke-dasharray="none"/>
+  <line x1="300" y1="60" x2="300" y2="760" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="760" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="760" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="760" x2="950" y2="760" class="lane-line" stroke-dasharray="none"/>
+
+  <!-- Títulos del Carril ÁREA -->
+  <text x="75" y="220" transform="rotate(-90 75 220)" font-weight="bold" font-size="20" fill="#e5e7eb" text-anchor="middle" letter-spacing="4">RECURSOS MATERIALES</text>
+  
+  <!-- Divisor Horizontal entre RM y Finanzas -->
+  <line x1="50" y1="360" x2="950" y2="360" class="sep-line"/>
+  
+  <text x="75" y="560" transform="rotate(-90 75 560)" font-weight="bold" font-size="20" fill="#e5e7eb" text-anchor="middle" letter-spacing="4">SUBDIRECCIÓN DE FINANZAS</text>
+
+  <!-- Nodos -->
+  <!-- 1. Inicio -->
+  <rect x="410" y="80" width="80" height="25" class="node-term" />
+  <text x="450" y="96" class="node-term-text">INICIO</text>
+  <path d="M 450 105 L 450 125" class="path-line"/>
+
+  <!-- 1. Captura de Solicitud -->
+  <polygon points="350,125 550,125 535,175 335,175" class="node-data"/>
+  <text x="450" y="145" class="node-text">1. Captura de Solicitud</text>
+  <text x="450" y="160" class="node-sub">Ingresa Partidas</text>
+  <path d="M 450 175 L 450 205" class="path-line"/>
+
+  <!-- 2. Envío de Oficio -->
+  <path d="M 350 205 L 550 205 L 550 245 C 500 265, 400 225, 350 245 Z" class="node-doc"/>
+  <text x="450" y="225" class="node-text">2. Genera y Envía Oficio</text>
+  <text x="450" y="240" class="node-sub">Solicitud de Reserva</text>
+  <path d="M 550 225 L 710 225" class="path-line"/>
+
+  <!-- 3. Validación SAFPOJ -->
+  <polygon points="775,195 840,225 775,255 710,225" class="node-rombo"/>
+  <text x="775" y="220" class="node-text">¿Saldo en</text>
+  <text x="775" y="235" class="node-text">SAFPOJ?</text>
+
+  <!-- Rechazo por Saldo -->
+  <path d="M 775 195 L 775 150" class="path-red"/>
+  <text x="790" y="180" font-size="10" fill="#991B1B" font-weight="bold">No</text>
+  
+  <!-- Bloqueo -->
+  <path d="M 695 130 C 695 120, 855 120, 855 130 L 855 170 C 855 180, 695 180, 695 170 Z" class="node-db" />
+  <path d="M 695 130 C 695 140, 855 140, 855 130" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="150" class="node-text">Bloqueo Automático</text>
+  <text x="775" y="163" class="node-sub">Falta de liquidez</text>
+  <path d="M 695 150 L 535 150" class="path-line"/>
+
+  <!-- Saldo OK -> Pre Reserva -->
+  <path d="M 775 255 L 775 290" class="path-green"/>
+  <text x="790" y="275" font-size="10" font-weight="bold">Sí</text>
+  
+  <path d="M 695 290 C 695 280, 855 280, 855 290 L 855 330 C 855 340, 695 340, 695 330 Z" class="node-db" />
+  <path d="M 695 290 C 695 300, 855 300, 855 290" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="312" class="node-text">Pre-Reserva Creada</text>
+  <text x="775" y="325" class="node-sub">Estatus = 1</text>
+  
+  <path d="M 775 330 L 775 385 L 450 385 L 450 405" class="path-line"/>
+
+  <!-- 3. Dictamen de Suficiencia -->
+  <polygon points="340,405 560,405 545,455 325,455" class="node-data"/>
+  <text x="450" y="425" class="node-text">3. Dictamen de Suficiencia</text>
+  <text x="450" y="440" class="node-sub">Evalúa Bandeja 02.2.8</text>
+  <path d="M 450 455 L 450 480" class="path-line"/>
+
+  <!-- ¿Autoriza? -->
+  <polygon points="450,480 510,510 450,540 390,510" class="node-rombo"/>
+  <text x="450" y="515" class="node-text">¿Autoriza?</text>
+
+  <!-- Rechazo Finanzas -->
+  <path d="M 510 510 L 695 510" class="path-red"/>
+  <text x="600" y="505" font-size="10" fill="#991B1B" font-weight="bold">No (Rechaza)</text>
+
+  <path d="M 695 490 C 695 480, 855 480, 855 490 L 855 530 C 855 540, 695 540, 695 530 Z" class="node-db" />
+  <path d="M 695 490 C 695 500, 855 500, 855 490" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="512" class="node-text">Libera Saldos</text>
+  <text x="775" y="525" class="node-sub">Estatus = 3</text>
+  
+  <path d="M 775 530 L 775 550 L 360 550 L 360 620" class="path-line"/>
+
+  <!-- Autoriza Finanzas -->
+  <path d="M 450 540 L 450 580 L 685 580" class="path-green"/>
+  <text x="560" y="575" font-size="10" font-weight="bold">Sí (Autoriza)</text>
+
+  <path d="M 685 560 C 685 550, 865 550, 865 560 L 865 600 C 865 610, 685 610, 685 600 Z" class="node-db" />
+  <path d="M 685 560 C 685 570, 865 570, 865 560" fill="none" stroke="#0284c7" stroke-width="2"/>
+  <text x="775" y="582" class="node-text">Reserva Contable M-XX</text>
+  <text x="775" y="595" class="node-sub">Afecta Balance</text>
+
+  <path d="M 775 600 L 775 610 L 540 610 L 540 620" class="path-line"/>
+
+  <!-- 4. Notifica Rechazo -->
+  <path d="M 300 620 L 420 620 L 420 655 C 390 670, 330 640, 300 655 Z" class="node-doc"/>
+  <text x="360" y="635" class="node-text">4. Notifica Rechazo</text>
+  <text x="360" y="648" class="node-sub">Oficio Negativo</text>
+
+  <!-- 4. Notifica Autoriza -->
+  <path d="M 480 620 L 600 620 L 600 655 C 570 670, 510 640, 480 655 Z" class="node-doc"/>
+  <text x="540" y="635" class="node-text">4. Notifica Autoriza.</text>
+  <text x="540" y="648" class="node-sub">Oficio Positivo</text>
+
+  <!-- FIN -->
+  <rect x="410" y="710" width="80" height="30" class="node-term" />
+  <text x="450" y="730" class="node-term-text">FIN</text>
+
+  <path d="M 360 655 L 360 690 L 430 690 L 430 710" class="path-line"/>
+  <path d="M 540 655 L 540 690 L 470 690 L 470 710" class="path-line"/>
+
+</svg>
+            </div>
+      </div>
+    </div>
+
+    <!-- 7. Proceso Funcional -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Matriz de Procesos y Descripción Funcional</div>
+      <div class="section-content">
+        <div id="module-process-table">
+              <table class="props-table">
+                <thead>
+                  <tr style="background: var(--pjev-verde-oscuro); color: white;">
+                    <th>ÁREA RESPONSABLE</th>
+                    <th>PASO / ETAPA</th>
+                    <th>PROCESO OPERATIVO</th>
+                    <th>SIAF-PJEV</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Recursos Materiales</strong></td>
+                    <td><strong>1. Captura de Solicitud</strong></td>
+                    <td>Detecta la necesidad de una compra, genera una Petición de Suficiencia y captura las partidas a afectar.</td>
+                    <td>Carga el listado de partidas activas (COG) permitiendo seleccionar sólo las pertinentes al ejercicio fiscal.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Recursos Materiales</strong></td>
+                    <td><strong>2. Generación y Envío de Oficio</strong></td>
+                    <td>Genera el Oficio de Solicitud de Reserva Presupuestal y envía formalmente la solicitud para evaluación.</td>
+                    <td>Valida saldos matemáticamente contra SAFPOJ. Si existe saldo disponible, "pre-reserva" (Estatus 1). Si no hay saldo, bloquea e impide el envío.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Subdirección de Finanzas</strong></td>
+                    <td><strong>3. Dictamen de Suficiencia</strong></td>
+                    <td>Revisa la bandeja operativa (Módulo 02.2.8) y decide Rechazar o Autorizar las partidas solicitadas.</td>
+                    <td>Actualiza estatus. En caso de Rechazo, libera inmediatamente los saldos pre-reservados. En caso de Autorización, descuenta los saldos definitivamente.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Subdirección de Finanzas</strong></td>
+                    <td><strong>4. Notificación de Resolución</strong></td>
+                    <td>Notifica formalmente por oficio la autorización (o rechazo) de la suficiencia presupuestal a Recursos Materiales para continuar la adjudicación.</td>
+                    <td>Genera el Folio Automático M-XX de Reserva Contable y permite la exportación del PDF Oficial con sellos institucionales.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
