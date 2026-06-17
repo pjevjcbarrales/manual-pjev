@@ -7,12 +7,10 @@
 <link rel="stylesheet" href="../shared.css">
 <style>
   body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
   
-  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
-  .method.get    { background:#e8f5e9; color:#1b5e20; }
-  .method.post   { background:#e3f2fd; color:#0d47a1; }
-  .method.put    { background:#fff8e1; color:#f57f17; }
-  .method.delete { background:#ffebee; color:#b71c1c; }
   .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
   .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
   .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
@@ -21,103 +19,508 @@
   .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
   .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
   .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
-  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
-  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
-  .badge-c { background:var(--pjev-gris-claro); color:var(--pjev-texto); border:1px solid var(--pjev-borde); }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+
+  .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; }
+  .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .sp-panel { display: none; }
+  .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .code-block pre { margin: 0; padding: 15px; background: #282c34; border-radius: 5px; color: #abb2bf; font-family: 'Consolas', monospace; font-size: 12px; overflow-x: auto; }
 </style>
 </head>
 <body>
 <div class="doc-main-inner">
 
     <div class="elem-breadcrumb">
-      <a href="../index.html">Análisis Funcional</a> ›
-      <span>Presupuesto</span> ›
-      <span>Registro</span> ›
-      <span>Bienes Inmuebles</span>
+      <a href="../index.html">Inicio</a> »
+      <span>Análisis Funcional</span> »
+      <span>02.1.3 Bienes Inmuebles (Arrendamientos)</span>
     </div>
 
     <div class="elem-header">
       <div>
         <div class="elem-id">02.1.3</div>
-        <h1 class="elem-title">Bienes Inmuebles</h1>
-        <p class="elem-desc">Catálogo maestro donde se registran los inmuebles ocupados por el Poder Judicial (Juzgados, oficinas, etc.), clasificando si son propios, en comodato o arrendados. Es un insumo fundamental para el padrón de arrendamientos y contratos.</p>
+        <h1 class="elem-title">Catálogo de Bienes Inmuebles (Arrendamientos)</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV. Registro del padrón de bienes inmuebles arrendados, conectando las áreas de Recursos Materiales, Presupuestos y Tesorería.</p>
         <div class="mod-header-badges">
-          <span class="mod-badge badge-c">Tipo: Catálogo Simple (CRUD)</span>
+          <span class="mod-badge badge-c">Tipo: Catálogo Compuesto (Grilla + Modal)</span>
         </div>
       </div>
     </div>
 
-    <!-- 1. DESCRIPCIÓN -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-      <p>Este catálogo concentra todos los espacios físicos donde operan los órganos jurisdiccionales o administrativos del Poder Judicial. Aunque normativamente algunos inmuebles sean propiedad del Gobierno y dados en comodato, o rentados a terceros, todos deben estar inventariados para poder ligar un contrato de arrendamiento o gastos de mantenimiento a una ubicación física específica.</p>
+        <div style="background-color: #FEF2F2; border-left: 4px solid #DC2626; padding: 12px 16px; margin-top: 20px; border-radius: 4px;">
+          <strong style="color: #991B1B; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+            ⚠️ ATENCIÓN DESARROLLO (EUNICE): LECTURA CRÍTICA
+          </strong>
+          <p style="margin: 8px 0 0 0; font-size: 13px; color: #7F1D1D; line-height: 1.5;">
+            Sigue las instrucciones de este documento de forma secuencial y literal (Cero ambigüedades). La arquitectura exige la separación entre la grilla de parámetros (<code>fn_leer</code>) y el formulario modal (<code>fn_abc</code>). No omitas NINGÚN campo de la tabla SQL especificada.
+          </p>
+        </div>
     </div>
 
-    <!-- 2. MARCO NORMATIVO -->
+    <!-- 01. Descripción General -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <div class="section-title"><span class="section-num">01</span> Descripción General</div>
+      <p>Módulo de registro, consulta y control del padrón de Bienes Inmuebles arrendados por el Poder Judicial. Este módulo unifica la base de datos de rentas y contratos de arrendamiento requerida para validar la emisión de pagos en Tesorería, la afectación presupuestal y el registro de pasivos.</p>
+    </div>
+
+    <!-- 02. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">02</span> Marco Normativo (SIAF / CONAC)</div>
+      <ul style="margin: 0; padding-left: 20px; color: #334155; font-size: 13px;">
+        <li><strong>LGCG (Art. 44 y 45):</strong> Exige la validación de documentación comprobatoria (Factura/CFDI vigente y validada ante el SAT) antes de cualquier registro contable.</li>
+        <li><strong>CONAC:</strong> Clasificador por Objeto del Gasto (COG). Este catálogo nutre los compromisos orientados al Capítulo 3000 (Servicios Generales), específicamente el concepto <strong>3200 Arrendamiento de bienes inmuebles</strong>.</li>
+      </ul>
+    </div>
+
+    <!-- 03. Roles -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">03</span> Roles que intervienen</div>
       <table class="props-table">
-        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <thead><tr><th>Rol</th><th>Acción Permitida</th><th>Restricción</th></tr></thead>
         <tbody>
-          <tr><td>Procedimiento Interno</td><td>"Trámite de pago de arrendamiento..."</td><td>Se requiere conocer el "Juzgado que alberga el inmueble" y el "Domicilio del inmueble".</td></tr>
-          <tr><td>CONAC</td><td>Bienes Inmuebles, Infraestructura y Construcciones en Proceso</td><td>Control patrimonial y ligadura de pólizas de gasto a ubicaciones.</td></tr>
+          <tr><td>RM_Capturista</td><td>Alta y Edición de Contratos</td><td>Bloqueo de edición si el contrato ya cuenta con facturas ligadas y pagadas en Tesorería.</td></tr>
+          <tr><td>TES_Analista</td><td>Lectura y Consulta</td><td>No puede alterar montos, vigencias ni cuentas bancarias del arrendador.</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 3. MODELO DE DATOS -->
+    <!-- 04. Modelo de Datos -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">3</span> Modelo de Datos</div>
+      <div class="section-title"><span class="section-num">04</span> Modelo de Datos (Propuesta Modernizada)</div>
+      <p>Esquema físico para registrar el padrón de inmuebles arrendados: <strong><code>[Cat_Inmuebles_Arrendados]</code></strong>. <em>Nota: El <code>IdContrato</code> se reserva para futuras versiones. Las fotos deben ir a una tabla relacional N.</em></p>
       <table class="props-table">
         <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Tabla: <code>catalogo.bienes_inmuebles</code></strong></td></tr>
-        <tr><td><code>inmueble_id</code></td><td><code>BIGINT PK</code></td><td>Identificador único del inmueble.</td></tr>
-        <tr><td><code>clave_inventario</code></td><td><code>VARCHAR(50)</code></td><td>Clave de control interno patrimonial (Opcional si es arrendado).</td></tr>
-        <tr><td><code>nombre_oficial</code></td><td><code>VARCHAR(150)</code></td><td>Nombre descriptivo (Ej. "Edificio Sede", "Juzgado 1ro Familiar Coatzacoalcos").</td></tr>
-        <tr><td><code>domicilio</code></td><td><code>VARCHAR(255)</code></td><td>Calle, número, colonia, código postal.</td></tr>
-        <tr><td><code>municipio_id</code></td><td><code>INT FK</code></td><td>Clave del municipio (Catálogo INEGI o interno).</td></tr>
-        <tr><td><code>tipo_tenencia</code></td><td><code>VARCHAR(1)</code></td><td><code>'P'</code> (Propio), <code>'A'</code> (Arrendado), <code>'C'</code> (Comodato).</td></tr>
-        <tr><td><code>unidad_adm_id</code></td><td><code>INT FK</code></td><td>Vínculo con la Unidad Administrativa que lo ocupa (Juzgado / Dirección).</td></tr>
-        <tr><td><code>activo</code></td><td><code>BOOLEAN</code></td><td>Si el inmueble sigue siendo operado por el PJEV.</td></tr>
+          <tr><td><code>IdInmueble</code></td><td><code>INT (PK)</code></td><td>Llave primaria autoincremental.</td></tr>
+          <tr><td><code>TipoPersona</code></td><td><code>CHAR(1)</code></td><td>'F' (Física) o 'M' (Moral).</td></tr>
+          <tr><td><code>RfcArrendador</code></td><td><code>VARCHAR(13)</code></td><td>RFC del propietario.</td></tr>
+          <tr><td><code>NombreRazonSocial</code></td><td><code>VARCHAR(250)</code></td><td>Nombre del arrendador o empresa.</td></tr>
+          <tr><td><code>RepresentanteLegal</code></td><td><code>VARCHAR(250)</code></td><td>Obligatorio si TipoPersona = 'M'.</td></tr>
+          <tr><td><code>TelefonoContacto</code></td><td><code>VARCHAR(50)</code></td><td>Teléfono de contacto.</td></tr>
+          <tr><td><code>CorreoElectronico</code></td><td><code>VARCHAR(150)</code></td><td>Email de contacto.</td></tr>
+          <tr><td><code>DomicilioFiscal</code></td><td><code>VARCHAR(500)</code></td><td>Domicilio fiscal del arrendador.</td></tr>
+          <tr><td><code>RutaConstanciaSituacionFiscal</code></td><td><code>VARCHAR(500)</code></td><td>Ruta del PDF de la constancia.</td></tr>
+          <tr><td><code>DescripcionInmueble</code></td><td><code>VARCHAR(MAX)</code></td><td>Características del inmueble.</td></tr>
+          <tr><td><code>DomicilioInmueble</code></td><td><code>VARCHAR(500)</code></td><td>Dirección física del inmueble.</td></tr>
+          <tr><td><code>Latitud</code></td><td><code>DECIMAL(9,6)</code></td><td>Coordenada geográfica.</td></tr>
+          <tr><td><code>Longitud</code></td><td><code>DECIMAL(9,6)</code></td><td>Coordenada geográfica.</td></tr>
+          <tr><td><code>SuperficieTerreno</code></td><td><code>FLOAT</code></td><td>Superficie total (m2).</td></tr>
+          <tr><td><code>SuperficieConstruccion</code></td><td><code>FLOAT</code></td><td>Superficie construida (m2).</td></tr>
+          <tr><td><code>TipoPropiedad</code></td><td><code>INT (FK)</code></td><td>Relación al catálogo de tipos.</td></tr>
+          <tr><td><code>Prioridad</code></td><td><code>TINYINT</code></td><td>Importancia operativa.</td></tr>
+          <tr><td><code>idcontrato</code></td><td><code>INT</code></td><td>Reservado para futuras actualizaciones.</td></tr>
+          <tr><td><code>NumeroContrato</code></td><td><code>VARCHAR(100)</code></td><td>Folio del contrato.</td></tr>
+          <tr><td><code>IdUnidadAdministrativa</code></td><td><code>INT (FK)</code></td><td>Juzgado o área que arrenda.</td></tr>
+          <tr><td><code>ImporteRentaMensual</code></td><td><code>DECIMAL(18,2)</code></td><td>Monto a pagar mensual.</td></tr>
+          <tr><td><code>FechaInicioVigencia</code></td><td><code>DATE</code></td><td>Fecha de inicio del contrato.</td></tr>
+          <tr><td><code>FechaFinVigencia</code></td><td><code>DATE</code></td><td>Fecha de fin del contrato.</td></tr>
+          <tr><td><code>RutaContratoPdf</code></td><td><code>VARCHAR(500)</code></td><td>Ruta del contrato digitalizado.</td></tr>
+          <tr><td><code>IdBanco</code></td><td><code>INT (FK)</code></td><td>Banco de pago.</td></tr>
+          <tr><td><code>CuentaBancariaClabe</code></td><td><code>VARCHAR(20)</code></td><td>CLABE o cuenta para transferencia.</td></tr>
+          <tr><td><code>Estatus</code></td><td><code>BIT</code></td><td>1 = Activo, 0 = Inactivo.</td></tr>
+          <tr><td><code>FechaRegistro</code></td><td><code>DATETIME</code></td><td>Fecha de alta en el sistema.</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 4. SERVICIOS REST -->
+    <!-- 05. Stored Procedures -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">4</span> Servicios REST (Endpoints)</div>
+      <div class="section-title"><span class="section-num">05</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">En un Formulario Compuesto (Catálogo + Modal), la manipulación de base de datos se realiza a través de 2 procedimientos principales:</p>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('leer', this)">fn_leer_catalogobienesinmuebles</button>
+        <button class="sp-tab" onclick="showSP('abc', this)">fn_abc_catalogobienesinmuebles</button>
+      </div>
+
+      <div id="sp-leer" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@IdInmueble</code></td><td><code>INT</code></td><td>Si trae valor, retorna el registro específico (Para el Modal). Nulo para el listado global.</td></tr>
+            <tr><td><code>@IdTipoPropiedad</code></td><td><code>INT</code></td><td>Filtro o dato: Tipo de propiedad.</td></tr>
+            <tr><td><code>@TipoPersona</code></td><td><code>CHAR(1)</code></td><td>Filtro o dato: Física o Moral.</td></tr>
+            <tr><td><code>@RazonSocial</code></td><td><code>VARCHAR(250)</code></td><td>Filtro general de búsqueda parcial por nombre.</td></tr>
+            <tr><td><code>@Ubicacion</code></td><td><code>VARCHAR(250)</code></td><td>Filtro general de búsqueda parcial en Domicilio.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{IdInmueble}</code></td><td><code>INT</code></td><td>ID del registro.</td></tr>
+            <tr><td><code>{TipoPersona}</code>, <code>{RfcArrendador}</code>, <code>{NombreRazonSocial}</code>, <code>{RepresentanteLegal}</code></td><td><code>VARCHAR</code></td><td>Datos de identificación del arrendador.</td></tr>
+            <tr><td><code>{TelefonoContacto}</code>, <code>{CorreoElectronico}</code>, <code>{DomicilioFiscal}</code></td><td><code>VARCHAR</code></td><td>Datos de contacto.</td></tr>
+            <tr><td><code>{DescripcionInmueble}</code>, <code>{DomicilioInmueble}</code></td><td><code>VARCHAR</code></td><td>Datos físicos del inmueble.</td></tr>
+            <tr><td><code>{SuperficieTerreno}</code>, <code>{SuperficieConstruccion}</code>, <code>{TipoPropiedad}</code>, <code>{Prioridad}</code></td><td><code>MIXTO</code></td><td>Métricas del inmueble.</td></tr>
+            <tr><td><code>{Latitud}</code>, <code>{Longitud}</code></td><td><code>DECIMAL</code></td><td>Geolocalización.</td></tr>
+            <tr><td><code>{NumeroContrato}</code>, <code>{IdUnidadAdministrativa}</code>, <code>{ImporteRentaMensual}</code>, <code>{FechaInicioVigencia}</code>, <code>{FechaFinVigencia}</code></td><td><code>MIXTO</code></td><td>Condiciones contractuales.</td></tr>
+            <tr><td><code>{IdBanco}</code>, <code>{CuentaBancariaClabe}</code></td><td><code>MIXTO</code></td><td>Datos bancarios.</td></tr>
+            <tr><td><code>{Estatus}</code></td><td><code>BIT</code></td><td>1: Activo, 0: Baja.</td></tr>
+          </tbody>
+        </table>
+        <div class="code-block">
+<pre>
+-- PROPÓSITO: Obtener el listado para la grilla de parámetros O el registro único para el Modal.
+CREATE OR ALTER PROCEDURE [dbo].[fn_leer_catalogobienesinmuebles]
+    @IdInmueble INT = NULL,           -- Si trae valor, retorna el registro específico (Para el Modal)
+    @IdTipoPropiedad INT = NULL,      -- Filtro
+    @TipoPersona CHAR(1) = NULL,      -- Filtro
+    @RazonSocial VARCHAR(250) = NULL, -- Filtro (Búsqueda parcial)
+    @Ubicacion VARCHAR(250) = NULL    -- Filtro (Búsqueda parcial en Domicilio)
+AS
+BEGIN
+    SELECT 
+        IdInmueble, TipoPersona, RfcArrendador, NombreRazonSocial, RepresentanteLegal,
+        TelefonoContacto, CorreoElectronico, DomicilioFiscal, RutaConstanciaSituacionFiscal,
+        DescripcionInmueble, DomicilioInmueble, Latitud, Longitud, SuperficieTerreno,
+        SuperficieConstruccion, TipoPropiedad, Prioridad, NumeroContrato, IdUnidadAdministrativa,
+        ImporteRentaMensual, FechaInicioVigencia, FechaFinVigencia, RutaContratoPdf,
+        IdBanco, CuentaBancariaClabe, Estatus
+    FROM Cat_Inmuebles_Arrendados
+    WHERE Estatus = 1
+      AND (@IdInmueble IS NULL OR IdInmueble = @IdInmueble)
+      AND (@IdTipoPropiedad IS NULL OR TipoPropiedad = @IdTipoPropiedad)
+      AND (@TipoPersona IS NULL OR TipoPersona = @TipoPersona)
+      AND (@RazonSocial IS NULL OR NombreRazonSocial LIKE '%' + @RazonSocial + '%')
+      AND (@Ubicacion IS NULL OR DomicilioInmueble LIKE '%' + @Ubicacion + '%');
+END
+</pre>
+        </div>
+      </div>
+
+      <div id="sp-abc" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@Accion</code></td><td><code>CHAR(1)</code></td><td>'I'=Insert, 'U'=Update, 'D'=Delete (Baja Lógica).</td></tr>
+            <tr><td><code>@JsonData</code></td><td><code>NVARCHAR(MAX)</code></td><td>JSON con toda la metadata del inmueble y contrato proveniente del modal de captura.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@IdGenerado</code></td><td><code>INT</code></td><td>Devuelve el ID insertado o el ID afectado (identity).</td></tr>
+            <tr><td><code>@MensajeError</code></td><td><code>VARCHAR(255)</code></td><td>'OK' en éxito o el mensaje de validación SQL arrojado por RAISERROR.</td></tr>
+          </tbody>
+        </table>
+        <div class="code-block">
+<pre>
+-- PROPÓSITO: Insertar o actualizar un registro proveniente de la captura Modal.
+CREATE OR ALTER PROCEDURE [dbo].[fn_abc_catalogobienesinmuebles]
+    @Accion CHAR(1), -- 'I'=Insert, 'U'=Update, 'D'=Delete(baja lógica)
+    @JsonData NVARCHAR(MAX),
+    @IdGenerado INT OUTPUT,
+    @MensajeError VARCHAR(255) OUTPUT
+AS
+BEGIN
+    -- Variables extraídas de JSON
+    DECLARE @IdInmueble INT, @TipoPersona CHAR(1), @RfcArrendador VARCHAR(13), @NombreRazonSocial VARCHAR(250);
+    -- ... [Extracción de variables via OPENJSON] ...
+
+    IF @Accion = 'I'
+    BEGIN
+        INSERT INTO Cat_Inmuebles_Arrendados (
+            TipoPersona, RfcArrendador, NombreRazonSocial, RepresentanteLegal, TelefonoContacto,
+            CorreoElectronico, DomicilioFiscal, RutaConstanciaSituacionFiscal, DescripcionInmueble,
+            DomicilioInmueble, Latitud, Longitud, SuperficieTerreno, SuperficieConstruccion,
+            TipoPropiedad, Prioridad, NumeroContrato, IdUnidadAdministrativa, ImporteRentaMensual,
+            FechaInicioVigencia, FechaFinVigencia, RutaContratoPdf, IdBanco, CuentaBancariaClabe
+        ) VALUES (
+            @TipoPersona, @RfcArrendador, @NombreRazonSocial, @RepresentanteLegal, @TelefonoContacto,
+            -- ... variables ...
+        );
+        SET @IdGenerado = SCOPE_IDENTITY();
+        SET @MensajeError = 'OK';
+    END
+    ELSE IF @Accion = 'U'
+    BEGIN
+        UPDATE Cat_Inmuebles_Arrendados SET ... WHERE IdInmueble = @IdInmueble;
+        SET @IdGenerado = @IdInmueble;
+        SET @MensajeError = 'OK';
+    END
+END
+</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">06</span> Servicios REST</div>
       <table class="props-table">
-        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Método</th><th>Ruta</th><th>Propósito</th></tr></thead>
         <tbody>
-        <tr><td><span class="method get">GET</span></td><td><code>/cfg/inmuebles</code></td><td>?tipo=A</td><td>Obtiene la lista de inmuebles (filtrables por tipo).</td></tr>
-        <tr><td><span class="method get">GET</span></td><td><code>/cfg/inmuebles/{id}</code></td><td></td><td>Obtiene los detalles de un inmueble específico.</td></tr>
-        <tr><td><span class="method post">POST</span></td><td><code>/cfg/inmuebles</code></td><td><code>{nombre, domicilio, tipo, unidad_id...}</code></td><td>Registra un nuevo inmueble en el catálogo.</td></tr>
-        <tr><td><span class="method put">PUT</span></td><td><code>/cfg/inmuebles/{id}</code></td><td><code>{domicilio...}</code></td><td>Actualiza datos del inmueble.</td></tr>
-        <tr><td><span class="method delete">DEL</span></td><td><code>/cfg/inmuebles/{id}</code></td><td></td><td>Baja lógica del inmueble (solo si no tiene contratos vigentes).</td></tr>
+          <tr><td>GET</td><td><code>/api/v1/inmuebles/buscar</code></td><td>Ejecuta <code>fn_leer_catalogobienesinmuebles</code> para poblar la grilla con base en filtros.</td></tr>
+          <tr><td>GET</td><td><code>/api/v1/inmuebles/{id}</code></td><td>Trae la información completa para poblar el <strong>Modal de Edición</strong>.</td></tr>
+          <tr><td>POST</td><td><code>/api/v1/inmuebles</code></td><td>Ejecuta <code>fn_abc...</code> con Acción 'I' desde el Modal de Alta.</td></tr>
+          <tr><td>PUT</td><td><code>/api/v1/inmuebles/{id}</code></td><td>Ejecuta <code>fn_abc...</code> con Acción 'U' desde el Modal de Edición.</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 5. REGLAS DE NEGOCIO -->
+    <!-- 07. Acciones del Módulo -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">5</span> Reglas de Negocio Críticas</div>
+      <div class="section-title"><span class="section-num">07</span> Acciones del Módulo</div>
       <table class="props-table">
-        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th></tr></thead>
+        <thead><tr><th>Botón / Acción</th><th>Descripción Funcional</th></tr></thead>
         <tbody>
-        <tr><td><strong>RN-INM-01</strong></td><td>Protección de Eliminación</td><td>No se puede dar de baja (o eliminar) un inmueble si está referenciado en un contrato de arrendamiento activo.</td><td>Backend (Controller/DB)</td></tr>
-        <tr><td><strong>RN-INM-02</strong></td><td>Clasificación Arrendamiento</td><td>Al crear un Contrato de Arrendamiento, el sistema solo sugerirá los inmuebles con <code>tipo_tenencia = 'A'</code>.</td><td>Frontend / API</td></tr>
+          <tr><td><strong>Buscar</strong></td><td>Recupera los valores de los inputs de filtro y llama al GET de búsqueda. Renderiza la tabla.</td></tr>
+          <tr><td><strong>Limpiar</strong></td><td>Resetea los filtros de búsqueda y recarga la grilla.</td></tr>
+          <tr><td><strong>Nuevo</strong></td><td>Abre la <strong>Pantalla Modal</strong> limpiando todos los campos para permitir el Alta.</td></tr>
+          <tr><td><strong>Editar</strong></td><td>Abre la <strong>Pantalla Modal</strong> pasándole el `IdInmueble` para mostrar los datos existentes.</td></tr>
+          <tr><td><strong>Guardar (Modal)</strong></td><td>Ejecuta las validaciones JS y llama al POST/PUT para detonar el guardado ABC en BD.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 08. Diseño de Interfaces -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">08</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('principal', this)">1. Pantalla Principal (Filtros)</button>
+        <button class="wf-tab" onclick="showWF('modal', this)">2. Pantalla Modal (Valores/Alta)</button>
+      </div>
+
+      <!-- Panel: Pantalla Principal (Filtros) -->
+      <div id="wf-principal" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar">
+            <span class="wf-bar-label">SIAF - Catálogo de Inmuebles</span>
+          </div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 900 600" width="100%" style="max-width:720px; background:#FFFFFF; border-radius:4px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-family:sans-serif;" xmlns="http://www.w3.org/2000/svg">
+              <text x="30" y="40" font-size="18" font-weight="bold" fill="#1B3A2D">Búsqueda de Inmuebles Arrendados</text>
+              <line x1="30" y1="55" x2="870" y2="55" stroke="#E2E8F0" stroke-width="2"/>
+              
+              <!-- Caja de Filtros -->
+              <rect x="30" y="70" width="840" height="100" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+              
+              <rect x="50" y="90" width="180" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="60" y="110" font-size="12" fill="#94A3B8">Tipo Persona</text>
+              <polygon points="215,100 225,100 220,108" fill="#94A3B8"/>
+
+              <rect x="250" y="90" width="180" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="260" y="110" font-size="12" fill="#94A3B8">Tipo Propiedad</text>
+              <polygon points="415,100 425,100 420,108" fill="#94A3B8"/>
+
+              <rect x="450" y="90" width="180" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="460" y="110" font-size="12" fill="#94A3B8">Razón Social</text>
+
+              <rect x="650" y="90" width="180" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="660" y="110" font-size="12" fill="#94A3B8">Ubicación</text>
+
+              <rect x="650" y="130" width="80" height="25" rx="4" fill="#E2E8F0"/>
+              <text x="690" y="147" font-size="11" font-weight="bold" fill="#475569" text-anchor="middle">Limpiar</text>
+              <rect x="740" y="130" width="90" height="25" rx="4" fill="#1B3A2D"/>
+              <text x="785" y="147" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Buscar</text>
+
+              <!-- Tabla de Resultados -->
+              <rect x="30" y="190" width="840" height="35" fill="#E2E8F0"/>
+              <text x="40" y="212" font-size="12" font-weight="bold" fill="#475569">Tipo Per.</text>
+              <text x="120" y="212" font-size="12" font-weight="bold" fill="#475569">Razón Social / Representante</text>
+              <text x="380" y="212" font-size="12" font-weight="bold" fill="#475569">Teléfono</text>
+              <text x="480" y="212" font-size="12" font-weight="bold" fill="#475569">Domicilio</text>
+              <text x="780" y="212" font-size="12" font-weight="bold" fill="#475569">Acciones</text>
+
+              <!-- Fila 1 -->
+              <line x1="30" y1="260" x2="870" y2="260" stroke="#F1F5F9" stroke-width="1"/>
+              <text x="40" y="245" font-size="12" fill="#334155">Moral</text>
+              <text x="120" y="245" font-size="12" fill="#334155">Inmobiliaria X (Juan Pérez)</text>
+              <text x="380" y="245" font-size="12" fill="#334155">2288112233</text>
+              <text x="480" y="245" font-size="12" fill="#334155">Av. Central 123, Xalapa, Ver.</text>
+              <rect x="780" y="230" width="60" height="20" rx="2" fill="#DEAC50"/>
+              <text x="810" y="244" font-size="10" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Editar</text>
+
+              <!-- Boton Nuevo Flotante o al pie -->
+              <rect x="770" y="40" width="100" height="30" rx="4" fill="#1B3A2D"/>
+              <text x="820" y="60" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">+ NUEVO</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Pantalla Modal (Valores) -->
+      <div id="wf-modal" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar" style="background:#000000; color:#fff;">
+            <span class="wf-bar-label" style="color:#fff;">MODAL OVERLAY (FONDO OSCURECIDO)</span>
+          </div>
+          <div class="wf-svg-area" style="background:#333;">
+            <svg viewBox="0 0 900 860" width="100%" style="max-width:720px; background:#FFFFFF; border-radius:6px; box-shadow: 0 10px 15px rgba(0,0,0,0.5); font-family:sans-serif;" xmlns="http://www.w3.org/2000/svg">
+              
+              <rect x="0" y="0" width="900" height="50" fill="#F8FAFC"/>
+              <text x="30" y="30" font-size="16" font-weight="bold" fill="#1B3A2D">Captura de Inmueble (Alta/Edición)</text>
+              <text x="860" y="30" font-size="16" font-weight="bold" fill="#94A3B8" cursor="pointer">X</text>
+              <line x1="0" y1="50" x2="900" y2="50" stroke="#E2E8F0" stroke-width="2"/>
+
+              <!-- SECCIÓN 1: DATOS DEL ARRENDADOR -->
+              <rect x="30" y="70" width="840" height="200" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+              <text x="50" y="100" font-size="14" font-weight="bold" fill="#334155">1. DATOS DEL ARRENDADOR (PROPIETARIO)</text>
+              
+              <text x="50" y="130" font-size="12" fill="#64748B">Régimen Fiscal:</text>
+              <circle cx="160" cy="126" r="6" fill="#1B3A2D"/>
+              <text x="175" y="130" font-size="12" fill="#334155" font-weight="bold">Persona Física</text>
+              <circle cx="280" cy="126" r="6" fill="#FFFFFF" stroke="#94A3B8"/>
+              <text x="295" y="130" font-size="12" fill="#334155">Persona Moral</text>
+
+              <rect x="50" y="150" width="380" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="60" y="170" font-size="12" fill="#94A3B8">Nombre Completo / Razón Social *</text>
+
+              <rect x="450" y="150" width="190" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="460" y="170" font-size="12" fill="#94A3B8">RFC (13 caracteres) *</text>
+              
+              <rect x="660" y="150" width="190" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="670" y="170" font-size="12" fill="#94A3B8">Carga Constancia (PDF) 📎</text>
+
+              <rect x="50" y="195" width="800" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="60" y="215" font-size="12" fill="#94A3B8">Domicilio Fiscal del Arrendador *</text>
+              
+              <rect x="50" y="240" width="380" height="30" rx="4" fill="#F1F5F9" stroke="#E2E8F0" stroke-dasharray="2"/>
+              <text x="60" y="260" font-size="12" fill="#94A3B8">Representante Legal (Habilitado sólo Moral)</text>
+
+              <rect x="450" y="240" width="190" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="460" y="260" font-size="12" fill="#94A3B8">Teléfono</text>
+              
+              <rect x="660" y="240" width="190" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="670" y="260" font-size="12" fill="#94A3B8">Correo Electrónico</text>
+
+
+              <!-- SECCIÓN 2: DATOS DEL INMUEBLE -->
+              <rect x="30" y="290" width="840" height="275" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+              <text x="50" y="320" font-size="14" font-weight="bold" fill="#334155">2. IDENTIFICACIÓN Y UBICACIÓN DEL INMUEBLE</text>
+              
+              <rect x="50" y="340" width="590" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="60" y="360" font-size="12" fill="#94A3B8">Descripción del Inmueble (Ej. Edificio de 3 pisos, 500m2...) *</text>
+              
+              <rect x="660" y="340" width="190" height="75" rx="4" fill="#F1F5F9" stroke="#94A3B8" stroke-dasharray="4"/>
+              <text x="690" y="375" font-size="12" fill="#64748B" text-anchor="middle" x="755">📷 Arrastrar Fotos</text>
+              <text x="755" y="395" font-size="10" fill="#94A3B8" text-anchor="middle">Max. 5MB (JPG/PNG)</text>
+              
+              <rect x="50" y="385" width="135" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="60" y="405" font-size="12" fill="#94A3B8">Sup. Terreno (m2)</text>
+              <rect x="195" y="385" width="135" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="205" y="405" font-size="12" fill="#94A3B8">Sup. Construcción</text>
+              <rect x="340" y="385" width="150" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="350" y="405" font-size="12" fill="#94A3B8">Tipo Propiedad</text>
+              <polygon points="475,395 485,395 480,403" fill="#94A3B8"/>
+              <rect x="500" y="385" width="140" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="510" y="405" font-size="12" fill="#94A3B8">Prioridad</text>
+              <polygon points="625,395 635,395 630,403" fill="#94A3B8"/>
+
+              <rect x="50" y="430" width="590" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="60" y="450" font-size="12" fill="#94A3B8">Domicilio Completo del Inmueble *</text>
+
+              <rect x="50" y="475" width="280" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="60" y="495" font-size="12" fill="#94A3B8">Latitud: Ej. 19.53124 *</text>
+              <rect x="345" y="475" width="295" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="355" y="495" font-size="12" fill="#94A3B8">Longitud: Ej. -96.91589 *</text>
+              
+              <rect x="50" y="520" width="800" height="35" rx="4" fill="#E2E8F0"/>
+              <text x="450" y="542" font-size="12" fill="#64748B" font-weight="bold" text-anchor="middle">🗺️ Previsualización de Geolocalización (Maps API)</text>
+
+
+              <!-- SECCIÓN 3: DATOS DEL CONTRATO Y PAGO -->
+              <rect x="30" y="585" width="840" height="190" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+              <text x="50" y="615" font-size="14" font-weight="bold" fill="#334155">3. CONTRATO DE ARRENDAMIENTO (SÓLO LECTURA - ASIGNADO EN OTRO MÓDULO)</text>
+              
+              <rect x="50" y="635" width="250" height="30" rx="4" fill="#F1F5F9" stroke="#CBD5E1"/>
+              <text x="60" y="655" font-size="12" fill="#94A3B8">Número de Contrato (Lectura)</text>
+              <rect x="320" y="635" width="250" height="30" rx="4" fill="#F1F5F9" stroke="#CBD5E1"/>
+              <text x="330" y="655" font-size="12" fill="#94A3B8">Unidad Administrativa (Lectura)</text>
+              <polygon points="550,645 560,645 555,653" fill="#94A3B8"/>
+              <rect x="590" y="635" width="260" height="30" rx="4" fill="#F1F5F9" stroke="#CBD5E1"/>
+              <text x="600" y="655" font-size="12" fill="#94A3B8">Importe de Renta Mensual ($) (Lectura)</text>
+
+              <rect x="50" y="680" width="250" height="30" rx="4" fill="#F1F5F9" stroke="#CBD5E1"/>
+              <text x="60" y="700" font-size="12" fill="#94A3B8">Vigencia Inicio (Lectura)</text>
+              <rect x="320" y="680" width="250" height="30" rx="4" fill="#F1F5F9" stroke="#CBD5E1"/>
+              <text x="330" y="700" font-size="12" fill="#94A3B8">Vigencia Fin (Lectura)</text>
+              <rect x="590" y="680" width="260" height="30" rx="4" fill="#F1F5F9" stroke="#CBD5E1"/>
+              <text x="600" y="700" font-size="12" fill="#94A3B8">Descargar Contrato 📎 (PDF)</text>
+
+              <rect x="50" y="725" width="380" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="60" y="745" font-size="12" fill="#94A3B8">Institución Bancaria</text>
+              <polygon points="410,735 420,735 415,743" fill="#94A3B8"/>
+              <rect x="450" y="725" width="400" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="460" y="745" font-size="12" fill="#94A3B8">Cuenta Bancaria / CLABE *</text>
+
+              <!-- Botones Acción -->
+              <line x1="0" y1="795" x2="900" y2="795" stroke="#E2E8F0" stroke-width="2"/>
+              <rect x="660" y="805" width="100" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+              <text x="710" y="825" font-size="13" font-weight="bold" fill="#64748B" text-anchor="middle">Cancelar</text>
+              
+              <rect x="770" y="805" width="100" height="30" rx="4" fill="#1B3A2D"/>
+              <text x="820" y="825" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Guardar</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 09. Reglas Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">09</span> Reglas Críticas de Negocio</div>
+      <p>Instrucciones de validación estrictas para el FrontEnd y BackEnd:</p>
+      <ul>
+        <li><strong>Contrato en Sólo Lectura:</strong> Los datos del contrato (Vigencias, Monto, Número, Unidad Administrativa) se asignan y administran desde un submódulo ajeno. En el catálogo de bienes inmuebles estos campos se presentan bloqueados (<em>Read-Only</em>) únicamente como metadatos de consulta.</li>
+        <li><strong>Formato RFC:</strong> Si <code>TipoPersona='F'</code>, longitud estricta de 13 caracteres. Si <code>'M'</code>, 12 caracteres.</li>
+        <li><strong>Habilitación Dinámica:</strong> El campo <code>RepresentanteLegal</code> debe ser <code>required=true</code> si y solo si <code>TipoPersona='M'</code>.</li>
+        <li><strong>Vigencia Temporal:</strong> <code>FechaFinVigencia</code> debe ser cronológicamente posterior a <code>FechaInicioVigencia</code>.</li>
+        <li><strong>Restricciones LGCG:</strong> Es obligatoria la captura de coordenadas y los PDFs de soporte.</li>
+      </ul>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
+      <p>Este catálogo detona operatividad en otras áreas. Consecuencias:</p>
+      <ul>
+        <li><strong>Presupuestos:</strong> Al autorizar el contrato, se enlaza al Capítulo 3000 de afectación presupuestal.</li>
+        <li><strong>Cuentas por Pagar (Tesorería):</strong> Solo los contratos vigentes (donde <code>GETDATE() &lt;= FechaFinVigencia</code>) permitirán la generación del comprobante de recursos (Layout Bancario TXT) para transferencias o pagos interbancarios.</li>
+      </ul>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <p><strong>¿Genera Póliza Automática?:</strong> NO.</p>
+      <p>Al ser un módulo de catálogo, su acción de GUARDAR no impacta el libro diario. La póliza se genera posteriormente en Tesorería cuando se asocia una Factura al contrato, originando el registro de pasivo en <code>2112-0-000 Proveedores</code>.</p>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr><td>2026-06-16</td><td>1.0</td><td>Refactorización completa. Diseño de formulario compuesto (Grilla + Modal). Mapeo exacto de base de datos.</td><td>Analista Funcional (AI)</td></tr>
         </tbody>
       </table>
     </div>
 
 </div>
 
-<!-- ==========================================
-     DIAGRAMA Y MATRIZ FUNCIONAL NO REQUIEREN
-     PARA CATÁLOGOS SIMPLES.
-=========================================== -->
 <script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
 </body>
 </html>

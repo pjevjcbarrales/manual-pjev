@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+import json
+
+html_content = r"""<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -30,20 +32,11 @@
 </style>
 </head>
 <body>
-
-<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999; max-width: calc(-60px + 100vw);">
-  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(27, 58, 45); border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; background: rgb(27, 58, 45); color: rgb(255, 255, 255);">📊 Ver Diagrama</button>
-  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(153, 27, 27); border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; background: rgb(153, 27, 27); color: rgb(255, 255, 255);">📋 Proceso Funcional</button>
-  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.location.reload()">⟳ Refrescar</button>
-  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.print()">🖨 Imprimir</button>
-</div>
-
 <div class="doc-main-inner">
 
     <div class="elem-breadcrumb">
       <a href="../index.html">Inicio</a> ›
-      <span>Presupuesto</span> ›
-      <span>Registro</span> ›
+      <span>Análisis Funcional</span> ›
       <span>02.1.4 Registro de contrato</span>
     </div>
 
@@ -55,8 +48,6 @@
         <div class="mod-header-badges">
           <span class="mod-badge badge-c">Tipo: Formulario Compuesto (Maestro-Detalle)</span>
         </div>
-
-        
       </div>
     </div>
 
@@ -64,8 +55,6 @@
     <div class="doc-section">
       <div class="section-title"><span class="section-num">1</span> Descripción General</div>
       <p>El submódulo "Registro de contrato" tiene como objetivo el control, captura y seguimiento administrativo-legal de los contratos celebrados por el Instituto (ya sea derivados de un procedimiento de licitación/adjudicación o de forma directa). Su función principal es consolidar la información legal, montos, garantías, vigencias y la vinculación preparatoria de los Oficios de Reserva, actuando como la antesala normativa indispensable para la posterior formalización contable del compromiso.</p>
-      
-      
     </div>
 
     <!-- 2. Marco Normativo -->
@@ -359,34 +348,13 @@ $$;</pre>
 
     <!-- 6. Servicios REST -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">6</span> Servicios REST (Endpoints)</div>
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
       <table class="props-table">
-        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr>
-            <td><span class="method get">GET</span></td>
-            <td><code>/recursos_materiales/contratos</code></td>
-            <td><code>?p_numero_contrato=...&amp;p_id_proveedor=...</code></td>
-            <td>Llama a <code>fn_leer_contratos</code> (p_accion=0). Obtiene el listado de contratos (Cabecera).</td>
-          </tr>
-          <tr>
-            <td><span class="method get">GET</span></td>
-            <td><code>/recursos_materiales/contratos/:id_contrato/detalles</code></td>
-            <td><code>URL Param: id_contrato</code></td>
-            <td>Llama a <code>fn_leer_contratos</code> (p_accion=1). Obtiene el desglose de partidas de la bolsa de dinero.</td>
-          </tr>
-          <tr>
-            <td><span class="method post">POST</span> / <span class="method patch">PATCH</span></td>
-            <td><code>/recursos_materiales/contratos</code></td>
-            <td>
-              <code>{</code><br>
-              <code>&nbsp;&nbsp;"p_accion": 1,</code><br>
-              <code>&nbsp;&nbsp;"p_json_contrato": { "numero_contrato": "...", "monto_maximo": 100.00, ... },</code><br>
-              <code>&nbsp;&nbsp;"p_json_detalles": [ { "id_oficio_reserva": 1, "id_partida": 32201, "total_detalle": 100.00 } ]</code><br>
-              <code>}</code>
-            </td>
-            <td>Llama a <code>fn_abc_contratos</code>. Inserta/actualiza cabecera y detalle en una sola transacción atómica, garantizando el cuadre del contrato.</td>
-          </tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/recursos_materiales/contratos</code></td><td>Llama a <code>fn_leer_contratos</code> (p_accion=0).</td></tr>
+          <tr><td><span class="method post">POST</span> / <span class="method patch">PATCH</span></td><td><code>/recursos_materiales/contratos</code></td><td>Llama a <code>fn_abc_contratos</code> (p_accion=1 o 2).</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/recursos_materiales/contratos/:id/detalles</code></td><td>Llama a <code>fn_leer_contratos</code> (p_accion=1).</td></tr>
         </tbody>
       </table>
     </div>
@@ -406,78 +374,26 @@ $$;</pre>
       <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
       
       <div class="wireframe-tabs">
-        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer consulta de contratos (Parámetros)</button>
-        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer consulta de contratos (Valores)</button>
-        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc_compuesta (Parámetros)</button>
-        <button class="wf-tab" onclick="showWF('p4',this)">pantalla_abc_compuesta (Valores)</button>
+        <button class="wf-tab active" onclick="showWF('p1',this)">Pantalla Leer (Grilla)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">Modal: Agregar Contrato (Vacío)</button>
+        <button class="wf-tab" onclick="showWF('p3',this)">Modal: Editar Contrato (Con Valores)</button>
       </div>
 
-      <!-- TAB 1: pantalla_leer Parametros -->
+      <!-- TAB 1: Pantalla Leer -->
       <div id="wf-p1" class="wf-panel active">
         <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Listado Principal de Contratos (Parámetros)</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Listado Principal de Contratos</span></div>
           <div class="wf-svg-area">
             <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1000" height="400" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <rect width="1000" height="400" fill="#f5f0e8" rx="4"/>
               
-              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Catálogo de Contratos</text>
-              <rect x="850" y="15" width="130" height="25" fill="#1B3A2D" rx="4"/>
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#183125">Catálogo de Contratos</text>
+              <rect x="850" y="15" width="130" height="25" fill="#183125" rx="4"/>
               <text x="915" y="32" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">+ Nuevo Contrato</text>
               
-              <rect x="20" y="60" width="960" height="60" fill="#fff" stroke="#ccc" rx="4"/>
-              <text x="35" y="80" font-size="10" fill="#666">Folio del Contrato</text>
-              <text x="200" y="80" font-size="10" fill="#666">Proveedor</text>
-              
-              <rect x="35" y="88" width="150" height="20" fill="#fff" stroke="#ccc" rx="2"/>
-              <text x="40" y="102" font-size="10" fill="#0284c7">@p_numero_contrato</text>
-              
-              <rect x="200" y="88" width="200" height="20" fill="#fff" stroke="#ccc" rx="2"/>
-              <text x="205" y="102" font-size="10" fill="#0284c7">@p_id_proveedor</text>
-              
-              <rect x="420" y="88" width="80" height="20" fill="#183125" rx="2"/>
-              <text x="460" y="102" fill="#fff" font-size="10" text-anchor="middle">Buscar</text>
-
-              <rect x="20" y="140" width="960" height="240" fill="#fcfcfc" stroke="#ccc" rx="4"/>
-              <rect x="20" y="140" width="960" height="25" fill="#f0f0f0"/>
-              <text x="30" y="156" font-size="10" font-weight="bold" fill="#666">FOLIO CONTRATO</text>
-              <text x="180" y="156" font-size="10" font-weight="bold" fill="#666">PROVEEDOR</text>
-              <text x="400" y="156" font-size="10" font-weight="bold" fill="#666">FECHA</text>
-              <text x="500" y="156" font-size="10" font-weight="bold" fill="#666">TIPO</text>
-              <text x="580" y="156" font-size="10" font-weight="bold" fill="#666">MONTO MÁX TOTAL</text>
-              <text x="750" y="156" font-size="10" font-weight="bold" fill="#666">ESTADO</text>
-              <text x="920" y="156" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
-              
-              <!-- Row 1 -->
-              <rect x="20" y="165" width="960" height="35" fill="#fff" stroke="#eee"/>
-              <text x="30" y="187" font-size="11" font-weight="bold" fill="#0284c7">{numero_contrato}</text>
-              <text x="180" y="187" font-size="11" fill="#0284c7">{proveedor_nombre}</text>
-              <text x="400" y="187" font-size="11" fill="#0284c7">{fecha_contrato}</text>
-              <text x="500" y="187" font-size="11" fill="#0284c7">{tipo_contrato}</text>
-              <text x="580" y="187" font-size="11" fill="#0284c7">{monto_maximo_total}</text>
-              <text x="750" y="187" font-size="11" fill="#0284c7">{id_poliza_comprometido}</text>
-              
-              <rect x="900" y="176" width="50" height="15" fill="#f3f3f3" rx="2" stroke="#ccc"/>
-              <text x="925" y="187" font-size="9" fill="#333" text-anchor="middle">Ver</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: pantalla_leer Valores -->
-      <div id="wf-p2" class="wf-panel">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Listado Principal de Contratos (Valores)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1000" height="400" fill="#fcfcfc" rx="4" stroke="#ddd"/>
-              
-              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Catálogo de Contratos</text>
-              <rect x="850" y="15" width="130" height="25" fill="#1B3A2D" rx="4"/>
-              <text x="915" y="32" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">+ Nuevo Contrato</text>
-              
-              <rect x="20" y="60" width="960" height="60" fill="#fff" stroke="#ccc" rx="4"/>
-              <text x="35" y="80" font-size="10" fill="#666">Folio del Contrato</text>
-              <text x="200" y="80" font-size="10" fill="#666">Proveedor</text>
+              <rect x="20" y="60" width="960" height="60" fill="#fff" stroke="#d4c9b5" rx="4"/>
+              <text x="35" y="80" font-size="10" fill="#5a5a5a">Folio del Contrato</text>
+              <text x="200" y="80" font-size="10" fill="#5a5a5a">Proveedor</text>
               
               <rect x="35" y="88" width="150" height="20" fill="#fff" stroke="#ccc" rx="2"/>
               <text x="40" y="102" font-size="10" fill="#ccc">Ingresar número...</text>
@@ -488,116 +404,106 @@ $$;</pre>
               <rect x="420" y="88" width="80" height="20" fill="#183125" rx="2"/>
               <text x="460" y="102" fill="#fff" font-size="10" text-anchor="middle">Buscar</text>
 
-              <rect x="20" y="140" width="960" height="240" fill="#fcfcfc" stroke="#ccc" rx="4"/>
-              <rect x="20" y="140" width="960" height="25" fill="#f0f0f0"/>
-              <text x="30" y="156" font-size="10" font-weight="bold" fill="#666">FOLIO CONTRATO</text>
-              <text x="180" y="156" font-size="10" font-weight="bold" fill="#666">PROVEEDOR</text>
-              <text x="400" y="156" font-size="10" font-weight="bold" fill="#666">FECHA</text>
-              <text x="500" y="156" font-size="10" font-weight="bold" fill="#666">TIPO</text>
-              <text x="580" y="156" font-size="10" font-weight="bold" fill="#666">MONTO MÁX TOTAL</text>
-              <text x="750" y="156" font-size="10" font-weight="bold" fill="#666">ESTADO</text>
-              <text x="920" y="156" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
+              <rect x="20" y="140" width="960" height="240" fill="#fff" stroke="#d4c9b5" rx="4"/>
+              <rect x="20" y="140" width="960" height="25" fill="#eef3ef"/>
+              <text x="30" y="156" font-size="10" font-weight="bold" fill="#183125">FOLIO CONTRATO</text>
+              <text x="180" y="156" font-size="10" font-weight="bold" fill="#183125">PROVEEDOR</text>
+              <text x="400" y="156" font-size="10" font-weight="bold" fill="#183125">FECHA</text>
+              <text x="500" y="156" font-size="10" font-weight="bold" fill="#183125">TIPO</text>
+              <text x="580" y="156" font-size="10" font-weight="bold" fill="#183125">MONTO MÁX TOTAL</text>
+              <text x="750" y="156" font-size="10" font-weight="bold" fill="#183125">ESTADO (COMPROMETIDO)</text>
+              <text x="920" y="156" font-size="10" font-weight="bold" fill="#183125">ACCIONES</text>
               
-              <rect x="20" y="165" width="960" height="35" fill="#fff" stroke="#eee"/>
-              <text x="30" y="187" font-size="11" fill="#333" font-weight="bold">PJEV-RM-001-2026</text>
-              <text x="180" y="187" font-size="11" fill="#333">Computación Golfo S.A.</text>
-              <text x="400" y="187" font-size="11" fill="#333">2026-06-01</text>
-              <text x="500" y="187" font-size="11" fill="#333">Cerrado</text>
-              <text x="580" y="187" font-size="11" fill="#333">$ 116,000.00</text>
-              <rect x="750" y="174" width="70" height="15" fill="#edf8ef" stroke="#8fd19e" rx="7"/>
-              <text x="785" y="185" font-size="8" fill="#166534" font-weight="bold" text-anchor="middle">COMPROMETIDO</text>
-              <rect x="900" y="176" width="50" height="15" fill="#f3f3f3" rx="2" stroke="#ccc"/>
-              <text x="925" y="187" font-size="9" fill="#333" text-anchor="middle">Ver</text>
+              <!-- Row 1 -->
+              <text x="30" y="180" font-size="11" fill="#333">PJEV-RM-001-2026</text>
+              <text x="180" y="180" font-size="11" fill="#333">Computación Golfo S.A.</text>
+              <text x="400" y="180" font-size="11" fill="#333">2026-06-01</text>
+              <text x="500" y="180" font-size="11" fill="#333">Cerrado</text>
+              <text x="580" y="180" font-size="11" fill="#333">$ 116,000.00</text>
+              <rect x="750" y="170" width="70" height="15" fill="#edf8ef" stroke="#8fd19e" rx="7"/>
+              <text x="785" y="181" font-size="8" fill="#166534" font-weight="bold" text-anchor="middle">COMPROMETIDO</text>
+              <rect x="910" y="170" width="50" height="15" fill="#f3f3f3" rx="2" stroke="#ccc"/>
+              <text x="935" y="181" font-size="9" fill="#333" text-anchor="middle">Ver</text>
 
-              <rect x="20" y="200" width="960" height="35" fill="#fafafa" stroke="#eee"/>
-              <text x="30" y="222" font-size="11" fill="#333" font-weight="bold">PJEV-RM-002-2026</text>
-              <text x="180" y="222" font-size="11" fill="#333">Papelería Centro</text>
-              <text x="400" y="222" font-size="11" fill="#333">2026-06-15</text>
-              <text x="500" y="222" font-size="11" fill="#333">Abierto</text>
-              <text x="580" y="222" font-size="11" fill="#333">$ 58,000.00</text>
-              <rect x="750" y="209" width="70" height="15" fill="#fffbeb" stroke="#f5d565" rx="7"/>
-              <text x="785" y="220" font-size="8" fill="#854d0e" font-weight="bold" text-anchor="middle">PENDIENTE</text>
-              <rect x="900" y="211" width="50" height="15" fill="#f3f3f3" rx="2" stroke="#ccc"/>
-              <text x="925" y="222" font-size="9" fill="#333" text-anchor="middle">Editar</text>
+              <!-- Row 2 -->
+              <text x="30" y="210" font-size="11" fill="#333">PJEV-RM-002-2026</text>
+              <text x="180" y="210" font-size="11" fill="#333">Papelería Centro</text>
+              <text x="400" y="210" font-size="11" fill="#333">2026-06-15</text>
+              <text x="500" y="210" font-size="11" fill="#333">Abierto</text>
+              <text x="580" y="210" font-size="11" fill="#333">$ 58,000.00</text>
+              <rect x="750" y="200" width="70" height="15" fill="#fffbeb" stroke="#f5d565" rx="7"/>
+              <text x="785" y="211" font-size="8" fill="#854d0e" font-weight="bold" text-anchor="middle">PENDIENTE</text>
+              <rect x="910" y="200" width="50" height="15" fill="#f3f3f3" rx="2" stroke="#ccc"/>
+              <text x="935" y="211" font-size="9" fill="#333" text-anchor="middle">Editar</text>
+              
             </svg>
           </div>
         </div>
       </div>
 
-      <!-- TAB 3: pantalla_abc_compuesta Parametros -->
-      <div id="wf-p3" class="wf-panel">
+      <!-- TAB 2: Modal Agregar -->
+      <div id="wf-p2" class="wf-panel">
         <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Modal: ABC Compuesta (Parámetros)</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Agregar Contrato (Vacío)</span></div>
           <div class="wf-svg-area">
             <svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg">
               <rect width="1000" height="650" fill="#000" opacity="0.3"/>
+              
               <rect x="100" y="30" width="800" height="580" fill="#fff" rx="6"/>
-              <text x="120" y="60" font-size="16" font-weight="bold" fill="#183125">Contrato (Parámetros de Entrada JSON)</text>
+              <text x="120" y="60" font-size="16" font-weight="bold" fill="#183125">Nuevo Contrato</text>
               <line x1="100" y1="75" x2="900" y2="75" stroke="#d4c9b5"/>
               
               <text x="120" y="100" font-size="12" fill="#5a5a5a">Folio / Número *</text>
               <rect x="120" y="105" width="230" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="130" y="122" font-size="11" fill="#0284c7">@p_json_contrato->>'numero_contrato'</text>
               
               <text x="370" y="100" font-size="12" fill="#5a5a5a">Fecha Contrato *</text>
               <rect x="370" y="105" width="230" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="380" y="122" font-size="11" fill="#0284c7">@p_json_contrato->>'fecha_contrato'</text>
               
               <text x="620" y="100" font-size="12" fill="#5a5a5a">Tipo *</text>
               <rect x="620" y="105" width="230" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="630" y="122" font-size="11" fill="#0284c7">@p_json_contrato->>'tipo_contrato'</text>
 
               <text x="120" y="150" font-size="12" fill="#5a5a5a">Proveedor *</text>
               <rect x="120" y="155" width="350" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="130" y="172" font-size="11" fill="#0284c7">@p_json_contrato->>'id_proveedor'</text>
 
               <text x="490" y="150" font-size="12" fill="#5a5a5a">Procedimiento Origen *</text>
               <rect x="490" y="155" width="360" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="500" y="172" font-size="11" fill="#0284c7">@p_json_contrato->>'id_procedimiento'</text>
 
               <text x="120" y="200" font-size="12" fill="#5a5a5a">Objeto / Descripción *</text>
               <rect x="120" y="205" width="730" height="40" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="130" y="222" font-size="11" fill="#0284c7">@p_json_contrato->>'descripcion_contrato'</text>
               
               <line x1="120" y1="260" x2="850" y2="260" stroke="#eee"/>
+              
               <text x="120" y="280" font-size="14" font-weight="bold" fill="#183125">Importes Generales (Sin IVA)</text>
               
               <text x="120" y="310" font-size="12" fill="#5a5a5a">Monto Mínimo</text>
               <rect x="120" y="315" width="230" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="130" y="332" font-size="11" fill="#0284c7">@p_json_contrato->>'monto_minimo'</text>
               
               <text x="370" y="310" font-size="12" fill="#5a5a5a">Monto Máximo *</text>
               <rect x="370" y="315" width="230" height="24" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="380" y="332" font-size="11" fill="#0284c7">@p_json_contrato->>'monto_maximo'</text>
-              
+
               <line x1="120" y1="360" x2="850" y2="360" stroke="#eee"/>
 
-              <text x="120" y="380" font-size="14" font-weight="bold" fill="#183125">Detalle Presupuestal (@p_json_detalles)</text>
-              <rect x="120" y="400" width="730" height="120" fill="#fff" stroke="#ccc" rx="4"/>
-              <rect x="120" y="400" width="730" height="25" fill="#f0f0f0" rx="4"/>
-              <text x="130" y="416" font-size="10" fill="#666" font-weight="bold">ID OFICIO RESERVA | PARTIDA | MONTO | IVA | TOTAL | ACCIÓN</text>
-              
-              <rect x="120" y="425" width="730" height="35" fill="#fff" stroke="#eee"/>
-              <text x="130" y="447" font-size="11" fill="#0284c7">{id_oficio_reserva}</text>
-              <text x="260" y="447" font-size="11" fill="#0284c7">{id_partida}</text>
-              <text x="400" y="447" font-size="11" fill="#0284c7">{monto_detalle}</text>
-              <text x="500" y="447" font-size="11" fill="#0284c7">{iva_detalle}</text>
-              <text x="600" y="447" font-size="11" fill="#0284c7">{total_detalle}</text>
+              <text x="120" y="380" font-size="14" font-weight="bold" fill="#183125">Detalle Presupuestal</text>
+              <rect x="120" y="400" width="730" height="120" fill="#f9f9f9" stroke="#ddd" rx="4"/>
+              <text x="130" y="420" font-size="11" fill="#666" font-weight="bold">ID OFICIO RESERVA | PARTIDA | MONTO | IVA | TOTAL</text>
+              <text x="480" y="460" font-size="11" fill="#999" text-anchor="middle">No hay detalles registrados...</text>
               
               <rect x="730" y="560" width="120" height="30" fill="#183125" rx="4"/>
               <text x="790" y="579" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Guardar</text>
+              <text x="680" y="579" fill="#183125" font-size="12" text-anchor="middle">Cancelar</text>
             </svg>
           </div>
         </div>
       </div>
 
-      <!-- TAB 4: pantalla_abc_compuesta Valores -->
-      <div id="wf-p4" class="wf-panel">
+      <!-- TAB 3: Modal Editar -->
+      <div id="wf-p3" class="wf-panel">
         <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Modal: ABC Compuesta (Valores)</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Editar Contrato (Poblado)</span></div>
           <div class="wf-svg-area">
             <svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg">
               <rect width="1000" height="650" fill="#000" opacity="0.3"/>
+              
               <rect x="100" y="30" width="800" height="580" fill="#fff" rx="6"/>
               <text x="120" y="60" font-size="16" font-weight="bold" fill="#183125">Editar Contrato: PJEV-RM-002-2026</text>
               <line x1="100" y1="75" x2="900" y2="75" stroke="#d4c9b5"/>
@@ -627,6 +533,7 @@ $$;</pre>
               <text x="130" y="222" font-size="11" fill="#333">Adquisición de insumos de papelería general.</text>
               
               <line x1="120" y1="260" x2="850" y2="260" stroke="#eee"/>
+              
               <text x="120" y="280" font-size="14" font-weight="bold" fill="#183125">Importes Generales (Sin IVA)</text>
               
               <text x="120" y="310" font-size="12" fill="#5a5a5a">Monto Mínimo</text>
@@ -646,16 +553,17 @@ $$;</pre>
               <text x="120" y="380" font-size="14" font-weight="bold" fill="#183125">Detalle Presupuestal</text>
               <rect x="120" y="400" width="730" height="120" fill="#fff" stroke="#ccc" rx="4"/>
               <rect x="120" y="400" width="730" height="25" fill="#f0f0f0" rx="4"/>
-              <text x="130" y="416" font-size="10" fill="#666" font-weight="bold">ID OFICIO RESERVA | PARTIDA | MONTO | IVA | TOTAL | ACCIÓN</text>
+              <text x="130" y="416" font-size="10" fill="#333" font-weight="bold">ID OFICIO RESERVA | PARTIDA | MONTO | IVA | TOTAL | ACCIÓN</text>
               
-              <rect x="120" y="425" width="730" height="35" fill="#fff" stroke="#eee"/>
-              <text x="130" y="447" font-size="11" fill="#333">OR-2026-05</text>
-              <text x="260" y="447" font-size="11" fill="#333">21101 - Mat. y Útiles</text>
-              <text x="400" y="447" font-size="11" fill="#333">50,000.00</text>
-              <text x="500" y="447" font-size="11" fill="#333">8,000.00</text>
-              <text x="600" y="447" font-size="11" fill="#333">58,000.00</text>
-              <text x="730" y="447" font-size="10" fill="#991B1B">Eliminar</text>
+              <!-- Fila Detalle -->
+              <text x="130" y="440" font-size="11" fill="#333">OR-2026-05</text>
+              <text x="260" y="440" font-size="11" fill="#333">21101 - Mat. y Útiles</text>
+              <text x="400" y="440" font-size="11" fill="#333">50,000.00</text>
+              <text x="500" y="440" font-size="11" fill="#333">8,000.00</text>
+              <text x="600" y="440" font-size="11" fill="#333">58,000.00</text>
+              <text x="730" y="440" font-size="10" fill="#991B1B">Eliminar</text>
 
+              <!-- Agregar fila btn -->
               <rect x="130" y="480" width="120" height="24" fill="#fff" stroke="#183125" rx="3"/>
               <text x="190" y="496" fill="#183125" font-size="11" text-anchor="middle">+ Agregar Renglón</text>
               
@@ -666,8 +574,10 @@ $$;</pre>
           </div>
         </div>
       </div>
+
     </div>
-<!-- 9. Reglas de Negocio -->
+
+    <!-- 9. Reglas de Negocio -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Especiales</div>
       <ul>
@@ -716,240 +626,9 @@ function showSP(id, btn) {
   btn.classList.add('active');
 }
 </script>
-
-
-<div id="modal-diagrama" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center;">
-    <div class="modal-box" style="background:#fff; padding:25px; border-radius:8px; max-width:1050px; width:95%; max-height:90vh; overflow-y:auto; position:relative; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
-        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-            <h3 style="color: var(--pjev-verde-oscuro); font-size: 16px; margin: 0;">Anexo 1: Diagrama de Flujo de Canal (Interfuncional)</h3>
-            <button class="modal-close" onclick="document.getElementById('modal-diagrama').style.display='none'" style="background:none; border:none; color:#991b1b; cursor:pointer; font-weight:bold; font-size:14px;">❌ Cerrar</button>
-        </div>
-        <div class="modal-body" style="text-align: center; background:#fafafa; border:1px solid #eee; border-radius:6px; padding:15px;">
-            
-            <svg viewBox="0 0 1000 900" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; background:#fff; font-family:sans-serif;">
-              <defs>
-                <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D" />
-                </marker>
-                
-                <style>
-                  .lane-header { font-size:13px; font-weight:bold; fill:#fff; text-anchor:middle; letter-spacing:1px; }
-                  .node-area { fill:#f8fafc; stroke:#94a3b8; stroke-width:2; rx:4; }
-                  .node-proc { fill:#fff; stroke:#1B3A2D; stroke-width:2; rx:6; }
-                  .node-siaf { fill:#fefce8; stroke:#ca8a04; stroke-width:2; rx:6; }
-                  
-                  .text-area { font-size:11px; fill:#334155; font-weight:bold; text-anchor:middle; }
-                  .text-main { font-size:12px; fill:#1B3A2D; font-weight:bold; text-anchor:middle; }
-                  .text-sub { font-size:10px; fill:#475569; text-anchor:middle; }
-                  
-                  .path-line { fill:none; stroke:#1B3A2D; stroke-width:2; marker-end:url(#arrow); }
-                  .path-link { fill:none; stroke:#94a3b8; stroke-width:1.5; stroke-dasharray:4,4; }
-                </style>
-              </defs>
-
-              <!-- Swimlanes Backgrounds -->
-              <rect x="0" y="0" width="250" height="900" fill="#f1f5f9" stroke="#cbd5e1"/>
-              <rect x="250" y="0" width="400" height="900" fill="#f0fdf4" stroke="#bbf7d0"/>
-              <rect x="650" y="0" width="350" height="900" fill="#fffbeb" stroke="#fde68a"/>
-              
-              <!-- Swimlanes Headers -->
-              <rect x="0" y="0" width="250" height="35" fill="#475569"/>
-              <text x="125" y="22" class="lane-header">ÁREA RESPONSABLE</text>
-              
-              <rect x="250" y="0" width="400" height="35" fill="#166534"/>
-              <text x="450" y="22" class="lane-header">PASO - PROCESO OPERATIVO</text>
-              
-              <rect x="650" y="0" width="350" height="35" fill="#854d0e"/>
-              <text x="825" y="22" class="lane-header">MÓDULO SIAF-PJEV</text>
-
-              <!-- 1. INICIO -->
-              <circle cx="450" cy="70" r="15" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
-              <text x="450" y="74" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">INICIO</text>
-              <path d="M 450 85 L 450 110" class="path-line"/>
-
-              <!-- STEP 1 -->
-              <!-- Area -->
-              <rect x="25" y="110" width="200" height="40" class="node-area"/>
-              <text x="125" y="134" class="text-area">Asuntos Jurídicos / Comités</text>
-              <!-- Proc -->
-              <rect x="300" y="110" width="300" height="50" class="node-proc"/>
-              <text x="450" y="130" class="text-main">1. Adjudicación y Firma</text>
-              <text x="450" y="145" class="text-sub">Dictamen, validación y firmas físicas</text>
-              <!-- SIAF -->
-              <rect x="700" y="115" width="250" height="40" class="node-siaf" fill="#f3f4f6" stroke="#9ca3af"/>
-              <text x="825" y="139" class="text-sub">N/A (Fuera del Sistema)</text>
-              <!-- Links -->
-              <path d="M 225 130 L 300 130" class="path-link"/>
-              <path d="M 600 135 L 700 135" class="path-link"/>
-
-              <path d="M 450 160 L 450 190" class="path-line"/>
-
-              <!-- STEP 2 -->
-              <rect x="25" y="190" width="200" height="40" class="node-area"/>
-              <text x="125" y="214" class="text-area">Recursos Materiales</text>
-              
-              <rect x="300" y="190" width="300" height="50" class="node-proc"/>
-              <text x="450" y="210" class="text-main">2. Registro de Cabecera</text>
-              <text x="450" y="225" class="text-sub">Captura de folios, montos y vigencias</text>
-              
-              <rect x="700" y="190" width="250" height="50" class="node-siaf"/>
-              <text x="825" y="210" class="text-main">02.1.4 Registro de Contrato</text>
-              <text x="825" y="225" class="text-sub">Generación del contrato base</text>
-              
-              <path d="M 225 210 L 300 210" class="path-link"/>
-              <path d="M 600 215 L 700 215" class="path-link"/>
-
-              <path d="M 450 240 L 450 280" class="path-line"/>
-
-              <!-- STEP 3 -->
-              <rect x="25" y="280" width="200" height="40" class="node-area"/>
-              <text x="125" y="304" class="text-area">Recursos Materiales</text>
-              
-              <rect x="300" y="280" width="300" height="50" class="node-proc"/>
-              <text x="450" y="300" class="text-main">3. Asignación de Partidas ("Bolsa")</text>
-              <text x="450" y="315" class="text-sub">Mapeo de COG vs Monto Total</text>
-              
-              <rect x="700" y="280" width="250" height="50" class="node-siaf"/>
-              <text x="825" y="300" class="text-main">02.1.4 Detalle Presupuestal</text>
-              <text x="825" y="315" class="text-sub">Cuadre exacto (Regla de Negocio)</text>
-              
-              <path d="M 225 300 L 300 300" class="path-link"/>
-              <path d="M 600 305 L 700 305" class="path-link"/>
-
-              <path d="M 450 330 L 450 370" class="path-line"/>
-
-              <!-- STEP 4 -->
-              <rect x="25" y="370" width="200" height="40" class="node-area"/>
-              <text x="125" y="394" class="text-area">Presupuesto</text>
-              
-              <rect x="300" y="370" width="300" height="50" class="node-proc"/>
-              <text x="450" y="390" class="text-main">4. Autorización y Compromiso</text>
-              <text x="450" y="405" class="text-sub">Inmovilización del recurso etiquetado</text>
-              
-              <rect x="700" y="370" width="250" height="50" class="node-siaf"/>
-              <text x="825" y="390" class="text-main">02.2.6 Compromisos</text>
-              <text x="825" y="405" class="text-sub">Póliza D-COMPROME (Bloqueo de 02.1.4)</text>
-              
-              <path d="M 225 390 L 300 390" class="path-link"/>
-              <path d="M 600 395 L 700 395" class="path-link"/>
-
-              <path d="M 450 420 L 450 460" class="path-line"/>
-
-              <!-- STEP 5 -->
-              <rect x="25" y="460" width="200" height="40" class="node-area"/>
-              <text x="125" y="484" class="text-area">Almacén / Centro de Costo</text>
-              
-              <rect x="300" y="460" width="300" height="50" class="node-proc"/>
-              <text x="450" y="480" class="text-main">5. Recepción (Devengado)</text>
-              <text x="450" y="495" class="text-sub">Entrega de bienes y factura validada</text>
-              
-              <rect x="700" y="460" width="250" height="50" class="node-siaf"/>
-              <text x="825" y="480" class="text-main">Módulo de Almacén</text>
-              <text x="825" y="495" class="text-sub">Entrada (Consume Saldo de Contrato)</text>
-              
-              <path d="M 225 480 L 300 480" class="path-link"/>
-              <path d="M 600 485 L 700 485" class="path-link"/>
-
-              <path d="M 450 510 L 450 550" class="path-line"/>
-
-              <!-- STEP 6 -->
-              <rect x="25" y="550" width="200" height="40" class="node-area"/>
-              <text x="125" y="574" class="text-area">Tesorería / Contabilidad</text>
-              
-              <rect x="300" y="550" width="300" height="50" class="node-proc"/>
-              <text x="450" y="570" class="text-main">6. Programación y Pago</text>
-              <text x="450" y="585" class="text-sub">Transferencia SPEI al proveedor</text>
-              
-              <rect x="700" y="550" width="250" height="50" class="node-siaf"/>
-              <text x="825" y="570" class="text-main">Módulo de Egresos</text>
-              <text x="825" y="585" class="text-sub">Póliza Egreso (Actualiza Pagado)</text>
-              
-              <path d="M 225 570 L 300 570" class="path-link"/>
-              <path d="M 600 575 L 700 575" class="path-link"/>
-
-              <!-- FIN -->
-              <path d="M 450 600 L 450 640" class="path-line"/>
-              <circle cx="450" cy="655" r="15" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
-              <text x="450" y="659" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">FIN</text>
-
-            </svg>
-        </div>
-    </div>
-</div>
-
-<div id="anexos-impresos" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center;">
-    <div class="modal-box" style="background:#fff; padding:25px; border-radius:8px; max-width:850px; width:95%; max-height:90vh; overflow-y:auto; position:relative; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
-        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-            <h3 style="color: var(--pjev-verde-oscuro); font-size: 16px; margin: 0;">Anexo 2: Flujograma de Procesos y Descripción</h3>
-            <button class="modal-close" onclick="document.getElementById('anexos-impresos').style.display='none'" style="background:none; border:none; color:#991b1b; cursor:pointer; font-weight:bold; font-size:14px;">❌ Cerrar</button>
-        </div>
-        <div id="module-process-table" class="modal-body">
-            
-      <table class="props-table">
-        <thead>
-          <tr>
-            <th>Área</th>
-            <th>Paso/Etapa</th>
-            <th>Proceso operativo</th>
-            <th>SIAF-PJEV</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Asuntos Jurídicos / Comités</strong></td>
-            <td>1. Adjudicación y Firma</td>
-            <td>Dictamen de adjudicación, validación legal de cláusulas y firma física (o electrónica) del contrato entre el PJEV y el Proveedor.</td>
-            <td><strong>N/A</strong> (Ocurre fuera del sistema transaccional o en el submódulo de Licitaciones).</td>
-          </tr>
-          <tr>
-            <td><strong>Recursos Materiales / Obra</strong></td>
-            <td>2. Registro de Cabecera</td>
-            <td>Recepción del contrato firmado. El enlace operativo captura los datos normativos: Folio, Proveedor, Vigencia, Monto Mínimo/Máximo y Garantía.</td>
-            <td><strong>02.1.4 Registro de Contrato.</strong> Se crea el registro del contrato mediante el formulario principal.</td>
-          </tr>
-          <tr>
-            <td><strong>Recursos Materiales</strong></td>
-            <td>3. Asignación de la "Bolsa"</td>
-            <td>Se define de qué claves presupuestales (Oficios de Reserva y Partidas COG) provendrán los recursos para fondear el monto máximo del contrato.</td>
-            <td><strong>02.1.4 Registro de Contrato.</strong> Se inserta el detalle presupuestal. El sistema exige que el total del detalle cuadre exactamente con el total de la cabecera (Regla de negocio).</td>
-          </tr>
-          <tr>
-            <td><strong>Presupuesto</strong></td>
-            <td>4. Autorización y Compromiso</td>
-            <td>Presupuesto valida las suficiencias y aprueba inmovilizar definitivamente el recurso etiquetado al contrato.</td>
-            <td><strong>02.2.6 Compromisos.</strong> Se "compromete" el contrato generando automáticamente la Póliza de Diario de Compromiso. El contrato cambia a estado <em>COMPROMETIDO</em> y queda bloqueado (ReadOnly).</td>
-          </tr>
-          <tr>
-            <td><strong>Almacén / Centro de Costo</strong></td>
-            <td>5. Recepción (Devengado)</td>
-            <td>El proveedor entrega la factura y los bienes o servicios. El área correspondiente firma la constancia de conformidad.</td>
-            <td><strong>Módulo de Almacén / Servicios.</strong> Se genera la Entrada de Almacén o el Devengado, consumiendo y descontando saldo directamente de la "bolsa" del contrato.</td>
-          </tr>
-          <tr>
-            <td><strong>Tesorería / Contabilidad</strong></td>
-            <td>6. Programación y Pago</td>
-            <td>Se programa el pago al proveedor con base en la factura devengada, emitiendo la transferencia electrónica.</td>
-            <td><strong>Módulo de Egresos.</strong> Se emite la Póliza de Egreso/Cheque. El sistema actualiza el saldo "Pagado" en las partidas del contrato original.</td>
-          </tr>
-        </tbody>
-      </table>
-        </div>
-    </div>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(b => {
-      if (b.innerText.includes('Proceso Funcional')) {
-        b.onclick = () => { document.getElementById('anexos-impresos').style.display = 'flex'; };
-      }
-      if (b.innerText.includes('Ver Diagrama')) {
-        b.onclick = () => { document.getElementById('modal-diagrama').style.display = 'flex'; };
-      }
-    });
-  });
-</script>
-
 </body>
 </html>
+"""
+
+with open(r'c:\dixsys\manual_pjev\sitio_web\07_recursos_materiales\02.1.4-registro-contrato.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
