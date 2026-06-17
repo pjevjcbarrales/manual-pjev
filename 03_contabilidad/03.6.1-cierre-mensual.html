@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03.6.1-cierre-mensual.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+
+  .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; }
+  .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .sp-panel { display: none; }
+  .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .code-block pre { margin: 0; padding: 15px; background: #282c34; border-radius: 5px; color: #abb2bf; font-family: 'Consolas', monospace; font-size: 12px; overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Análisis Funcional</span> ›
+      <span>03.6.1 Cierre Mensual Contable</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">03.6.1</div>
+        <h1 class="elem-title">Cierre Mensual Contable</h1>
+        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV. Procedimiento de auditoría y cierre lógico del periodo contable.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Panel de Control (Cierre Mensual)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>El módulo "Cierre Mensual Contable" es el panel de control (Dashboard) que permite a la Dirección de Contabilidad auditar el estado de las pólizas contables generadas durante un mes y un ejercicio específico, y proceder con el cierre lógico del periodo. Cierra el mes una vez que no existan pólizas pendientes de afectar, impidiendo así cualquier modificación futura a la contabilidad de dicho periodo.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo (SIAF / CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Manual de Contabilidad Gubernamental (CONAC)</td><td>El cierre contable mensual es obligatorio para garantizar la inmutabilidad de la información financiera una vez que se emiten los Estados Financieros. Un periodo cerrado no puede recibir nuevas pólizas ni modificaciones.</td></tr>
+          <tr><td>Reglas de Inmutabilidad de SIAF</td><td>Asegura el cumplimiento de la regla de inmutabilidad: "Los registros contables no podrán ser alterados una vez que el ente público haya emitido la información financiera del periodo".</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td>Jefe de Contabilidad</td><td>Visualizar tablero, Ejecutar Acción "CERRAR MES".</td><td>No puede cerrar si existen pólizas pendientes de afectar (`afecta = 0`).</td></tr>
+          <tr><td>Analista Contable</td><td>Solo visualización del tablero.</td><td>No tiene acceso al botón "CERRAR MES".</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Daryl, no debes crear tablas nuevas. Este módulo extrae la información de 3 fuentes exactas:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li>Para obtener el Ejercicio Activo: Usarás la tabla <code>config.catalogo_ejercicios</code> filtrando por <code>eje_activo = true</code>.</li>
+        <li>Para la Tabla de Control de Meses: Usarás la tabla <code>config.catalogo_periodos</code>. Un mes se considera <strong>CERRADO</strong> cuando <code>per_estatus = true</code>.</li>
+        <li>Para la Estadística de Pólizas: Generarás una vista dinámica leyendo <code>polizamovto</code>, filtrando por <code>estatus < 4</code>.</li>
+      </ul>
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Vista Dinámica de Estadísticas</h3>
+      <div class="code-block">
+<pre><span style="color:#5c6370;">-- Consulta base para devolver la matriz de datos al frontend.</span>
+<span style="color:#c678dd;">SELECT</span> 
+    e.eje_anio <span style="color:#c678dd;">AS</span> ejercicio_anio,
+    p.per_ejercicio_id <span style="color:#c678dd;">AS</span> ejercicio, 
+    p.per_mes <span style="color:#c678dd;">AS</span> mes, 
+    p.per_estatus <span style="color:#c678dd;">AS</span> mes_cerrado,
+    p.per_enviado_contabilidad <span style="color:#c678dd;">AS</span> mes_calculado,
+    <span style="color:#e5c07b;">SUM</span>(<span style="color:#c678dd;">CASE WHEN</span> m.afecta = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span> m.poliza_pd <span style="color:#c678dd;">ELSE</span> <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">END</span>) <span style="color:#c678dd;">AS</span> pd_afectadas,
+    <span style="color:#e5c07b;">SUM</span>(<span style="color:#c678dd;">CASE WHEN</span> m.afecta = <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">THEN</span> m.poliza_pd <span style="color:#c678dd;">ELSE</span> <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">END</span>) <span style="color:#c678dd;">AS</span> pd_pendientes
+    <span style="color:#5c6370;">-- (Aplica SUM similar para PE, PI y PP en afectadas y pendientes)</span>
+<span style="color:#c678dd;">FROM</span> config.catalogo_ejercicios e
+<span style="color:#c678dd;">INNER JOIN</span> config.catalogo_periodos p <span style="color:#c678dd;">ON</span> e.eje_id = p.per_ejercicio_id
+<span style="color:#c678dd;">LEFT JOIN</span> polizamovto m 
+    <span style="color:#c678dd;">ON</span> p.per_ejercicio_id = m.ejercicio 
+    <span style="color:#c678dd;">AND</span> p.per_mes = m.mes 
+    <span style="color:#c678dd;">AND</span> m.estatus &lt; <span style="color:#d19a66;">4</span>
+<span style="color:#c678dd;">WHERE</span> p.per_ejercicio_id = @p_ejercicio <span style="color:#5c6370;">-- Parámetro de entrada</span>
+<span style="color:#c678dd;">GROUP BY</span> e.eje_anio, p.per_ejercicio_id, p.per_mes, p.per_estatus, p.per_enviado_contabilidad
+<span style="color:#c678dd;">ORDER BY</span> p.per_mes <span style="color:#c678dd;">ASC</span>;</pre>
+      </div>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Las operaciones en base de datos se manejan a través de los siguientes Stored Procedures principales:</p>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_estadisticas_mes</button>
+        <button class="sp-tab" onclick="showSP('sp2',this)">fn_abc_cerrar_mes</button>
+      </div>
+
+      <!-- TAB 1: LEER ESTADISTICAS -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_ejercicio_id</code></td><td><code>INT</code></td><td>ID del ejercicio a consultar. Si es nulo, toma el que tenga <code>eje_activo = true</code>.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{ejercicio_anio}</code></td><td><code>INT</code></td><td>Año del ejercicio</td></tr>
+            <tr><td><code>{mes}</code></td><td><code>INT</code></td><td>Número del mes (1-12)</td></tr>
+            <tr><td><code>{mes_cerrado}</code></td><td><code>BOOLEAN</code></td><td>Estatus del mes</td></tr>
+            <tr><td><code>{pd_afectadas} ... {pp_pendientes}</code></td><td><code>INT</code></td><td>Contadores de pólizas</td></tr>
+            <tr><td><code>{puede_cerrar}</code></td><td><code>BOOLEAN</code></td><td>TRUE si la suma de pendientes es 0 y el mes está calculado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TAB 2: ABC CERRAR MES -->
+      <div id="sp-sp2" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_ejercicio_id</code></td><td><code>INT</code></td><td>ID del ejercicio</td></tr>
+            <tr><td><code>@p_mes</code></td><td><code>INT</code></td><td>Mes a cerrar</td></tr>
+            <tr><td><code>@p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario activo en sesión</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{v_exito}</code></td><td><code>BOOLEAN</code></td><td>Indicador de éxito</td></tr>
+            <tr><td><code>{v_mensaje}</code></td><td><code>VARCHAR</code></td><td>Mensaje de éxito o descripción del error (Ej. "Existen pólizas pendientes")</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method get" style="color:#0284c7; font-weight:bold;">GET</span></td><td><code>/api/contabilidad/cierre-mensual/{ejercicio_id?}</code></td><td>Ninguno</td><td>Llama a <code>fn_leer_estadisticas_mes</code>. Alimenta el Dashboard.</td></tr>
+          <tr><td><span class="method post" style="color:#16a34a; font-weight:bold;">POST</span></td><td><code>/api/contabilidad/cierre-mensual/cerrar</code></td><td>JSON: <code>{ "ejercicio_id": 2024, "mes": 5 }</code></td><td>Llama a <code>fn_abc_cerrar_mes</code>. Ejecuta la acción de cerrar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo (Frontend)</div>
+      <table class="props-table">
+        <thead><tr><th>Botón / Acción UI</th><th>Descripción Funcional Exacta para Daryl</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Click en Tarjeta de Mes</strong></td><td>Establece la variable reactiva <code>mesActivo</code>. Le añade una clase CSS para resaltar (Ej. Borde dorado). Solo se selecciona un mes a la vez.</td></tr>
+          <tr><td><strong>Botón "CERRAR MES"</strong></td><td>Lanza Modal de Confirmación si el mes tiene 0 pendientes. Si OK -> POST <code>/cerrar</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">Consola Central (Estilo Light)</button>
+      </div>
+
+      <!-- TAB 1: Grid Principal -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Consola de Cierres (Lista)</span></div>
+          <div class="wf-svg-area">
+             <!-- SVG DASHBOARD GENERAL (LIGHT) -->
+             <svg viewBox="0 0 900 700" style="width:100%; max-width:900px; height:auto;" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <rect width="900" height="700" fill="#F8F5EE" rx="10"/>
+                
+                <!-- Title Area -->
+                <text x="20" y="40" fill="#1B3A2D" font-family="Segoe UI, sans-serif" font-size="20" font-weight="900">⚙ CONSOLA CENTRAL DE REPORTES Y CIERRES</text>
+                <text x="20" y="60" fill="#64748B" font-family="Segoe UI" font-size="11">Tablero de auditoría y cierre lógico de periodos. Valida pólizas pendientes antes del cierre definitivo.</text>
+                
+                <!-- White Box -->
+                <rect x="20" y="80" width="860" height="580" fill="#FFFFFF" stroke="#E2E8F0" rx="8"/>
+                
+                <!-- Header of Box -->
+                <path d="M 20 88 A 8 8 0 0 1 28 80 L 872 80 A 8 8 0 0 1 880 88 L 880 120 L 20 120 Z" fill="#1B3A2D"/>
+                <text x="40" y="105" fill="#FFFFFF" font-family="Segoe UI" font-size="13" font-weight="bold">1. INDICADORES DE CÁLCULO MENSUAL (EJERCICIO 2026)</text>
+                <rect x="740" y="90" width="120" height="20" fill="#2C5E4A" rx="10"/>
+                <text x="800" y="104" fill="#FFFFFF" font-family="Segoe UI" font-size="9" font-weight="bold" text-anchor="middle">EJERCICIO EN CURSO</text>
+
+                <!-- Table Headers -->
+                <text x="40" y="150" fill="#64748B" font-family="Segoe UI" font-size="10" font-weight="bold">MES</text>
+                <text x="220" y="150" fill="#64748B" font-family="Segoe UI" font-size="10" font-weight="bold">CUENTA PÓLIZAS</text>
+                <text x="500" y="150" fill="#64748B" font-family="Segoe UI" font-size="10" font-weight="bold">ESTATUS</text>
+                <text x="780" y="150" fill="#64748B" font-family="Segoe UI" font-size="10" font-weight="bold" text-anchor="middle">ACCIONES</text>
+                
+                <line x1="20" y1="160" x2="880" y2="160" stroke="#F1F5F9" stroke-width="2"/>
+
+                <!-- Row 1: Enero -->
+                <text x="40" y="185" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">01 - Enero</text>
+                <text x="220" y="178" fill="#475569" font-family="Segoe UI" font-size="11" font-weight="bold">PD: 150;&nbsp; PE: 60;</text>
+                <text x="220" y="192" fill="#475569" font-family="Segoe UI" font-size="11" font-weight="bold">PI: 20;&nbsp;&nbsp; PP: 20</text>
+                <text x="500" y="185" fill="#166534" font-family="Segoe UI" font-size="12" font-weight="bold">✔ Mes Cerrado</text>
+                <rect x="700" y="168" width="160" height="26" fill="#F1F5F9" rx="4"/>
+                <text x="780" y="185" fill="#94A3B8" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="200" x2="880" y2="200" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 2: Febrero -->
+                <text x="40" y="225" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">02 - Febrero</text>
+                <text x="220" y="218" fill="#475569" font-family="Segoe UI" font-size="11" font-weight="bold">PD: 100;&nbsp; PE: 40;</text>
+                <text x="220" y="232" fill="#475569" font-family="Segoe UI" font-size="11" font-weight="bold">PI: 30;&nbsp;&nbsp; PP: 15</text>
+                <text x="500" y="225" fill="#166534" font-family="Segoe UI" font-size="12" font-weight="bold">✔ Mes Cerrado</text>
+                <rect x="700" y="208" width="160" height="26" fill="#F1F5F9" rx="4"/>
+                <text x="780" y="225" fill="#94A3B8" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="240" x2="880" y2="240" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 3: Marzo -->
+                <text x="40" y="265" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">03 - Marzo</text>
+                <text x="220" y="258" fill="#475569" font-family="Segoe UI" font-size="11" font-weight="bold">PD: 200;&nbsp; PE: 50;</text>
+                <text x="220" y="272" fill="#475569" font-family="Segoe UI" font-size="11" font-weight="bold">PI: 40;&nbsp;&nbsp; PP: 15</text>
+                <text x="500" y="265" fill="#B45309" font-family="Segoe UI" font-size="12" font-weight="bold">◷ Abierto / Listo para Cierre</text>
+                <rect x="700" y="248" width="160" height="26" fill="#1B3A2D" rx="4"/>
+                <text x="780" y="265" fill="#FFFFFF" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">▶ Cerrar Mes</text>
+                <line x1="20" y1="280" x2="880" y2="280" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 4: Abril -->
+                <text x="40" y="305" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">04 - Abril</text>
+                <text x="220" y="298" fill="#475569" font-family="Segoe UI" font-size="11" font-weight="bold">PD: 280;&nbsp; PE: 60;</text>
+                <text x="220" y="312" fill="#475569" font-family="Segoe UI" font-size="11" font-weight="bold">PI: 50;&nbsp;&nbsp; PP: 30 &nbsp; <tspan fill="#DC2626">(7 pendientes)</tspan></text>
+                <text x="500" y="305" fill="#DC2626" font-family="Segoe UI" font-size="12" font-weight="bold">⚠️ Abierto / Con Errores</text>
+                <rect x="700" y="288" width="160" height="26" fill="#F1F5F9" rx="4"/>
+                <text x="780" y="305" fill="#94A3B8" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="320" x2="880" y2="320" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 5: Mayo -->
+                <text x="40" y="345" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">05 - Mayo</text>
+                <text x="220" y="338" fill="#94A3B8" font-family="Segoe UI" font-size="11">PD: 0;&nbsp; PE: 0;</text>
+                <text x="220" y="352" fill="#94A3B8" font-family="Segoe UI" font-size="11">PI: 0;&nbsp; PP: 0</text>
+                <text x="500" y="345" fill="#64748B" font-family="Segoe UI" font-size="12" font-weight="bold">◯ Sin datos</text>
+                <rect x="700" y="328" width="160" height="26" fill="#FFFFFF" stroke="#E2E8F0" rx="4"/>
+                <text x="780" y="345" fill="#CBD5E1" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="360" x2="880" y2="360" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 6: Junio -->
+                <text x="40" y="385" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">06 - Junio</text>
+                <text x="220" y="378" fill="#94A3B8" font-family="Segoe UI" font-size="11">PD: 0;&nbsp; PE: 0;</text>
+                <text x="220" y="392" fill="#94A3B8" font-family="Segoe UI" font-size="11">PI: 0;&nbsp; PP: 0</text>
+                <text x="500" y="385" fill="#64748B" font-family="Segoe UI" font-size="12" font-weight="bold">◯ Sin datos</text>
+                <rect x="700" y="368" width="160" height="26" fill="#FFFFFF" stroke="#E2E8F0" rx="4"/>
+                <text x="780" y="385" fill="#CBD5E1" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="400" x2="880" y2="400" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 7: Julio -->
+                <text x="40" y="425" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">07 - Julio</text>
+                <text x="220" y="418" fill="#94A3B8" font-family="Segoe UI" font-size="11">PD: 0;&nbsp; PE: 0;</text>
+                <text x="220" y="432" fill="#94A3B8" font-family="Segoe UI" font-size="11">PI: 0;&nbsp; PP: 0</text>
+                <text x="500" y="425" fill="#64748B" font-family="Segoe UI" font-size="12" font-weight="bold">◯ Sin datos</text>
+                <rect x="700" y="408" width="160" height="26" fill="#FFFFFF" stroke="#E2E8F0" rx="4"/>
+                <text x="780" y="425" fill="#CBD5E1" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="440" x2="880" y2="440" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 8: Agosto -->
+                <text x="40" y="465" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">08 - Agosto</text>
+                <text x="220" y="458" fill="#94A3B8" font-family="Segoe UI" font-size="11">PD: 0;&nbsp; PE: 0;</text>
+                <text x="220" y="472" fill="#94A3B8" font-family="Segoe UI" font-size="11">PI: 0;&nbsp; PP: 0</text>
+                <text x="500" y="465" fill="#64748B" font-family="Segoe UI" font-size="12" font-weight="bold">◯ Sin datos</text>
+                <rect x="700" y="448" width="160" height="26" fill="#FFFFFF" stroke="#E2E8F0" rx="4"/>
+                <text x="780" y="465" fill="#CBD5E1" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="480" x2="880" y2="480" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 9: Septiembre -->
+                <text x="40" y="505" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">09 - Septiembre</text>
+                <text x="220" y="498" fill="#94A3B8" font-family="Segoe UI" font-size="11">PD: 0;&nbsp; PE: 0;</text>
+                <text x="220" y="512" fill="#94A3B8" font-family="Segoe UI" font-size="11">PI: 0;&nbsp; PP: 0</text>
+                <text x="500" y="505" fill="#64748B" font-family="Segoe UI" font-size="12" font-weight="bold">◯ Sin datos</text>
+                <rect x="700" y="488" width="160" height="26" fill="#FFFFFF" stroke="#E2E8F0" rx="4"/>
+                <text x="780" y="505" fill="#CBD5E1" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="520" x2="880" y2="520" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 10: Octubre -->
+                <text x="40" y="545" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">10 - Octubre</text>
+                <text x="220" y="538" fill="#94A3B8" font-family="Segoe UI" font-size="11">PD: 0;&nbsp; PE: 0;</text>
+                <text x="220" y="552" fill="#94A3B8" font-family="Segoe UI" font-size="11">PI: 0;&nbsp; PP: 0</text>
+                <text x="500" y="545" fill="#64748B" font-family="Segoe UI" font-size="12" font-weight="bold">◯ Sin datos</text>
+                <rect x="700" y="528" width="160" height="26" fill="#FFFFFF" stroke="#E2E8F0" rx="4"/>
+                <text x="780" y="545" fill="#CBD5E1" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="560" x2="880" y2="560" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 11: Noviembre -->
+                <text x="40" y="585" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">11 - Noviembre</text>
+                <text x="220" y="578" fill="#94A3B8" font-family="Segoe UI" font-size="11">PD: 0;&nbsp; PE: 0;</text>
+                <text x="220" y="592" fill="#94A3B8" font-family="Segoe UI" font-size="11">PI: 0;&nbsp; PP: 0</text>
+                <text x="500" y="585" fill="#64748B" font-family="Segoe UI" font-size="12" font-weight="bold">◯ Sin datos</text>
+                <rect x="700" y="568" width="160" height="26" fill="#FFFFFF" stroke="#E2E8F0" rx="4"/>
+                <text x="780" y="585" fill="#CBD5E1" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                <line x1="20" y1="600" x2="880" y2="600" stroke="#F1F5F9" stroke-width="1"/>
+
+                <!-- Row 12: Diciembre -->
+                <text x="40" y="625" fill="#1E293B" font-family="Segoe UI" font-size="12" font-weight="bold">12 - Diciembre</text>
+                <text x="220" y="618" fill="#94A3B8" font-family="Segoe UI" font-size="11">PD: 0;&nbsp; PE: 0;</text>
+                <text x="220" y="632" fill="#94A3B8" font-family="Segoe UI" font-size="11">PI: 0;&nbsp; PP: 0</text>
+                <text x="500" y="625" fill="#64748B" font-family="Segoe UI" font-size="12" font-weight="bold">◯ Sin datos</text>
+                <rect x="700" y="608" width="160" height="26" fill="#FFFFFF" stroke="#E2E8F0" rx="4"/>
+                <text x="780" y="625" fill="#CBD5E1" font-family="Segoe UI" font-size="11" font-weight="bold" text-anchor="middle">Bloqueado</text>
+                
+                <!-- Footer of list -->
+                <rect x="20" y="640" width="860" height="40" fill="#F8FAFC"/>
+                <text x="450" y="665" fill="#94A3B8" font-family="Segoe UI" font-size="11" text-anchor="middle">Visualizando todos los periodos del año fiscal en curso.</text>
+
+             </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 9. Reglas de Negocio y Límites de Validación -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas y Límites de Validación</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla / Límite de Validación</th><th>Consecuencia si no se cumple</th><th>Dónde se valida</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>RN-CM-01</strong></td>
+            <td><strong>Pólizas Aplicadas:</strong> Validar que todas las pólizas del mes estén aplicadas (<code>afecta = 1</code> o equivalente).</td>
+            <td>No permite avanzar. Retorna mensaje: "Existen pólizas sin aplicar. Aplíquelas o cancélelas".</td>
+            <td>SP <code>fn_abc_cerrar_mes</code></td>
+          </tr>
+          <tr>
+            <td><strong>RN-CM-02</strong></td>
+            <td><strong>Cuadre Contable:</strong> Validar que todas las pólizas del mes estén cuadradas matemáticamente (Σ Cargos = Σ Abonos).</td>
+            <td>Detiene el cierre. Retorna mensaje para que el usuario analice, corrija la póliza o la cancele.</td>
+            <td>SP <code>fn_abc_cerrar_mes</code></td>
+          </tr>
+          <tr>
+            <td><strong>RN-CM-03</strong></td>
+            <td><strong>Unidad Administrativa en Gasto:</strong> Validar que todas las pólizas de gasto tengan asignada explícitamente su Unidad Administrativa (Organización).</td>
+            <td>Detiene el cierre. Exige que el usuario edite la póliza para colocar la unidad, o bien la cancele.</td>
+            <td>SP <code>fn_abc_cerrar_mes</code></td>
+          </tr>
+          <tr>
+            <td><strong>RN-CM-04</strong></td>
+            <td><strong>Vigencia de Cuentas:</strong> Validar que todas las cuentas contables afectadas por las pólizas del mes se encuentren "Vigentes" en el Catálogo de Cuentas.</td>
+            <td>Detiene el cierre. Solicita al usuario que corrija las cuentas en la póliza o cancele la operación.</td>
+            <td>SP <code>fn_abc_cerrar_mes</code></td>
+          </tr>
+          <tr>
+            <td><strong>RN-CM-05</strong></td>
+            <td><strong>Secuencialidad de Meses:</strong> No se puede cerrar el mes N si el mes N-1 sigue abierto.</td>
+            <td>Error en validación inicial: "El mes anterior no está cerrado".</td>
+            <td>SP <code>fn_abc_cerrar_mes</code></td>
+          </tr>
+          <tr>
+            <td><strong>RN-CM-06</strong></td>
+            <td><strong>Reversibilidad Transaccional (Rollback):</strong> El proceso de cierre debe ejecutarse bajo una transacción (<code>BEGIN TRY... CATCH</code>). Si el mes se marca como cerrado pero una validación post-cierre detecta un error o inconsistencia, el sistema revierte el proceso.</td>
+            <td>Se revierte (vuelve a abrir) y el mes se queda en estatus "Abierto / En Revisión".</td>
+            <td>SP <code>fn_abc_cerrar_mes</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
+      <p>Impacta transversalmente a los módulos operativos (Pólizas, Presupuesto, Compras). Si <code>per_estatus == true</code> para un mes en la tabla de <code>catalogo_periodos</code>, el sistema debe denegar el guardado de cualquier operación con fecha que caiga en ese mes.</p>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
+        <tbody>
+          <tr><td><strong>NO</strong></td><td>Este módulo <strong>NO GENERA PÓLIZAS AUTOMÁTICAS</strong> por sí mismo. Su función es actuar como una cerradura o precinto de auditoría.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. Historial de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+      <table class="props-table">
+        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+        <tbody>
+          <tr><td>2026-06-16</td><td>1.0</td><td>Creación inicial del documento con especificaciones rígidas para Daryl (Alineación Estilo DOC-08).</td><td>Analista Funcional (AI)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

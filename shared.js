@@ -261,12 +261,11 @@ function injectPMCard() {
     ${visitasHtml}
   `;
   
-  // Buscar la sección de Historial de Cambios (usualmente la última)
-  const sections = document.querySelectorAll('.doc-section');
-  let targetSection = sections.length > 0 ? sections[sections.length - 1] : null;
+  // Inyectar debajo de las etiquetas en el encabezado
+  const headerSection = document.querySelector('.elem-header > div') || document.querySelector('.elem-header');
   
-  if (targetSection) {
-    targetSection.appendChild(pmBanner);
+  if (headerSection) {
+    headerSection.appendChild(pmBanner);
   } else {
     const docMain = document.querySelector('.doc-main');
     if (docMain) {
