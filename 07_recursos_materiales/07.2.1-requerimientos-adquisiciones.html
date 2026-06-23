@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.2.1 Requerimientos de Adquisiciones — SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="doc-main-inner">
+
+    <!-- BREADCRUMB -->
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Recursos Materiales</span> ›
+      <span>Registros</span> ›
+      <span>07.2.1 Requerimientos de Adquisiciones</span>
+    </div>
+
+    <!-- ENCABEZADO Y TÍTULO -->
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">07.2.1</div>
+        <h1 class="elem-title">Requerimientos de Adquisiciones</h1>
+        <p class="elem-desc">Bandeja maestra para la recepción, estructuración y trazabilidad del ciclo de vida de los requerimientos de compra enviados por las Unidades Administrativas.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Fase 1: Petición y Seguimiento</span>
+          <span class="mod-badge badge-s">Tipo: Registro / Tablero de Control</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">rm / registros / requerimientos</code></span>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Sistema de Bandejas (Ciclo de Vida)</div>
+      <p>Este módulo centraliza el seguimiento de cada requerimiento mediante un sistema de bandejas de entrada y salida, permitiendo visualizar en todo momento en qué etapa del proceso de compras se encuentra una petición.</p>
+    </div>
+
+    <!-- 2. Marco Normativo (SIAF / CONAC) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo (SIAF / CONAC)</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>LGCG (Art. 44 y 55) y Acuerdos CONAC</strong></td>
+            <td>Establecen la obligatoriedad de verificar la suficiencia y consistencia presupuestal antes de contraer obligaciones, generando la evidencia documental correspondiente. La validación financiera es precondición para el registro del <em>Gasto Comprometido</em>.</td>
+          </tr>
+          <tr>
+            <td><strong>Catálogo de Procedimientos (09_Verificación...)</strong></td>
+            <td>Regula la emisión del <em>Control de Movimientos Presupuestales</em> desde Recursos Materiales hacia Programación y Presupuesto.</td>
+          </tr>
+          <tr>
+            <td><strong>Ley 539 de Adquisiciones (Art. 10)</strong></td>
+            <td>Exige contar con la disponibilidad presupuestal autorizada antes de iniciar la adjudicación o licitación de los bienes o servicios.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <p>Dependiendo de la modalidad de adquisición, los actores y niveles de autorización varían significativamente. A continuación se detallan los roles clave extraídos de los procedimientos institucionales:</p>
+      
+      <h4 style="margin-top:20px; color:var(--pjev-verde-oscuro);">A. Adjudicación Directa</h4>
+      <table class="props-table">
+        <thead><tr><th>Rol / Actor</th><th>Intervención principal en el proceso</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Unidad Requirente</strong></td><td>Emite la requisición original detallando la necesidad.</td></tr>
+          <tr><td><strong>Almacén</strong></td><td>Verifica y certifica la no-existencia de los bienes solicitados antes de iniciar la compra.</td></tr>
+          <tr><td><strong>Proveedores Externos</strong></td><td>Reciben la solicitud y emiten sus respectivas cotizaciones formales.</td></tr>
+          <tr><td><strong>Departamento de Adquisiciones</strong></td><td>Analiza la requisición, solicita cotizaciones, elabora el Cuadro Comparativo y verifica suficiencia del monto ganador.</td></tr>
+          <tr><td><strong>Titulares (Subdirector RM y Director DGA)</strong></td><td>Validan y firman el Cuadro Comparativo para formalizar la selección de la mejor oferta.</td></tr>
+          <tr><td><strong>Comisión de Aprovisionamiento</strong></td><td>Interviene y firma el Cuadro Comparativo según el monto normativo aplicable para dar el visto bueno a la adjudicación.</td></tr>
+        </tbody>
+      </table>
+
+      <h4 style="margin-top:20px; color:var(--pjev-verde-oscuro);">B. Licitaciones (Pública y Simplificada)</h4>
+      <table class="props-table">
+        <thead><tr><th>Rol / Actor</th><th>Intervención principal en el proceso</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Subdirección de Recursos Materiales</strong></td><td>Integra la Requisición original junto con el Anexo Técnico detallado y lo turna a Adquisiciones.</td></tr>
+          <tr><td><strong>Departamento de Adquisiciones</strong></td><td>Verifica las partidas CONAC, tramita la Suficiencia y elabora proyectos de convocatoria y resúmenes.</td></tr>
+          <tr><td><strong>Subdirección de Recursos Financieros</strong></td><td>Recibe el Control de Movimientos y emite el Oficio de Confirmación Presupuestal.</td></tr>
+          <tr><td><strong>Dirección General de Administración (DGA)</strong></td><td>Firma y envía oficios de invitación a eventos a las comisiones correspondientes.</td></tr>
+          <tr><td><strong>Comisión de Licitación</strong></td><td>Cuerpo colegiado principal en licitaciones que recibe oficios de invitación, revisa bases y participa en los actos de apertura y fallos.</td></tr>
+          <tr><td><strong>Comisión de Aprovisionamiento</strong></td><td>Interviene como cuerpo colegiado de apoyo y vigilancia en el proceso, recibiendo notificaciones y participando en los actos correspondientes.</td></tr>
+          <tr><td><strong>Consejo de la Judicatura</strong></td><td>Máxima autoridad que revisa la suficiencia y emite el Acta del Pleno aprobando el arranque de la Licitación.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p>Todas las tablas residen exclusivamente en el esquema <code>materiales</code> y están particionadas por ejercicio fiscal (ej. <code>_2026</code>). El ciclo de vida (estado) se controla mediante el tipo <code>ENUM estatus_bandeja</code>.</p>
+      
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px; margin-top:20px;">1. Encabezado: <strong><code>materiales.requerimiento_2026</code></strong></p>
+      <table class="props-table" style="margin-bottom:20px;">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id_requerimiento</code></td><td><code>SERIAL (PK)</code></td><td>Identificador único de la petición.</td></tr>
+          <tr><td><code>ejercicio</code></td><td><code>INT</code></td><td>Llave de partición.</td></tr>
+          <tr><td><code>folio_oficio</code></td><td><code>VARCHAR(50)</code></td><td>Número de control interno.</td></tr>
+          <tr><td><code>id_organizacion</code></td><td><code>INT (FK)</code></td><td>Centro de costo. Limita la UA y partidas.</td></tr>
+          <tr><td><code>id_area_requirente</code></td><td><code>INT</code></td><td>ID del área que solicita.</td></tr>
+          <tr><td><code>fecha_recepcion</code></td><td><code>TIMESTAMP</code></td><td>Fecha en que RM recibe la petición.</td></tr>
+          <tr><td><code>id_modalidad</code></td><td><code>INT (FK)</code></td><td>Modalidad asignada (Cruce con cat_modalidades).</td></tr>
+          <tr><td><code>estatus_actual</code></td><td><code>ENUM estatus_bandeja</code></td><td>Bandeja en la que se encuentra ('Recepción', 'Suficiencia', etc.).</td></tr>
+          <tr><td><code>usuario_captura</code></td><td><code>VARCHAR(20)</code></td><td>Auditoría: Usuario que creó.</td></tr>
+          <tr><td><code>fecha_captura</code></td><td><code>TIMESTAMP</code></td><td>Auditoría: Fecha de creación.</td></tr>
+          <tr><td><code>usuario_modificacion</code></td><td><code>VARCHAR(20)</code></td><td>Auditoría: Usuario que modificó.</td></tr>
+          <tr><td><code>fecha_modificacion</code></td><td><code>TIMESTAMP</code></td><td>Auditoría: Fecha de modificación.</td></tr>
+        </tbody>
+      </table>
+
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">2. Detalle Económico (Movimientos): <strong><code>materiales.requerimientomovtos_2026</code></strong></p>
+      <table class="props-table" style="margin-bottom:20px;">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id_movimiento</code></td><td><code>SERIAL (PK)</code></td><td>Identificador único del movimiento.</td></tr>
+          <tr><td><code>id_requerimiento</code></td><td><code>INT (FK)</code></td><td>Relación con el encabezado.</td></tr>
+          <tr><td><code>ejercicio</code></td><td><code>INT</code></td><td>Llave de partición.</td></tr>
+          <tr><td><code>partida_presupuestal</code></td><td><code>VARCHAR(20)</code></td><td>Clave COG de la cual se solicita recurso.</td></tr>
+          <tr><td><code>importe_estimado</code></td><td><code>NUMERIC(18,2)</code></td><td>Monto requerido.</td></tr>
+          <tr><td><code>concepto_tecnico</code></td><td><code>TEXT</code></td><td>Bienes o servicios requeridos en esta partida.</td></tr>
+          <tr><td><code>usuario_captura</code></td><td><code>VARCHAR(20)</code></td><td>Auditoría: Usuario que creó.</td></tr>
+          <tr><td><code>fecha_captura</code></td><td><code>TIMESTAMP</code></td><td>Auditoría: Fecha de creación.</td></tr>
+          <tr><td><code>usuario_modificacion</code></td><td><code>VARCHAR(20)</code></td><td>Auditoría: Usuario que modificó.</td></tr>
+          <tr><td><code>fecha_modificacion</code></td><td><code>TIMESTAMP</code></td><td>Auditoría: Fecha de modificación.</td></tr>
+        </tbody>
+      </table>
+
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">3. Trazabilidad (Bitácora): <strong><code>materiales.requerimientohistorial_2026</code></strong></p>
+      <table class="props-table" style="margin-bottom:20px;">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id_historial</code></td><td><code>SERIAL (PK)</code></td><td>Identificador del registro histórico.</td></tr>
+          <tr><td><code>id_requerimiento</code></td><td><code>INT (FK)</code></td><td>Relación con el encabezado.</td></tr>
+          <tr><td><code>ejercicio</code></td><td><code>INT</code></td><td>Llave de partición.</td></tr>
+          <tr><td><code>bandeja_origen</code></td><td><code>ENUM estatus_bandeja</code></td><td>De dónde venía el requerimiento.</td></tr>
+          <tr><td><code>bandeja_destino</code></td><td><code>ENUM estatus_bandeja</code></td><td>A qué bandeja pasó.</td></tr>
+          <tr><td><code>accion</code></td><td><code>VARCHAR(255)</code></td><td>Motivo textual (Ej. 'Turnado por validación de documentos').</td></tr>
+          <tr><td><code>id_usuario</code></td><td><code>INT</code></td><td>Usuario que ejecutó la transición.</td></tr>
+          <tr><td><code>fecha_accion</code></td><td><code>TIMESTAMP</code></td><td>Momento del pase de bandeja.</td></tr>
+          <tr><td><code>usuario_captura</code></td><td><code>VARCHAR(20)</code></td><td>Auditoría: Usuario que creó.</td></tr>
+          <tr><td><code>fecha_captura</code></td><td><code>TIMESTAMP</code></td><td>Auditoría: Fecha de creación.</td></tr>
+          <tr><td><code>usuario_modificacion</code></td><td><code>VARCHAR(20)</code></td><td>Auditoría: Usuario que modificó.</td></tr>
+          <tr><td><code>fecha_modificacion</code></td><td><code>TIMESTAMP</code></td><td>Auditoría: Fecha de modificación.</td></tr>
+        </tbody>
+      </table>
+
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">4. Evidencia Normativa: <strong><code>materiales.requerimientochecklist_2026</code></strong></p>
+      <table class="props-table" style="margin-bottom:20px;">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id_req_checklist</code></td><td><code>SERIAL (PK)</code></td><td>Identificador del checklist adjunto.</td></tr>
+          <tr><td><code>id_requerimiento</code></td><td><code>INT (FK)</code></td><td>Relación con el encabezado.</td></tr>
+          <tr><td><code>ejercicio</code></td><td><code>INT</code></td><td>Llave de partición.</td></tr>
+          <tr><td><code>id_documento</code></td><td><code>INT (FK)</code></td><td>Cruce con el diccionario de documentos (07.1.5).</td></tr>
+          <tr><td><code>entregado</code></td><td><code>BOOLEAN</code></td><td>Si el documento ya fue recepcionado o cargado.</td></tr>
+          <tr><td><code>ruta_archivo_pdf</code></td><td><code>VARCHAR(500)</code></td><td>Ubicación en storage del documento escaneado.</td></tr>
+          <tr><td><code>usuario_captura</code>, <code>fecha_captura</code>, <code>usuario_modificacion</code>, <code>fecha_modificacion</code></td><td><code>AUDIT</code></td><td>Campos estándar de auditoría de creación y actualización.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Manipulación de las 4 tablas transaccionales particionadas (8 procedimientos en total).</p>
+      
+      <style>
+        .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; flex-wrap: wrap; }
+        .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+        .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+        .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+        .sp-panel { display: none; }
+        .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+      </style>
+
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_req</button>
+        <button class="sp-tab" onclick="showSP('sp2',this)">fn_abc_req</button>
+        <button class="sp-tab" onclick="showSP('sp3',this)">fn_leer_movtos</button>
+        <button class="sp-tab" onclick="showSP('sp4',this)">fn_abc_movtos</button>
+        <button class="sp-tab" onclick="showSP('sp5',this)">fn_leer_historial</button>
+        <button class="sp-tab" onclick="showSP('sp6',this)">fn_abc_historial</button>
+        <button class="sp-tab" onclick="showSP('sp7',this)">fn_leer_checklist</button>
+        <button class="sp-tab" onclick="showSP('sp8',this)">fn_abc_checklist</button>
+      </div>
+
+      <!-- TAB 1: LEER REQ -->
+      <div id="sp-sp1" class="sp-panel active">
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">1. Leer Encabezado</h3>
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>0: Leer</td></tr>
+            <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Ejercicio activo</td></tr>
+            <tr><td><code>@p_id_requerimiento</code></td><td><code>INT</code></td><td>Null para listado, >0 único</td></tr>
+          </tbody>
+        </table>
+        <div class="code-wrap" style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">materiales.fn_leer_requerimiento</span>(
+    p_accion <span style="color:#c678dd;">integer</span>, p_ejercicio <span style="color:#c678dd;">integer</span>, p_id_requerimiento <span style="color:#c678dd;">integer DEFAULT NULL</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_id_requerimiento > <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">row_to_json</span>(t) <span style="color:#c678dd;">INTO</span> v_resultado <span style="color:#c678dd;">FROM</span> materiales.requerimiento t <span style="color:#c678dd;">WHERE</span> t.id_requerimiento = p_id_requerimiento <span style="color:#c678dd;">AND</span> t.ejercicio = p_ejercicio;
+    <span style="color:#c678dd;">ELSE</span>
+        <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'registros'</span>, <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(l)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>)) <span style="color:#c678dd;">INTO</span> v_resultado
+        <span style="color:#c678dd;">FROM</span> materiales.requerimiento l <span style="color:#c678dd;">WHERE</span> l.ejercicio = p_ejercicio;
+    <span style="color:#c678dd;">END IF</span>;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: ABC REQ -->
+      <div id="sp-sp2" class="sp-panel">
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">2. ABC Encabezado</h3>
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Alta, 2: Cambio, 3: Baja</td></tr>
+            <tr><td><code>@p_id_organizacion</code></td><td><code>INT</code></td><td>Centro de costo asociado</td></tr>
+            <tr><td><code>@p_estatus_actual</code></td><td><code>ENUM</code></td><td>Bandeja destino</td></tr>
+          </tbody>
+        </table>
+        <div class="code-wrap" style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">materiales.fn_abc_requerimiento</span>(
+    p_accion <span style="color:#c678dd;">integer</span>, p_ejercicio <span style="color:#c678dd;">integer</span>, p_usuario <span style="color:#c678dd;">varchar</span>, p_id_requerimiento <span style="color:#c678dd;">integer</span>,
+    p_folio_oficio <span style="color:#c678dd;">varchar</span>, p_id_organizacion <span style="color:#c678dd;">integer</span>, p_id_area_requirente <span style="color:#c678dd;">integer</span>, p_id_modalidad <span style="color:#c678dd;">integer</span>, p_estatus_actual <span style="color:#c678dd;">varchar</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_id <span style="color:#c678dd;">integer</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">INSERT INTO</span> materiales.requerimiento(ejercicio, folio_oficio, id_organizacion, id_area_requirente, id_modalidad, estatus_actual, usuario_captura)
+        <span style="color:#c678dd;">VALUES</span> (p_ejercicio, p_folio_oficio, p_id_organizacion, p_id_area_requirente, p_id_modalidad, p_estatus_actual::materiales.estatus_bandeja, p_usuario) <span style="color:#c678dd;">RETURNING</span> id_requerimiento <span style="color:#c678dd;">INTO</span> v_id;
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">UPDATE</span> materiales.requerimiento <span style="color:#c678dd;">SET</span> folio_oficio = p_folio_oficio, id_organizacion = p_id_organizacion, id_area_requirente = p_id_area_requirente, id_modalidad = p_id_modalidad, estatus_actual = p_estatus_actual::materiales.estatus_bandeja, usuario_modificacion = p_usuario, fecha_modificacion = <span style="color:#56b6c2;">now</span>() <span style="color:#c678dd;">WHERE</span> id_requerimiento = p_id_requerimiento;
+        v_id := p_id_requerimiento;
+    <span style="color:#c678dd;">END IF</span>;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'data'</span>, <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'id'</span>, v_id));
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: LEER MOVTOS -->
+      <div id="sp-sp3" class="sp-panel">
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">3. Leer Movimientos (Detalle)</h3>
+        <div class="code-wrap" style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">materiales.fn_leer_req_movtos</span>(
+    p_accion <span style="color:#c678dd;">integer</span>, p_ejercicio <span style="color:#c678dd;">integer</span>, p_id_requerimiento <span style="color:#c678dd;">integer</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'registros'</span>, <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(l)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>)) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> materiales.requerimientomovtos l <span style="color:#c678dd;">WHERE</span> l.id_requerimiento = p_id_requerimiento <span style="color:#c678dd;">AND</span> l.ejercicio = p_ejercicio;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ABC MOVTOS -->
+      <div id="sp-sp4" class="sp-panel">
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">4. ABC Movimientos</h3>
+        <div class="code-wrap" style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">materiales.fn_abc_req_movtos</span>(
+    p_accion <span style="color:#c678dd;">integer</span>, p_ejercicio <span style="color:#c678dd;">integer</span>, p_usuario <span style="color:#c678dd;">varchar</span>, p_id_movimiento <span style="color:#c678dd;">integer</span>,
+    p_id_requerimiento <span style="color:#c678dd;">integer</span>, p_partida <span style="color:#c678dd;">varchar</span>, p_importe <span style="color:#c678dd;">numeric</span>, p_concepto <span style="color:#c678dd;">text</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">INSERT INTO</span> materiales.requerimientomovtos(ejercicio, id_requerimiento, partida_presupuestal, importe_estimado, concepto_tecnico, usuario_captura)
+        <span style="color:#c678dd;">VALUES</span> (p_ejercicio, p_id_requerimiento, p_partida, p_importe, p_concepto, p_usuario);
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">UPDATE</span> materiales.requerimientomovtos <span style="color:#c678dd;">SET</span> partida_presupuestal = p_partida, importe_estimado = p_importe, concepto_tecnico = p_concepto, usuario_modificacion = p_usuario, fecha_modificacion = <span style="color:#56b6c2;">now</span>() <span style="color:#c678dd;">WHERE</span> id_movimiento = p_id_movimiento;
+    <span style="color:#c678dd;">END IF</span>;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: LEER HISTORIAL -->
+      <div id="sp-sp5" class="sp-panel">
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">5. Leer Historial (Línea de Tiempo)</h3>
+        <div class="code-wrap" style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">materiales.fn_leer_req_historial</span>(
+    p_accion <span style="color:#c678dd;">integer</span>, p_ejercicio <span style="color:#c678dd;">integer</span>, p_id_requerimiento <span style="color:#c678dd;">integer</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'registros'</span>, <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(l)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>)) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> materiales.requerimientohistorial l <span style="color:#c678dd;">WHERE</span> l.id_requerimiento = p_id_requerimiento <span style="color:#c678dd;">ORDER BY</span> l.fecha_accion <span style="color:#c678dd;">DESC</span>;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 6: ABC HISTORIAL -->
+      <div id="sp-sp6" class="sp-panel">
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">6. ABC Historial (Solo Inserción)</h3>
+        <p style="font-size:12px; color:red; margin-bottom:10px;">Regla de Negocio: No se permite Update ni Delete por ser bitácora de auditoría inmutable.</p>
+        <div class="code-wrap" style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">materiales.fn_abc_req_historial</span>(
+    p_accion <span style="color:#c678dd;">integer</span>, p_ejercicio <span style="color:#c678dd;">integer</span>, p_usuario <span style="color:#c678dd;">varchar</span>, p_id_requerimiento <span style="color:#c678dd;">integer</span>,
+    p_bandeja_origen <span style="color:#c678dd;">varchar</span>, p_bandeja_destino <span style="color:#c678dd;">varchar</span>, p_accion_desc <span style="color:#c678dd;">varchar</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">INSERT INTO</span> materiales.requerimientohistorial(ejercicio, id_requerimiento, bandeja_origen, bandeja_destino, accion, id_usuario, fecha_accion, usuario_captura)
+        <span style="color:#c678dd;">VALUES</span> (p_ejercicio, p_id_requerimiento, p_bandeja_origen::materiales.estatus_bandeja, p_bandeja_destino::materiales.estatus_bandeja, p_accion_desc, <span style="color:#56b6c2;">cast</span>(p_usuario <span style="color:#c678dd;">as integer</span>), <span style="color:#56b6c2;">now</span>(), p_usuario);
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Evento registrado'</span>);
+    <span style="color:#c678dd;">ELSE</span>
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">-1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Operacion no permitida en historial'</span>);
+    <span style="color:#c678dd;">END IF</span>;
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 7: LEER CHECKLIST -->
+      <div id="sp-sp7" class="sp-panel">
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">7. Leer Checklist de Anexos</h3>
+        <div class="code-wrap" style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">materiales.fn_leer_req_checklist</span>(
+    p_accion <span style="color:#c678dd;">integer</span>, p_ejercicio <span style="color:#c678dd;">integer</span>, p_id_requerimiento <span style="color:#c678dd;">integer</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'registros'</span>, <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(l)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>)) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> materiales.requerimientochecklist l <span style="color:#c678dd;">WHERE</span> l.id_requerimiento = p_id_requerimiento <span style="color:#c678dd;">AND</span> l.ejercicio = p_ejercicio;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 8: ABC CHECKLIST -->
+      <div id="sp-sp8" class="sp-panel">
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-bottom: 8px;">8. ABC Checklist (Marcar documento entregado)</h3>
+        <div class="code-wrap" style="margin-top: 10px; max-height: 200px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">materiales.fn_abc_req_checklist</span>(
+    p_accion <span style="color:#c678dd;">integer</span>, p_ejercicio <span style="color:#c678dd;">integer</span>, p_usuario <span style="color:#c678dd;">varchar</span>, p_id_req_checklist <span style="color:#c678dd;">integer</span>,
+    p_id_requerimiento <span style="color:#c678dd;">integer</span>, p_id_documento <span style="color:#c678dd;">integer</span>, p_entregado <span style="color:#c678dd;">boolean</span>, p_ruta <span style="color:#c678dd;">varchar</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">INSERT INTO</span> materiales.requerimientochecklist(ejercicio, id_requerimiento, id_documento, entregado, ruta_archivo_pdf, usuario_captura)
+        <span style="color:#c678dd;">VALUES</span> (p_ejercicio, p_id_requerimiento, p_id_documento, p_entregado, p_ruta, p_usuario);
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">UPDATE</span> materiales.requerimientochecklist <span style="color:#c678dd;">SET</span> entregado = p_entregado, ruta_archivo_pdf = p_ruta, usuario_modificacion = p_usuario, fecha_modificacion = <span style="color:#56b6c2;">now</span>() <span style="color:#c678dd;">WHERE</span> id_req_checklist = p_id_req_checklist;
+    <span style="color:#c678dd;">END IF</span>;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST (Swagger OpenAPI)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todos los endpoints están expuestos y documentados formalmente en la interfaz <strong>Swagger</strong> del API Gateway (SIAF-API), permitiendo la prueba interactiva de los payloads JSON.</p>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Stored Procedure</th><th>Descripción en Swagger</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method get" style="color:#0ea5e9; font-weight:bold;">GET</span></td><td><code>/materiales/requerimientos</code></td><td><code>fn_leer_requerimiento</code></td><td>Obtiene el listado general de requerimientos o uno específico por ID.</td></tr>
+          <tr><td><span class="method post" style="color:#10b981; font-weight:bold;">POST</span> / <span class="method patch" style="color:#f59e0b; font-weight:bold;">PATCH</span></td><td><code>/materiales/requerimientos</code></td><td><code>fn_abc_requerimiento</code></td><td>Guarda (POST) o Modifica (PATCH) la cabecera principal del requerimiento.</td></tr>
+          
+          <tr><td><span class="method get" style="color:#0ea5e9; font-weight:bold;">GET</span></td><td><code>/materiales/requerimientos/:id/movimientos</code></td><td><code>fn_leer_req_movtos</code></td><td>Devuelve las partidas presupuestales solicitadas para este requerimiento.</td></tr>
+          <tr><td><span class="method post" style="color:#10b981; font-weight:bold;">POST</span> / <span class="method patch" style="color:#f59e0b; font-weight:bold;">PATCH</span></td><td><code>/materiales/requerimientos/:id/movimientos</code></td><td><code>fn_abc_req_movtos</code></td><td>Alta o edición de un renglón presupuestal en el requerimiento.</td></tr>
+
+          <tr><td><span class="method get" style="color:#0ea5e9; font-weight:bold;">GET</span></td><td><code>/materiales/requerimientos/:id/historial</code></td><td><code>fn_leer_req_historial</code></td><td>Obtiene la línea de tiempo de cambios de bandeja del requerimiento.</td></tr>
+          <tr><td><span class="method post" style="color:#10b981; font-weight:bold;">POST</span></td><td><code>/materiales/requerimientos/:id/historial</code></td><td><code>fn_abc_req_historial</code></td><td>Registra un salto de bandeja (Solo inserción permitida).</td></tr>
+
+          <tr><td><span class="method get" style="color:#0ea5e9; font-weight:bold;">GET</span></td><td><code>/materiales/requerimientos/:id/checklist</code></td><td><code>fn_leer_req_checklist</code></td><td>Devuelve la matriz de documentos anexos exigidos por la modalidad.</td></tr>
+          <tr><td><span class="method post" style="color:#10b981; font-weight:bold;">POST</span> / <span class="method patch" style="color:#f59e0b; font-weight:bold;">PATCH</span></td><td><code>/materiales/requerimientos/:id/checklist</code></td><td><code>fn_abc_req_checklist</code></td><td>Marca un documento como entregado y guarda la ruta del PDF.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo (Botonera)</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Las acciones que pueden realizarse dentro del formulario del requerimiento son las siguientes:</p>
+      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
+        <li style="margin-bottom: 8px;"><strong>Guardar encabezado:</strong> Guarda el oficio y los datos de la carátula. En modo "nuevo", sólo aparece esta opción; en modo "editar/ver" aparecen las opciones adicionales.</li>
+        <li style="margin-bottom: 8px;"><strong>Imprimir Requerimiento (PDF):</strong> Genera el formato de control impreso del requerimiento con sus partidas y cuadro de firmas.</li>
+        <li style="margin-bottom: 8px;"><strong>Historial:</strong> Despliega una ventana modal con la bitácora de saltos de bandeja (Trazabilidad). Muestra el usuario, fecha, y bandeja destino.</li>
+        <li><strong>Turnar / Cambiar de Bandeja:</strong> Abre el modal para avanzar el requerimiento a la siguiente etapa (ej. de <em>Recepción</em> a <em>Suficiencia</em>) o regresarlo por observaciones. Esta acción es la que inyecta automáticamente un registro en la bitácora (<code>fn_abc_req_historial</code>).</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI / Wireframes) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer_requerimientos (Parámetros)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer_requerimientos (Valores)</button>
+        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc_compuesta (Parámetros)</button>
+        <button class="wf-tab" onclick="showWF('p4',this)">pantalla_abc_compuesta (Valores)</button>
+
+        <button class="wf-tab" onclick="showWF('p5',this)">pantalla_abc_modal_historial (Parámetros)</button>
+        <button class="wf-tab" onclick="showWF('p6',this)">pantalla_abc_modal_historial (Valores)</button>
+        <button class="wf-tab" onclick="showWF('p7',this)">pantalla_abc_modal_checklists (Parámetros)</button>
+        <button class="wf-tab" onclick="showWF('p8',this)">pantalla_abc_modal_checklists (Valores)</button>
+
+      </div>
+
+      <!-- TAB 1: pantalla_leer Parametros -->
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Listado de Requerimientos (Parámetros)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1200" height="400" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Action Bar -->
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Bandeja de Requerimientos</text>
+              <rect x="1050" y="15" width="130" height="25" fill="#1B3A2D" rx="4"/>
+              <text x="1115" y="32" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">+ Nuevo Requerimiento</text>
+              
+              <!-- Box de Filtros -->
+              <rect x="20" y="60" width="1160" height="80" fill="#fff" stroke="#ccc" rx="4"/>
+              
+              <!-- Labels de filtros -->
+              <text x="35" y="80" font-size="10" fill="#666">Organización</text>
+              <text x="175" y="80" font-size="10" fill="#666">Unidad Requirente</text>
+              <text x="335" y="80" font-size="10" fill="#666">Rango de fechas</text>
+              <text x="500" y="80" font-size="10" fill="#666">Tipo de Licitación</text>
+              <text x="660" y="80" font-size="10" fill="#666">Núm. Oficio</text>
+              <text x="820" y="80" font-size="10" fill="#666">Estatus</text>
+
+              <!-- Inputs de filtros -->
+              <rect x="35" y="88" width="120" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="45" y="104" font-size="11" fill="#1B3A2D">@p_id_organizacion</text>
+              
+              <rect x="175" y="88" width="140" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="185" y="104" font-size="11" fill="#1B3A2D">@p_id_area_req...</text>
+              
+              <rect x="335" y="88" width="145" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="345" y="104" font-size="11" fill="#1B3A2D">@p_f_ini - @p_f_fin</text>
+              
+              <rect x="500" y="88" width="140" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="510" y="104" font-size="11" fill="#1B3A2D">@p_id_modalidad</text>
+              
+              <rect x="660" y="88" width="140" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="670" y="104" font-size="11" fill="#1B3A2D">@p_folio</text>
+
+              <rect x="820" y="88" width="140" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="830" y="104" font-size="11" fill="#1B3A2D">@p_estatus</text>
+
+              <!-- Botones filtro -->
+              <rect x="980" y="88" width="80" height="24" fill="#1B3A2D" rx="4"/>
+              <text x="1020" y="104" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">Consultar</text>
+
+              <!-- Box Grid -->
+              <rect x="20" y="160" width="1160" height="220" fill="#fcfcfc" stroke="#ccc" rx="4"/>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="160" width="1160" height="25" fill="#f0f0f0"/>
+              <text x="30" y="177" font-size="10" font-weight="bold" fill="#666">NO. REQ</text>
+              <text x="110" y="177" font-size="10" font-weight="bold" fill="#666">TIPO LICITACIÓN</text>
+              <text x="250" y="177" font-size="10" font-weight="bold" fill="#666">FECHA</text>
+              <text x="330" y="177" font-size="10" font-weight="bold" fill="#666">ORGANIZACIÓN</text>
+              <text x="500" y="177" font-size="10" font-weight="bold" fill="#666">UNIDAD REQUIRENTE</text>
+              <text x="730" y="177" font-size="10" font-weight="bold" fill="#666">NÚM. OFICIO</text>
+              <text x="860" y="177" font-size="10" font-weight="bold" fill="#666">ESTATUS</text>
+              <text x="1080" y="177" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
+
+              <!-- Renglón 1 -->
+              <rect x="20" y="185" width="1160" height="35" fill="#fff" stroke="#eee"/>
+              <text x="30" y="207" font-size="11" fill="#333">{id_requerimiento}</text>
+              <text x="110" y="207" font-size="11" fill="#333">{modalidad}</text>
+              <text x="250" y="207" font-size="11" fill="#333">{fecha}</text>
+              <text x="330" y="207" font-size="11" fill="#333">{organizacion}</text>
+              <text x="500" y="207" font-size="11" fill="#333">{area_requirente}</text>
+              <text x="730" y="207" font-size="11" fill="#333">{folio_oficio}</text>
+              <text x="860" y="207" font-size="11" fill="#333">{estatus}</text>
+              <rect x="1080" y="192" width="60" height="22" fill="#1B3A2D" rx="4"/><text x="1110" y="207" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Abrir</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: pantalla_leer Valores -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Listado de Requerimientos (Valores)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1200" height="400" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Action Bar -->
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Bandeja de Requerimientos</text>
+              <rect x="1050" y="15" width="130" height="25" fill="#1B3A2D" rx="4"/>
+              <text x="1115" y="32" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">+ Nuevo Requerimiento</text>
+              
+              <!-- Box de Filtros -->
+              <rect x="20" y="60" width="1160" height="80" fill="#fff" stroke="#ccc" rx="4"/>
+              
+              <!-- Labels de filtros -->
+              <text x="35" y="80" font-size="10" fill="#666">Organización</text>
+              <text x="175" y="80" font-size="10" fill="#666">Unidad Requirente</text>
+              <text x="335" y="80" font-size="10" fill="#666">Rango de fechas</text>
+              <text x="500" y="80" font-size="10" fill="#666">Tipo de Licitación</text>
+              <text x="660" y="80" font-size="10" fill="#666">Núm. Oficio</text>
+              <text x="820" y="80" font-size="10" fill="#666">Estatus</text>
+
+              <!-- Inputs de filtros -->
+              <rect x="35" y="88" width="120" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="45" y="104" font-size="11" fill="#888">0101-Dir. Gral...</text>
+              
+              <rect x="175" y="88" width="140" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="185" y="104" font-size="11" fill="#888">DGT-Infraestructura</text>
+              
+              <rect x="335" y="88" width="145" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="345" y="104" font-size="11" fill="#888">01/01/26 - 31/01/26</text>
+              
+              <rect x="500" y="88" width="140" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="510" y="104" font-size="11" fill="#888">Licitación Pública...</text>
+              
+              <rect x="660" y="88" width="140" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="670" y="104" font-size="11" fill="#888">REQ-2026-001</text>
+
+              <rect x="820" y="88" width="140" height="24" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="830" y="104" font-size="11" fill="#888">01 - Bandeja de...</text>
+
+              <!-- Botones filtro -->
+              <rect x="980" y="88" width="80" height="24" fill="#1B3A2D" rx="4"/>
+              <text x="1020" y="104" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">Consultar</text>
+
+              <!-- Box Grid -->
+              <rect x="20" y="160" width="1160" height="220" fill="#fcfcfc" stroke="#ccc" rx="4"/>
+              
+              <!-- Grid Header -->
+              <rect x="20" y="160" width="1160" height="25" fill="#f0f0f0"/>
+              <text x="30" y="177" font-size="10" font-weight="bold" fill="#666">NO. REQ</text>
+              <text x="110" y="177" font-size="10" font-weight="bold" fill="#666">TIPO LICITACIÓN</text>
+              <text x="250" y="177" font-size="10" font-weight="bold" fill="#666">FECHA</text>
+              <text x="330" y="177" font-size="10" font-weight="bold" fill="#666">ORGANIZACIÓN</text>
+              <text x="500" y="177" font-size="10" font-weight="bold" fill="#666">UNIDAD REQUIRENTE</text>
+              <text x="730" y="177" font-size="10" font-weight="bold" fill="#666">NÚM. OFICIO</text>
+              <text x="860" y="177" font-size="10" font-weight="bold" fill="#666">ESTATUS</text>
+              <text x="1080" y="177" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
+
+              <!-- Renglón 1 -->
+              <rect x="20" y="185" width="1160" height="35" fill="#fff" stroke="#eee"/>
+              <text x="30" y="207" font-size="11" fill="#0284c7" font-weight="bold">924</text>
+              <text x="110" y="207" font-size="11" fill="#333">Adjudicación Directa</text>
+              <text x="250" y="207" font-size="11" fill="#333">15/01/2026</text>
+              <text x="330" y="207" font-size="11" fill="#333">0101-Dir. Gral. Admin...</text>
+              <text x="500" y="207" font-size="11" fill="#333">DGT-Infraestructura</text>
+              <text x="730" y="207" font-size="11" fill="#333" font-weight="bold">REQ-2026-001</text>
+              <rect x="860" y="193" width="120" height="20" fill="#dbeafe" rx="10"/><text x="920" y="206" font-size="10" fill="#1e40af" text-anchor="middle">01 - Bandeja Recepción</text>
+              <rect x="1080" y="192" width="60" height="22" fill="#1B3A2D" rx="4"/><text x="1110" y="207" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Abrir</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ABC Parametros -->
+      <div id="wf-p3" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Parámetros)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1200 650" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1200" height="650" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Title -->
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Edición de Requerimiento: @p_folio</text>
+              <rect x="1050" y="15" width="130" height="25" fill="#b91c1c" rx="4"/>
+              <text x="1115" y="32" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">&lt; Volver a Bandeja</text>
+
+              <!-- Botonera / Acciones -->
+              <rect x="20" y="55" width="1160" height="60" fill="#fff" stroke="#ccc" rx="4"/>
+              
+              <!-- Seccion Edicion -->
+              <text x="35" y="75" font-size="10" fill="#999" font-weight="bold">EDICIÓN</text>
+              <rect x="35" y="85" width="80" height="24" fill="#1B3A2D" rx="3"/><text x="75" y="101" font-size="10" fill="#fff" text-anchor="middle">Guardar</text>
+              <rect x="120" y="85" width="80" height="24" fill="#f1f5f9" border="1" stroke="#ccc" rx="3"/><text x="160" y="101" font-size="10" fill="#333" text-anchor="middle">Cancelar</text>
+
+              <line x1="215" y1="65" x2="215" y2="105" stroke="#eee" stroke-width="2"/>
+
+              <!-- Seccion Impresión -->
+              <text x="230" y="75" font-size="10" fill="#999" font-weight="bold">IMPRESIÓN</text>
+              <rect x="230" y="85" width="160" height="24" fill="#0284c7" rx="3"/><text x="310" y="101" font-size="10" fill="#fff" text-anchor="middle">Oficio Solicitud Reserva (PDF)</text>
+              
+              <line x1="405" y1="65" x2="405" y2="105" stroke="#eee" stroke-width="2"/>
+
+              <!-- Seccion Bitacora -->
+              <text x="420" y="75" font-size="10" fill="#999" font-weight="bold">BITÁCORA</text>
+              <rect x="420" y="85" width="70" height="24" fill="#f1f5f9" stroke="#ccc" rx="3"/><text x="455" y="101" font-size="10" fill="#333" text-anchor="middle">Historial</text>
+              <rect x="495" y="85" width="120" height="24" fill="#eab308" rx="3"/><text x="555" y="101" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">Enviar / Regresar ➔</text>
+
+              <line x1="630" y1="65" x2="630" y2="105" stroke="#eee" stroke-width="2"/>
+
+              <!-- Seccion Especiales -->
+              <text x="645" y="75" font-size="10" fill="#999" font-weight="bold">ESPECIALES</text>
+              <rect x="645" y="85" width="80" height="24" fill="#f1f5f9" stroke="#ccc" rx="3"/><text x="685" y="101" font-size="10" fill="#333" text-anchor="middle">Checklists</text>
+              <rect x="730" y="85" width="120" height="24" fill="#f1f5f9" stroke="#ccc" rx="3"/><text x="790" y="101" font-size="10" fill="#333" text-anchor="middle">Archivos Adjuntos</text>
+
+
+              <!-- Encabezado -->
+              <rect x="20" y="130" width="1160" height="80" fill="#f8fafc" stroke="#ccc" rx="4"/>
+              
+              <text x="35" y="155" font-size="10" fill="#666">Organización</text>
+              <rect x="35" y="165" width="220" height="26" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="45" y="182" font-size="11" fill="#1B3A2D">@p_id_organizacion</text>
+
+              <text x="270" y="155" font-size="10" fill="#666">Unidad Requirente</text>
+              <rect x="270" y="165" width="220" height="26" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="280" y="182" font-size="11" fill="#1B3A2D">@p_id_area_requirente</text>
+
+              <text x="505" y="155" font-size="10" fill="#666">Núm. Oficio</text>
+              <rect x="505" y="165" width="180" height="26" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="515" y="182" font-size="11" fill="#1B3A2D">@p_folio_oficio</text>
+
+              <text x="700" y="155" font-size="10" fill="#666">Tipo de Licitación (Modalidad)</text>
+              <rect x="700" y="165" width="200" height="26" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="710" y="182" font-size="11" fill="#1B3A2D">@p_id_modalidad</text>
+
+              <!-- Movimientos (Detalle) -->
+              <text x="20" y="240" font-size="14" font-weight="bold" fill="#333">Movimientos (Partidas y Conceptos)</text>
+              <rect x="20" y="250" width="1160" height="300" fill="#fff" stroke="#ccc" rx="4"/>
+              
+              <!-- Tab header in detalle -->
+              <rect x="20" y="250" width="1160" height="35" fill="#f1f5f9" rx="4"/>
+              <text x="30" y="272" font-size="11" font-weight="bold" fill="#1B3A2D">Partidas Presupuestales</text>
+
+              <rect x="20" y="285" width="1160" height="25" fill="#f0f0f0"/>
+              <text x="30" y="302" font-size="10" font-weight="bold" fill="#666">CUCOP</text>
+              <text x="130" y="302" font-size="10" font-weight="bold" fill="#666">PARTIDA</text>
+              <text x="230" y="302" font-size="10" font-weight="bold" fill="#666">DESCRIPCIÓN</text>
+              <text x="600" y="302" font-size="10" font-weight="bold" fill="#666">CANTIDAD</text>
+              <text x="700" y="302" font-size="10" font-weight="bold" fill="#666">PRECIO UNITARIO</text>
+              <text x="850" y="302" font-size="10" font-weight="bold" fill="#666">SUBTOTAL</text>
+              <text x="1050" y="302" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
+
+              <!-- Fila Edicion en Linea -->
+              <rect x="20" y="310" width="1160" height="40" fill="#fff" stroke="#eee"/>
+              <rect x="30" y="318" width="80" height="24" fill="#fff" stroke="#ccc" rx="2"/><text x="35" y="334" font-size="10" fill="#999">@p_cucop</text>
+              <rect x="130" y="318" width="80" height="24" fill="#fff" stroke="#ccc" rx="2"/><text x="135" y="334" font-size="10" fill="#999">@p_partida</text>
+              <rect x="230" y="318" width="350" height="24" fill="#fff" stroke="#ccc" rx="2"/><text x="235" y="334" font-size="10" fill="#999">@p_desc</text>
+              <rect x="600" y="318" width="80" height="24" fill="#fff" stroke="#ccc" rx="2"/><text x="605" y="334" font-size="10" fill="#999">@p_cant</text>
+              <rect x="700" y="318" width="100" height="24" fill="#fff" stroke="#ccc" rx="2"/><text x="705" y="334" font-size="10" fill="#999">@p_precio</text>
+              <text x="850" y="334" font-size="11" font-weight="bold" fill="#333">Auto</text>
+              
+              <rect x="1050" y="318" width="80" height="24" fill="#10b981" rx="4"/><text x="1090" y="334" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">+ Agregar</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ABC Valores -->
+      <div id="wf-p4" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Valores)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1200 650" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1200" height="650" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              
+              <!-- Title -->
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Edición de Requerimiento: REQ-2026-001</text>
+              <rect x="1050" y="15" width="130" height="25" fill="#b91c1c" rx="4"/>
+              <text x="1115" y="32" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">&lt; Volver a Bandeja</text>
+
+              <!-- Botonera / Acciones -->
+              <rect x="20" y="55" width="1160" height="60" fill="#fff" stroke="#ccc" rx="4"/>
+              
+              <!-- Seccion Edicion -->
+              <text x="35" y="75" font-size="10" fill="#999" font-weight="bold">EDICIÓN</text>
+              <rect x="35" y="85" width="80" height="24" fill="#1B3A2D" rx="3"/><text x="75" y="101" font-size="10" fill="#fff" text-anchor="middle">Guardar</text>
+              <rect x="120" y="85" width="80" height="24" fill="#f1f5f9" border="1" stroke="#ccc" rx="3"/><text x="160" y="101" font-size="10" fill="#333" text-anchor="middle">Cancelar</text>
+
+              <line x1="215" y1="65" x2="215" y2="105" stroke="#eee" stroke-width="2"/>
+
+              <!-- Seccion Impresión -->
+              <text x="230" y="75" font-size="10" fill="#999" font-weight="bold">IMPRESIÓN</text>
+              <rect x="230" y="85" width="160" height="24" fill="#0284c7" rx="3"/><text x="310" y="101" font-size="10" fill="#fff" text-anchor="middle">Oficio Solicitud Reserva (PDF)</text>
+              
+              <line x1="405" y1="65" x2="405" y2="105" stroke="#eee" stroke-width="2"/>
+
+              <!-- Seccion Bitacora -->
+              <text x="420" y="75" font-size="10" fill="#999" font-weight="bold">BITÁCORA</text>
+              <rect x="420" y="85" width="70" height="24" fill="#f1f5f9" stroke="#ccc" rx="3"/><text x="455" y="101" font-size="10" fill="#333" text-anchor="middle">Historial</text>
+              <rect x="495" y="85" width="120" height="24" fill="#eab308" rx="3"/><text x="555" y="101" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">Enviar / Regresar ➔</text>
+
+              <line x1="630" y1="65" x2="630" y2="105" stroke="#eee" stroke-width="2"/>
+
+              <!-- Seccion Especiales -->
+              <text x="645" y="75" font-size="10" fill="#999" font-weight="bold">ESPECIALES</text>
+              <rect x="645" y="85" width="80" height="24" fill="#f1f5f9" stroke="#ccc" rx="3"/><text x="685" y="101" font-size="10" fill="#333" text-anchor="middle">Checklists</text>
+              <rect x="730" y="85" width="120" height="24" fill="#f1f5f9" stroke="#ccc" rx="3"/><text x="790" y="101" font-size="10" fill="#333" text-anchor="middle">Archivos Adjuntos</text>
+
+
+              <!-- Encabezado -->
+              <rect x="20" y="130" width="1160" height="80" fill="#f8fafc" stroke="#ccc" rx="4"/>
+              
+              <text x="35" y="155" font-size="10" fill="#666">Organización</text>
+              <rect x="35" y="165" width="220" height="26" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="45" y="182" font-size="11" fill="#333">0101 - Dir. Gral. Admin.</text>
+
+              <text x="270" y="155" font-size="10" fill="#666">Unidad Requirente</text>
+              <rect x="270" y="165" width="220" height="26" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="280" y="182" font-size="11" fill="#333">DGT - Soporte Técnico</text>
+
+              <text x="505" y="155" font-size="10" fill="#666">Núm. Oficio</text>
+              <rect x="505" y="165" width="180" height="26" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="515" y="182" font-size="11" fill="#333" font-weight="bold">REQ-2026-001</text>
+
+              <text x="700" y="155" font-size="10" fill="#666">Tipo de Licitación (Modalidad)</text>
+              <rect x="700" y="165" width="200" height="26" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="710" y="182" font-size="11" fill="#333">Adjudicación Directa</text>
+
+              <text x="930" y="155" font-size="10" fill="#666">Estatus de Bandeja</text>
+              <rect x="930" y="165" width="200" height="26" fill="#dbeafe" stroke="#bfdbfe" rx="3"/>
+              <text x="940" y="182" font-size="11" fill="#1e40af" font-weight="bold">01 - Bandeja Recepción</text>
+
+              <!-- Movimientos (Detalle) -->
+              <text x="20" y="240" font-size="14" font-weight="bold" fill="#333">Movimientos (Partidas y Conceptos)</text>
+              <rect x="20" y="250" width="1160" height="300" fill="#fff" stroke="#ccc" rx="4"/>
+              
+              <!-- Tab header in detalle -->
+              <rect x="20" y="250" width="1160" height="35" fill="#f1f5f9" rx="4"/>
+              <text x="30" y="272" font-size="11" font-weight="bold" fill="#1B3A2D">Partidas Presupuestales</text>
+
+              <rect x="20" y="285" width="1160" height="25" fill="#f0f0f0"/>
+              <text x="30" y="302" font-size="10" font-weight="bold" fill="#666">CUCOP</text>
+              <text x="130" y="302" font-size="10" font-weight="bold" fill="#666">PARTIDA</text>
+              <text x="230" y="302" font-size="10" font-weight="bold" fill="#666">DESCRIPCIÓN</text>
+              <text x="600" y="302" font-size="10" font-weight="bold" fill="#666">CANTIDAD</text>
+              <text x="700" y="302" font-size="10" font-weight="bold" fill="#666">PRECIO UNITARIO</text>
+              <text x="850" y="302" font-size="10" font-weight="bold" fill="#666">SUBTOTAL</text>
+              <text x="1050" y="302" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
+
+              <!-- Fila Edicion en Linea -->
+              <rect x="20" y="310" width="1160" height="40" fill="#fff" stroke="#eee"/>
+              <rect x="30" y="318" width="80" height="24" fill="#fff" stroke="#ccc" rx="2"/><text x="35" y="334" font-size="10" fill="#999">Buscar...</text>
+              <rect x="130" y="318" width="80" height="24" fill="#f9f9f9" stroke="#ccc" rx="2"/><text x="135" y="334" font-size="10" fill="#ccc">Auto</text>
+              <rect x="230" y="318" width="350" height="24" fill="#f9f9f9" stroke="#ccc" rx="2"/><text x="235" y="334" font-size="10" fill="#ccc">Descripción del bien...</text>
+              <rect x="600" y="318" width="80" height="24" fill="#fff" stroke="#ccc" rx="2"/><text x="605" y="334" font-size="10" fill="#999">0.00</text>
+              <rect x="700" y="318" width="100" height="24" fill="#fff" stroke="#ccc" rx="2"/><text x="705" y="334" font-size="10" fill="#999">$0.00</text>
+              <text x="850" y="334" font-size="11" font-weight="bold" fill="#333">$0.00</text>
+              
+              <rect x="1050" y="318" width="80" height="24" fill="#10b981" rx="4"/><text x="1090" y="334" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">+ Agregar</text>
+
+              <!-- Renglones guardados -->
+              <rect x="20" y="350" width="1160" height="30" fill="#fafafa" stroke="#eee"/>
+              <text x="30" y="370" font-size="11" fill="#0284c7" font-weight="bold">2110001</text>
+              <text x="130" y="370" font-size="11" fill="#333">21101</text>
+              <text x="230" y="370" font-size="11" fill="#333">Material de Oficina (Lápices No. 2)</text>
+              <text x="600" y="370" font-size="11" fill="#333">10</text>
+              <text x="700" y="370" font-size="11" fill="#333">$5.00</text>
+              <text x="850" y="370" font-size="11" fill="#15803d" font-weight="bold">$50.00</text>
+              <rect x="1050" y="356" width="35" height="18" fill="#f59e0b" rx="2"/><text x="1067" y="369" font-size="9" fill="#fff" font-weight="bold" text-anchor="middle">Edit</text>
+              <rect x="1090" y="356" width="35" height="18" fill="#ef4444" rx="2"/><text x="1107" y="369" font-size="9" fill="#fff" font-weight="bold" text-anchor="middle">Del</text>
+
+              <!-- Footer Totales -->
+              <rect x="20" y="500" width="1160" height="50" fill="#f8fafc" stroke="#ccc" rx="4"/>
+              <text x="750" y="530" font-size="14" font-weight="bold" fill="#666">TOTAL DEL REQUERIMIENTO:</text>
+              <text x="1000" y="530" font-size="16" font-weight="bold" fill="#15803d">$50.00</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      
+      <!-- TAB 5: Modal Historial (Parametros) -->
+      <div id="wf-p5" class="wf-panel">
+        <div class="wf-box" style="position:relative;">
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Bitácora de Historial (Parámetros)</span></div>
+          <div class="wf-svg-area" style="position:relative; background:#eee; min-height:450px;">
+            <svg viewBox="0 0 1200 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1200" height="450" fill="rgba(0,0,0,0.5)"/>
+              
+              <!-- Modal Box -->
+              <rect x="250" y="50" width="700" height="350" fill="#fff" rx="8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.3))"/>
+              
+              <!-- Modal Header -->
+              <rect x="250" y="50" width="700" height="50" fill="#f8fafc" rx="8"/>
+              <text x="280" y="80" font-size="16" font-weight="bold" fill="#333">Bitácora de Requerimiento (Historial)</text>
+              <text x="910" y="80" font-size="20" fill="#999" font-weight="bold" cursor="pointer">×</text>
+              <line x1="250" y1="100" x2="950" y2="100" stroke="#eee" stroke-width="1"/>
+
+              <!-- Grid Headers -->
+              <rect x="280" y="120" width="640" height="30" fill="#f1f5f9" rx="4"/>
+              <text x="290" y="140" font-size="11" font-weight="bold" fill="#666">BANDEJA DESTINO (ESTATUS)</text>
+              <text x="490" y="140" font-size="11" font-weight="bold" fill="#666">USUARIO</text>
+              <text x="640" y="140" font-size="11" font-weight="bold" fill="#666">OBSERVACIONES</text>
+              <text x="820" y="140" font-size="11" font-weight="bold" fill="#666">FECHA Y HORA</text>
+
+              <!-- Row 1 -->
+              <rect x="280" y="160" width="640" height="35" fill="#fff" stroke="#eee"/>
+              <text x="290" y="182" font-size="11" fill="#333">{estatus_bandeja}</text>
+              <text x="490" y="182" font-size="11" fill="#333">{usuario_captura}</text>
+              <text x="640" y="182" font-size="11" fill="#333">{observaciones}</text>
+              <text x="820" y="182" font-size="11" fill="#666">{fecha_captura}</text>
+
+              <!-- Modal Footer -->
+              <line x1="250" y1="340" x2="950" y2="340" stroke="#eee" stroke-width="1"/>
+              <rect x="850" y="355" width="80" height="30" fill="#f1f5f9" stroke="#ccc" rx="4"/>
+              <text x="890" y="375" fill="#333" font-size="12" text-anchor="middle">Cerrar</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 6: Modal Historial (Valores) -->
+      <div id="wf-p6" class="wf-panel">
+        <div class="wf-box" style="position:relative;">
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Bitácora de Historial (Valores)</span></div>
+          <div class="wf-svg-area" style="position:relative; background:#eee; min-height:450px;">
+            <svg viewBox="0 0 1200 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1200" height="450" fill="rgba(0,0,0,0.5)"/>
+              
+              <!-- Modal Box -->
+              <rect x="250" y="50" width="700" height="350" fill="#fff" rx="8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.3))"/>
+              
+              <!-- Modal Header -->
+              <rect x="250" y="50" width="700" height="50" fill="#f8fafc" rx="8"/>
+              <text x="280" y="80" font-size="16" font-weight="bold" fill="#333">Bitácora de Requerimiento (Historial)</text>
+              <text x="910" y="80" font-size="20" fill="#999" font-weight="bold" cursor="pointer">×</text>
+              <line x1="250" y1="100" x2="950" y2="100" stroke="#eee" stroke-width="1"/>
+
+              <!-- Grid Headers -->
+              <rect x="280" y="120" width="640" height="30" fill="#f1f5f9" rx="4"/>
+              <text x="290" y="140" font-size="11" font-weight="bold" fill="#666">BANDEJA DESTINO (ESTATUS)</text>
+              <text x="490" y="140" font-size="11" font-weight="bold" fill="#666">USUARIO</text>
+              <text x="640" y="140" font-size="11" font-weight="bold" fill="#666">OBSERVACIONES</text>
+              <text x="820" y="140" font-size="11" font-weight="bold" fill="#666">FECHA Y HORA</text>
+
+              <!-- Row 1 -->
+              <rect x="280" y="160" width="640" height="35" fill="#fff" stroke="#eee"/>
+              <rect x="290" y="168" width="120" height="20" fill="#dbeafe" rx="10"/><text x="350" y="182" font-size="10" fill="#1e40af" text-anchor="middle">01 - Recepción</text>
+              <text x="490" y="182" font-size="11" fill="#333">jbarrales</text>
+              <text x="640" y="182" font-size="11" fill="#333">Se crea oficio base.</text>
+              <text x="820" y="182" font-size="11" fill="#666">15/01/2026 10:45</text>
+
+              <!-- Row 2 -->
+              <rect x="280" y="195" width="640" height="35" fill="#fafafa" stroke="#eee"/>
+              <rect x="290" y="203" width="120" height="20" fill="#fef9c3" rx="10"/><text x="350" y="217" font-size="10" fill="#a16207" text-anchor="middle">02 - Suficiencia</text>
+              <text x="490" y="217" font-size="11" fill="#333">mlopez</text>
+              <text x="640" y="217" font-size="11" fill="#333">Turnado para validación pptal.</text>
+              <text x="820" y="217" font-size="11" fill="#666">16/01/2026 09:12</text>
+
+              <!-- Modal Footer -->
+              <line x1="250" y1="340" x2="950" y2="340" stroke="#eee" stroke-width="1"/>
+              <rect x="850" y="355" width="80" height="30" fill="#f1f5f9" stroke="#ccc" rx="4"/>
+              <text x="890" y="375" fill="#333" font-size="12" text-anchor="middle">Cerrar</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 7: Modal Checklists (Parámetros) -->
+      <div id="wf-p7" class="wf-panel">
+        <div class="wf-box" style="position:relative;">
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Checklists de Documentos (Parámetros)</span></div>
+          <div class="wf-svg-area" style="position:relative; background:#eee; min-height:450px;">
+            <svg viewBox="0 0 1200 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1200" height="450" fill="rgba(0,0,0,0.5)"/>
+              
+              <!-- Modal Box -->
+              <rect x="200" y="50" width="800" height="350" fill="#fff" rx="8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.3))"/>
+              
+              <!-- Modal Header -->
+              <rect x="200" y="50" width="800" height="50" fill="#f8fafc" rx="8"/>
+              <text x="230" y="80" font-size="16" font-weight="bold" fill="#333">Checklist Documental: {modalidad_nombre}</text>
+              <text x="960" y="80" font-size="20" fill="#999" font-weight="bold" cursor="pointer">×</text>
+              <line x1="200" y1="100" x2="1000" y2="100" stroke="#eee" stroke-width="1"/>
+
+              <!-- Grid Headers -->
+              <rect x="230" y="145" width="740" height="30" fill="#f1f5f9" rx="4"/>
+              <text x="240" y="165" font-size="11" font-weight="bold" fill="#666">DOCUMENTO EXIGIDO</text>
+              <text x="500" y="165" font-size="11" font-weight="bold" fill="#666">ESTATUS</text>
+              <text x="650" y="165" font-size="11" font-weight="bold" fill="#666">ARCHIVO PDF</text>
+              <text x="880" y="165" font-size="11" font-weight="bold" fill="#666">ACCIÓN</text>
+
+              <!-- Row 1 -->
+              <rect x="230" y="185" width="740" height="40" fill="#fff" stroke="#eee"/>
+              <text x="240" y="210" font-size="12" fill="#333">{nombre_documento}</text>
+              <text x="500" y="210" font-size="11" fill="#333">{entregado_bool}</text>
+              <text x="650" y="210" font-size="11" fill="#333">@p_ruta_archivo_pdf</text>
+              <text x="880" y="210" font-size="11" fill="#333">[Eliminar] o [@p_file]</text>
+
+              <!-- Modal Footer -->
+              <line x1="200" y1="340" x2="1000" y2="340" stroke="#eee" stroke-width="1"/>
+              <rect x="890" y="355" width="80" height="30" fill="#f1f5f9" stroke="#ccc" rx="4"/>
+              <text x="930" y="375" fill="#333" font-size="12" text-anchor="middle">Cerrar</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 8: Modal Checklists (Valores) -->
+      <div id="wf-p8" class="wf-panel">
+        <div class="wf-box" style="position:relative;">
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Checklists de Documentos (Valores)</span></div>
+          <div class="wf-svg-area" style="position:relative; background:#eee; min-height:450px;">
+            <svg viewBox="0 0 1200 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1200" height="450" fill="rgba(0,0,0,0.5)"/>
+              
+              <!-- Modal Box -->
+              <rect x="200" y="50" width="800" height="350" fill="#fff" rx="8" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.3))"/>
+              
+              <!-- Modal Header -->
+              <rect x="200" y="50" width="800" height="50" fill="#f8fafc" rx="8"/>
+              <text x="230" y="80" font-size="16" font-weight="bold" fill="#333">Checklist Documental: Adjudicación Directa</text>
+              <text x="960" y="80" font-size="20" fill="#999" font-weight="bold" cursor="pointer">×</text>
+              <line x1="200" y1="100" x2="1000" y2="100" stroke="#eee" stroke-width="1"/>
+
+              <!-- Instructions -->
+              <text x="230" y="125" font-size="12" fill="#666">Adjunta los archivos PDF requeridos según la modalidad seleccionada en el requerimiento.</text>
+
+              <!-- Grid Headers -->
+              <rect x="230" y="145" width="740" height="30" fill="#f1f5f9" rx="4"/>
+              <text x="240" y="165" font-size="11" font-weight="bold" fill="#666">DOCUMENTO EXIGIDO</text>
+              <text x="500" y="165" font-size="11" font-weight="bold" fill="#666">ESTATUS</text>
+              <text x="650" y="165" font-size="11" font-weight="bold" fill="#666">ARCHIVO PDF</text>
+              <text x="880" y="165" font-size="11" font-weight="bold" fill="#666">ACCIÓN</text>
+
+              <!-- Row 1 -->
+              <rect x="230" y="185" width="740" height="40" fill="#fff" stroke="#eee"/>
+              <text x="240" y="210" font-size="12" fill="#333">Dictamen de Adjudicación</text>
+              <rect x="500" y="195" width="80" height="20" fill="#dcfce7" rx="10"/><text x="540" y="209" font-size="10" fill="#166534" text-anchor="middle">✔ Cargado</text>
+              <text x="650" y="210" font-size="11" fill="#0284c7" text-decoration="underline">dictamen_adj_v1.pdf</text>
+              <rect x="880" y="195" width="80" height="24" fill="#ef4444" rx="4"/><text x="920" y="211" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Eliminar</text>
+
+              <!-- Row 2 -->
+              <rect x="230" y="225" width="740" height="40" fill="#fafafa" stroke="#eee"/>
+              <text x="240" y="250" font-size="12" fill="#333">Cotización Proveedor Ganador</text>
+              <rect x="500" y="235" width="80" height="20" fill="#fee2e2" rx="10"/><text x="540" y="249" font-size="10" fill="#991b1b" text-anchor="middle">Pendiente</text>
+              <rect x="650" y="235" width="200" height="24" fill="#fff" stroke="#ccc" rx="3"/><text x="660" y="251" font-size="11" fill="#999">Seleccionar archivo...</text>
+              <rect x="880" y="235" width="80" height="24" fill="#10b981" rx="4"/><text x="920" y="251" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Subir PDF</text>
+
+              <!-- Modal Footer -->
+              <line x1="200" y1="340" x2="1000" y2="340" stroke="#eee" stroke-width="1"/>
+              <rect x="890" y="355" width="80" height="30" fill="#f1f5f9" stroke="#ccc" rx="4"/>
+              <text x="930" y="375" fill="#333" font-size="12" text-anchor="middle">Cerrar</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+<!-- 9. Reglas de Negocio Críticas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead>
+          <tr><th>Condición</th><th>Regla de Validación en Sistema</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Relación Centro de Costo - Unidad Administrativa</strong></td>
+            <td>El <code>id_organizacion</code> (Centro de Costo) delimita estrictamente el catálogo de Unidades Administrativas que el usuario puede elegir, así como el universo de partidas presupuestales disponibles para los movimientos de ese requerimiento.</td>
+          </tr>
+          <tr>
+            <td><strong>Equipos de Fotocopiado (Arrendamiento)</strong></td>
+            <td>El sistema debe exigir obligatoriamente la carga del archivo PDF del <em>Dictamen de Asuntos Jurídicos</em> (Art. 19, Ley 539) antes de permitir la formalización en la Bandeja 01.</td>
+          </tr>
+          <tr>
+            <td><strong>Prórroga de Convenios</strong></td>
+            <td>El monto capturado no puede exceder el <strong>20%</strong> del monto original del contrato padre, y debe heredar los mismos precios unitarios (Art. 65, Ley 539).</td>
+          </tr>
+          <tr>
+            <td><strong>Contratación de Seguros (Vehículos / Inmuebles)</strong></td>
+            <td>Se debe habilitar una pestaña adicional para la carga estructurada del padrón vehicular (valor factura) o la relación de inmuebles y coberturas amparadas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+        
+    
+    <!-- 10. Flujos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Interoperabilidad)</div>
+      <p>Este módulo no opera de forma aislada. Actúa como el punto de inicio de la cadena de suministro y debe comunicarse en tiempo real con otros dominios del SIAF-PJEV:</p>
+      
+      <table class="props-table">
+        <thead>
+          <tr><th>Módulo Destino</th><th>Tipo de Integración</th><th>Propósito del Consumo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>02 - Presupuestos</strong></td>
+            <td><span class="mod-badge badge-s">Lectura Activa</span></td>
+            <td><strong>Suficiencia Previa:</strong> Al capturar los movimientos (Partida/Monto), se consume la vista de <em>Saldos Presupuestales</em> para alertar al usuario si el techo financiero del Centro de Costo es insuficiente para la adquisición solicitada.</td>
+          </tr>
+          <tr>
+            <td><strong>07.4 - Almacén General</strong></td>
+            <td><span class="mod-badge badge-s">Lectura Activa</span></td>
+            <td><strong>Validación de Existencias:</strong> Al solicitar artículos (ej. Material de Oficina, Tóner), el sistema consulta el inventario en tiempo real. Si hay <em>Stock</em> suficiente para cubrir la demanda, se puede rechazar la compra y sugerir el surtimiento directo desde el Almacén.</td>
+          </tr>
+          <tr>
+            <td><strong>Catálogos Institucionales</strong></td>
+            <td><span class="mod-badge badge-a">Referencia Dura</span></td>
+            <td><strong>Catálogo CUCOP:</strong> Los bienes y servicios solicitados deben vincularse forzosamente al catálogo estandarizado (CUCOP / Clasificador por Objeto del Gasto) administrado por el área de Recursos Materiales.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 11. Afectación Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
+      <p>De acuerdo a los lineamientos del <strong>Consejo Nacional de Armonización Contable (CONAC)</strong>, en la etapa de <em>Requerimiento de Adquisiciones</em> <strong>NO se genera ninguna afectación contable ni presupuestal</strong>.</p>
+      
+      <div style="background-color: var(--pjev-info-bg); border: 1px solid var(--pjev-info-borde); border-radius: 8px; padding: 16px; margin-top: 12px; font-size: 13px; color: var(--pjev-info-text);">
+        <strong>Nota Normativa:</strong> El Requerimiento es un documento de carácter puramente administrativo interno, cuyo propósito es formalizar la necesidad de un bien o servicio por parte de un Área Requirente. <br><br>
+        El primer momento contable (<strong>Presupuesto Comprometido</strong>) se detonará en etapas posteriores del flujo, específicamente al momento de emitir y autorizar el <em>Pedido o Contrato</em> derivado de la adjudicación, tal como lo marca la LGCG.
+      </div>
+    </div>
+
+    <!-- 12. Diagrama de Flujo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Diagrama Interfuncional del Procedimiento</div>
+      <p>Visualización del flujo de trabajo, responsabilidades y puntos de interacción con el sistema.</p>
+      
+
+    </div>
+
+    <!-- MODAL DIAGRAMA -->
+    <style>
+      .modal-overlay {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999;
+        align-items: center; justify-content: center;
+      }
+      .modal-overlay.active { display: flex; }
+      .modal-box {
+        background: #fff; width: 95%; max-width: 1200px; max-height: 90vh;
+        border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        display: flex; flex-direction: column; overflow: hidden;
+      }
+      .modal-header {
+        background: var(--pjev-blanco); padding: 16px 24px; border-bottom: 1px solid var(--pjev-borde);
+        display: flex; justify-content: space-between; align-items: center;
+      }
+      .modal-title { font-size: 16px; font-weight: bold; color: var(--pjev-verde-oscuro); }
+      .modal-close {
+        background: #dc2626; color: #fff; border: none; padding: 6px 12px;
+        border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;
+      }
+      .modal-close:hover { background: #b91c1c; }
+      .modal-body { padding: 24px; overflow-y: auto; background: #f8fafc; }
+      
+      @media print {
+        .modal-overlay {
+          position: static; width: auto; height: auto; background: none; display: block !important; backdrop-filter: none;
+        }
+        .modal-box { box-shadow: none; border-radius: 0; max-height: none; width: 100%; }
+        .modal-header { display: none; }
+        .modal-body { padding: 0; background: none; overflow-y: visible; }
+      }
+    </style>
+    
+    <div id="modal-diagrama" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title">Diagrama Interfuncional del Procedimiento</div>
+          <button class="modal-close" onclick="document.getElementById('modal-diagrama').classList.remove('active')">✖ Cerrar</button>
+        </div>
+        <div class="modal-body">
+          <div id="module-flowchart">
+<svg viewBox="0 0 1000 850" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff; border-radius: 8px;">
+  <defs>
+    <style>
+      .header-area { fill: #1B3A2D; }
+      .header-proceso { fill: #DEAC50; }
+      .header-siaf { fill: #1B3A2D; }
+      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; letter-spacing: 1px; }
+      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
+      .sep-line { stroke: #e5e7eb; stroke-width: 3; }
+      
+      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
+      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      
+      .node-action { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 5; ry: 5; }
+      .node-siaf { fill: #f0fdf4; stroke: #166534; stroke-width: 2; rx: 5; ry: 5; }
+      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
+      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
+
+      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
+      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
+      
+      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
+      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
+      .path-dash { stroke: #666; stroke-width: 1.5; stroke-dasharray: 5 5; fill: none; marker-end: url(#arrow-dash); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#991B1B"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/>
+    </marker>
+    <marker id="arrow-dash" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+
+  <!-- Cabeceras de Columna -->
+  <rect x="50" y="20" width="250" height="40" class="header-area"/>
+  <text x="175" y="45" class="header-text">ÁREA RESPONSABLE</text>
+  
+  <rect x="300" y="20" width="300" height="40" class="header-proceso"/>
+  <text x="450" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
+  
+  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
+  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
+
+  <!-- Líneas Divisorias -->
+  <line x1="50" y1="60" x2="50" y2="820" class="lane-line" stroke-dasharray="none"/>
+  <line x1="300" y1="60" x2="300" y2="820" class="lane-line"/>
+  <line x1="600" y1="60" x2="600" y2="820" class="lane-line"/>
+  <line x1="950" y1="60" x2="950" y2="820" class="lane-line" stroke-dasharray="none"/>
+  <line x1="50" y1="820" x2="950" y2="820" class="lane-line" stroke-dasharray="none"/>
+  
+  <!-- Divisiones de Área -->
+  <text x="75" y="300" transform="rotate(-90 75 300)" font-weight="bold" font-size="18" fill="#e5e7eb" text-anchor="middle" letter-spacing="4">UNIDAD REQUIRENTE</text>
+  <line x1="50" y1="560" x2="950" y2="560" class="sep-line"/>
+  <text x="75" y="700" transform="rotate(-90 75 700)" font-weight="bold" font-size="16" fill="#e5e7eb" text-anchor="middle" letter-spacing="3">RECURSOS MATERIALES</text>
+
+  <!-- Nodos -->
+  
+  <!-- INICIO -->
+  <rect x="135" y="80" width="80" height="25" class="node-term" />
+  <text x="175" y="96" class="node-term-text">INICIO</text>
+  <path d="M 175 105 L 175 120" class="path-line"/>
+
+  <!-- 1. Detección (Área) -->
+  <rect x="100" y="120" width="150" height="40" class="node-action" />
+  <text x="175" y="140" class="node-text">1. Detecta Necesidad</text>
+  <text x="175" y="152" class="node-sub">Recaba dictámenes</text>
+  <path d="M 250 140 L 700 140" class="path-line"/>
+
+  <!-- 1. SIAF -->
+  <rect x="700" y="120" width="150" height="40" class="node-siaf" />
+  <text x="775" y="140" class="node-text">Ingreso a 07.2.1</text>
+  <text x="775" y="152" class="node-sub">Genera Folio (Bandeja 00)</text>
+  <path d="M 775 160 L 775 190" class="path-line"/>
+
+  <!-- 2. Captura Partidas (Operativo) -->
+  <path d="M 775 190 L 775 220 L 525 220" class="path-line"/>
+  <rect x="375" y="200" width="150" height="40" class="node-action" />
+  <text x="450" y="220" class="node-text">2. Captura Partidas</text>
+  <text x="450" y="232" class="node-sub">Claves CUCOP y Montos</text>
+  <path d="M 525 220 L 710 220" class="path-line"/>
+
+  <!-- 2. Validación SIAF -->
+  <polygon points="775,190 850,220 775,250 700,220" class="node-rombo"/>
+  <text x="775" y="217" class="node-text">¿Saldo y</text>
+  <text x="775" y="229" class="node-text">Stock OK?</text>
+  
+  <path d="M 775 190 L 775 160" class="path-red"/>
+  <text x="785" y="180" font-size="10" fill="#991B1B" font-weight="bold">No</text>
+  
+  <path d="M 775 250 L 775 290" class="path-green"/>
+  <text x="785" y="275" font-size="10" fill="#166534" font-weight="bold">Sí</text>
+
+  <!-- 3. Carga de Anexos (Operativo) -->
+  <path d="M 775 300 L 525 300" class="path-line"/>
+  <rect x="375" y="280" width="150" height="40" class="node-action" />
+  <text x="450" y="300" class="node-text">3. Carga Anexos PDF</text>
+  <text x="450" y="312" class="node-sub">Digitalización Doc.</text>
+  <path d="M 525 300 L 700 300" class="path-line"/>
+
+  <!-- 3. Validación Checklist SIAF -->
+  <rect x="700" y="280" width="150" height="40" class="node-siaf" />
+  <text x="775" y="300" class="node-text">Valida Checklist</text>
+  <text x="775" y="312" class="node-sub">Requisitos Obligatorios</text>
+  <path d="M 775 320 L 775 360" class="path-line"/>
+
+  <!-- 4. Impresión Oficio (Operativo) -->
+  <path d="M 775 370 L 525 370" class="path-line"/>
+  <path d="M 375 350 L 525 350 L 525 380 C 475 400, 425 360, 375 380 Z" class="node-doc"/>
+  <text x="450" y="370" class="node-text">4. Imprime y Firma</text>
+  <text x="450" y="382" class="node-sub">Autorización Titular</text>
+  <path d="M 525 370 L 700 370" class="path-line"/>
+  
+  <!-- 4. Generación PDF SIAF -->
+  <rect x="700" y="350" width="150" height="40" class="node-siaf" />
+  <text x="775" y="370" class="node-text">Emite Documento</text>
+  <text x="775" y="382" class="node-sub">PDF Institucional Oficial</text>
+  <path d="M 775 390 L 775 430" class="path-line"/>
+
+  <!-- 5. Ejecuta Turnar (Operativo) -->
+  <path d="M 775 450 L 525 450" class="path-line"/>
+  <rect x="375" y="430" width="150" height="40" class="node-action" />
+  <text x="450" y="450" class="node-text">5. Ejecuta "Turnar"</text>
+  <text x="450" y="462" class="node-sub">Envío de Solicitud Formal</text>
+  <path d="M 525 450 L 700 450" class="path-line"/>
+
+  <!-- 5. Bandeja SIAF -->
+  <rect x="700" y="430" width="150" height="40" class="node-siaf" />
+  <text x="775" y="450" class="node-text">Bloqueo de Edición</text>
+  <text x="775" y="462" class="node-sub">Asigna Bandeja = 01</text>
+  <path d="M 775 470 L 775 510" class="path-line"/>
+
+  <!-- Pasamos a la división de Recursos Materiales -->
+  <!-- 6. Recepción y Revisión (Área RM) -->
+  <path d="M 775 520 L 775 600 L 250 600" class="path-line"/>
+  <rect x="100" y="580" width="150" height="40" class="node-action" />
+  <text x="175" y="600" class="node-text">6. Recepción y Revisión</text>
+  <text x="175" y="612" class="node-sub">Mesa de Control RM</text>
+  <path d="M 250 600 L 710 600" class="path-line"/>
+
+  <!-- 6. Validación de Trámite SIAF -->
+  <polygon points="775,570 850,600 775,630 700,600" class="node-rombo"/>
+  <text x="775" y="597" class="node-text">¿Trámite</text>
+  <text x="775" y="609" class="node-text">Correcto?</text>
+
+  <!-- Regreso a 00 -->
+  <path d="M 850 600 L 920 600 L 920 180 L 775 180" class="path-red"/>
+  <text x="870" y="590" font-size="10" fill="#991B1B" font-weight="bold">No (Regresar)</text>
+
+  <!-- Turno a 02 (Suficiencia) -->
+  <path d="M 775 630 L 775 670" class="path-green"/>
+  <text x="785" y="655" font-size="10" fill="#166534" font-weight="bold">Sí (Turnar)</text>
+  
+  <rect x="700" y="670" width="150" height="40" class="node-siaf" />
+  <text x="775" y="690" class="node-text">Cambio de Estatus</text>
+  <text x="775" y="702" class="node-sub">Asigna Bandeja = 02</text>
+  <path d="M 775 710 L 775 750" class="path-line"/>
+  <path d="M 850 690 L 900 690 L 900 750" class="path-dash"/>
+
+  <!-- FIN -->
+  <rect x="735" y="750" width="80" height="25" class="node-term" />
+  <text x="775" y="766" class="node-term-text">FIN</text>
+  
+  <rect x="850" y="750" width="100" height="40" class="node-action" stroke="#666" stroke-dasharray="2 2" fill="#fafafa"/>
+  <text x="900" y="770" class="node-sub">Inicia Flujo</text>
+  <text x="900" y="782" class="node-sub">07.2.2 (Suficiencia)</text>
+
+</svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL FLUJOGRAMA Y DESCRIPCIÓN -->
+    <div id="modal-proceso" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title">Flujograma de Procesos y Descripción</div>
+          <button class="modal-close" onclick="document.getElementById('modal-proceso').classList.remove('active')">✖ Cerrar</button>
+        </div>
+        <div class="modal-body">
+          <div class="doc-section" id="module-process-table" style="border:none; padding:0; background:none;">
+            <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 15px;">Anexo 2: Tabla Descriptiva del Procedimiento</h3>
+            <table class="props-table">
+              <thead>
+                <tr style="background: var(--pjev-verde-oscuro); color: white;">
+                  <th style="color:white; width: 15%;">ÁREA RESPONSABLE</th>
+                  <th style="color:white; width: 15%;">PASO / ETAPA</th>
+                  <th style="color:white; width: 35%;">PROCESO OPERATIVO</th>
+                  <th style="color:white; width: 35%;">SIAF-PJEV</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Unidad Requirente</strong><br><span style="font-size:10px; color:#666;">(Usuario Solicitante)</span></td>
+                  <td><strong>1. Detección de Necesidad e Ingreso</strong></td>
+                  <td>Identifica la necesidad de adquirir bienes o contratar servicios de acuerdo a su Programa Operativo Anual (POA). Reúne cotizaciones previas, fichas técnicas y dictámenes de viabilidad (ej. DGT para tecnología).</td>
+                  <td>El usuario ingresa al módulo <code>07.2.1</code> y da clic en "Nuevo Requerimiento". El sistema inicializa un folio temporal y coloca el registro en <strong>Bandeja 00 (Borrador)</strong>.</td>
+                </tr>
+                <tr>
+                  <td><strong>Unidad Requirente</strong><br><span style="font-size:10px; color:#666;">(Usuario Solicitante)</span></td>
+                  <td><strong>2. Captura de Partidas (Suficiencia Previa)</strong></td>
+                  <td>Ingresa el detalle exacto de lo que se desea comprar (Clave CUCOP, partida presupuestal, cantidad, precio unitario estimado, descripción detallada).</td>
+                  <td>El sistema valida en tiempo real con <strong>Presupuestos</strong> que el Centro de Costo cuente con saldo disponible. También valida contra <strong>Almacén</strong> si existe stock para surtirlo directamente. Bloquea la captura si se superan los techos financieros.</td>
+                </tr>
+                <tr>
+                  <td><strong>Unidad Requirente</strong><br><span style="font-size:10px; color:#666;">(Usuario Solicitante)</span></td>
+                  <td><strong>3. Carga de Anexos (Checklist)</strong></td>
+                  <td>Digitaliza y carga en formato PDF todos los documentos comprobatorios exigidos por la normatividad estatal según el tipo de adjudicación proyectada.</td>
+                  <td>Activa el modal interactivo de <em>Checklist Documental</em>. El sistema no permite turnar el requerimiento hasta que los documentos marcados como "Obligatorios" hayan sido subidos (check verde).</td>
+                </tr>
+                <tr>
+                  <td><strong>Unidad Requirente</strong><br><span style="font-size:10px; color:#666;">(Titular del Área)</span></td>
+                  <td><strong>4. Autorización y Firma</strong></td>
+                  <td>El Titular del Área revisa que la solicitud sea correcta, imprime el Oficio de Requerimiento generado por el sistema y lo firma de forma autógrafa o mediante FIEL (Firma Electrónica).</td>
+                  <td>Genera el formato de control impreso (Jasper/PDF) congelando los montos temporales y emitiendo el documento oficial con códigos de barras y sellos institucionales.</td>
+                </tr>
+                <tr>
+                  <td><strong>Unidad Requirente</strong><br><span style="font-size:10px; color:#666;">(Usuario Solicitante)</span></td>
+                  <td><strong>5. Turno a Recursos Materiales</strong></td>
+                  <td>Ejecuta la acción de envío dentro del sistema para hacer llegar la solicitud formalmente a las oficinas centrales de Recursos Materiales.</td>
+                  <td>Cambia el Estatus del documento a <strong>Bandeja 01 (Recepción RM)</strong>, bloquea la edición del formulario e inserta el registro de trazabilidad en la Bitácora de Historial.</td>
+                </tr>
+                <tr>
+                  <td><strong>Recursos Materiales</strong><br><span style="font-size:10px; color:#666;">(Mesa de Control)</span></td>
+                  <td><strong>6. Recepción y Revisión Inicial</strong></td>
+                  <td>Recibe la notificación del nuevo requerimiento. Analiza la petición, verifica que los PDFs adjuntos sean legibles y concuerden con las partidas solicitadas.</td>
+                  <td>Permite visualización de solo lectura. Si todo es correcto, habilita el turno a <strong>Bandeja 02 (Suficiencia Presupuestal)</strong>. Si hay errores, permite usar el botón "Regresar" para devolverlo a Bandeja 00 con observaciones.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

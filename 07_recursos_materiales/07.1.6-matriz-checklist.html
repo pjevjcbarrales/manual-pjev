@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.1.6 Configuración de Matriz (Checklists)</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+  
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  
+  .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; }
+  .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .sp-panel { display: none; }
+  .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Recursos Materiales</span> ›
+      <span>Catálogos</span> ›
+      <span>07.1.6 Matriz Checklists</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">07.1.6</div>
+        <h1 class="elem-title">Configuración de Matriz (Checklists)</h1>
+        <p class="elem-desc">Motor de configuración dinámica que asocia una Modalidad de Compra con los N Documentos Requisito exigibles normativamente.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-c">Tipo: Formulario Puente (Asignación Múltiple)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>A diferencia de los catálogos simples, esta "Matriz" sirve para enlazar registros. Cuando el usuario operativo crea un nuevo Requerimiento y le asigna la modalidad "Licitación Pública", el sistema leerá de esta matriz exactamente cuáles documentos PDF le va a exigir adjuntar en el expediente. Es el puente entre el catálogo 07.1.4 y el 07.1.5.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <ul>
+        <li><strong>Políticas y Bases de Adquisiciones:</strong> Define explícitamente qué papeles integran el expediente único para cada procedimiento.</li>
+      </ul>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Rol</th>
+            <th>Acción permitida</th>
+            <th>Restricción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Administrador de Catálogos (RM)</td>
+            <td>Asignar y desasignar documentos a una modalidad.</td>
+            <td>No puede desasignar un documento si existe un requerimiento "En Trámite" que depende de esa regla.</td>
+          </tr>
+          <tr>
+            <td>Órgano Interno de Control</td>
+            <td>Auditoría de cambios (Solo vista).</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Tabla: <strong><code>materiales.cat_matriz_checklist</code></strong></p>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id_matriz</code></td><td><code>SERIAL (PK)</code></td><td>Identificador único del cruce.</td></tr>
+          <tr><td><code>id_modalidad</code> <span class="badge-req">REQ</span></td><td><code>INT (FK)</code></td><td>Llave foránea hacia <code>cat_modalidades</code>.</td></tr>
+          <tr><td><code>id_documento</code> <span class="badge-req">REQ</span></td><td><code>INT (FK)</code></td><td>Llave foránea hacia <code>cat_documentos_requisito</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_matriz</button>
+        <button class="sp-tab" onclick="showSP('sp2',this)">fn_guardar_matriz</button>
+      </div>
+
+      <!-- TAB 1: LEER -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_id_modalidad</code></td><td><code>INT</code></td><td>ID de la modalidad sobre la cual se buscarán los documentos asignados.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- Función para leer la configuración</span>
+CREATE OR REPLACE FUNCTION materiales.fn_leer_matriz(
+    p_id_modalidad integer
+) RETURNS jsonb LANGUAGE plpgsql AS $$
+DECLARE v_resultado jsonb;
+BEGIN
+    SELECT jsonb_build_object('asignados', COALESCE(jsonb_agg(row_to_json(m)), '[]'::jsonb)) INTO v_resultado
+    FROM materiales.cat_matriz_checklist m
+    JOIN materiales.cat_documentos_requisito d ON m.id_documento = d.id_documento
+    WHERE m.id_modalidad = p_id_modalidad
+      AND d.estatus_registro = 1;
+
+    RETURN jsonb_build_object('cod_resultado', 0, 'msg_resultado', 'OK', 'data', v_resultado);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('cod_resultado', -1, 'msg_resultado', SQLERRM);
+END;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: GUARDAR -->
+      <div id="sp-sp2" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_id_modalidad</code></td><td><code>INT</code></td><td>ID de la modalidad maestra.</td></tr>
+            <tr><td><code>@p_json_documentos</code></td><td><code>JSONB</code></td><td>Arreglo de enteros <code>[1, 5, 8]</code> representando los IDs de los documentos chequeados.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- Función para guardado masivo (Reemplazo total por modalidad)</span>
+CREATE OR REPLACE FUNCTION materiales.fn_guardar_matriz(
+    p_id_modalidad integer,
+    p_json_documentos jsonb
+) RETURNS jsonb LANGUAGE plpgsql AS $$
+DECLARE 
+    v_doc_id integer;
+BEGIN
+    -- 1. Borrar asignaciones anteriores para esta modalidad
+    DELETE FROM materiales.cat_matriz_checklist WHERE id_modalidad = p_id_modalidad;
+    
+    -- 2. Insertar las nuevas basado en el arreglo JSON de checkboxes
+    FOR v_doc_id IN SELECT value::integer FROM jsonb_array_elements_text(p_json_documentos)
+    LOOP
+        INSERT INTO materiales.cat_matriz_checklist (id_modalidad, id_documento)
+        VALUES (p_id_modalidad, v_doc_id);
+    END LOOP;
+
+    RETURN jsonb_build_object('cod_resultado', 0, 'msg_resultado', 'Matriz actualizada correctamente');
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('cod_resultado', -1, 'msg_resultado', SQLERRM);
+END;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST (Endpoints)</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="method get">GET</span></td>
+            <td><code>/materiales/matriz-checklist/:id_modalidad</code></td>
+            <td><code>URL Param: id_modalidad</code></td>
+            <td>Devuelve los IDs de los documentos vinculados a esa modalidad.</td>
+          </tr>
+          <tr>
+            <td><span class="method post">POST</span></td>
+            <td><code>/materiales/matriz-checklist</code></td>
+            <td><code>{ "id_modalidad": 2, "documentos": [1, 3, 5] }</code></td>
+            <td>Borra las asignaciones previas de la Modalidad 2 y guarda la nueva configuración de arreglo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <ul>
+        <li><strong>Carga Dinámica de Checkboxes:</strong> Al seleccionar una modalidad del combobox, el sistema hace <i>fetch</i> de todos los documentos y palomea los que estén guardados.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">Interfaz Compuesta de Asignación</button>
+      </div>
+
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Asignación por Checkboxes</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 400" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="400" fill="#fcfcfc" stroke="#ddd" rx="4"/>
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Configuración de Matriz Checklist</text>
+              
+              <rect x="20" y="50" width="760" height="70" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="40" y="75" font-size="12" font-weight="bold" fill="#1B3A2D">1. Selecciona la Modalidad a configurar:</text>
+              <rect x="40" y="85" width="300" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/>
+              <text x="50" y="102" font-size="11" fill="#333">Licitación Pública Nacional ▼</text>
+
+              <text x="40" y="150" font-size="12" font-weight="bold" fill="#1B3A2D">2. Documentos exigibles para esta modalidad:</text>
+              
+              <rect x="40" y="160" width="720" height="180" fill="#fff" stroke="#eee" rx="4"/>
+              
+              <!-- Checkbox Item 1 -->
+              <rect x="50" y="175" width="14" height="14" fill="#1B3A2D" rx="2"/>
+              <path d="M 53 182 L 56 186 L 62 178" fill="none" stroke="#fff" stroke-width="2"/>
+              <text x="75" y="187" font-size="12" fill="#333">Oficio de Suficiencia Presupuestal</text>
+              
+              <!-- Checkbox Item 2 -->
+              <rect x="50" y="205" width="14" height="14" fill="#1B3A2D" rx="2"/>
+              <path d="M 53 212 L 56 216 L 62 208" fill="none" stroke="#fff" stroke-width="2"/>
+              <text x="75" y="217" font-size="12" fill="#333">Anexo Técnico</text>
+
+              <!-- Checkbox Item 3 (Unchecked) -->
+              <rect x="50" y="235" width="14" height="14" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="75" y="247" font-size="12" fill="#333">Cotización Proveedor 1 (Solo ADJ)</text>
+
+              <!-- Checkbox Item 4 -->
+              <rect x="50" y="265" width="14" height="14" fill="#1B3A2D" rx="2"/>
+              <path d="M 53 272 L 56 276 L 62 268" fill="none" stroke="#fff" stroke-width="2"/>
+              <text x="75" y="277" font-size="12" fill="#333">Dictamen de Adjudicación</text>
+
+              <rect x="660" y="355" width="100" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="710" y="375" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Guardar Config.</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Especiales</div>
+      <p>El guardado masivo (Reemplazo total) es la estrategia recomendada por simplicidad en el FrontEnd. Se eliminan todas las configuraciones para la modalidad seleccionada y se reinsertan los IDs checkeados actualmente en pantalla.</p>
+    </div>
+
+    <!-- 10. Validaciones de Interfaz -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Validaciones de Interfaz</div>
+      <ul>
+        <li>Validar que exista al menos 1 documento seleccionado antes de guardar.</li>
+        <li>Si el usuario cambia de Modalidad en el Combobox y tiene cambios sin guardar en los checkboxes, advertirle antes de refrescar los datos.</li>
+      </ul>
+    </div>
+
+    <!-- 11. Reportes y Salidas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Reportes y Salidas Físicas</div>
+      <p>No aplica.</p>
+    </div>
+
+    <!-- 12. Notificaciones y Alertas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Notificaciones y Alertas</div>
+      <p>Toasts estándar de éxito o error al guardar configuración.</p>
+    </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

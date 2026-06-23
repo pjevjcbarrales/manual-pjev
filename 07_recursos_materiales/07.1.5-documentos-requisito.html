@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.1.5 Catálogo de Documentos (Requisitos)</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.patch  { background:#fff8e1; color:#795548; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  
+  .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-gris-borde); margin-bottom: 15px; }
+  .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .sp-panel { display: none; }
+  .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Inicio</a> ›
+      <span>Recursos Materiales</span> ›
+      <span>Catálogos</span> ›
+      <span>07.1.5 Documentos</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">07.1.5</div>
+        <h1 class="elem-title">Catálogo de Documentos (Requisitos)</h1>
+        <p class="elem-desc">Diccionario maestro de los posibles anexos, oficios y formatos exigibles durante un proceso de adquisición.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Modo A — Catálogo Simple</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Este catálogo sirve como la base de datos centralizada de todos los tipos de documentos (Ej. "Anexo Técnico", "Cuadro Comparativo", "Estudio de Mercado", "Dictamen de Excepción") que pueden formar parte del <em>Checklist</em> documental de un requerimiento. Posteriormente, en la Matriz de Checklists, estos documentos se enlazarán a las distintas modalidades de compra.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <ul>
+        <li><strong>Control Interno:</strong> Establece la necesidad de integrar y resguardar expedientes documentales completos como soporte de cualquier erogación de recursos públicos (Auditoría).</li>
+      </ul>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Rol</th>
+            <th>Acción permitida</th>
+            <th>Restricción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Administrador de Catálogos (RM)</td>
+            <td>Alta, baja, cambio y consulta.</td>
+            <td>La baja lógica ocultará el documento de configuraciones futuras de checklists, pero persistirá en los requerimientos históricos que ya lo hayan utilizado.</td>
+          </tr>
+          <tr>
+            <td>Analista RM</td>
+            <td>Solo consulta.</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Tabla: <strong><code>materiales.cat_documentos_requisito</code></strong></p>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id_documento</code></td><td><code>SERIAL (PK)</code></td><td>Identificador único del requisito.</td></tr>
+          <tr><td><code>nombre_documento</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(255)</code></td><td>Nombre del anexo (Ej. 'Estudio de Mercado').</td></tr>
+          <tr><td><code>es_obligatorio</code> <span class="badge-req">REQ</span></td><td><code>BOOLEAN</code></td><td>Define si, por defecto, el sistema lo marcará como ineludible (True) o como anexo opcional (False).</td></tr>
+          <tr><td><code>estatus_registro</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>Baja lógica (1=Activo, 0=Inactivo).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_documentos_req</button>
+        <button class="sp-tab" onclick="showSP('sp2',this)">fn_abc_documentos_req</button>
+      </div>
+
+      <!-- TAB 1: LEER -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_id_documento</code></td><td><code>INT</code></td><td>Null/0 para listado, >0 para registro único.</td></tr>
+            <tr><td><code>@p_busqueda</code></td><td><code>VARCHAR</code></td><td>Filtro opcional.</td></tr>
+            <tr><td><code>@p_estatus</code></td><td><code>INT</code></td><td>Filtro de baja lógica.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- Función para lectura</span>
+CREATE OR REPLACE FUNCTION materiales.fn_leer_documentos_req(
+    p_id_documento integer DEFAULT NULL,
+    p_busqueda varchar DEFAULT NULL,
+    p_estatus integer DEFAULT 1
+) RETURNS jsonb LANGUAGE plpgsql AS $$
+DECLARE v_resultado jsonb;
+BEGIN
+    IF p_id_documento > 0 THEN
+        SELECT row_to_json(t) INTO v_resultado 
+        FROM materiales.cat_documentos_requisito t 
+        WHERE t.id_documento = p_id_documento;
+    ELSE
+        SELECT jsonb_build_object('registros', COALESCE(jsonb_agg(row_to_json(l)), '[]'::jsonb)) INTO v_resultado
+        FROM materiales.cat_documentos_requisito l
+        WHERE (p_busqueda IS NULL OR l.nombre_documento ILIKE '%' || p_busqueda || '%')
+          AND (p_estatus IS NULL OR l.estatus_registro = p_estatus);
+    END IF;
+    RETURN jsonb_build_object('cod_resultado', 0, 'msg_resultado', 'OK', 'data', v_resultado);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('cod_resultado', -1, 'msg_resultado', SQLERRM);
+END;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: ABC -->
+      <div id="sp-sp2" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Alta, 2: Modificación, 3: Baja Lógica</td></tr>
+            <tr><td><code>@p_id_documento</code></td><td><code>INT</code></td><td>Requerido para accion 2 y 3.</td></tr>
+            <tr><td><code>@p_nombre_documento</code></td><td><code>VARCHAR</code></td><td>Nombre del anexo.</td></tr>
+            <tr><td><code>@p_es_obligatorio</code></td><td><code>BOOLEAN</code></td><td>Switch de obligatoriedad base.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#5c6370;">-- Función para ABC</span>
+CREATE OR REPLACE FUNCTION materiales.fn_abc_documentos_req(
+    p_accion integer,
+    p_id_documento integer DEFAULT NULL,
+    p_nombre_documento varchar DEFAULT NULL,
+    p_es_obligatorio boolean DEFAULT true
+) RETURNS jsonb LANGUAGE plpgsql AS $$
+DECLARE v_id integer;
+BEGIN
+    IF p_accion = 1 THEN
+        INSERT INTO materiales.cat_documentos_requisito (nombre_documento, es_obligatorio, estatus_registro)
+        VALUES (p_nombre_documento, p_es_obligatorio, 1) RETURNING id_documento INTO v_id;
+    ELSIF p_accion = 2 THEN
+        UPDATE materiales.cat_documentos_requisito 
+        SET nombre_documento = p_nombre_documento, es_obligatorio = p_es_obligatorio
+        WHERE id_documento = p_id_documento;
+        v_id := p_id_documento;
+    ELSIF p_accion = 3 THEN
+        UPDATE materiales.cat_documentos_requisito SET estatus_registro = 0
+        WHERE id_documento = p_id_documento;
+        v_id := p_id_documento;
+    END IF;
+    RETURN jsonb_build_object('cod_resultado', 0, 'msg_resultado', 'Guardado correctamente', 'data', jsonb_build_object('id_documento', v_id));
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('cod_resultado', -1, 'msg_resultado', SQLERRM);
+END;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST (Endpoints)</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="method get">GET</span></td>
+            <td><code>/materiales/documentos-requisito</code></td>
+            <td><code>?q=...</code></td>
+            <td>Lista de documentos.</td>
+          </tr>
+          <tr>
+            <td><span class="method post">POST</span></td>
+            <td><code>/materiales/documentos-requisito</code></td>
+            <td><code>{ "nombre": "...", "obligatorio": true }</code></td>
+            <td>Alta.</td>
+          </tr>
+          <tr>
+            <td><span class="method put">PUT</span></td>
+            <td><code>/materiales/documentos-requisito/:id</code></td>
+            <td><code>{ "nombre": "...", "obligatorio": true }</code></td>
+            <td>Modificación.</td>
+          </tr>
+          <tr>
+            <td><span class="method delete">DELETE</span></td>
+            <td><code>/materiales/documentos-requisito/:id</code></td>
+            <td>—</td>
+            <td>Baja lógica.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+      <ul>
+        <li><strong>Configuración del Diccionario:</strong> Provee el catálogo fuente del cual se armarán los checklists dinámicos de los requerimientos.</li>
+      </ul>
+    </div>
+
+    <!-- 8. Diseño de Interfaces (UI) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Parámetros)</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Valores)</button>
+        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc (Valores)</button>
+      </div>
+
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">pantalla_leer (Parámetros)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 300" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="300" fill="#fcfcfc" stroke="#ddd" rx="4"/>
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Catálogo de Documentos</text>
+              <rect x="650" y="15" width="130" height="25" fill="#1B3A2D" rx="4"/>
+              <text x="715" y="32" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">+ Nuevo Documento</text>
+              <rect x="20" y="50" width="760" height="40" fill="#fff" stroke="#ccc" rx="4"/>
+              <text x="30" y="75" font-size="11" fill="#0284c7">@p_busqueda</text>
+              <rect x="20" y="100" width="760" height="150" fill="#fff" stroke="#ccc" rx="4"/>
+              <rect x="20" y="100" width="760" height="30" fill="#f8fafc"/>
+              <text x="35" y="120" font-size="10" font-weight="bold" fill="#666">ID</text>
+              <text x="100" y="120" font-size="10" font-weight="bold" fill="#666">NOMBRE DEL DOCUMENTO</text>
+              <text x="500" y="120" font-size="10" font-weight="bold" fill="#666">OBLIGATORIO</text>
+              <text x="600" y="120" font-size="10" font-weight="bold" fill="#666">ESTADO</text>
+              <text x="700" y="120" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
+              <text x="35" y="150" font-size="11" fill="#0284c7">{id}</text>
+              <text x="100" y="150" font-size="11" fill="#0284c7">{nombre_documento}</text>
+              <text x="500" y="150" font-size="11" fill="#0284c7">{es_obligatorio}</text>
+              <text x="600" y="150" font-size="11" fill="#0284c7">{estatus}</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">pantalla_leer (Valores)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 300" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="300" fill="#fcfcfc" stroke="#ddd" rx="4"/>
+              <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Catálogo de Documentos</text>
+              <rect x="650" y="15" width="130" height="25" fill="#1B3A2D" rx="4"/>
+              <text x="715" y="32" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">+ Nuevo Documento</text>
+              <rect x="20" y="50" width="760" height="40" fill="#fff" stroke="#ccc" rx="4"/>
+              <rect x="20" y="100" width="760" height="150" fill="#fff" stroke="#ccc" rx="4"/>
+              <rect x="20" y="100" width="760" height="30" fill="#f8fafc"/>
+              <text x="35" y="120" font-size="10" font-weight="bold" fill="#666">ID</text>
+              <text x="100" y="120" font-size="10" font-weight="bold" fill="#666">NOMBRE DEL DOCUMENTO</text>
+              <text x="500" y="120" font-size="10" font-weight="bold" fill="#666">OBLIGATORIO</text>
+              <text x="600" y="120" font-size="10" font-weight="bold" fill="#666">ESTADO</text>
+              <text x="700" y="120" font-size="10" font-weight="bold" fill="#666">ACCIONES</text>
+              <rect x="20" y="130" width="760" height="30" fill="#fff" stroke="#eee"/>
+              <text x="35" y="150" font-size="11" fill="#333">1</text>
+              <text x="100" y="150" font-size="11" fill="#333">Estudio de Mercado</text>
+              <rect x="495" y="138" width="30" height="16" fill="#f1f5f9" rx="4"/><text x="510" y="150" font-size="10" fill="#334155" text-anchor="middle">SÍ</text>
+              <rect x="590" y="138" width="50" height="16" fill="#dcfce7" rx="8"/><text x="615" y="150" font-size="9" fill="#166534" text-anchor="middle">ACTIVO</text>
+              <text x="700" y="150" font-size="11" fill="#1B3A2D">✏️ 🗑️</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div id="wf-p3" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">pantalla_abc (Valores)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 250" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="250" fill="#000" opacity="0.3"/>
+              <rect x="150" y="30" width="500" height="180" fill="#fff" rx="6"/>
+              <text x="170" y="60" font-size="16" font-weight="bold" fill="#183125">Editar Documento</text>
+              <line x1="150" y1="75" x2="650" y2="75" stroke="#eee"/>
+              <text x="170" y="100" font-size="12" fill="#5a5a5a">Nombre del Anexo *</text>
+              <rect x="170" y="110" width="300" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+              <text x="180" y="130" font-size="11" fill="#333">Estudio de Mercado</text>
+              
+              <text x="490" y="100" font-size="12" fill="#5a5a5a">¿Es Obligatorio base?</text>
+              <!-- Switch toggle on -->
+              <rect x="490" y="115" width="40" height="20" fill="#1B3A2D" rx="10"/>
+              <circle cx="520" cy="125" r="8" fill="#fff"/>
+
+              <rect x="530" y="160" width="100" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="580" y="180" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Guardar</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Reglas de Negocio -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Especiales</div>
+      <p>No aplican reglas matemáticas complejas. Unicidad obligatoria del nombre del documento.</p>
+    </div>
+
+    <!-- 10. Validaciones de Interfaz -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Validaciones de Interfaz</div>
+      <p>Input text validado contra caracteres extraños que pudieran afectar la generación dinámica de carpetas o nombres de archivos PDF en un futuro.</p>
+    </div>
+
+    <!-- 11. Reportes y Salidas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Reportes y Salidas Físicas</div>
+      <p>No aplica.</p>
+    </div>
+
+    <!-- 12. Notificaciones y Alertas -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Notificaciones y Alertas</div>
+      <p>Toasts estándar de éxito o error.</p>
+    </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

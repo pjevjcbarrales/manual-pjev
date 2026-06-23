@@ -1437,55 +1437,64 @@ const pmData = {
         },
         {
             "id": "07.2.1",
+            "nombre": "Requerimientos de adquisiciones",
+            "desarrollador_asignado": "Sin asignar",
+            "avance_desarrollo": 0,
+            "iteracion_desarrollo": 0,
+            "tipo_formulario": "Compuesto",
+            "visitas": []
+        },
+        {
+            "id": "07.2.2",
             "nombre": "Suficiencia Presupuestal",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
         },
         {
-            "id": "07.2.2.1",
+            "id": "07.2.3.1",
             "nombre": "Adjudicación Directa",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
         },
         {
-            "id": "07.2.2.2",
+            "id": "07.2.3.2",
             "nombre": "Invitación < 3",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
         },
         {
-            "id": "07.2.2.3",
+            "id": "07.2.3.3",
             "nombre": "Licitación",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
         },
         {
-            "id": "07.2.3.1",
+            "id": "07.2.4.1",
             "nombre": "Pedido",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
         },
         {
-            "id": "07.2.3.2",
+            "id": "07.2.4.2",
             "nombre": "Contrato",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
         },
         {
-            "id": "07.2.3.3",
+            "id": "07.2.4.3",
             "nombre": "Servicio",
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
         },
         {
-            "id": "07.2.4.1",
+            "id": "07.2.5.1",
             "nombre": "Registro de Factura",
             "estado": "Pendiente",
             "programador": "Backend Developer",
