@@ -76,6 +76,9 @@
     <div class="doc-section">
       <div class="section-title"><span class="section-num">1</span> Descripción General</div>
       <p>La opción de <strong>Suficiencia Presupuestal</strong> es el primer eslabón obligatorio en la cadena de suministros del Poder Judicial. Permite al área de Recursos Materiales consultar en tiempo real el saldo de las partidas presupuestales (COG) solicitadas por las Unidades Administrativas. Su objetivo principal es asegurar que exista dinero líquido disponible antes de firmar cualquier pedido o contrato, separando los fondos de manera preventiva.</p>
+      <div style="background: var(--pjev-info-bg); border-left: 4px solid var(--pjev-info-borde); padding: 12px; margin: 15px 0; font-size: 13px; color: var(--pjev-info-text);">
+        <strong>Nota Arquitectónica (Estructura Programática):</strong> El presupuesto del PJEV se clasifica estrictamente bajo la estructura: <em>Organización, Función, Programa, Subprograma y Proyecto</em>. Esta relación jerárquica es la base común que debe prevalecer en toda la aplicación (BD, Backend y Frontend). Ningún módulo, incluido éste, puede operar fuera de esta estructura.
+      </div>
       <p>Si la partida cuenta con saldo suficiente, se genera un trámite de <strong>Confirmación</strong>. Si el saldo es insuficiente en el mes actual pero existe en meses futuros, se solicita una <strong>Recalendarización</strong>. Si no existe saldo anual, se solicita una <strong>Transferencia</strong> o <strong>Apertura</strong> de partida.</p>
     </div>
 
@@ -142,7 +145,11 @@
           <tr><td><code>fecha_solicitud</code></td><td><code>DATETIME</code></td><td>Fecha de creación de la solicitud.</td></tr>
           
           <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">DATOS GENERALES</td></tr>
-          <tr><td><code>id_centro_costo</code></td><td><code>INT FK</code></td><td>Unidad Administrativa (UA) que solicita.</td></tr>
+          <tr><td><code>id_centro_costo</code></td><td><code>INT FK</code></td><td>Estructura Programática: Organización (Centro de Costos).</td></tr>
+          <tr><td><code>id_funcion</code></td><td><code>INT FK</code></td><td>Estructura Programática: Función.</td></tr>
+          <tr><td><code>id_programa</code></td><td><code>INT FK</code></td><td>Estructura Programática: Programa.</td></tr>
+          <tr><td><code>id_subprograma</code></td><td><code>INT FK</code></td><td>Estructura Programática: Subprograma.</td></tr>
+          <tr><td><code>id_proyecto</code></td><td><code>INT FK</code></td><td>Estructura Programática: Proyecto.</td></tr>
           <tr><td><code>monto_total</code></td><td><code>NUMERIC(18,2)</code></td><td>Suma total del requerimiento.</td></tr>
           <tr><td><code>concepto</code></td><td><code>VARCHAR(500)</code></td><td>Justificación de la suficiencia.</td></tr>
           <tr><td><code>id_tiposuficiencia</code></td><td><code>INT FK</code></td><td>Tipo de trámite (Confirmación, Transferencia, Recalendarización, Apertura).</td></tr>
@@ -168,18 +175,11 @@
           <tr><td><code>id_detalle</code></td><td><code>INT PK</code></td><td>Identificador de la afectación.</td></tr>
           <tr><td><code>id_suficiencia</code></td><td><code>INT FK</code></td><td>Vinculación a la cabecera.</td></tr>
           <tr><td><code>cve_partida_cog</code></td><td><code>VARCHAR(10)</code></td><td>Partida del gasto (Ej. 3614).</td></tr>
-          <tr><td><code>monto_enero</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Enero.</td></tr>
-          <tr><td><code>monto_febrero</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Febrero.</td></tr>
-          <tr><td><code>monto_marzo</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Marzo.</td></tr>
-          <tr><td><code>monto_abril</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Abril.</td></tr>
-          <tr><td><code>monto_mayo</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Mayo.</td></tr>
-          <tr><td><code>monto_junio</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Junio.</td></tr>
-          <tr><td><code>monto_julio</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Julio.</td></tr>
-          <tr><td><code>monto_agosto</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Agosto.</td></tr>
-          <tr><td><code>monto_septiembre</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Septiembre.</td></tr>
-          <tr><td><code>monto_octubre</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Octubre.</td></tr>
-          <tr><td><code>monto_noviembre</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Noviembre.</td></tr>
-          <tr><td><code>monto_diciembre</code></td><td><code>NUMERIC(18,2)</code></td><td>Calendarización para el mes de Diciembre.</td></tr>
+          <tr><td><code>descripcion_bien</code></td><td><code>VARCHAR(500)</code></td><td>Descripción del bien o servicio requerido.</td></tr>
+          <tr><td><code>unidad_medida</code></td><td><code>VARCHAR(50)</code></td><td>Unidad de medida (Ej. Pieza, Lote, Servicio).</td></tr>
+          <tr><td><code>cantidad</code></td><td><code>DECIMAL(10,2)</code></td><td>Cantidad solicitada.</td></tr>
+          <tr><td><code>precio_unitario</code></td><td><code>NUMERIC(18,2)</code></td><td>Precio unitario estimado.</td></tr>
+          <tr><td><code>monto_total</code></td><td><code>NUMERIC(18,2)</code></td><td>Importe total estimado (cantidad * precio_unitario).</td></tr>
 
           <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">AUDITORÍA (COLUMNAS POR DEFECTO)</td></tr>
           <tr><td><code>fecha_registro</code></td><td><code>DATETIME</code></td><td>Fecha de inserción de la partida.</td></tr>
@@ -224,7 +224,6 @@
           <tbody>
             <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio. Ejercicio fiscal activo.</td></tr>
             <tr><td><code>@p_id_suficiencia</code></td><td><code>INT</code></td><td>Opcional. Leer un registro específico.</td></tr>
-            <tr><td><code>@p_id_centro_costo</code></td><td><code>INT</code></td><td>Opcional. Filtrar por Unidad requirente.</td></tr>
             <tr><td><code>@p_fecha_inicio</code></td><td><code>DATE</code></td><td>Opcional. Fecha de solicitud Inicial.</td></tr>
             <tr><td><code>@p_fecha_fin</code></td><td><code>DATE</code></td><td>Opcional. Fecha de solicitud Final.</td></tr>
             <tr><td><code>@p_folio_solicitud</code></td><td><code>VARCHAR</code></td><td>Opcional. Búsqueda por Oficio de solicitud.</td></tr>
@@ -239,10 +238,10 @@
           <tbody>
             <tr><td><code>{id_suficiencia}</code></td><td><code>INT</code></td><td>ID único de la Fase 1.</td></tr>
             <tr><td><code>{folio_solicitud}</code></td><td><code>VARCHAR</code></td><td>Folio de petición (Ej. RM-SUF-...).</td></tr>
+            <tr><td><code>{id_centro_costo}...{id_proyecto}</code></td><td><code>INT</code></td><td>Estructura Programática.</td></tr>
             <tr><td><code>{fecha_solicitud}</code></td><td><code>DATETIME</code></td><td>Fecha de captura en RM.</td></tr>
             <tr><td><code>{folio_oficio_reserva}</code></td><td><code>VARCHAR</code></td><td>Oficio de autorización financiera (Fase 2).</td></tr>
             <tr><td><code>{fecha_autorizacion}</code></td><td><code>DATETIME</code></td><td>Fecha en que Finanzas congeló el recurso.</td></tr>
-            <tr><td><code>{id_centro_costo}</code></td><td><code>INT</code></td><td>Unidad Administrativa asociada.</td></tr>
             <tr><td><code>{concepto}</code></td><td><code>VARCHAR</code></td><td>Justificación de la adquisición.</td></tr>
             <tr><td><code>{monto_total}</code></td><td><code>DECIMAL</code></td><td>Importe total amparado.</td></tr>
             <tr><td><code>{id_contrato_origen}</code></td><td><code>INT</code></td><td>Vínculo con contrato previo (si aplica).</td></tr>
@@ -275,7 +274,7 @@
         <span style="color:#c678dd;">SELECT</span> 
             m.id_suficiencia, m.folio_solicitud, m.fecha_solicitud, 
             p.folio_oficio_reserva, p.fecha_autorizacion,
-            m.id_centro_costo, m.concepto, m.monto_total, 
+            m.id_centro_costo, m.id_funcion, m.id_programa, m.id_subprograma, m.id_proyecto, m.concepto, m.monto_total, 
             m.id_contrato_origen, m.porcentaje_ampliacion, 
             m.estatus_actual
         <span style="color:#c678dd;">FROM</span> rm.rm_suficiencias m
@@ -312,7 +311,11 @@ $$;</pre>
           <tbody>
             <tr><td><code>{id_detalle}</code></td><td><code>INT</code></td><td>ID de la afectación.</td></tr>
             <tr><td><code>{cve_partida_cog}</code></td><td><code>VARCHAR</code></td><td>Partida contable afectada.</td></tr>
-            <tr><td><code>{monto_enero}...{monto_diciembre}</code></td><td><code>DECIMAL</code></td><td>Calendarización mensual.</td></tr>
+            <tr><td><code>{descripcion_bien}</code></td><td><code>VARCHAR</code></td><td>Descripción del concepto.</td></tr>
+            <tr><td><code>{unidad_medida}</code></td><td><code>VARCHAR</code></td><td>Unidad de medida.</td></tr>
+            <tr><td><code>{cantidad}</code></td><td><code>DECIMAL</code></td><td>Cantidad solicitada.</td></tr>
+            <tr><td><code>{precio_unitario}</code></td><td><code>DECIMAL</code></td><td>Precio unitario estimado.</td></tr>
+            <tr><td><code>{monto_total}</code></td><td><code>DECIMAL</code></td><td>Importe total del renglón.</td></tr>
           </tbody>
         </table>
         <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Definición SQL (PostgreSQL)</h3>
@@ -329,7 +332,7 @@ $$;</pre>
     <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_resultado
     <span style="color:#c678dd;">FROM</span> (
         <span style="color:#c678dd;">SELECT</span> 
-            d.id_detalle, d.cve_partida_cog, d.monto_enero, d.monto_febrero, d.monto_marzo, d.monto_abril, d.monto_mayo, d.monto_junio, d.monto_julio, d.monto_agosto, d.monto_septiembre, d.monto_octubre, d.monto_noviembre, d.monto_diciembre
+            d.id_detalle, d.cve_partida_cog, d.descripcion_bien, d.unidad_medida, d.cantidad, d.precio_unitario, d.monto_total
         <span style="color:#c678dd;">FROM</span> rm.rm_suficiencias_partidas d
         <span style="color:#c678dd;">WHERE</span> d.id_suficiencia = p_id_suficiencia
     ) t;
@@ -348,7 +351,7 @@ $$;</pre>
             <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Insertar, 2: Actualizar, 3: Eliminar Lógica.</td></tr>
             <tr><td><code>@p_ejercicio</code></td><td><code>INT</code></td><td>Obligatorio. Ejercicio fiscal en sesión.</td></tr>
             <tr><td><code>@p_id_suficiencia</code></td><td><code>INT</code></td><td>Obligatorio para Acción 2 y 3.</td></tr>
-            <tr><td><code>@p_id_centro_costo</code></td><td><code>INT</code></td><td>Obligatorio para Acción 1 y 2.</td></tr>
+            <tr><td><code>@p_id_centro_costo</code> al <code>@p_id_proyecto</code></td><td><code>INT</code></td><td>Estructura Programática (Obligatorio).</td></tr>
             <tr><td><code>@p_concepto</code></td><td><code>VARCHAR</code></td><td>Obligatorio para Acción 1 y 2.</td></tr>
             <tr><td><code>@p_monto_total</code></td><td><code>DECIMAL</code></td><td>Monto total calculado del requerimiento.</td></tr>
             <tr><td><code>@p_id_contrato_origen</code></td><td><code>INT</code></td><td>Opcional. Si es ampliación de un contrato.</td></tr>
@@ -376,6 +379,10 @@ $$;</pre>
     p_ejercicio <span style="color:#c678dd;">INT</span>,
     p_id_suficiencia <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
     p_id_centro_costo <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_funcion <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_programa <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_subprograma <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_id_proyecto <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
     p_concepto <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
     p_monto_total <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
     p_id_contrato_origen <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
@@ -390,8 +397,8 @@ $$;</pre>
     <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
         <span style="color:#5c6370;">-- ACCION 1: INSERTAR NUEVA SOLICITUD (FASE 1)</span>
         v_folio := <span style="color:#98c379;">'RM-SUF-'</span> || <span style="color:#56b6c2;">to_char</span>(<span style="color:#56b6c2;">now</span>(), <span style="color:#98c379;">'YYYY'</span>) || <span style="color:#98c379;">'-'</span> || <span style="color:#56b6c2;">LPAD</span>(<span style="color:#56b6c2;">CAST</span>(<span style="color:#56b6c2;">nextval</span>(<span style="color:#98c379;">'rm.seq_suficiencias'</span>) <span style="color:#c678dd;">AS</span> <span style="color:#c678dd;">VARCHAR</span>), <span style="color:#d19a66;">3</span>, <span style="color:#98c379;">'0'</span>);
-        <span style="color:#c678dd;">INSERT INTO</span> rm.rm_suficiencias(ejercicio, folio_solicitud, fecha_solicitud, id_centro_costo, concepto, monto_total, estatus_actual, id_contrato_origen, porcentaje_ampliacion, id_tiposuficiencia, fecha_registro, usuario_registro)
-        <span style="color:#c678dd;">VALUES</span>(p_ejercicio, v_folio, <span style="color:#56b6c2;">now</span>(), p_id_centro_costo, p_concepto, p_monto_total, <span style="color:#d19a66;">0</span>, p_id_contrato_origen, p_porcentaje_ampliacion, p_id_tiposuficiencia, <span style="color:#56b6c2;">now</span>(), p_id_usuario)
+        <span style="color:#c678dd;">INSERT INTO</span> rm.rm_suficiencias(ejercicio, folio_solicitud, fecha_solicitud, id_centro_costo, id_funcion, id_programa, id_subprograma, id_proyecto, concepto, monto_total, estatus_actual, id_contrato_origen, porcentaje_ampliacion, id_tiposuficiencia, fecha_registro, usuario_registro)
+        <span style="color:#c678dd;">VALUES</span>(p_ejercicio, v_folio, <span style="color:#56b6c2;">now</span>(), p_id_centro_costo, p_id_funcion, p_id_programa, p_id_subprograma, p_id_proyecto, p_concepto, p_monto_total, <span style="color:#d19a66;">0</span>, p_id_contrato_origen, p_porcentaje_ampliacion, p_id_tiposuficiencia, <span style="color:#56b6c2;">now</span>(), p_id_usuario)
         <span style="color:#c678dd;">RETURNING</span> id_suficiencia <span style="color:#c678dd;">INTO</span> v_id_gen;
         
         <span style="color:#5c6370;">-- REGISTRAR EN BITÁCORA</span>
@@ -403,7 +410,12 @@ $$;</pre>
     <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
         <span style="color:#5c6370;">-- ACCION 2: ACTUALIZAR BORRADOR</span>
         <span style="color:#c678dd;">UPDATE</span> rm.rm_suficiencias
-        <span style="color:#c678dd;">SET</span> id_centro_costo = p_id_centro_costo,
+        <span style="color:#c678dd;">SET</span>
+            id_centro_costo = p_id_centro_costo,
+            id_funcion = p_id_funcion,
+            id_programa = p_id_programa,
+            id_subprograma = p_id_subprograma,
+            id_proyecto = p_id_proyecto,
             concepto = p_concepto,
             monto_total = p_monto_total,
             id_contrato_origen = p_id_contrato_origen,
@@ -431,7 +443,11 @@ $$;</pre>
             <tr><td><code>@p_id_detalle</code></td><td><code>INT</code></td><td>Obligatorio para Acción 2 y 3.</td></tr>
             <tr><td><code>@p_id_suficiencia</code></td><td><code>INT</code></td><td>Obligatorio para Acción 1.</td></tr>
             <tr><td><code>@p_cve_partida_cog</code></td><td><code>VARCHAR</code></td><td>Obligatorio para Acción 1 y 2.</td></tr>
-            <tr><td><code>@p_monto_enero</code> al <code>@p_monto_diciembre</code></td><td><code>DECIMAL</code></td><td>Monto calendarizado de cada mes respectivo.</td></tr>
+            <tr><td><code>@p_descripcion_bien</code></td><td><code>VARCHAR</code></td><td>Descripción del renglón.</td></tr>
+            <tr><td><code>@p_unidad_medida</code></td><td><code>VARCHAR</code></td><td>Pieza, Lote, Servicio, etc.</td></tr>
+            <tr><td><code>@p_cantidad</code></td><td><code>DECIMAL</code></td><td>Cantidad de bienes/servicios.</td></tr>
+            <tr><td><code>@p_precio_unitario</code></td><td><code>DECIMAL</code></td><td>Precio por unidad.</td></tr>
+            <tr><td><code>@p_monto_total</code></td><td><code>DECIMAL</code></td><td>Importe total (cantidad * precio unitario).</td></tr>
           </tbody>
         </table>
         <table class="props-table" style="margin-top: 10px;">
@@ -445,7 +461,7 @@ $$;</pre>
         <div class="code-wrap" style="margin-top: 0; max-height: 400px; overflow-y: auto;">
           <div class="code-block">
 <pre><span style="color:#5c6370;">-- ==========================================
--- 4. ABC PARTIDAS (CALENDARIZACIÓN)
+-- 4. ABC PARTIDAS (REQUISICIÓN)
 -- ==========================================</span>
 <span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">rm.fn_abc_suficiencia_partidas</span>(
     p_accion <span style="color:#c678dd;">INT</span>,
@@ -453,27 +469,33 @@ $$;</pre>
     p_id_detalle <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
     p_id_suficiencia <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
     p_cve_partida_cog <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
-    p_monto_enero <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_febrero <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_marzo <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_abril <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_mayo <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_junio <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_julio <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_agosto <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_septiembre <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_octubre <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_noviembre <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
-    p_monto_diciembre <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>
+    p_descripcion_bien <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_unidad_medida <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_cantidad <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_precio_unitario <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    p_monto_total <span style="color:#c678dd;">DECIMAL</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#d19a66;">0</span>
 ) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
 <span style="color:#c678dd;">BEGIN</span>
     <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
         <span style="color:#5c6370;">-- TODO: Ejecutar verificación previa con fn_rm_suficiencias_saldo_partida para validar el REGLA-SUF-03</span>
-        <span style="color:#c678dd;">INSERT INTO</span> rm.rm_suficiencias_partidas(ejercicio, id_suficiencia, cve_partida_cog, monto_enero, monto_febrero, monto_marzo, monto_abril, monto_mayo, monto_junio, monto_julio, monto_agosto, monto_septiembre, monto_octubre, monto_noviembre, monto_diciembre)
-        <span style="color:#c678dd;">VALUES</span>(p_ejercicio, p_id_suficiencia, p_cve_partida_cog, p_monto_enero, p_monto_febrero, p_monto_marzo, p_monto_abril, p_monto_mayo, p_monto_junio, p_monto_julio, p_monto_agosto, p_monto_septiembre, p_monto_octubre, p_monto_noviembre, p_monto_diciembre);
+        <span style="color:#c678dd;">INSERT INTO</span> rm.rm_suficiencias_partidas(ejercicio, id_suficiencia, cve_partida_cog, descripcion_bien, unidad_medida, cantidad, precio_unitario, monto_total)
+        <span style="color:#c678dd;">VALUES</span>(p_ejercicio, p_id_suficiencia, p_cve_partida_cog, p_descripcion_bien, p_unidad_medida, p_cantidad, p_precio_unitario, p_monto_total);
         
-        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Partida calendarizada agregada con éxito.'</span>);
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Partida de requisición agregada con éxito.'</span>);
     
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">UPDATE</span> rm.rm_suficiencias_partidas
+        <span style="color:#c678dd;">SET</span> cve_partida_cog = p_cve_partida_cog,
+            descripcion_bien = p_descripcion_bien,
+            unidad_medida = p_unidad_medida,
+            cantidad = p_cantidad,
+            precio_unitario = p_precio_unitario,
+            monto_total = p_monto_total,
+            fecha_actualizacion = <span style="color:#56b6c2;">now</span>()
+        <span style="color:#c678dd;">WHERE</span> ejercicio = p_ejercicio <span style="color:#c678dd;">AND</span> id_detalle = p_id_detalle;
+        
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Partida actualizada correctamente.'</span>);
+        
     <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span>
         <span style="color:#c678dd;">DELETE FROM</span> rm.rm_suficiencias_partidas <span style="color:#c678dd;">WHERE</span> ejercicio = p_ejercicio <span style="color:#c678dd;">AND</span> id_detalle = p_id_detalle;
         <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Partida eliminada correctamente.'</span>);
@@ -496,8 +518,8 @@ $$;</pre>
           <tr><td><span class="method get" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e8f5e9; color:#1b5e20;">GET</span></td><td><code>/api/v1/rm/suficiencias/{id}</code></td><td>Obtiene el detalle (encabezado, partidas e historial).</td></tr>
           <tr><td><span class="method post" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e3f2fd; color:#0d47a1;">POST</span></td><td><code>/api/v1/rm/suficiencias</code></td><td>Crea una nueva solicitud (Fase 1).</td></tr>
           <tr><td><span class="method put" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#fff3e0; color:#e65100;">PUT</span></td><td><code>/api/v1/rm/suficiencias/{id}</code></td><td>Actualiza datos de la solicitud (si está en Borrador).</td></tr>
-          <tr><td><span class="method post" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e3f2fd; color:#0d47a1;">POST</span></td><td><code>/api/v1/rm/suficiencias/{id}/partidas</code></td><td>Añade o actualiza la calendarización de una partida.</td></tr>
-          <tr><td><span class="method delete" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#ffebee; color:#b71c1c;">DEL</span></td><td><code>/api/v1/rm/suficiencias/partidas/{id_detalle}</code></td><td>Elimina una partida calendarizada.</td></tr>
+          <tr><td><span class="method post" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e3f2fd; color:#0d47a1;">POST</span></td><td><code>/api/v1/rm/suficiencias/{id}/partidas</code></td><td>Añade o actualiza una partida de requisición.</td></tr>
+          <tr><td><span class="method delete" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#ffebee; color:#b71c1c;">DEL</span></td><td><code>/api/v1/rm/suficiencias/partidas/{id_detalle}</code></td><td>Elimina una partida de requisición.</td></tr>
           <tr><td><span class="method post" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e3f2fd; color:#0d47a1;">POST</span></td><td><code>/api/v1/rm/suficiencias/{id}/enviar</code></td><td>Envía el trámite a Finanzas (Cambia estatus a 1).</td></tr>
           <tr><td><span class="method get" style="font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; background:#e8f5e9; color:#1b5e20;">GET</span></td><td><code>/api/v1/rm/suficiencias/{id}/pdf/oficio</code></td><td>Descarga el Oficio de Requerimiento.</td></tr>
         </tbody>
@@ -554,6 +576,9 @@ $$;</pre>
       <p style="margin-top:10px; font-size:13px; color:#475569;">
         <strong>Formulario Compuesto:</strong> Los wireframes se dividen en Parámetros (mapeo con Stored Procedures) y Valores (datos de ejemplo).
       </p>
+      <div style="background: var(--pjev-info-bg); border-left: 4px solid var(--pjev-info-borde); padding: 12px; margin: 15px 0; font-size: 13px; color: var(--pjev-info-text);">
+        <strong>Nota UI (Estructura Programática en Cabecera):</strong> De acuerdo con el Formato Único de Requisición (Anexo 19), la Estructura Programática (<em>Organización, Función, Programa, Subprograma, Proyecto</em>) se selecciona en los <strong>datos generales (encabezado)</strong> del trámite. La grilla (partidas) hereda esta cartera y únicamente captura la Partida Específica (COG) y su calendarización.
+      </div>
 
       <!-- 8.1 Pantalla Principal: Leer (Parámetros) -->
       
@@ -571,14 +596,11 @@ $$;</pre>
 <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
   <rect width="1000" height="500" fill="#fcfcfc" rx="4" stroke="#ddd"/>
   
-  <rect x="20" y="20" width="120" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
-  <text x="25" y="37" font-size="10" font-weight="bold" fill="#0f172a">@p_ejercicio</text>
+  <rect x="20" y="20" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+  <text x="25" y="37" font-size="10" font-weight="bold" fill="#0f172a">@p_id_tiposuficiencia</text>
 
-  <rect x="150" y="20" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
-  <text x="155" y="37" font-size="10" font-weight="bold" fill="#0f172a">@p_id_tiposuficiencia</text>
-
-  <rect x="320" y="20" width="220" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
-  <text x="325" y="37" font-size="10" font-weight="bold" fill="#0f172a">@p_folio_solicitud</text>
+  <rect x="200" y="20" width="220" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/> 
+  <text x="205" y="37" font-size="10" font-weight="bold" fill="#0f172a">@p_folio_solicitud</text>
 
   <rect x="20" y="60" width="960" height="40" fill="#f4f6f5" stroke="#ccc" rx="4"/>
   <rect x="40" y="70" width="100" height="24" fill="#1B3A2D" rx="3"/> 
@@ -587,19 +609,17 @@ $$;</pre>
   <rect x="20" y="120" width="960" height="30" fill="#1B3A2D"/>
   <text x="30" y="140" fill="#fff" font-size="11" font-weight="bold">FOLIO SOLICITUD</text>
   <text x="200" y="140" fill="#fff" font-size="11" font-weight="bold">FECHA</text>
-  <text x="320" y="140" fill="#fff" font-size="11" font-weight="bold">CENTRO COSTO</text>
-  <text x="550" y="140" fill="#fff" font-size="11" font-weight="bold">TIPO TRÁMITE</text>
-  <text x="750" y="140" fill="#fff" font-size="11" font-weight="bold">MONTO TOTAL</text>
-  <text x="880" y="140" fill="#fff" font-size="11" font-weight="bold">ESTATUS</text>
+  <text x="350" y="140" fill="#fff" font-size="11" font-weight="bold">TIPO TRÁMITE</text>
+  <text x="600" y="140" fill="#fff" font-size="11" font-weight="bold">MONTO TOTAL</text>
+  <text x="800" y="140" fill="#fff" font-size="11" font-weight="bold">ESTATUS</text>
 
   <rect x="20" y="150" width="960" height="35" fill="#fff" stroke="#e2e8f0"/>
   <text x="30" y="172" fill="#2563eb" font-size="11">@folio_solicitud</text>
   <text x="200" y="172" fill="#2563eb" font-size="11">@fecha_solicitud</text>
-  <text x="320" y="172" fill="#2563eb" font-size="11">@id_centro_costo</text>
-  <text x="550" y="172" fill="#2563eb" font-size="11">@id_tiposuficiencia</text>
-  <text x="750" y="172" fill="#2563eb" font-size="11">@monto_total</text>
-  <rect x="880" y="155" width="70" height="25" fill="#fef08a" rx="12"/>
-  <text x="915" y="172" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">@estatus</text>
+  <text x="350" y="172" fill="#2563eb" font-size="11">@id_tiposuficiencia</text>
+  <text x="600" y="172" fill="#2563eb" font-size="11">@monto_total</text>
+  <rect x="800" y="155" width="70" height="25" fill="#fef08a" rx="12"/>
+  <text x="835" y="172" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">@estatus</text>
 </svg>
         </div>
       </div>
@@ -611,14 +631,11 @@ $$;</pre>
 <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
   <rect width="1000" height="500" fill="#fcfcfc" rx="4" stroke="#ddd"/>
   
-  <rect x="20" y="20" width="120" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
-  <text x="25" y="37" font-size="10" font-weight="bold" fill="#0f172a">2026</text>
+  <rect x="20" y="20" width="160" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
+  <text x="25" y="37" font-size="10" font-weight="bold" fill="#0f172a">01 - NUEVA SUFICIENCIA</text>
 
-  <rect x="150" y="20" width="160" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
-  <text x="155" y="37" font-size="10" font-weight="bold" fill="#0f172a">01 - NUEVA SUFICIENCIA</text>
-
-  <rect x="320" y="20" width="220" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
-  <text x="325" y="37" font-size="10" font-weight="bold" fill="#0f172a">RM-SUF-2026-001</text>
+  <rect x="200" y="20" width="220" height="25" fill="#f8fafc" stroke="#ccc" rx="3"/> 
+  <text x="205" y="37" font-size="10" font-weight="bold" fill="#0f172a">RM-SUF-2026-001</text>
 
   <rect x="20" y="60" width="960" height="40" fill="#f4f6f5" stroke="#ccc" rx="4"/>
   <rect x="40" y="70" width="100" height="24" fill="#1B3A2D" rx="3"/> 
@@ -627,19 +644,17 @@ $$;</pre>
   <rect x="20" y="120" width="960" height="30" fill="#1B3A2D"/>
   <text x="30" y="140" fill="#fff" font-size="11" font-weight="bold">FOLIO SOLICITUD</text>
   <text x="200" y="140" fill="#fff" font-size="11" font-weight="bold">FECHA</text>
-  <text x="320" y="140" fill="#fff" font-size="11" font-weight="bold">CENTRO COSTO</text>
-  <text x="550" y="140" fill="#fff" font-size="11" font-weight="bold">TIPO TRÁMITE</text>
-  <text x="750" y="140" fill="#fff" font-size="11" font-weight="bold">MONTO TOTAL</text>
-  <text x="880" y="140" fill="#fff" font-size="11" font-weight="bold">ESTATUS</text>
+  <text x="350" y="140" fill="#fff" font-size="11" font-weight="bold">TIPO TRÁMITE</text>
+  <text x="600" y="140" fill="#fff" font-size="11" font-weight="bold">MONTO TOTAL</text>
+  <text x="800" y="140" fill="#fff" font-size="11" font-weight="bold">ESTATUS</text>
 
   <rect x="20" y="150" width="960" height="35" fill="#fff" stroke="#e2e8f0"/>
   <text x="30" y="172" fill="#2563eb" font-size="11">RM-SUF-2026-001</text>
   <text x="200" y="172" fill="#2563eb" font-size="11">2026-01-10 10:30</text>
-  <text x="320" y="172" fill="#2563eb" font-size="11">01 - DIR. ADQUISICIONES</text>
-  <text x="550" y="172" fill="#2563eb" font-size="11">01 - NUEVA SUFICIENCIA</text>
-  <text x="750" y="172" fill="#2563eb" font-size="11">$ 105,000.00</text>
-  <rect x="880" y="155" width="70" height="25" fill="#fef08a" rx="12"/>
-  <text x="915" y="172" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">Borrador</text>
+  <text x="350" y="172" fill="#2563eb" font-size="11">01 - NUEVA SUFICIENCIA</text>
+  <text x="600" y="172" fill="#2563eb" font-size="11">$ 105,000.00</text>
+  <rect x="800" y="155" width="70" height="25" fill="#fef08a" rx="12"/>
+  <text x="835" y="172" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">Borrador</text>
 </svg>
         </div>
       </div>
@@ -661,126 +676,122 @@ $$;</pre>
   
   <!-- SECCIÓN 1: ENCABEZADO -->
   <text x="40" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 1: DATOS DEL ENCABEZADO (rm_suficiencias)</text>
-  <rect x="40" y="100" width="920" height="140" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
+  <rect x="40" y="100" width="920" height="230" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
   
-  <text x="50" y="130" font-size="11" font-weight="bold" fill="#666">Folio Solicitud:</text>
-  <rect x="50" y="135" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="55" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_folio_solicitud</text>
+  <!-- Fila 1: Estructura Programática -->
+  <text x="50" y="130" font-size="11" font-weight="bold" fill="#666">Organización:</text>
+  <rect x="50" y="135" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_org</text>
 
-  <text x="230" y="130" font-size="11" font-weight="bold" fill="#666">Ejercicio:</text>
-  <rect x="230" y="135" width="100" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="235" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_ejercicio</text>
+  <text x="210" y="130" font-size="11" font-weight="bold" fill="#666">Función:</text>
+  <rect x="210" y="135" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="215" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_fun</text>
 
-  <text x="350" y="130" font-size="11" font-weight="bold" fill="#666">Centro Costo (UA):</text>
-  <rect x="350" y="135" width="280" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="355" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_id_centro_costo</text>
+  <text x="370" y="130" font-size="11" font-weight="bold" fill="#666">Programa:</text>
+  <rect x="370" y="135" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="375" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_prog</text>
 
-  <text x="650" y="130" font-size="11" font-weight="bold" fill="#666">Tipo Trámite:</text>
-  <rect x="650" y="135" width="290" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="655" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_id_tiposuficiencia</text>
+  <text x="530" y="130" font-size="11" font-weight="bold" fill="#666">Subprograma:</text>
+  <rect x="530" y="135" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="535" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_sub</text>
 
-  <text x="50" y="180" font-size="11" font-weight="bold" fill="#666">Concepto / Justificación:</text>
-  <rect x="50" y="185" width="480" height="30" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="55" y="205" font-size="10" font-weight="bold" fill="#0f172a">@p_concepto</text>
+  <text x="690" y="130" font-size="11" font-weight="bold" fill="#666">Proyecto:</text>
+  <rect x="690" y="135" width="250" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="695" y="152" font-size="10" font-weight="bold" fill="#0f172a">@p_proy</text>
 
-  <text x="550" y="180" font-size="11" font-weight="bold" fill="#666">Contrato Origen:</text>
-  <rect x="550" y="185" width="130" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="555" y="202" font-size="10" font-weight="bold" fill="#0f172a">@p_id_contrato_origen</text>
+  <!-- Fila 2: Solicitud -->
+  <text x="50" y="180" font-size="11" font-weight="bold" fill="#666">No. de Solicitud:</text>
+  <rect x="50" y="185" width="180" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="202" font-size="10" font-weight="bold" fill="#0f172a">@p_folio</text>
 
-  <text x="700" y="180" font-size="11" font-weight="bold" fill="#666">% Amp:</text>
-  <rect x="700" y="185" width="80" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="705" y="202" font-size="10" font-weight="bold" fill="#0f172a">@p_porc</text>
+  <text x="260" y="180" font-size="11" font-weight="bold" fill="#666">Fecha Solicitud:</text>
+  <rect x="260" y="185" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="265" y="202" font-size="10" font-weight="bold" fill="#0f172a">@p_fecha_solicitud</text>
 
-  <text x="800" y="180" font-size="11" font-weight="bold" fill="#666">Monto Total:</text>
-  <rect x="800" y="185" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="805" y="202" font-size="10" font-weight="bold" fill="#0f172a">@p_monto_total</text>
+  <text x="430" y="180" font-size="11" font-weight="bold" fill="#666">Importe Total:</text>
+  <rect x="430" y="185" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="435" y="202" font-size="10" font-weight="bold" fill="#0f172a">@p_total</text>
+
+  <!-- Fila 3: Concepto -->
+  <text x="50" y="230" font-size="11" font-weight="bold" fill="#666">Concepto:</text>
+  <rect x="50" y="235" width="890" height="30" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="255" font-size="10" font-weight="bold" fill="#0f172a">@p_concepto</text>
+
+  <!-- Fila 4: Tramite -->
+  <text x="50" y="290" font-size="11" font-weight="bold" fill="#666">Tipo de Trámite:</text>
+  <rect x="50" y="295" width="250" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="312" font-size="10" font-weight="bold" fill="#0f172a">@p_id_tipo</text>
+
+  <text x="330" y="290" font-size="11" font-weight="bold" fill="#666">Contrato Origen:</text>
+  <rect x="330" y="295" width="150" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="335" y="312" font-size="10" font-weight="bold" fill="#0f172a">@p_id_cont</text>
+
+  <text x="510" y="290" font-size="11" font-weight="bold" fill="#666">% Ampliación:</text>
+  <rect x="510" y="295" width="100" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="515" y="312" font-size="10" font-weight="bold" fill="#0f172a">@p_porc</text>
 
   <!-- SECCIÓN 2: BOTONES DE ACCIONES -->
-  <text x="40" y="270" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 2: ACCIONES</text>
-  <rect x="40" y="280" width="920" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
+  <text x="40" y="360" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 2: ACCIONES</text>
+  <rect x="40" y="370" width="920" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
   
-  <rect x="50" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
-  <text x="120" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Guardar Cabecera</text>
+  <rect x="50" y="380" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="120" y="400" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Guardar Cabecera</text>
 
-  <rect x="210" y="290" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
-  <text x="280" y="310" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">Eliminar Solicitud</text>
+  <rect x="210" y="380" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
+  <text x="280" y="400" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">Eliminar Solicitud</text>
 
-  <rect x="650" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
-  <text x="720" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Imprimir Oficio</text>
+  <rect x="650" y="380" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="720" y="400" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Imprimir Oficio</text>
 
-  <rect x="810" y="290" width="140" height="30" fill="#1B3A2D" rx="4"/>
-  <text x="880" y="310" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Enviar a Finanzas</text>
+  <rect x="810" y="380" width="140" height="30" fill="#1B3A2D" rx="4"/>
+  <text x="880" y="400" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Enviar a Finanzas</text>
 
   <!-- SECCIÓN 3: MOVIMIENTOS EN MODO GRID -->
-  <text x="40" y="360" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 3: CAPTURA DE MOVIMIENTOS EN MODO GRID (rm_suficiencias_partidas)</text>
+  <text x="40" y="450" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 3: REQUISICIÓN DE PARTIDAS (rm_suficiencias_partidas)</text>
   
   <!-- Grid Header -->
-  <rect x="40" y="375" width="920" height="25" fill="#1B3A2D" />
-  <text x="45" y="392" fill="#fff" font-size="9" font-weight="bold">COG</text>
-  <text x="100" y="392" fill="#fff" font-size="9" font-weight="bold">ENE</text>
-  <text x="160" y="392" fill="#fff" font-size="9" font-weight="bold">FEB</text>
-  <text x="220" y="392" fill="#fff" font-size="9" font-weight="bold">MAR</text>
-  <text x="280" y="392" fill="#fff" font-size="9" font-weight="bold">ABR</text>
-  <text x="340" y="392" fill="#fff" font-size="9" font-weight="bold">MAY</text>
-  <text x="400" y="392" fill="#fff" font-size="9" font-weight="bold">JUN</text>
-  <text x="460" y="392" fill="#fff" font-size="9" font-weight="bold">JUL</text>
-  <text x="520" y="392" fill="#fff" font-size="9" font-weight="bold">AGO</text>
-  <text x="580" y="392" fill="#fff" font-size="9" font-weight="bold">SEP</text>
-  <text x="640" y="392" fill="#fff" font-size="9" font-weight="bold">OCT</text>
-  <text x="700" y="392" fill="#fff" font-size="9" font-weight="bold">NOV</text>
-  <text x="760" y="392" fill="#fff" font-size="9" font-weight="bold">DIC</text>
-  <text x="820" y="392" fill="#fff" font-size="9" font-weight="bold">TOTAL</text>
-  <text x="900" y="392" fill="#fff" font-size="9" font-weight="bold">ACCIÓN</text>
+  <rect x="40" y="465" width="920" height="25" fill="#1B3A2D" />
+  <text x="45" y="482" fill="#fff" font-size="9" font-weight="bold">COG</text>
+  <text x="120" y="482" fill="#fff" font-size="9" font-weight="bold">DESCRIPCIÓN DE BIEN / SERVICIO</text>
+  <text x="400" y="482" fill="#fff" font-size="9" font-weight="bold">U. MEDIDA</text>
+  <text x="520" y="482" fill="#fff" font-size="9" font-weight="bold">CANTIDAD</text>
+  <text x="640" y="482" fill="#fff" font-size="9" font-weight="bold">PRECIO U.</text>
+  <text x="760" y="482" fill="#fff" font-size="9" font-weight="bold">TOTAL</text>
+  <text x="900" y="482" fill="#fff" font-size="9" font-weight="bold">ACCIÓN</text>
 
   <!-- Grid Row 1 (Existing Data) -->
-  <rect x="40" y="400" width="920" height="30" fill="#fff" stroke="#e2e8f0" />
-  <text x="45" y="418" fill="#2563eb" font-size="9">@p_cog_1</text>
-  <text x="100" y="418" fill="#2563eb" font-size="9">@p_e_1</text>
-  <text x="160" y="418" fill="#2563eb" font-size="9">@p_f_1</text>
-  <text x="220" y="418" fill="#2563eb" font-size="9">@p_m_1</text>
-  <text x="280" y="418" fill="#2563eb" font-size="9">@p_a_1</text>
-  <text x="340" y="418" fill="#2563eb" font-size="9">@p_m2_1</text>
-  <text x="400" y="418" fill="#2563eb" font-size="9">@p_j_1</text>
-  <text x="460" y="418" fill="#2563eb" font-size="9">@p_j2_1</text>
-  <text x="520" y="418" fill="#2563eb" font-size="9">@p_a2_1</text>
-  <text x="580" y="418" fill="#2563eb" font-size="9">@p_s_1</text>
-  <text x="640" y="418" fill="#2563eb" font-size="9">@p_o_1</text>
-  <text x="700" y="418" fill="#2563eb" font-size="9">@p_n_1</text>
-  <text x="760" y="418" fill="#2563eb" font-size="9">@p_d_1</text>
-  <text x="820" y="418" fill="#1B3A2D" font-size="9" font-weight="bold">@p_tot_1</text>
+  <rect x="40" y="490" width="920" height="30" fill="#fff" stroke="#e2e8f0" />
+  <text x="45" y="508" fill="#2563eb" font-size="9">@p_cog_1</text>
+  <text x="120" y="508" fill="#2563eb" font-size="9">@p_desc_1</text>
+  <text x="400" y="508" fill="#2563eb" font-size="9">@p_um_1</text>
+  <text x="520" y="508" fill="#2563eb" font-size="9">@p_cant_1</text>
+  <text x="640" y="508" fill="#2563eb" font-size="9">@p_precio_1</text>
+  <text x="760" y="508" fill="#1B3A2D" font-size="9" font-weight="bold">@p_tot_1</text>
   
-  <rect x="900" y="405" width="40" height="20" fill="#ef4444" rx="3" />
-  <text x="920" y="418" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">X</text>
+  <rect x="900" y="495" width="40" height="20" fill="#ef4444" rx="3" />
+  <text x="920" y="508" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">X</text>
 
   <!-- Grid Row 2 (Input Row) -->
-  <rect x="40" y="430" width="920" height="35" fill="#f8fafc" stroke="#e2e8f0" />
-  <rect x="43" y="435" width="50" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="98" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="158" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="218" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="278" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="338" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="398" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="458" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="518" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="578" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="638" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="698" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="758" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="40" y="520" width="920" height="35" fill="#f8fafc" stroke="#e2e8f0" />
+  <rect x="43" y="525" width="70" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="118" y="525" width="270" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="398" y="525" width="110" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="518" y="525" width="110" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="638" y="525" width="110" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
   
-  <text x="820" y="452" fill="#666" font-size="9" font-style="italic">Auto</text>
+  <text x="760" y="542" fill="#666" font-size="9" font-style="italic">Auto</text>
   
-  <rect x="890" y="437" width="60" height="21" fill="#1B3A2D" rx="3" />
-  <text x="920" y="451" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">+ ADD</text>
+  <rect x="890" y="527" width="60" height="21" fill="#1B3A2D" rx="3" />
+  <text x="920" y="541" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">+ ADD</text>
 
   <!-- SECCIÓN 4: TOTAL DE PARTIDAS -->
-  <text x="40" y="520" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 4: TOTAL DE PARTIDAS PRESUPUESTALES</text>
-  <rect x="600" y="530" width="360" height="50" fill="#fdfdfd" stroke="#1B3A2D" stroke-width="2" rx="4" />
-  <text x="620" y="560" font-size="14" font-weight="bold" fill="#1B3A2D">Suma Total Partidas: @p_suma_total</text>
+  <text x="40" y="610" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 4: TOTAL DE REQUISICIÓN</text>
+  <rect x="600" y="620" width="360" height="50" fill="#fdfdfd" stroke="#1B3A2D" stroke-width="2" rx="4" />
+  <text x="620" y="650" font-size="14" font-weight="bold" fill="#1B3A2D">Suma Total Partidas: @p_suma_total</text>
 
   <!-- CERRAR MODAL -->
-  <rect x="400" y="620" width="200" height="40" fill="#e2e8f0" rx="4" />
-  <text x="500" y="645" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
+  <rect x="400" y="700" width="200" height="40" fill="#e2e8f0" rx="4" />
+  <text x="500" y="725" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
 
 </svg>
         </div>
@@ -803,126 +814,122 @@ $$;</pre>
   
   <!-- SECCIÓN 1: ENCABEZADO -->
   <text x="40" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 1: DATOS DEL ENCABEZADO (rm_suficiencias)</text>
-  <rect x="40" y="100" width="920" height="140" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
+  <rect x="40" y="100" width="920" height="230" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
   
-  <text x="50" y="130" font-size="11" font-weight="bold" fill="#666">Folio Solicitud:</text>
-  <rect x="50" y="135" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="55" y="152" font-size="10" font-weight="bold" fill="#0f172a">RM-SUF-2026-001</text>
+  <!-- Fila 1: Estructura Programática -->
+  <text x="50" y="130" font-size="11" font-weight="bold" fill="#666">Organización:</text>
+  <rect x="50" y="135" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="152" font-size="10" font-weight="bold" fill="#0f172a">02 - DIRECCIÓN GENERAL</text>
 
-  <text x="230" y="130" font-size="11" font-weight="bold" fill="#666">Ejercicio:</text>
-  <rect x="230" y="135" width="100" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="235" y="152" font-size="10" font-weight="bold" fill="#0f172a">2026</text>
+  <text x="210" y="130" font-size="11" font-weight="bold" fill="#666">Función:</text>
+  <rect x="210" y="135" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="215" y="152" font-size="10" font-weight="bold" fill="#0f172a">03 - JUSTICIA</text>
 
-  <text x="350" y="130" font-size="11" font-weight="bold" fill="#666">Centro Costo (UA):</text>
-  <rect x="350" y="135" width="280" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="355" y="152" font-size="10" font-weight="bold" fill="#0f172a">01 - DIR. RECURSOS MATERIALES</text>
+  <text x="370" y="130" font-size="11" font-weight="bold" fill="#666">Programa:</text>
+  <rect x="370" y="135" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="375" y="152" font-size="10" font-weight="bold" fill="#0f172a">01 - ADM. JUSTICIA</text>
 
-  <text x="650" y="130" font-size="11" font-weight="bold" fill="#666">Tipo Trámite:</text>
-  <rect x="650" y="135" width="290" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="655" y="152" font-size="10" font-weight="bold" fill="#0f172a">01 - NUEVA SUFICIENCIA</text>
+  <text x="530" y="130" font-size="11" font-weight="bold" fill="#666">Subprograma:</text>
+  <rect x="530" y="135" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="535" y="152" font-size="10" font-weight="bold" fill="#0f172a">01 - JUZGADOS</text>
 
-  <text x="50" y="180" font-size="11" font-weight="bold" fill="#666">Concepto / Justificación:</text>
-  <rect x="50" y="185" width="480" height="30" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="55" y="205" font-size="10" font-weight="bold" fill="#0f172a">Suministros de oficina para dependencias.</text>
+  <text x="690" y="130" font-size="11" font-weight="bold" fill="#666">Proyecto:</text>
+  <rect x="690" y="135" width="250" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="695" y="152" font-size="10" font-weight="bold" fill="#0f172a">001 - MANTENIMIENTO</text>
 
-  <text x="550" y="180" font-size="11" font-weight="bold" fill="#666">Contrato Origen:</text>
-  <rect x="550" y="185" width="130" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="555" y="202" font-size="10" font-weight="bold" fill="#0f172a">N/A</text>
+  <!-- Fila 2: Solicitud -->
+  <text x="50" y="180" font-size="11" font-weight="bold" fill="#666">No. de Solicitud:</text>
+  <rect x="50" y="185" width="180" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="202" font-size="10" font-weight="bold" fill="#0f172a">RM-SUF-2026-001</text>
 
-  <text x="700" y="180" font-size="11" font-weight="bold" fill="#666">% Amp:</text>
-  <rect x="700" y="185" width="80" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="705" y="202" font-size="10" font-weight="bold" fill="#0f172a">0%</text>
+  <text x="260" y="180" font-size="11" font-weight="bold" fill="#666">Fecha Solicitud:</text>
+  <rect x="260" y="185" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="265" y="202" font-size="10" font-weight="bold" fill="#0f172a">2026-01-10 10:30</text>
 
-  <text x="800" y="180" font-size="11" font-weight="bold" fill="#666">Monto Total:</text>
-  <rect x="800" y="185" width="140" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
-  <text x="805" y="202" font-size="10" font-weight="bold" fill="#0f172a">$ 105,000.00</text>
+  <text x="430" y="180" font-size="11" font-weight="bold" fill="#666">Importe Total:</text>
+  <rect x="430" y="185" width="160" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="435" y="202" font-size="10" font-weight="bold" fill="#0f172a">$ 105,000.00</text>
+
+  <!-- Fila 3: Concepto -->
+  <text x="50" y="230" font-size="11" font-weight="bold" fill="#666">Concepto:</text>
+  <rect x="50" y="235" width="890" height="30" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="255" font-size="10" font-weight="bold" fill="#0f172a">Suministros de oficina para dependencias.</text>
+
+  <!-- Fila 4: Tramite -->
+  <text x="50" y="290" font-size="11" font-weight="bold" fill="#666">Tipo de Trámite:</text>
+  <rect x="50" y="295" width="250" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="55" y="312" font-size="10" font-weight="bold" fill="#0f172a">01 - NUEVA SUFICIENCIA</text>
+
+  <text x="330" y="290" font-size="11" font-weight="bold" fill="#666">Contrato Origen:</text>
+  <rect x="330" y="295" width="150" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="335" y="312" font-size="10" font-weight="bold" fill="#0f172a">N/A</text>
+
+  <text x="510" y="290" font-size="11" font-weight="bold" fill="#666">% Ampliación:</text>
+  <rect x="510" y="295" width="100" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+  <text x="515" y="312" font-size="10" font-weight="bold" fill="#0f172a">0%</text>
 
   <!-- SECCIÓN 2: BOTONES DE ACCIONES -->
-  <text x="40" y="270" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 2: ACCIONES</text>
-  <rect x="40" y="280" width="920" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
+  <text x="40" y="360" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 2: ACCIONES</text>
+  <rect x="40" y="370" width="920" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
   
-  <rect x="50" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
-  <text x="120" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Guardar Cabecera</text>
+  <rect x="50" y="380" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="120" y="400" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Guardar Cabecera</text>
 
-  <rect x="210" y="290" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
-  <text x="280" y="310" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">Eliminar Solicitud</text>
+  <rect x="210" y="380" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
+  <text x="280" y="400" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">Eliminar Solicitud</text>
 
-  <rect x="650" y="290" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
-  <text x="720" y="310" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Imprimir Oficio</text>
+  <rect x="650" y="380" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+  <text x="720" y="400" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">Imprimir Oficio</text>
 
-  <rect x="810" y="290" width="140" height="30" fill="#1B3A2D" rx="4"/>
-  <text x="880" y="310" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Enviar a Finanzas</text>
+  <rect x="810" y="380" width="140" height="30" fill="#1B3A2D" rx="4"/>
+  <text x="880" y="400" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Enviar a Finanzas</text>
 
   <!-- SECCIÓN 3: MOVIMIENTOS EN MODO GRID -->
-  <text x="40" y="360" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 3: CAPTURA DE MOVIMIENTOS EN MODO GRID (rm_suficiencias_partidas)</text>
+  <text x="40" y="450" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 3: REQUISICIÓN DE PARTIDAS (rm_suficiencias_partidas)</text>
   
   <!-- Grid Header -->
-  <rect x="40" y="375" width="920" height="25" fill="#1B3A2D" />
-  <text x="45" y="392" fill="#fff" font-size="9" font-weight="bold">COG</text>
-  <text x="100" y="392" fill="#fff" font-size="9" font-weight="bold">ENE</text>
-  <text x="160" y="392" fill="#fff" font-size="9" font-weight="bold">FEB</text>
-  <text x="220" y="392" fill="#fff" font-size="9" font-weight="bold">MAR</text>
-  <text x="280" y="392" fill="#fff" font-size="9" font-weight="bold">ABR</text>
-  <text x="340" y="392" fill="#fff" font-size="9" font-weight="bold">MAY</text>
-  <text x="400" y="392" fill="#fff" font-size="9" font-weight="bold">JUN</text>
-  <text x="460" y="392" fill="#fff" font-size="9" font-weight="bold">JUL</text>
-  <text x="520" y="392" fill="#fff" font-size="9" font-weight="bold">AGO</text>
-  <text x="580" y="392" fill="#fff" font-size="9" font-weight="bold">SEP</text>
-  <text x="640" y="392" fill="#fff" font-size="9" font-weight="bold">OCT</text>
-  <text x="700" y="392" fill="#fff" font-size="9" font-weight="bold">NOV</text>
-  <text x="760" y="392" fill="#fff" font-size="9" font-weight="bold">DIC</text>
-  <text x="820" y="392" fill="#fff" font-size="9" font-weight="bold">TOTAL</text>
-  <text x="900" y="392" fill="#fff" font-size="9" font-weight="bold">ACCIÓN</text>
+  <rect x="40" y="465" width="920" height="25" fill="#1B3A2D" />
+  <text x="45" y="482" fill="#fff" font-size="9" font-weight="bold">COG</text>
+  <text x="120" y="482" fill="#fff" font-size="9" font-weight="bold">DESCRIPCIÓN DE BIEN / SERVICIO</text>
+  <text x="400" y="482" fill="#fff" font-size="9" font-weight="bold">U. MEDIDA</text>
+  <text x="520" y="482" fill="#fff" font-size="9" font-weight="bold">CANTIDAD</text>
+  <text x="640" y="482" fill="#fff" font-size="9" font-weight="bold">PRECIO U.</text>
+  <text x="760" y="482" fill="#fff" font-size="9" font-weight="bold">TOTAL</text>
+  <text x="900" y="482" fill="#fff" font-size="9" font-weight="bold">ACCIÓN</text>
 
   <!-- Grid Row 1 (Existing Data) -->
-  <rect x="40" y="400" width="920" height="30" fill="#fff" stroke="#e2e8f0" />
-  <text x="45" y="418" fill="#2563eb" font-size="9">21111</text>
-  <text x="100" y="418" fill="#2563eb" font-size="9">25,000</text>
-  <text x="160" y="418" fill="#2563eb" font-size="9">25,000</text>
-  <text x="220" y="418" fill="#2563eb" font-size="9">25,000</text>
-  <text x="280" y="418" fill="#2563eb" font-size="9">0</text>
-  <text x="340" y="418" fill="#2563eb" font-size="9">0</text>
-  <text x="400" y="418" fill="#2563eb" font-size="9">15,000</text>
-  <text x="460" y="418" fill="#2563eb" font-size="9">15,000</text>
-  <text x="520" y="418" fill="#2563eb" font-size="9">0</text>
-  <text x="580" y="418" fill="#2563eb" font-size="9">0</text>
-  <text x="640" y="418" fill="#2563eb" font-size="9">0</text>
-  <text x="700" y="418" fill="#2563eb" font-size="9">0</text>
-  <text x="760" y="418" fill="#2563eb" font-size="9">0</text>
-  <text x="820" y="418" fill="#1B3A2D" font-size="9" font-weight="bold">$ 105,000</text>
+  <rect x="40" y="490" width="920" height="30" fill="#fff" stroke="#e2e8f0" />
+  <text x="45" y="508" fill="#2563eb" font-size="9">21111</text>
+  <text x="120" y="508" fill="#2563eb" font-size="9">Papel bond blanco, tamaño carta, 37 kg</text>
+  <text x="400" y="508" fill="#2563eb" font-size="9">Caja con 10 millares</text>
+  <text x="520" y="508" fill="#2563eb" font-size="9">100.00</text>
+  <text x="640" y="508" fill="#2563eb" font-size="9">$ 1,050.00</text>
+  <text x="760" y="508" fill="#1B3A2D" font-size="9" font-weight="bold">$ 105,000.00</text>
   
-  <rect x="900" y="405" width="40" height="20" fill="#ef4444" rx="3" />
-  <text x="920" y="418" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">X</text>
+  <rect x="900" y="495" width="40" height="20" fill="#ef4444" rx="3" />
+  <text x="920" y="508" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">X</text>
 
   <!-- Grid Row 2 (Input Row) -->
-  <rect x="40" y="430" width="920" height="35" fill="#f8fafc" stroke="#e2e8f0" />
-  <rect x="43" y="435" width="50" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="98" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="158" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="218" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="278" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="338" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="398" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="458" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="518" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="578" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="638" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="698" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
-  <rect x="758" y="435" width="55" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="40" y="520" width="920" height="35" fill="#f8fafc" stroke="#e2e8f0" />
+  <rect x="43" y="525" width="70" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="118" y="525" width="270" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="398" y="525" width="110" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="518" y="525" width="110" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+  <rect x="638" y="525" width="110" height="25" fill="#e2e8f0" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
   
-  <text x="820" y="452" fill="#666" font-size="9" font-style="italic">Auto</text>
+  <text x="760" y="542" fill="#666" font-size="9" font-style="italic">Auto</text>
   
-  <rect x="890" y="437" width="60" height="21" fill="#1B3A2D" rx="3" />
-  <text x="920" y="451" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">+ ADD</text>
+  <rect x="890" y="527" width="60" height="21" fill="#1B3A2D" rx="3" />
+  <text x="920" y="541" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">+ ADD</text>
 
   <!-- SECCIÓN 4: TOTAL DE PARTIDAS -->
-  <text x="40" y="520" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 4: TOTAL DE PARTIDAS PRESUPUESTALES</text>
-  <rect x="600" y="530" width="360" height="50" fill="#fdfdfd" stroke="#1B3A2D" stroke-width="2" rx="4" />
-  <text x="620" y="560" font-size="14" font-weight="bold" fill="#1B3A2D">Suma Total Partidas: $ 105,000.00</text>
+  <text x="40" y="610" font-size="12" font-weight="bold" fill="#1B3A2D">SECCIÓN 4: TOTAL DE REQUISICIÓN</text>
+  <rect x="600" y="620" width="360" height="50" fill="#fdfdfd" stroke="#1B3A2D" stroke-width="2" rx="4" />
+  <text x="620" y="650" font-size="14" font-weight="bold" fill="#1B3A2D">Suma Total Partidas: $ 105,000.00</text>
 
   <!-- CERRAR MODAL -->
-  <rect x="400" y="620" width="200" height="40" fill="#e2e8f0" rx="4" />
-  <text x="500" y="645" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
+  <rect x="400" y="700" width="200" height="40" fill="#e2e8f0" rx="4" />
+  <text x="500" y="725" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
 
 </svg>
         </div>
@@ -955,6 +962,8 @@ $$;</pre>
         <li style="margin-bottom: 10px;"><strong>REGLA-SUF-03 (Candado de Edición):</strong> La acción de Actualizar o Eliminar (Inputs habilitados y llamadas al ABC) solo es permitida si el <code>estatus_actual</code> en base de datos es <code>0</code> (Borrador) o <code>3</code> (Rechazado). Si <code>estatus_actual IN (1, 2)</code>, el UI debe bloquearse (Read-Only) y los SP deben abortar cualquier instrucción.</li>
         
         <li style="margin-bottom: 10px;"><strong>REGLA-SUF-04 (Pre-condición de Envío):</strong> Para poder accionar el botón "Enviar a Finanzas", el frontend debe validar que exista por lo menos <strong>una (1)</strong> partida guardada en la grilla inferior (<code>rm_suficiencias_partidas</code>).</li>
+        
+        <li style="margin-bottom: 10px;"><strong>REGLA-SUF-05 (Integridad de Estructura Programática):</strong> Cualquier afectación o registro presupuestal (backend y frontend) debe validar que la combinación de <em>Organización, Función, Programa, Subprograma y Proyecto</em> sea válida y corresponda al ejercicio fiscal activo, evitando manejar estos elementos como datos aislados.</li>
       </ul>
     </div>
 
