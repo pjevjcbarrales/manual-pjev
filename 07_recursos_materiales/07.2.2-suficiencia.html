@@ -1283,22 +1283,35 @@ $$;</pre>
     </div>
     
     <script>
-      const buttons = document.querySelectorAll('button');
-      buttons.forEach(b => {
+      function showSP(spId, btn) {
+        const container = btn.closest('.doc-section');
+        container.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+        container.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        container.querySelector('#sp-' + spId).classList.add('active');
+      }
+
+      const allButtons = document.querySelectorAll('button');
+      allButtons.forEach(b => {
         if (b.innerText.includes('Ver Diagrama')) {
           b.onclick = () => {
-            document.getElementById('modal-diagrama').classList.add('active');
+            const diagModal = document.getElementById('modal-diagrama');
+            if (diagModal) diagModal.classList.add('active');
+            const anexos = document.getElementById('anexos-impresos');
+            if (anexos) anexos.classList.add('active');
           };
         }
         if (b.innerText.includes('Proceso Funcional')) {
           b.onclick = () => {
-            document.getElementById('modal-proceso').classList.add('active');
+            const procModal = document.getElementById('modal-proceso');
+            if (procModal) procModal.classList.add('active');
+            const anexos = document.getElementById('anexos-impresos');
+            if (anexos) anexos.classList.add('active');
           };
         }
       });
     </script>
-    <script>
-      <style>
+    <style>
       #anexos-impresos {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background: rgba(0,0,0,0.6); z-index: 10000;
@@ -1335,28 +1348,20 @@ $$;</pre>
     </style>
     <script>
       const anexosDiv = document.getElementById('anexos-impresos');
-      // Envolver el contenido existente en la caja del modal si no está envuelto
-      if (!anexosDiv.querySelector('.modal-box')) {
-        const content = anexosDiv.innerHTML;
-        anexosDiv.innerHTML = `
-          <div class="modal-box">
-            <div class="modal-header">
-              <div class="modal-title">Diagrama Interfuncional del Procedimiento</div>
-              <button class="modal-close" onclick="document.getElementById('anexos-impresos').classList.remove('active')">✖ Cerrar</button>
+      if (anexosDiv) {
+        if (!anexosDiv.querySelector('.modal-box')) {
+          const content = anexosDiv.innerHTML;
+          anexosDiv.innerHTML = `
+            <div class="modal-box">
+              <div class="modal-header">
+                <div class="modal-title">Diagrama Interfuncional del Procedimiento</div>
+                <button class="modal-close" onclick="document.getElementById('anexos-impresos').classList.remove('active')">✖ Cerrar</button>
+              </div>
+              <div class="modal-body">${content}</div>
             </div>
-            <div class="modal-body">${content}</div>
-          </div>
-        `;
-      }
-
-      const buttons = document.querySelectorAll('button');
-      buttons.forEach(b => {
-        if (b.innerText.includes('Ver Diagrama') || b.innerText.includes('Proceso Funcional')) {
-          b.onclick = () => {
-            anexosDiv.classList.add('active');
-          };
+          `;
         }
-      });
+      }
     </script>
 
 </div>
