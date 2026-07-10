@@ -243,6 +243,8 @@
         <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.4-eaepe-objeto-gasto.html">EAepe - Objeto del Gasto <span class="sidebar-id">02.3.4.4</span></a>
         <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.5-eaepe-clasif-func.html">EAepe - Clasif. Funcional <span class="sidebar-id">02.3.4.5</span></a>
         <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.6-edo-analitico-ingresos.html">Edo. Analítico Ingresos <span class="sidebar-id">02.3.4.6</span></a>
+      </div>
+      
       <div class="sidebar-subgroup">
         <div class="sidebar-subgroup-label">02.4 — Manuales de Usuario</div>
         <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.4.1-manual-bienes-inmuebles.html">Catálogo de Bienes Inmuebles <span class="sidebar-id">02.4.1</span></a>
@@ -389,7 +391,8 @@
         <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Libro de Bancos / Pagos <span class="sidebar-id">06.4.2</span></a>
       </div>
     </div>
-            <div class="sidebar-group">
+
+    <div class="sidebar-group">
       <div class="sidebar-group-label">07 · Recursos Materiales</div>
       
       <!-- 07.1 Catálogos -->
@@ -462,7 +465,7 @@
 </div>
 <script src="shared.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  (function initAccordion() {
     // 1. Lógica del Acordeón
     const groups = document.querySelectorAll('.sidebar-group');
     groups.forEach((group) => {
@@ -509,7 +512,7 @@
         e.currentTarget.classList.add('active');
       });
     });
-  });
+  })();
 </script>
 </body>
 </html>

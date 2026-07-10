@@ -1,5 +1,13 @@
 /* _shared.js — UI_PJEV Documentation */
 
+function inIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    return true;
+  }
+}
+
 /* ── Copiar código ── */
 function copyCode(blockId, btn) {
   const block = document.getElementById(blockId);
@@ -23,7 +31,7 @@ function markActiveSidebarLink() {
 
 /* ── Inyectar Botones de Herramientas ── */
 function injectToolbar() {
-  if (window.self !== window.top && !document.querySelector('.topbar')) {
+  if (inIframe() && !document.querySelector('.topbar')) {
     const toolbar = document.createElement('div');
     toolbar.style.position = 'fixed';
     toolbar.style.top = '20px';
@@ -165,15 +173,15 @@ function injectToolbar() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+(function initShared() {
   markActiveSidebarLink();
   injectToolbar();
   
   // No inyectar en el index o dashboard
-  if (window.self !== window.top && location.pathname.indexOf('dashboard') === -1) {
+  if (inIframe() && location.pathname.indexOf('dashboard') === -1) {
     loadPMDataAndInject();
   }
-});
+})();
 
 function loadPMDataAndInject() {
   const isRoot = location.pathname.split('/').pop() === 'home.html' || location.pathname.split('/').pop() === 'en_construccion.html';
