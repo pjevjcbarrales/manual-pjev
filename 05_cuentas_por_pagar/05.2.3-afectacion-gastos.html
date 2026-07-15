@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05.2.3 Afectación de Gastos — SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+
+  .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+</style>
+
+</head>
+<body>
+<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999; max-width: calc(-60px + 100vw);">
+<button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.location.reload()">⟳ Refrescar</button>
+<button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: rgb(255, 255, 255); color: rgb(27, 58, 45); box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;" onclick="window.print()">🖨 Imprimir</button>
+</div>
+<div class="doc-main-inner">
+
+    <!-- BREADCRUMB -->
+    <div class="elem-breadcrumb">
+        <a href="../index.html">Inicio</a> ›
+        <span>Cuentas por Pagar</span> ›
+        <span>Registros</span> ›
+        <span>05.2.3 Afectación de Gastos</span>
+    </div>
+
+    <!-- ENCABEZADO Y TÍTULO -->
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">05.2.3</div>
+        <h1 class="elem-title">Afectación de Gastos (Órdenes de Pago)</h1>
+        <p class="elem-desc">Módulo transaccional de Cuentas por Pagar encargado de registrar las facturas (CFDI), clasificar el gasto presupuestalmente y gestionar el flujo de autorizaciones para su pago.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-a">Fase 2: Ejecución del Gasto</span>
+          <span class="mod-badge badge-s">Tipo: Formulario Compuesto (1:N)</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">cxp / registros / afectacion_gasto</code></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Descripción General -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>La opción de <strong>Afectación de Gastos</strong> es el núcleo operativo del Departamento de Tesorería. Sustituye al antiguo esquema basado exclusivamente en el llenado manual del "Anexo 9". Este módulo permite registrar un trámite de pago capturando uno o múltiples archivos XML (CFDI) asociados a un único beneficiario (Proveedor, Empleado, Unidad Administrativa o Tercero).</p>
+      <p>Una vez capturada la cabecera y vinculadas las facturas, el analista asigna el gasto a la estructura programática correspondiente (Organización, Función, Programa, Proyecto y Partida - OGTO) en el grid de detalles, validando en tiempo real que exista <strong>disponibilidad presupuestal</strong> suficiente antes de enviar el trámite a la cadena de firmas y autorización.</p>
+    </div>
+
+    <!-- 2. Marco Normativo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
+            <td>Art. 4 Fracc. XVI y Art. 9</td>
+            <td>Asegurar el registro armónico de las etapas del gasto. Una afectación confirmada debe detonar automáticamente los momentos contables de Comprometido y Devengado.</td>
+          </tr>
+          <tr>
+            <td><strong>Reglamento Interior del PJEV</strong></td>
+            <td>Manual de Procedimientos (Recursos Financieros)</td>
+            <td>Obliga a la generación de la "Solicitud-comprobación de recurso" (Orden de Pago) mediante el sistema institucional para verificar el techo financiero.</td>
+          </tr>
+          <tr>
+            <td><strong>SAT - Anexo 20</strong></td>
+            <td>Reglas de validación CFDI</td>
+            <td>Extracción y validación fidedigna del UUID, RFC del receptor/emisor y desglose de impuestos retenidos para el entero de obligaciones fiscales.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. Roles que intervienen -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Analista de Tesorería / Capturista</strong></td>
+            <td>Crear la afectación, cargar CFDIs, clasificar las partidas (OGTO) y enviar a validación.</td>
+            <td>Solo puede editar afectaciones en estatus CAPTURA o RECHAZADO. No autoriza pagos.</td>
+          </tr>
+          <tr>
+            <td><strong>Jefe de Control Presupuestal</strong></td>
+            <td>Valida que la partida, proyecto y suficiencia presupuestal sean correctas. Pasa el estatus a VALIDADO.</td>
+            <td>No puede alterar los XML cargados, solo rechazar o aprobar la clasificación.</td>
+          </tr>
+          <tr>
+            <td><strong>Titular / Director Administrativo</strong></td>
+            <td>Autoriza la orden de pago (Estatus AUTORIZADO) firmando digitalmente la afectación.</td>
+            <td>Requiere que el trámite haya pasado por Control Presupuestal.</td>
+          </tr>
+          <tr>
+            <td><strong>Analista de Cuentas por Pagar</strong></td>
+            <td>Programa el pago y marca el trámite como PAGADO una vez transferido el recurso en bancos.</td>
+            <td>Solo puede actuar sobre registros AUTORIZADOS.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    
+    
+    
+    <!-- 4. Modelo de Datos -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <p>La persistencia del módulo se diseñó para operar grandes volúmenes de comprobaciones sin saturar la tabla principal. La cabecera se aloja en <code>cxp.afectaciones_gasto</code> particionada por <strong>ejercicio fiscal</strong> y garantiza la unicidad de beneficiarios, delegando las N facturas (CFDI) a la tabla hija <code>_cfdi</code> y la validación presupuestal a la tabla <code>_detalles</code>.</p>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showDBTab('db1',this)">cxp.afectaciones_gasto</button>
+        <button class="sp-tab" onclick="showDBTab('db2',this)">cxp.afectaciones_gasto_cfdi</button>
+        <button class="sp-tab" onclick="showDBTab('db3',this)">cxp.afectaciones_gasto_detalles</button>
+        <button class="sp-tab" onclick="showDBTab('db4',this)">cxp.afectaciones_gasto_firmas</button>
+      </div>
+
+      <!-- TAB 1: CABECERA -->
+      <div id="db-db1" class="sp-panel active">
+          <table class="props-table">
+            <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">FASE 1: TRÁMITE / ALTA DE CABECERA</td></tr>
+              <tr><td><code>ag_id</code></td><td><code>UUID PK</code></td><td>Identificador global único del trámite.</td></tr>
+              <tr><td><code>ejercicio_fiscal</code></td><td><code>SMALLINT PK</code></td><td>Llave de partición obligatoria.</td></tr>
+              <tr><td><code>folio</code></td><td><code>VARCHAR(20)</code></td><td>Folio alfanumérico secuencial asignado al guardar.</td></tr>
+              <tr><td><code>fecha_elaboracion</code></td><td><code>DATE</code></td><td>Fecha en la que el analista genera el registro.</td></tr>
+              <tr><td><code>concepto</code></td><td><code>VARCHAR(500)</code></td><td>Justificación principal del gasto.</td></tr>
+              <tr><td><code>tipo_pago</code></td><td><code>SMALLINT</code></td><td>Tipo de trámite que condiciona al beneficiario.</td></tr>
+              <tr><td><code>cuenta_contable_abono</code></td><td><code>VARCHAR(50)</code></td><td>Cuenta pasiva (auto-generada) para el momento del Devengado.</td></tr>
+              <tr><td><code>estatus_workflow</code></td><td><code>VARCHAR(20)</code></td><td>Estado transaccional ('CAPTURA', 'VALIDADO', 'AUTORIZADO', 'PROGRAMADO', 'PAGADO', 'CANCELADO').</td></tr>
+              
+              <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">BENEFICIARIO (UNO OBLIGATORIO)</td></tr>
+              <tr><td><code>f_proveedor_id</code></td><td><code>INT FK</code></td><td>Si el cobro proviene de una empresa (Catálogo config).</td></tr>
+              <tr><td><code>f_empleado_id</code></td><td><code>INT FK</code></td><td>Si es viático, nómina o reembolso.</td></tr>
+              <tr><td><code>f_ua_id</code></td><td><code>INT FK</code></td><td>Si el recurso se asigna internamente (fondo rotatorio).</td></tr>
+              <tr><td><code>f_tercero_id</code> / <code>_inst_id</code></td><td><code>INT FK</code></td><td>Terceros o retenciones institucionales.</td></tr>
+
+              <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">AUDITORÍA (DEFAULT)</td></tr>
+              <tr><td><code>usuario_c</code></td><td><code>VARCHAR(50)</code></td><td>Usuario creador.</td></tr>
+              <tr><td><code>fecha_c</code></td><td><code>TIMESTAMP</code></td><td>Fecha de creación de la cabecera.</td></tr>
+            </tbody>
+          </table>
+          <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+          <div class="code-wrap" style="margin-top: 0; max-height: 300px; overflow-y: auto;">
+            <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE TABLE</span> <span style="color:#61afef;">cxp.afectaciones_gasto</span> (
+    ag_id UUID <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#56b6c2;">gen_random_uuid</span>(),
+    ejercicio_fiscal SMALLINT <span style="color:#c678dd;">NOT NULL</span>,
+    folio <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">20</span>) <span style="color:#c678dd;">NULL</span>,
+    tipo_pago SMALLINT <span style="color:#c678dd;">NOT NULL</span>,
+    cuenta_contable_abono <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">50</span>) <span style="color:#c678dd;">NULL</span>,
+    afecta_presupuesto BOOLEAN <span style="color:#c678dd;">NOT NULL</span>,
+    f_centro_costo_id <span style="color:#c678dd;">INTEGER NOT NULL</span>,
+    concepto <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">500</span>) <span style="color:#c678dd;">NOT NULL</span>,
+    fecha_elaboracion <span style="color:#c678dd;">DATE NOT NULL</span>,
+    estatus_workflow <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">20</span>) <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#98c379;">'CAPTURA'</span>,
+    usuario_c <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">50</span>) <span style="color:#c678dd;">NOT NULL</span>,
+    fecha_c <span style="color:#c678dd;">TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT</span> <span style="color:#56b6c2;">now</span>(),
+    usuario_m <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">50</span>) <span style="color:#c678dd;">NULL</span>,
+    fecha_m <span style="color:#c678dd;">TIMESTAMP WITHOUT TIME ZONE NULL</span>,
+    estatus_registro SMALLINT <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#d19a66;">1</span>,
+    f_proveedor_id <span style="color:#c678dd;">INTEGER NULL</span>,
+    f_empleado_id <span style="color:#c678dd;">INTEGER NULL</span>,
+    f_ua_id <span style="color:#c678dd;">INTEGER NULL</span>,
+    f_tercero_id <span style="color:#c678dd;">INTEGER NULL</span>,
+    f_tercero_inst_id <span style="color:#c678dd;">INTEGER NULL</span>,
+    referencia <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">50</span>) <span style="color:#c678dd;">NULL</span>,
+    f_bien_inmueble_id <span style="color:#c678dd;">INTEGER NULL</span>,
+    <span style="color:#c678dd;">CONSTRAINT</span> pk_afectaciones_gasto <span style="color:#c678dd;">PRIMARY KEY</span> (ejercicio_fiscal, ag_id)
+) <span style="color:#c678dd;">PARTITION BY LIST</span> (ejercicio_fiscal);</pre>
+            </div>
+          </div>
+      </div>
+
+      <!-- TAB 2: CFDI -->
+      <div id="db-db2" class="sp-panel">
+          <table class="props-table">
+            <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr><td><code>agc_id</code></td><td><code>UUID PK</code></td><td>ID de relación de la factura.</td></tr>
+              <tr><td><code>f_ag_id</code></td><td><code>UUID FK</code></td><td>Vinculación al trámite principal.</td></tr>
+              <tr><td><code>uuid_cfdi</code></td><td><code>VARCHAR(36)</code></td><td>Folio Fiscal timbrado por el SAT.</td></tr>
+              <tr><td><code>importe_subtotal</code></td><td><code>NUMERIC(15,2)</code></td><td>Extraído del XML.</td></tr>
+              <tr><td><code>importe_iva</code></td><td><code>NUMERIC(15,2)</code></td><td>Extraído del XML.</td></tr>
+              <tr><td><code>importe_retenciones</code></td><td><code>NUMERIC(15,2)</code></td><td>Extraído del XML (ISR/IVA retenidos).</td></tr>
+              <tr><td><code>importe_total</code></td><td><code>NUMERIC(15,2)</code></td><td>Monto final exacto del CFDI.</td></tr>
+            </tbody>
+          </table>
+          <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+          <div class="code-wrap" style="margin-top: 0; max-height: 300px; overflow-y: auto;">
+            <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE TABLE</span> <span style="color:#61afef;">cxp.afectaciones_gasto_cfdi</span> (
+    agc_id UUID <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#56b6c2;">gen_random_uuid</span>(),
+    f_ag_id UUID <span style="color:#c678dd;">NOT NULL</span>,
+    uuid_cfdi <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">36</span>) <span style="color:#c678dd;">NOT NULL</span>,
+    importe_subtotal <span style="color:#c678dd;">NUMERIC</span>(<span style="color:#d19a66;">15</span>,<span style="color:#d19a66;">2</span>) <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    importe_iva <span style="color:#c678dd;">NUMERIC</span>(<span style="color:#d19a66;">15</span>,<span style="color:#d19a66;">2</span>) <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    importe_retenciones <span style="color:#c678dd;">NUMERIC</span>(<span style="color:#d19a66;">15</span>,<span style="color:#d19a66;">2</span>) <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    importe_total <span style="color:#c678dd;">NUMERIC</span>(<span style="color:#d19a66;">15</span>,<span style="color:#d19a66;">2</span>) <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    usuario_c <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">50</span>) <span style="color:#c678dd;">NOT NULL</span>,
+    fecha_c <span style="color:#c678dd;">TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT</span> <span style="color:#56b6c2;">now</span>(),
+    <span style="color:#c678dd;">CONSTRAINT</span> pk_afectaciones_gasto_cfdi <span style="color:#c678dd;">PRIMARY KEY</span> (agc_id)
+);</pre>
+            </div>
+          </div>
+      </div>
+
+      <!-- TAB 3: DETALLES -->
+      <div id="db-db3" class="sp-panel">
+          <table class="props-table">
+            <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">ESTRUCTURA PROGRAMÁTICA (OGTO)</td></tr>
+              <tr><td><code>f_centro_costo_id</code></td><td><code>INT FK</code></td><td>Organización que genera el gasto.</td></tr>
+              <tr><td><code>f_funcion_id</code></td><td><code>INT FK</code></td><td>Función a la que pertenece el gasto.</td></tr>
+              <tr><td><code>f_programa_id</code></td><td><code>INT FK</code></td><td>Programa derivado del PBR.</td></tr>
+              <tr><td><code>f_subprograma_id</code></td><td><code>INT FK</code></td><td>Subprograma en el PBR.</td></tr>
+              <tr><td><code>f_proyecto_id</code></td><td><code>INT FK</code></td><td>Proyecto (o Acción) a ejercer.</td></tr>
+              <tr><td><code>f_cog_id</code></td><td><code>INT FK</code></td><td>Partida Presupuestal / Clasificador por Objeto del Gasto.</td></tr>
+              <tr><td><code>f_fuente_fin_id</code></td><td><code>INT FK</code></td><td>Fondo o Fuente de Financiamiento (Ej. Ramo 33).</td></tr>
+              
+              <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">IMPORTES (AFECTACIÓN REAL)</td></tr>
+              <tr><td><code>importe_solicitado</code></td><td><code>NUMERIC(15,2)</code></td><td>Monto etiquetado para esta combinación programática.</td></tr>
+              <tr><td><code>disponibilidad_presupuestal</code></td><td><code>NUMERIC(15,2)</code></td><td>Saldo verificado en SAFPOJ al momento del registro.</td></tr>
+            </tbody>
+          </table>
+          <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+          <div class="code-wrap" style="margin-top: 0; max-height: 300px; overflow-y: auto;">
+            <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE TABLE</span> <span style="color:#61afef;">cxp.afectaciones_gasto_detalles</span> (
+    agd_id UUID <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#56b6c2;">gen_random_uuid</span>(),
+    f_ag_id UUID <span style="color:#c678dd;">NOT NULL</span>,
+    f_centro_costo_id <span style="color:#c678dd;">INTEGER NOT NULL</span>,
+    f_funcion_id <span style="color:#c678dd;">INTEGER NOT NULL</span>,
+    f_programa_id <span style="color:#c678dd;">INTEGER NOT NULL</span>,
+    f_subprograma_id <span style="color:#c678dd;">INTEGER NOT NULL</span>,
+    f_proyecto_id <span style="color:#c678dd;">INTEGER NOT NULL</span>,
+    f_cog_id <span style="color:#c678dd;">INTEGER NOT NULL</span>,
+    f_fuente_fin_id <span style="color:#c678dd;">INTEGER NOT NULL</span>,
+    importe_solicitado <span style="color:#c678dd;">NUMERIC</span>(<span style="color:#d19a66;">15</span>,<span style="color:#d19a66;">2</span>) <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    disponibilidad_presupuestal <span style="color:#c678dd;">NUMERIC</span>(<span style="color:#d19a66;">15</span>,<span style="color:#d19a66;">2</span>) <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#d19a66;">0</span>,
+    usuario_c <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">50</span>) <span style="color:#c678dd;">NOT NULL</span>,
+    fecha_c <span style="color:#c678dd;">TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT</span> <span style="color:#56b6c2;">now</span>(),
+    <span style="color:#c678dd;">CONSTRAINT</span> pk_afectaciones_gasto_detalles <span style="color:#c678dd;">PRIMARY KEY</span> (agd_id)
+);</pre>
+            </div>
+          </div>
+      </div>
+
+      <!-- TAB 4: FIRMAS -->
+      <div id="db-db4" class="sp-panel">
+          <table class="props-table">
+            <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr><td><code>agf_id</code></td><td><code>UUID PK</code></td><td>ID de la firma.</td></tr>
+              <tr><td><code>f_ag_id</code></td><td><code>UUID FK</code></td><td>Vinculación al trámite principal.</td></tr>
+              <tr><td><code>rol_firma</code></td><td><code>VARCHAR(50)</code></td><td>Rol de quien interviene (Ej. 'ELABORÓ', 'AUTORIZÓ').</td></tr>
+              <tr><td><code>f_empleado_id</code></td><td><code>INT FK</code></td><td>Persona que firmó el avance.</td></tr>
+              <tr><td><code>fecha_firma</code></td><td><code>TIMESTAMP</code></td><td>Fecha exacta de la acción.</td></tr>
+              <tr><td><code>estatus_firma</code></td><td><code>VARCHAR(20)</code></td><td>Resultado de la validación ('APROBADO', 'RECHAZADO').</td></tr>
+            </tbody>
+          </table>
+          <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+          <div class="code-wrap" style="margin-top: 0; max-height: 300px; overflow-y: auto;">
+            <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE TABLE</span> <span style="color:#61afef;">cxp.afectaciones_gasto_firmas</span> (
+    agf_id UUID <span style="color:#c678dd;">NOT NULL DEFAULT</span> <span style="color:#56b6c2;">gen_random_uuid</span>(),
+    f_ag_id UUID <span style="color:#c678dd;">NOT NULL</span>,
+    rol_firma <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">50</span>) <span style="color:#c678dd;">NOT NULL</span>,
+    f_empleado_id <span style="color:#c678dd;">INTEGER NOT NULL</span>,
+    fecha_firma <span style="color:#c678dd;">TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT</span> <span style="color:#56b6c2;">now</span>(),
+    estatus_firma <span style="color:#c678dd;">VARCHAR</span>(<span style="color:#d19a66;">20</span>) <span style="color:#c678dd;">NOT NULL</span>,
+    observaciones <span style="color:#c678dd;">TEXT NULL</span>,
+    <span style="color:#c678dd;">CONSTRAINT</span> pk_afectaciones_gasto_firmas <span style="color:#c678dd;">PRIMARY KEY</span> (agf_id)
+);</pre>
+            </div>
+          </div>
+      </div>
+    </div>
+
+</div>
+
+    <!-- 5. Stored Procedures -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
+      <p>A continuación se detalla la lógica de los procedimientos de base de datos encargados de las transacciones (ABC) y las consultas (Leer) para el Módulo de Afectación de Gastos. <em>Nota: Los SPs relacionados a CFDI y Firmas han sido omitidos en esta iteración.</em></p>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_leer_afectacion_encabezado</button>
+        <button class="sp-tab" onclick="showSP('sp2',this)">fn_leer_afectacion_detalles</button>
+        <button class="sp-tab" onclick="showSP('sp3',this)">fn_abc_afectacion_encabezado</button>
+        <button class="sp-tab" onclick="showSP('sp4',this)">fn_abc_afectacion_detalles</button>
+      </div>
+
+      <!-- TAB 1: LEER ENCABEZADO -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_ejercicio_fiscal</code></td><td><code>INT</code></td><td>Enviado por Backend desde la sesión. Llave de partición.</td></tr>
+            <tr><td><code>@p_ag_id</code></td><td><code>UUID</code></td><td>Opcional. Para obtener un trámite específico.</td></tr>
+            <tr><td><code>@p_folio</code></td><td><code>VARCHAR</code></td><td>Opcional. Búsqueda por folio asignado.</td></tr>
+            <tr><td><code>@p_concepto</code></td><td><code>VARCHAR</code></td><td>Opcional. Búsqueda por palabras clave.</td></tr>
+            <tr><td><code>@p_f_proveedor_id</code></td><td><code>INT</code></td><td>Opcional. Búsqueda por beneficiario.</td></tr>
+            <tr><td><code>@p_f_centro_costo_id</code></td><td><code>INT</code></td><td>Opcional. Filtro por organización.</td></tr>
+            <tr><td><code>@p_uuid_cfdi</code></td><td><code>VARCHAR</code></td><td>Opcional. Búsqueda por factura (subconsulta a _cfdi).</td></tr>
+            <tr><td><code>@p_estatus_workflow</code></td><td><code>VARCHAR</code></td><td>Opcional. Filtro por estado ('CAPTURA', 'VALIDADO', etc.).</td></tr>
+            <tr><td><code>@p_es_rh</code></td><td><code>BOOLEAN</code></td><td>Obligatorio (Sesión). Define si el usuario pertenece a Recursos Humanos.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1 (Éxito) o -1 (Error).</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Notificación del estado.</td></tr>
+            <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">NODO {data} (Arreglo JSON)</td></tr>
+            <tr><td><code>{ag_id}</code></td><td><code>UUID</code></td><td>Identificador único del encabezado.</td></tr>
+            <tr><td><code>{folio}</code></td><td><code>VARCHAR</code></td><td>Folio secuencial.</td></tr>
+            <tr><td><code>{fecha_elaboracion}</code></td><td><code>DATE</code></td><td>Fecha en que se originó.</td></tr>
+            <tr><td><code>{concepto}</code></td><td><code>VARCHAR</code></td><td>Motivo general del pago.</td></tr>
+            <tr><td><code>{estatus_workflow}</code></td><td><code>VARCHAR</code></td><td>Fase actual en la cadena de firmas.</td></tr>
+            <tr><td><code>{cuenta_contable_abono}</code></td><td><code>VARCHAR</code></td><td>Cuenta pasiva generada automáticamente.</td></tr>
+            <tr><td><code>{f_proveedor_id}</code></td><td><code>INT</code></td><td>(Si aplica) ID del proveedor.</td></tr>
+            <tr><td><code>{f_empleado_id}</code></td><td><code>INT</code></td><td>(Si aplica) ID del empleado.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">cxp.fn_leer_afectacion_encabezado</span>(
+    p_ejercicio_fiscal <span style="color:#c678dd;">INT</span>,
+    p_ag_id UUID <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_folio <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_concepto <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_proveedor_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_centro_costo_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_uuid_cfdi <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_estatus_workflow <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_es_rh <span style="color:#c678dd;">BOOLEAN</span> <span style="color:#d1d5db;">DEFAULT FALSE</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> (
+        <span style="color:#c678dd;">SELECT</span> 
+            a.ag_id, a.ejercicio_fiscal, a.folio, a.tipo_pago, a.afecta_presupuesto, a.cuenta_contable_abono,
+            a.f_centro_costo_id, a.concepto, a.fecha_elaboracion, a.estatus_workflow,
+            a.f_proveedor_id, a.f_empleado_id, a.f_ua_id, a.f_tercero_id, a.f_tercero_inst_id
+        <span style="color:#c678dd;">FROM</span> cxp.afectaciones_gasto a
+        <span style="color:#c678dd;">WHERE</span> a.ejercicio_fiscal = p_ejercicio_fiscal
+          <span style="color:#c678dd;">AND</span> a.estatus_registro = <span style="color:#d19a66;">1</span>
+          <span style="color:#c678dd;">AND</span> (p_ag_id <span style="color:#c678dd;">IS NULL OR</span> a.ag_id = p_ag_id)
+          <span style="color:#c678dd;">AND</span> (p_folio <span style="color:#c678dd;">IS NULL OR</span> a.folio <span style="color:#56b6c2;">ILIKE</span> <span style="color:#98c379;">'%'</span> || p_folio || <span style="color:#98c379;">'%'</span>)
+          <span style="color:#c678dd;">AND</span> (p_concepto <span style="color:#c678dd;">IS NULL OR</span> a.concepto <span style="color:#56b6c2;">ILIKE</span> <span style="color:#98c379;">'%'</span> || p_concepto || <span style="color:#98c379;">'%'</span>)
+          <span style="color:#c678dd;">AND</span> (p_f_proveedor_id <span style="color:#c678dd;">IS NULL OR</span> a.f_proveedor_id = p_f_proveedor_id)
+          <span style="color:#c678dd;">AND</span> (p_f_centro_costo_id <span style="color:#c678dd;">IS NULL OR</span> a.f_centro_costo_id = p_f_centro_costo_id)
+          <span style="color:#c678dd;">AND</span> (p_estatus_workflow <span style="color:#c678dd;">IS NULL OR</span> a.estatus_workflow = p_estatus_workflow)
+          <span style="color:#5c6370;">-- Segregación Capítulo 1000 (Nómina)</span>
+          <span style="color:#c678dd;">AND</span> (
+              (p_es_rh = <span style="color:#d19a66;">TRUE</span> <span style="color:#c678dd;">AND</span> a.tipo_pago = <span style="color:#d19a66;">4</span>) <span style="color:#c678dd;">OR</span>
+              (p_es_rh = <span style="color:#d19a66;">FALSE</span> <span style="color:#c678dd;">AND</span> a.tipo_pago <> <span style="color:#d19a66;">4</span>)
+          )
+          <span style="color:#c678dd;">AND</span> (p_uuid_cfdi <span style="color:#c678dd;">IS NULL OR EXISTS</span> (
+              <span style="color:#c678dd;">SELECT</span> <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">FROM</span> cxp.afectaciones_gasto_cfdi c <span style="color:#c678dd;">WHERE</span> c.f_ag_id = a.ag_id <span style="color:#c678dd;">AND</span> c.uuid_cfdi <span style="color:#56b6c2;">ILIKE</span> <span style="color:#98c379;">'%'</span> || p_uuid_cfdi || <span style="color:#98c379;">'%'</span>
+          ))
+    ) t;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: LEER PARTIDAS -->
+      <div id="sp-sp2" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_ag_id</code></td><td><code>UUID</code></td><td>Obligatorio. ID del trámite padre.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1 (Éxito) o -1 (Error).</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Notificación del estado.</td></tr>
+            <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">NODO {data} (Arreglo JSON)</td></tr>
+            <tr><td><code>{agd_id}</code></td><td><code>UUID</code></td><td>ID del detalle (partida).</td></tr>
+            <tr><td><code>{f_centro_costo_id}...</code></td><td><code>INT</code></td><td>Estructura programática completa.</td></tr>
+            <tr><td><code>{importe_solicitado}</code></td><td><code>NUMERIC</code></td><td>Importe etiquetado a esta partida.</td></tr>
+            <tr><td><code>{disponibilidad_presupuestal}</code></td><td><code>NUMERIC</code></td><td>Saldo congelado/verificado.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">cxp.fn_leer_afectacion_detalles</span>(
+    p_ag_id UUID
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_resultado <span style="color:#56b6c2;">jsonb</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#56b6c2;">COALESCE</span>(<span style="color:#56b6c2;">jsonb_agg</span>(<span style="color:#56b6c2;">row_to_json</span>(t)), <span style="color:#98c379;">'[]'</span>::<span style="color:#56b6c2;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_resultado
+    <span style="color:#c678dd;">FROM</span> (
+        <span style="color:#c678dd;">SELECT</span> 
+            agd_id, f_ag_id, f_centro_costo_id, f_funcion_id, f_programa_id,
+            f_subprograma_id, f_proyecto_id, f_cog_id, f_fuente_fin_id,
+            importe_solicitado, disponibilidad_presupuestal
+        <span style="color:#c678dd;">FROM</span> cxp.afectaciones_gasto_detalles
+        <span style="color:#c678dd;">WHERE</span> f_ag_id = p_ag_id
+    ) t;
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'OK'</span>, <span style="color:#98c379;">'data'</span>, v_resultado);
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ABC ENCABEZADO -->
+      <div id="sp-sp3" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Alta, 2: Modificación, 3: Borrado Lógico.</td></tr>
+            <tr><td><code>@p_ejercicio_fiscal</code></td><td><code>INT</code></td><td>Obligatorio en todas las acciones.</td></tr>
+            <tr><td><code>@p_ag_id</code></td><td><code>UUID</code></td><td>Nulo al insertar (1). Obligatorio en (2) y (3).</td></tr>
+            <tr><td><code>@p_tipo_pago</code></td><td><code>INT</code></td><td>Determina el tipo de trámite y beneficiario.</td></tr>
+            <tr><td><code>@p_afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>Si se descontará del saldo SAFPOJ.</td></tr>
+            <tr><td><code>@p_f_centro_costo_id</code></td><td><code>INT</code></td><td>Organización de origen.</td></tr>
+            <tr><td><code>@p_concepto</code></td><td><code>VARCHAR</code></td><td>Justificación principal del gasto.</td></tr>
+            <tr><td><code>@p_f_proveedor_id</code></td><td><code>INT</code></td><td>ID si el beneficiario es proveedor.</td></tr>
+            <tr><td><code>@p_usuario</code></td><td><code>VARCHAR</code></td><td>Quién ejecuta la transacción.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1 (Éxito) o -1 (Error).</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Notificación del estado.</td></tr>
+            <tr><td><code>{id_generado}</code></td><td><code>UUID</code></td><td>Se devuelve en inserción (1).</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">cxp.fn_abc_afectacion_encabezado</span>(
+    p_accion <span style="color:#c678dd;">INT</span>,
+    p_ejercicio_fiscal <span style="color:#c678dd;">INT</span>,
+    p_ag_id UUID <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_tipo_pago <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_afecta_presupuesto <span style="color:#c678dd;">BOOLEAN</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_centro_costo_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_concepto <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_fecha_elaboracion <span style="color:#c678dd;">DATE</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_proveedor_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_empleado_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_ua_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_usuario <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#98c379;">'SISTEMA'</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span> v_id_gen UUID; v_folio <span style="color:#c678dd;">VARCHAR</span>; v_cuenta_abono <span style="color:#c678dd;">VARCHAR</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#5c6370;">-- Generación de Folio básico (simulación)</span>
+        v_folio := <span style="color:#98c379;
+        <span style="color:#5c6370;">-- Auto-generar cuenta de abono según tipo de pago y beneficiario</span>
+        v_cuenta_abono := cxp.fn_generar_cuenta_pasivo(p_tipo_pago, p_f_proveedor_id, p_f_empleado_id);">'AG-'</span> || p_ejercicio_fiscal || <span style="color:#98c379;">'-'</span> || <span style="color:#56b6c2;">EXTRACT</span>(EPOCH <span style="color:#c678dd;">FROM</span> <span style="color:#56b6c2;">now</span>())::<span style="color:#c678dd;">INT</span>;
+        <span style="color:#c678dd;">INSERT INTO</span> cxp.afectaciones_gasto(
+            ejercicio_fiscal, folio, tipo_pago, afecta_presupuesto, f_centro_costo_id, cuenta_contable_abono,
+            concepto, fecha_elaboracion, estatus_workflow, f_proveedor_id, f_empleado_id, f_ua_id, usuario_c
+        ) <span style="color:#c678dd;">VALUES</span> (
+            p_ejercicio_fiscal, v_folio, p_tipo_pago, p_afecta_presupuesto, p_f_centro_costo_id, v_cuenta_abono,
+            p_concepto, p_fecha_elaboracion, <span style="color:#98c379;">'CAPTURA'</span>, p_f_proveedor_id, p_f_empleado_id, p_f_ua_id, p_usuario
+        ) <span style="color:#c678dd;">RETURNING</span> ag_id <span style="color:#c678dd;">INTO</span> v_id_gen;
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Alta exitosa'</span>, <span style="color:#98c379;">'id_generado'</span>, v_id_gen);
+
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#5c6370;">-- Re-calcular cuenta en actualización</span>
+        v_cuenta_abono := cxp.fn_generar_cuenta_pasivo(p_tipo_pago, p_f_proveedor_id, p_f_empleado_id);
+        <span style="color:#c678dd;">UPDATE</span> cxp.afectaciones_gasto
+        <span style="color:#c678dd;">SET</span> tipo_pago = p_tipo_pago, cuenta_contable_abono = v_cuenta_abono, afecta_presupuesto = p_afecta_presupuesto,
+            f_centro_costo_id = p_f_centro_costo_id, concepto = p_concepto,
+            f_proveedor_id = p_f_proveedor_id, f_empleado_id = p_f_empleado_id,
+            usuario_m = p_usuario, fecha_m = <span style="color:#56b6c2;">now</span>()
+        <span style="color:#c678dd;">WHERE</span> ag_id = p_ag_id <span style="color:#c678dd;">AND</span> ejercicio_fiscal = p_ejercicio_fiscal <span style="color:#c678dd;">AND</span> estatus_workflow = <span style="color:#98c379;">'CAPTURA'</span>;
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Actualización exitosa'</span>);
+    
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">UPDATE</span> cxp.afectaciones_gasto <span style="color:#c678dd;">SET</span> estatus_registro = <span style="color:#d19a66;">0</span>, usuario_m = p_usuario, fecha_m = <span style="color:#56b6c2;">now</span>()
+        <span style="color:#c678dd;">WHERE</span> ag_id = p_ag_id <span style="color:#c678dd;">AND</span> ejercicio_fiscal = p_ejercicio_fiscal <span style="color:#c678dd;">AND</span> estatus_workflow = <span style="color:#98c379;">'CAPTURA'</span>;
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Eliminado lógicamente'</span>);
+    <span style="color:#c678dd;">END IF</span>;
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ABC PARTIDAS -->
+      <div id="sp-sp4" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>@p_accion</code></td><td><code>INT</code></td><td>1: Alta, 2: Modificación, 3: Eliminación Física.</td></tr>
+            <tr><td><code>@p_agd_id</code></td><td><code>UUID</code></td><td>Obligatorio para Acción 2 y 3.</td></tr>
+            <tr><td><code>@p_f_ag_id</code></td><td><code>UUID</code></td><td>ID de la cabecera, obligatorio en Acción 1.</td></tr>
+            <tr><td><code>@p_f_centro_costo_id</code></td><td><code>INT</code></td><td>Clave de la organización en OGTO.</td></tr>
+            <tr><td><code>@p_f_funcion_id</code></td><td><code>INT</code></td><td>Clave de la función en OGTO.</td></tr>
+            <tr><td><code>@p_f_programa_id</code></td><td><code>INT</code></td><td>Clave de programa en OGTO.</td></tr>
+            <tr><td><code>@p_f_subprograma_id</code></td><td><code>INT</code></td><td>Clave de subprograma en OGTO.</td></tr>
+            <tr><td><code>@p_f_proyecto_id</code></td><td><code>INT</code></td><td>Clave de proyecto en OGTO.</td></tr>
+            <tr><td><code>@p_f_cog_id</code></td><td><code>INT</code></td><td>Partida del gasto (Clasificador por Objeto).</td></tr>
+            <tr><td><code>@p_f_fuente_fin_id</code></td><td><code>INT</code></td><td>Fondo financiero (Ej. Recursos Propios).</td></tr>
+            <tr><td><code>@p_importe_solicitado</code></td><td><code>NUMERIC</code></td><td>Monto etiquetado para este cruce.</td></tr>
+            <tr><td><code>@p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario creador/modificador.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>1 si pasó la validación, -1 si falló.</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje detallado (Ej. "Saldo insuficiente en SAFPOJ").</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> <span style="color:#61afef;">cxp.fn_abc_afectacion_detalles</span>(
+    p_accion <span style="color:#c678dd;">INT</span>,
+    p_agd_id UUID <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_ag_id UUID <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_centro_costo_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_funcion_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_programa_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_subprograma_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_proyecto_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_cog_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_f_fuente_fin_id <span style="color:#c678dd;">INT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_importe_solicitado <span style="color:#c678dd;">NUMERIC</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_usuario <span style="color:#c678dd;">VARCHAR</span> <span style="color:#d1d5db;">DEFAULT</span> <span style="color:#98c379;">'SISTEMA'</span>
+) <span style="color:#c678dd;">RETURNS</span> <span style="color:#56b6c2;">jsonb</span> <span style="color:#c678dd;">LANGUAGE</span> plpgsql <span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#5c6370;">-- Validación Presupuestal Simulada</span>
+        <span style="color:#c678dd;">INSERT INTO</span> cxp.afectaciones_gasto_detalles(
+            f_ag_id, f_centro_costo_id, f_funcion_id, f_programa_id, f_subprograma_id,
+            f_proyecto_id, f_cog_id, f_fuente_fin_id, importe_solicitado, disponibilidad_presupuestal, usuario_c
+        ) <span style="color:#c678dd;">VALUES</span> (
+            p_f_ag_id, p_f_centro_costo_id, p_f_funcion_id, p_f_programa_id, p_f_subprograma_id,
+            p_f_proyecto_id, p_f_cog_id, p_f_fuente_fin_id, p_importe_solicitado, <span style="color:#d19a66;">0</span>, p_usuario
+        );
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Partida asignada con éxito'</span>);
+    
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">UPDATE</span> cxp.afectaciones_gasto_detalles
+        <span style="color:#c678dd;">SET</span> f_centro_costo_id = p_f_centro_costo_id, f_funcion_id = p_f_funcion_id,
+            f_programa_id = p_f_programa_id, f_subprograma_id = p_f_subprograma_id,
+            f_proyecto_id = p_f_proyecto_id, f_cog_id = p_f_cog_id, f_fuente_fin_id = p_f_fuente_fin_id,
+            importe_solicitado = p_importe_solicitado
+        <span style="color:#c678dd;">WHERE</span> agd_id = p_agd_id;
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Partida actualizada'</span>);
+    
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">DELETE FROM</span> cxp.afectaciones_gasto_detalles <span style="color:#c678dd;">WHERE</span> agd_id = p_agd_id;
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#56b6c2;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">1</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Partida eliminada'</span>);
+    <span style="color:#c678dd;">END IF</span>;
+<span style="color:#c678dd;">END</span>;
+$$;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Servicios REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST (Endpoints NestJS)</div>
+      <p>El backend (NestJS) expone los siguientes endpoints bajo el controlador <code>AfectacionesGastoController</code>. Cada servicio valida el payload mediante DTOs (Data Transfer Objects) y consume los Stored Procedures definidos en la sección anterior utilizando Prisma <code>$queryRaw</code>.</p>
+      
+      <table class="props-table">
+        <thead><tr><th>Verbo</th><th>Ruta / Endpoint</th><th>SP Invocado</th><th>Descripción y Payload</th></tr></thead>
+        <tbody>
+          <tr><td colspan="4" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">ENDPOINTS DE CABECERA (FASE 1)</td></tr>
+          <tr>
+            <td><span class="elem-tag" style="background:#1d4ed8; color:#fff; border:none; font-family:var(--font-mono); font-weight:bold;">GET</span></td>
+            <td><code>/cxp/afectaciones-gasto</code></td>
+            <td><code>fn_leer_..._encabezado</code></td>
+            <td>Obtiene el listado paginado. Admite Query Params: <code>?ejercicio=2026&estatus=CAPTURA</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="elem-tag" style="background:#1d4ed8; color:#fff; border:none; font-family:var(--font-mono); font-weight:bold;">GET</span></td>
+            <td><code>/cxp/afectaciones-gasto/:id</code></td>
+            <td><code>fn_leer_..._encabezado</code></td>
+            <td>Obtiene un trámite específico mediante su <code>ag_id</code> (UUID).</td>
+          </tr>
+          <tr>
+            <td><span class="elem-tag" style="background:#166534; color:#fff; border:none; font-family:var(--font-mono); font-weight:bold;">POST</span></td>
+            <td><code>/cxp/afectaciones-gasto</code></td>
+            <td><code>fn_abc_..._encabezado (1)</code></td>
+            <td>Crea un nuevo trámite.<br><span style="font-size:10px; color:var(--pjev-texto-muted);">Body: <code>{ tipo_pago, f_centro_costo_id, concepto... }</code></span></td>
+          </tr>
+          <tr>
+            <td><span class="elem-tag" style="background:#ca8a04; color:#fff; border:none; font-family:var(--font-mono); font-weight:bold;">PUT</span></td>
+            <td><code>/cxp/afectaciones-gasto/:id</code></td>
+            <td><code>fn_abc_..._encabezado (2)</code></td>
+            <td>Actualiza un trámite en estatus 'CAPTURA'.<br><span style="font-size:10px; color:var(--pjev-texto-muted);">Body: Igual que POST pero sin campos inmutables.</span></td>
+          </tr>
+          <tr>
+            <td><span class="elem-tag" style="background:#991b1b; color:#fff; border:none; font-family:var(--font-mono); font-weight:bold;">DELETE</span></td>
+            <td><code>/cxp/afectaciones-gasto/:id</code></td>
+            <td><code>fn_abc_..._encabezado (3)</code></td>
+            <td>Borrado lógico (estatus_registro = 0). Solo permitido si el trámite sigue en 'CAPTURA'.</td>
+          </tr>
+
+          <tr><td colspan="4" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">ENDPOINTS DE DETALLE (PARTIDAS OGTO)</td></tr>
+          <tr>
+            <td><span class="elem-tag" style="background:#1d4ed8; color:#fff; border:none; font-family:var(--font-mono); font-weight:bold;">GET</span></td>
+            <td><code>/cxp/afectaciones-gasto/:id/partidas</code></td>
+            <td><code>fn_leer_..._detalles</code></td>
+            <td>Obtiene las líneas de clasificación presupuestal del trámite.</td>
+          </tr>
+          <tr>
+            <td><span class="elem-tag" style="background:#166534; color:#fff; border:none; font-family:var(--font-mono); font-weight:bold;">POST</span></td>
+            <td><code>/cxp/afectaciones-gasto/:id/partidas</code></td>
+            <td><code>fn_abc_..._detalles (1)</code></td>
+            <td>Inserta una nueva partida y descuenta saldo simulado.<br><span style="font-size:10px; color:var(--pjev-texto-muted);">Body: <code>{ f_cog_id, f_programa_id..., importe }</code></span></td>
+          </tr>
+          <tr>
+            <td><span class="elem-tag" style="background:#ca8a04; color:#fff; border:none; font-family:var(--font-mono); font-weight:bold;">PUT</span></td>
+            <td><code>/cxp/afectaciones-gasto/:id/partidas/:id_partida</code></td>
+            <td><code>fn_abc_..._detalles (2)</code></td>
+            <td>Modifica los montos o la clave programática de un renglón existente.</td>
+          </tr>
+          <tr>
+            <td><span class="elem-tag" style="background:#991b1b; color:#fff; border:none; font-family:var(--font-mono); font-weight:bold;">DELETE</span></td>
+            <td><code>/cxp/afectaciones-gasto/:id/partidas/:id_partida</code></td>
+            <td><code>fn_abc_..._detalles (3)</code></td>
+            <td>Elimina la partida físicamente.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Acciones del Módulo -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo y Procedimientos</div>
+      <p>Esta sección mapea los eventos transaccionales del sistema con los pasos dictados en el <strong>Manual de Procedimientos de Cuentas por Pagar</strong>. Cada acción altera el <code>estatus_workflow</code> y registra una traza inmutable en la tabla de firmas, garantizando la auditoría del proceso.</p>
+      
+      <table class="props-table">
+        <thead><tr><th>Acción (Botón UI)</th><th>Rol Requerido</th><th>Cambio de Estatus</th><th>Paso en el Manual de Procedimientos</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Guardar Borrador / Afectar Presupuesto</strong></td>
+            <td>Analista de Tesorería</td>
+            <td>Se mantiene en <span class="siaf-badge siaf-badge-registrado">CAPTURA</span></td>
+            <td>Paso Inicial: El analista recibe el soporte documental, carga el XML (factura) y reserva preventivamente el saldo en las partidas (OGTO).</td>
+          </tr>
+          <tr>
+            <td><strong>Turnar a Revisión Presupuestal</strong></td>
+            <td>Analista de Tesorería</td>
+            <td>De CAPTURA a <span class="siaf-badge siaf-badge-enviado">EN REVISIÓN</span></td>
+            <td>Envío de la "Solicitud de Pago" y su soporte (físico/digital) al área de Control Presupuestal para su cruce con el techo financiero.</td>
+          </tr>
+          <tr>
+            <td><strong>Validar Clasificación Presupuestal</strong></td>
+            <td>Jefe de Control Presupuestal</td>
+            <td>De EN REVISIÓN a <span class="siaf-badge siaf-badge-autorizado" style="background:#fef08a; color:#854d0e; border-color:#eab308;">VALIDADO</span></td>
+            <td>Revisión y Visto Bueno: El jefe confirma que la partida afectada es la correcta según el clasificador por objeto del gasto y que existe liquidez.</td>
+          </tr>
+          <tr>
+            <td><strong>Autorizar Orden (Firma Electrónica)</strong></td>
+            <td>Director Administrativo</td>
+            <td>De VALIDADO a <span class="siaf-badge siaf-badge-autorizado">AUTORIZADO</span></td>
+            <td>Firma Oficial: Autorización formal de la orden de pago, equivalente a la rúbrica autógrafa del formato impreso. Detona el momento de DEVENGADO.</td>
+          </tr>
+          <tr>
+            <td><strong>Programar Transferencia</strong></td>
+            <td>Analista de CxP / Bancos</td>
+            <td>De AUTORIZADO a <span class="siaf-badge siaf-badge-afectado" style="background:#e0e7ff; color:#3730a3; border-color:#818cf8;">PROGRAMADO</span></td>
+            <td>Carga del archivo Layout al portal bancario comercial para la dispersión masiva o individual de los fondos.</td>
+          </tr>
+          <tr>
+            <td><strong>Confirmar Dispersión Bancaria</strong></td>
+            <td>Analista de CxP / Bancos</td>
+            <td>De PROGRAMADO a <span class="siaf-badge siaf-badge-afectado">PAGADO</span></td>
+            <td>Paso Final: Conciliación del comprobante electrónico de pago (CEP). El ciclo concluye y se detona el momento contable de EJERCIDO/PAGADO.</td>
+          </tr>
+          <tr>
+            <td><strong>Rechazar / Cancelar Trámite</strong></td>
+            <td>Validador / Autorizador</td>
+            <td>A <span class="siaf-badge siaf-badge-cancelado">RECHAZADO / CANCELADO</span></td>
+            <td>Devolución del trámite por errores normativos, fiscales o falta de liquidez. Libera inmediatamente el saldo presupuestal retenido.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 8. Diseño de Interfaces -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (Wireframes)</div>
+      <p>A continuación se presentan los prototipos (wireframes) de la interfaz de usuario para el Módulo de Afectación de Gastos, respetando la guía de estilos visuales del SIAF-PJEV.</p>
+      
+      <div class="wf-tabs">
+        <button class="wf-tab active" onclick="switchWfTab(this, 'wf1')">Bandeja de entrada (parámetros)</button>
+        <button class="wf-tab" onclick="switchWfTab(this, 'wf2')">Bandeja de entrada (valores)</button>
+        <button class="wf-tab" onclick="switchWfTab(this, 'wf3')">Formulario de captura (valores)</button>
+        <button class="wf-tab" onclick="switchWfTab(this, \'wf4\')">Formulario de captura (parámetros)</button>
+      </div>
+
+      <!-- WF1: Bandeja de Entrada -->
+      <div id="wf1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar">1. Pantalla Principal: Bandeja de Entrada (Mapeo de Variables)</div>
+          <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+            <svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+              <!-- Background / Browser Window -->
+              <rect width="1000" height="600" fill="#f8fafc" rx="6" />
+              
+              <!-- SIAF Topbar Fake -->
+              <rect width="1000" height="50" fill="#183125" />
+              <circle cx="35" cy="25" r="12" fill="#DEAC50" opacity="0.3" stroke="#DEAC50" stroke-width="2"/>
+              <text x="60" y="30" fill="#DEAC50" font-size="14" font-weight="bold">SIAF-PJEV</text>
+              <text x="150" y="30" fill="#fff" opacity="0.5" font-size="12">| Cuentas por Pagar > Afectación de Gastos</text>
+              <text x="850" y="30" fill="#fff" font-size="11">👤 Analista CxP</text>
+
+              <!-- Page Header -->
+              <text x="30" y="100" fill="#183125" font-size="20" font-weight="bold">Bandeja de Afectaciones de Gasto</text>
+              
+              <rect x="800" y="85" width="170" height="36" fill="#183125" rx="6" />
+              <text x="885" y="108" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">+ Nueva Afectación</text>
+
+              <!-- Filter Section (Parametros IN) -->
+              <rect x="30" y="140" width="940" height="120" fill="#fff" stroke="#e2e8f0" rx="6" />
+              
+              <!-- Row 1 Filters -->
+              <text x="50" y="165" fill="#475569" font-size="11" font-weight="bold">FOLIO</text>
+              <rect x="50" y="170" width="120" height="28" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="60" y="188" fill="#c678dd" font-family="'Consolas', monospace" font-size="11" font-weight="bold">@p_folio</text>
+              
+              <text x="190" y="165" fill="#475569" font-size="11" font-weight="bold">CONCEPTO</text>
+              <rect x="190" y="170" width="200" height="28" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="200" y="188" fill="#c678dd" font-family="'Consolas', monospace" font-size="11" font-weight="bold">@p_concepto</text>
+              
+              <text x="410" y="165" fill="#475569" font-size="11" font-weight="bold">BENEFICIARIO</text>
+              <rect x="410" y="170" width="200" height="28" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="420" y="188" fill="#c678dd" font-family="'Consolas', monospace" font-size="11" font-weight="bold">@p_f_proveedor_id</text>
+              
+              <text x="630" y="165" fill="#475569" font-size="11" font-weight="bold">ORGANIZACIÓN (CENTRO DE COSTO)</text>
+              <rect x="630" y="170" width="310" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="640" y="188" fill="#c678dd" font-family="'Consolas', monospace" font-size="11" font-weight="bold">@p_f_centro_costo_id ▼</text>
+
+              <!-- Row 2 Filters -->
+              <text x="50" y="215" fill="#475569" font-size="11" font-weight="bold">FACTURA (CFDI)</text>
+              <rect x="50" y="220" width="180" height="28" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="60" y="238" fill="#c678dd" font-family="'Consolas', monospace" font-size="11" font-weight="bold">@p_uuid_cfdi</text>
+              
+              <text x="250" y="215" fill="#475569" font-size="11" font-weight="bold">ESTATUS</text>
+              <rect x="250" y="220" width="140" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="260" y="238" fill="#c678dd" font-family="'Consolas', monospace" font-size="11" font-weight="bold">@p_estatus_workflow ▼</text>
+
+              <!-- Buttons -->
+              <rect x="410" y="220" width="100" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="460" y="238" fill="#334155" font-size="12" font-weight="bold" text-anchor="middle">🔍 Buscar</text>
+
+              <text x="540" y="238" fill="#2563eb" font-size="12" font-weight="bold" text-decoration="underline" cursor="pointer">Limpiar filtros</text>
+
+              <!-- Data Grid (Valores OUT) -->
+              <rect x="30" y="280" width="940" height="280" fill="#fff" stroke="#e2e8f0" rx="6" />
+              
+              <!-- Grid Header -->
+              <rect x="30" y="280" width="940" height="40" fill="#f1f5f9" stroke="#e2e8f0" />
+              <text x="50" y="305" fill="#475569" font-size="11" font-weight="bold">FOLIO</text>
+              <text x="140" y="305" fill="#475569" font-size="11" font-weight="bold">FECHA</text>
+              <text x="260" y="305" fill="#475569" font-size="11" font-weight="bold">CONCEPTO / BENEFICIARIO</text>
+              <text x="580" y="305" fill="#475569" font-size="11" font-weight="bold">TIPO DE PAGO</text>
+              <text x="730" y="305" fill="#475569" font-size="11" font-weight="bold">ESTATUS</text>
+              <text x="880" y="305" fill="#475569" font-size="11" font-weight="bold">ACCIONES</text>
+
+              <!-- Row 1: Mapping Row (CAPTURA) -->
+              <rect x="30" y="320" width="940" height="60" fill="#fff" stroke="#f1f5f9" />
+              <text x="50" y="345" fill="#0f172a" font-family="'Consolas', monospace" font-size="12" font-weight="bold">{folio}</text>
+              <text x="140" y="345" fill="#475569" font-family="'Consolas', monospace" font-size="12">{fecha_elaboracion}</text>
+              <text x="260" y="345" fill="#0f172a" font-family="'Consolas', monospace" font-size="12" font-weight="bold">{concepto}</text>
+              <text x="260" y="362" fill="#64748b" font-family="'Consolas', monospace" font-size="11">{f_proveedor_id} / {f_empleado_id}</text>
+              <text x="580" y="345" fill="#475569" font-family="'Consolas', monospace" font-size="12">{tipo_pago}</text>
+              
+              <rect x="730" y="333" width="100" height="20" fill="#f0ede6" stroke="#d0cabc" rx="10" />
+              <text x="780" y="347" fill="#5a5a5a" font-family="'Consolas', monospace" font-size="10" font-weight="bold" text-anchor="middle">{estatus_workflow}</text>
+              
+              <!-- Hidden Row ID Note -->
+              <text x="50" y="370" fill="#e11d48" font-family="'Consolas', monospace" font-size="10">Key (hidden): {ag_id}</text>
+
+              <!-- Actions (Static) -->
+              <rect x="880" y="335" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="892" y="351" fill="#334155" font-size="12" text-anchor="middle">✏️</text>
+              <rect x="910" y="335" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="922" y="351" fill="#991b1b" font-size="12" text-anchor="middle">🗑️</text>
+
+              <!-- Row 2: Mapping Row 2 (VALIDADO) -->
+              <rect x="30" y="380" width="940" height="60" fill="#f8fafc" stroke="#f1f5f9" />
+              <text x="50" y="405" fill="#0f172a" font-family="'Consolas', monospace" font-size="12" font-weight="bold">{folio}</text>
+              <text x="140" y="405" fill="#475569" font-family="'Consolas', monospace" font-size="12">{fecha_elaboracion}</text>
+              <text x="260" y="405" fill="#0f172a" font-family="'Consolas', monospace" font-size="12" font-weight="bold">{concepto}</text>
+              <text x="260" y="422" fill="#64748b" font-family="'Consolas', monospace" font-size="11">{f_proveedor_id}</text>
+              <text x="580" y="405" fill="#475569" font-family="'Consolas', monospace" font-size="12">{tipo_pago}</text>
+              
+              <rect x="730" y="393" width="100" height="20" fill="#fffbeb" stroke="#f5d565" rx="10" />
+              <text x="780" y="407" fill="#854d0e" font-family="'Consolas', monospace" font-size="10" font-weight="bold" text-anchor="middle">{estatus_workflow}</text>
+              
+              <!-- Actions (Static) -->
+              <rect x="880" y="395" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="892" y="411" fill="#334155" font-size="12" text-anchor="middle">👁️</text>
+              <rect x="910" y="395" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="922" y="411" fill="#334155" font-size="12" text-anchor="middle">🖨️</text>
+
+              <!-- Pagination -->
+              <rect x="30" y="500" width="940" height="50" fill="#fff" rx="6" />
+              <text x="50" y="530" fill="#64748b" font-size="12">Paginación controlada por UI</text>
+              
+              <rect x="850" y="515" width="30" height="24" fill="#f1f5f9" rx="4" />
+              <text x="865" y="531" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle"><</text>
+              <rect x="885" y="515" width="30" height="24" fill="#183125" rx="4" />
+              <text x="900" y="531" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">1</text>
+              <rect x="920" y="515" width="30" height="24" fill="#f1f5f9" rx="4" />
+              <text x="935" y="531" fill="#334155" font-size="11" font-weight="bold" text-anchor="middle">2</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- WF3: Formulario de captura (valores) -->
+      <div id="wf3" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar">3. Modal: Formulario de Captura (Valores)</div>
+          <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+            <svg viewBox="0 0 1100 900" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+              <!-- Background / Browser Window Fake -->
+              <rect width="1100" height="900" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <!-- Modal Overlay -->
+              <rect width="1100" height="900" fill="rgba(0,0,0,0.6)" />
+              
+              <!-- Modal Container -->
+              <rect x="20" y="20" width="1060" height="860" fill="#fff" rx="6" stroke="#999" />
+              
+              <!-- Modal Header -->
+              <rect x="20" y="20" width="1060" height="40" fill="#1B3A2D" rx="6" />
+              <rect x="20" y="40" width="1060" height="20" fill="#1B3A2D" />
+              <text x="40" y="45" fill="#fff" font-size="14" font-weight="bold">AFECTACIÓN PRESUPUESTAL / ORDEN DE PAGO (Captura)</text>
+              <text x="1040" y="45" fill="#fff" font-size="14" font-weight="bold" cursor="pointer">X</text>
+              
+              <!-- SECCIÓN 1: ENCABEZADO -->
+              <text x="40" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">DATOS DEL ENCABEZADO</text>
+              <rect x="40" y="100" width="1020" height="230" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
+              
+              <!-- Fila 1: Folio, Fecha, Estatus, Tipo Movimiento -->
+              <text x="50" y="125" font-size="10" font-weight="bold" fill="#666">FOLIO PRESUPUESTAL</text>
+              <rect x="50" y="130" width="150" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="60" y="148" font-size="11" font-weight="bold" fill="#0f172a">AG-2026-001</text>
+
+              <text x="230" y="125" font-size="10" font-weight="bold" fill="#666">FECHA ELAB.</text>
+              <rect x="230" y="130" width="120" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="240" y="148" font-size="11" font-weight="bold" fill="#0f172a">15/05/2026</text>
+              
+              <text x="380" y="125" font-size="10" font-weight="bold" fill="#666">ESTATUS</text>
+              <rect x="380" y="130" width="120" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <rect x="390" y="134" width="70" height="20" fill="#f0ede6" stroke="#d0cabc" rx="10" />
+              <text x="425" y="148" fill="#5a5a5a" font-size="10" font-weight="bold" text-anchor="middle">CAPTURA</text>
+
+              <text x="530" y="125" font-size="10" font-weight="bold" fill="#666">TIPO DE MOVIMIENTO</text>
+              <rect x="530" y="130" width="250" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="540" y="148" font-size="11" fill="#0f172a">1 - Pago a Proveedores ▼</text>
+
+              <text x="810" y="125" font-size="10" font-weight="bold" fill="#666">AFECTA PPTO.</text>
+              <rect x="810" y="130" width="100" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="820" y="148" font-size="11" fill="#0f172a">☑ Sí</text>
+
+              <!-- Fila 2: Organización, Beneficiario, RFC -->
+              <text x="50" y="175" font-size="10" font-weight="bold" fill="#666">ORGANIZACIÓN</text>
+              <rect x="50" y="180" width="400" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="60" y="198" font-size="11" fill="#0f172a">01A01 - PRESIDENCIA DEL TRIBUNAL SUPERIOR ▼</text>
+
+              <text x="480" y="175" font-size="10" font-weight="bold" fill="#666">NOMBRE DEL PROVEEDOR O BENEFICIARIO</text>
+              <rect x="480" y="180" width="350" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="490" y="198" font-size="11" fill="#0f172a">Oficentro S.A. de C.V. ▼</text>
+
+              <text x="860" y="175" font-size="10" font-weight="bold" fill="#666">RFC</text>
+              <rect x="860" y="180" width="150" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="870" y="198" font-size="11" fill="#0f172a">OFI991231XX1</text>
+
+              <!-- Fila 3: Concepto -->
+              <text x="50" y="225" font-size="10" font-weight="bold" fill="#666">CONCEPTO</text>
+              <rect x="50" y="230" width="960" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="60" y="248" font-size="11" fill="#0f172a">Pago de papelería mensual</text>
+
+              <!-- Padding space until actions -->
+              <!-- SECCIÓN 2: BOTONES DE ACCIONES -->
+              <text x="40" y="325" font-size="12" font-weight="bold" fill="#1B3A2D">ACCIONES DEL TRÁMITE</text>
+              <rect x="40" y="335" width="1020" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
+              
+              <rect x="50" y="345" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+              <text x="120" y="365" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">💾 Guardar</text>
+
+              <rect x="210" y="345" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
+              <text x="280" y="365" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">🗑️ Eliminar</text>
+
+              <rect x="880" y="345" width="160" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="960" y="365" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">🖨️ Generar Anexo 9</text>
+
+              <!-- SECCIÓN 3: MOVIMIENTOS EN MODO GRID -->
+              <text x="40" y="420" font-size="12" font-weight="bold" fill="#1B3A2D">AFECTACIÓN PRESUPUESTAL (Basado en estructura de Anexo 9)</text>
+              
+              <!-- Grid Header -->
+              <rect x="40" y="430" width="1020" height="30" fill="#f1f5f9" stroke="#ccc" />
+              <text x="50" y="450" fill="#333" font-size="9" font-weight="bold">ORG.</text>
+              <text x="100" y="450" fill="#333" font-size="9" font-weight="bold">FUN.</text>
+              <text x="140" y="450" fill="#333" font-size="9" font-weight="bold">PROG.</text>
+              <text x="190" y="450" fill="#333" font-size="9" font-weight="bold">SUB.</text>
+              <text x="230" y="450" fill="#333" font-size="9" font-weight="bold">PROY.</text>
+              <text x="280" y="450" fill="#333" font-size="9" font-weight="bold">PARTIDA</text>
+              <text x="340" y="450" fill="#333" font-size="9" font-weight="bold">FTE.</text>
+              <text x="380" y="450" fill="#333" font-size="9" font-weight="bold">T. G.</text>
+              <text x="430" y="450" fill="#333" font-size="9" font-weight="bold">CONCEPTO ESPECÍFICO</text>
+              <text x="660" y="450" fill="#333" font-size="9" font-weight="bold">UUID FACTURA</text>
+              <text x="890" y="450" fill="#333" font-size="9" font-weight="bold">IMPORTE</text>
+              <text x="1010" y="450" fill="#333" font-size="9" font-weight="bold">ACCIÓN</text>
+
+              <!-- Grid Row 1 (Saved) -->
+              <rect x="40" y="460" width="1020" height="35" fill="#fff" stroke="#e2e8f0" />
+              <!-- Read Only Structure fields derived from Center/Partida -->
+              <text x="50" y="482" fill="#64748b" font-size="10">01A</text>
+              <text x="100" y="482" fill="#64748b" font-size="10">121</text>
+              <text x="140" y="482" fill="#64748b" font-size="10">E7</text>
+              <text x="190" y="482" fill="#64748b" font-size="10">02</text>
+              <text x="230" y="482" fill="#64748b" font-size="10">01</text>
+              <!-- Captured Data -->
+              <text x="280" y="482" fill="#0f172a" font-size="10" font-weight="bold">21101</text>
+              <text x="340" y="482" fill="#64748b" font-size="10">1</text>
+              <text x="380" y="482" fill="#64748b" font-size="10">1</text>
+              
+              <text x="430" y="482" fill="#0f172a" font-size="10">Papel bond y lápices</text>
+              <text x="660" y="482" fill="#0f172a" font-size="10">A1B2C3D4-E5F6...</text>
+              <text x="890" y="482" fill="#1B3A2D" font-size="11" font-weight="bold">$5,000.00</text>
+              
+              <rect x="1010" y="468" width="24" height="20" fill="#f1f5f9" rx="3" />
+              <text x="1022" y="482" fill="#991b1b" font-size="11" text-anchor="middle">🗑️</text>
+
+              <!-- Grid Row 2 (Saved) -->
+              <rect x="40" y="495" width="1020" height="35" fill="#f8fafc" stroke="#e2e8f0" />
+              <text x="50" y="517" fill="#64748b" font-size="10">01A</text>
+              <text x="100" y="517" fill="#64748b" font-size="10">121</text>
+              <text x="140" y="517" fill="#64748b" font-size="10">E7</text>
+              <text x="190" y="517" fill="#64748b" font-size="10">02</text>
+              <text x="230" y="517" fill="#64748b" font-size="10">01</text>
+              <text x="280" y="517" fill="#0f172a" font-size="10" font-weight="bold">21201</text>
+              <text x="340" y="517" fill="#64748b" font-size="10">1</text>
+              <text x="380" y="517" fill="#64748b" font-size="10">1</text>
+              
+              <text x="430" y="517" fill="#0f172a" font-size="10">Tóner para impresoras</text>
+              <text x="660" y="517" fill="#0f172a" font-size="10">A1B2C3D4-E5F6...</text>
+              <text x="890" y="517" fill="#1B3A2D" font-size="11" font-weight="bold">$2,500.00</text>
+              
+              <rect x="1010" y="503" width="24" height="20" fill="#f1f5f9" rx="3" />
+              <text x="1022" y="517" fill="#991b1b" font-size="11" text-anchor="middle">🗑️</text>
+
+              <!-- Grid Row 3 (Input Mode) -->
+              <rect x="40" y="530" width="1020" height="40" fill="#fff" stroke="#cbd5e1" stroke-width="2" />
+              <text x="50" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="100" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="140" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="190" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="230" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              
+              <rect x="275" y="538" width="55" height="24" fill="#fff" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+              <text x="280" y="555" fill="#94a3b8" font-size="10">Buscar🔍</text>
+              
+              <text x="340" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="380" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              
+              <rect x="425" y="538" width="220" height="24" fill="#fff" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+              <text x="430" y="555" fill="#94a3b8" font-size="10">Capturar concepto...</text>
+              
+              <rect x="655" y="538" width="220" height="24" fill="#fff" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+              <text x="660" y="555" fill="#94a3b8" font-size="10">Seleccionar UUID...</text>
+
+              <rect x="885" y="538" width="90" height="24" fill="#fff" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+              <text x="890" y="555" fill="#1B3A2D" font-size="11" font-weight="bold">$0.00</text>
+
+              <rect x="990" y="540" width="25" height="20" fill="#1B3A2D" rx="3" />
+              <text x="1002" y="554" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">✓</text>
+              <rect x="1020" y="540" width="25" height="20" fill="#fff" stroke="#ccc" rx="3" />
+              <text x="1032" y="554" fill="#666" font-size="10" font-weight="bold" text-anchor="middle">X</text>
+
+              <!-- Add Button & Totals -->
+              <rect x="40" y="570" width="1020" height="35" fill="#e8ecea" stroke="#e2e8f0" />
+              <rect x="50" y="577" width="100" height="22" fill="#1B3A2D" rx="3" />
+              <text x="100" y="592" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">+ Agregar línea</text>
+              
+              <text x="760" y="592" fill="#000" font-size="11" font-weight="bold">SUMA (TOTAL AFECTACIÓN):</text>
+              <text x="965" y="592" fill="#1B3A2D" font-size="14" font-weight="bold" text-anchor="end">$7,500.00</text>
+
+              <!-- Totals Blocks from Anexo 9 -->
+              <rect x="730" y="615" width="330" height="60" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="740" y="635" fill="#666" font-size="10" font-weight="bold">(-) DEVOLUCIÓN:</text>
+              <text x="1040" y="635" fill="#64748b" font-size="11" font-weight="bold" text-anchor="end">$0.00</text>
+              <text x="740" y="650" fill="#666" font-size="10" font-weight="bold">(-) RETENCIÓN:</text>
+              <text x="1040" y="650" fill="#64748b" font-size="11" font-weight="bold" text-anchor="end">$0.00</text>
+              <text x="740" y="665" fill="#000" font-size="11" font-weight="bold">(=) NETO A PAGAR:</text>
+              <text x="1040" y="665" fill="#1B3A2D" font-size="12" font-weight="bold" text-anchor="end">$7,500.00</text>
+
+              <!-- CERRAR MODAL -->
+              <rect x="430" y="770" width="200" height="40" fill="#e2e8f0" rx="4" />
+              <text x="530" y="795" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- WF4: Formulario de captura (parámetros) -->
+      <div id="wf4" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar">4. Modal: Formulario de Captura (Mapeo a Base de Datos)</div>
+          <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+            <svg viewBox="0 0 1100 900" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+              <!-- Background / Browser Window Fake -->
+              <rect width="1100" height="900" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <!-- Modal Overlay -->
+              <rect width="1100" height="900" fill="rgba(0,0,0,0.6)" />
+              
+              <!-- Modal Container -->
+              <rect x="20" y="20" width="1060" height="860" fill="#fff" rx="6" stroke="#999" />
+              
+              <!-- Modal Header -->
+              <rect x="20" y="20" width="1060" height="40" fill="#1B3A2D" rx="6" />
+              <rect x="20" y="40" width="1060" height="20" fill="#1B3A2D" />
+              <text x="40" y="45" fill="#fff" font-size="14" font-weight="bold">AFECTACIÓN PRESUPUESTAL / ORDEN DE PAGO (Data Binding)</text>
+              <text x="1040" y="45" fill="#fff" font-size="14" font-weight="bold" cursor="pointer">X</text>
+              
+              <!-- SECCIÓN 1: ENCABEZADO -->
+              <text x="40" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">DATOS DEL ENCABEZADO (fn_abc_afectacion_encabezado)</text>
+              <rect x="40" y="100" width="1020" height="230" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
+              
+              <!-- Fila 1: Folio, Fecha, Estatus, Tipo Movimiento -->
+              <text x="50" y="125" font-size="10" font-weight="bold" fill="#666">FOLIO PRESUPUESTAL (OUT)</text>
+              <rect x="50" y="130" width="150" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="60" y="148" font-family="'Consolas', monospace" font-size="11" font-weight="bold" fill="#c678dd">{folio}</text>
+
+              <text x="230" y="125" font-size="10" font-weight="bold" fill="#666">FECHA ELAB. (OUT)</text>
+              <rect x="230" y="130" width="120" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="240" y="148" font-family="'Consolas', monospace" font-size="11" font-weight="bold" fill="#c678dd">{fecha}</text>
+              
+              <text x="380" y="125" font-size="10" font-weight="bold" fill="#666">ESTATUS (OUT)</text>
+              <rect x="380" y="130" width="120" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <rect x="390" y="134" width="70" height="20" fill="#f0ede6" stroke="#d0cabc" rx="10" />
+              <text x="425" y="148" fill="#5a5a5a" font-family="'Consolas', monospace" font-size="10" font-weight="bold" text-anchor="middle">{estatus}</text>
+
+              <text x="530" y="125" font-size="10" font-weight="bold" fill="#666">TIPO DE MOVIMIENTO (IN)</text>
+              <rect x="530" y="130" width="250" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="540" y="148" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_tipo_pago</text>
+
+              <text x="810" y="125" font-size="10" font-weight="bold" fill="#666">AFECTA PPTO. (IN)</text>
+              <rect x="810" y="130" width="100" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="820" y="148" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_afecta_ppto</text>
+
+              <!-- Fila 2: Organización, Beneficiario, RFC -->
+              <text x="50" y="175" font-size="10" font-weight="bold" fill="#666">ORGANIZACIÓN (IN)</text>
+              <rect x="50" y="180" width="400" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="60" y="198" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_f_centro_costo_id</text>
+
+              <text x="480" y="175" font-size="10" font-weight="bold" fill="#666">NOMBRE DEL PROVEEDOR O BENEFICIARIO (IN)</text>
+              <rect x="480" y="180" width="350" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="490" y="198" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_f_proveedor_id | @p_f_empleado_id</text>
+
+              <text x="860" y="175" font-size="10" font-weight="bold" fill="#666">RFC (OUT)</text>
+              <rect x="860" y="180" width="150" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="870" y="198" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">{rfc}</text>
+
+              <!-- Fila 3: Concepto -->
+              <text x="50" y="225" font-size="10" font-weight="bold" fill="#666">CONCEPTO (IN)</text>
+              <rect x="50" y="230" width="960" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="60" y="248" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_concepto</text>
+              
+              <!-- Hidden Row ID Note -->
+              <text x="50" y="280" fill="#e11d48" font-family="'Consolas', monospace" font-size="11">Hidden Key: @p_ag_id (UUID del encabezado)</text>
+
+              <!-- SECCIÓN 2: BOTONES DE ACCIONES -->
+              <text x="40" y="325" font-size="12" font-weight="bold" fill="#1B3A2D">ACCIONES DEL TRÁMITE</text>
+              <rect x="40" y="335" width="1020" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
+              
+              <rect x="50" y="345" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+              <text x="120" y="365" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">💾 @p_accion = 1 o 2</text>
+
+              <rect x="210" y="345" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
+              <text x="280" y="365" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">🗑️ @p_accion = 3</text>
+
+              <!-- SECCIÓN 3: MOVIMIENTOS EN MODO GRID -->
+              <text x="40" y="420" font-size="12" font-weight="bold" fill="#1B3A2D">AFECTACIÓN PRESUPUESTAL (fn_abc_afectacion_detalles)</text>
+              
+              <!-- Grid Header -->
+              <rect x="40" y="430" width="1020" height="30" fill="#f1f5f9" stroke="#ccc" />
+              <text x="50" y="450" fill="#333" font-size="9" font-weight="bold">ORG.</text>
+              <text x="100" y="450" fill="#333" font-size="9" font-weight="bold">FUN.</text>
+              <text x="140" y="450" fill="#333" font-size="9" font-weight="bold">PROG.</text>
+              <text x="190" y="450" fill="#333" font-size="9" font-weight="bold">SUB.</text>
+              <text x="230" y="450" fill="#333" font-size="9" font-weight="bold">PROY.</text>
+              <text x="280" y="450" fill="#333" font-size="9" font-weight="bold">PARTIDA</text>
+              <text x="340" y="450" fill="#333" font-size="9" font-weight="bold">FTE.</text>
+              <text x="380" y="450" fill="#333" font-size="9" font-weight="bold">T. G.</text>
+              <text x="430" y="450" fill="#333" font-size="9" font-weight="bold">CONCEPTO ESPECÍFICO</text>
+              <text x="660" y="450" fill="#333" font-size="9" font-weight="bold">UUID FACTURA</text>
+              <text x="890" y="450" fill="#333" font-size="9" font-weight="bold">IMPORTE</text>
+              <text x="1010" y="450" fill="#333" font-size="9" font-weight="bold">ACCIÓN</text>
+
+              <!-- Grid Row 1 (Input Mode) -->
+              <rect x="40" y="460" width="1020" height="40" fill="#fff" stroke="#cbd5e1" stroke-width="2" />
+              
+              <!-- Inherited outputs -->
+              <text x="50" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{org}</text>
+              <text x="100" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{fun}</text>
+              <text x="140" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{prg}</text>
+              <text x="190" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{sub}</text>
+              <text x="230" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{pry}</text>
+              
+              <!-- Captured Partida -->
+              <rect x="275" y="468" width="55" height="24" fill="#fff" stroke="#cbd5e1" rx="2" />
+              <text x="280" y="485" fill="#c678dd" font-family="'Consolas', monospace" font-size="10" font-weight="bold">@p_f_par</text>
+              
+              <text x="340" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{fte}</text>
+              <text x="380" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{tg}</text>
+              
+              <!-- Captured Concepto -->
+              <rect x="425" y="468" width="220" height="24" fill="#fff" stroke="#cbd5e1" rx="2" />
+              <text x="430" y="485" fill="#c678dd" font-family="'Consolas', monospace" font-size="10" font-weight="bold">@p_concepto</text>
+              
+              <!-- External UUID -->
+              <rect x="655" y="468" width="220" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="2" stroke-dasharray="2,2"/>
+              <text x="660" y="485" fill="#94a3b8" font-family="'Consolas', monospace" font-size="10">{uuid_cfdi}</text>
+
+              <!-- Captured Monto -->
+              <rect x="885" y="468" width="90" height="24" fill="#fff" stroke="#cbd5e1" rx="2" />
+              <text x="890" y="485" fill="#c678dd" font-family="'Consolas', monospace" font-size="11" font-weight="bold">@p_monto</text>
+
+              <!-- Action button for inserting -->
+              <rect x="990" y="470" width="25" height="20" fill="#1B3A2D" rx="3" />
+              <text x="1002" y="484" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">✓</text>
+              <rect x="1020" y="470" width="25" height="20" fill="#fff" stroke="#ccc" rx="3" />
+              <text x="1032" y="484" fill="#666" font-size="10" font-weight="bold" text-anchor="middle">X</text>
+
+              <text x="50" y="520" fill="#e11d48" font-family="'Consolas', monospace" font-size="11">Hidden Keys para la partida: @p_ag_id, @p_detalle_id</text>
+
+              <!-- Add Button & Totals -->
+              <rect x="40" y="540" width="1020" height="35" fill="#e8ecea" stroke="#e2e8f0" />
+              <rect x="50" y="547" width="100" height="22" fill="#1B3A2D" rx="3" />
+              <text x="100" y="562" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">+ @p_accion=1</text>
+              
+              <!-- CERRAR MODAL -->
+              <rect x="430" y="650" width="200" height="40" fill="#e2e8f0" rx="4" />
+              <text x="530" y="675" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- WF2: Bandeja de entrada (valores) -->
+      <div id="wf2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar">2. Pantalla Principal: Bandeja de Entrada (Valores de Ejemplo)</div>
+          <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+            <svg viewBox="0 0 1000 760" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+              <!-- Background / Browser Window -->
+              <rect width="1000" height="760" fill="#f8fafc" rx="6" />
+              
+              <!-- SIAF Topbar Fake -->
+              <rect width="1000" height="50" fill="#183125" />
+              <circle cx="35" cy="25" r="12" fill="#DEAC50" opacity="0.3" stroke="#DEAC50" stroke-width="2"/>
+              <text x="60" y="30" fill="#DEAC50" font-size="14" font-weight="bold">SIAF-PJEV</text>
+              <text x="150" y="30" fill="#fff" opacity="0.5" font-size="12">| Cuentas por Pagar > Afectación de Gastos</text>
+              <text x="850" y="30" fill="#fff" font-size="11">👤 Analista CxP</text>
+
+              <!-- Page Header -->
+              <text x="30" y="100" fill="#183125" font-size="20" font-weight="bold">Bandeja de Afectaciones de Gasto</text>
+              <text x="30" y="120" fill="#64748b" font-size="12">Gestión y seguimiento de los trámites de afectación presupuestal para el pago a proveedores y terceros.</text>
+              
+              <rect x="800" y="85" width="170" height="36" fill="#183125" rx="6" />
+              <text x="885" y="108" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">+ Nueva Afectación</text>
+
+              <!-- Filter Section -->
+              <rect x="30" y="150" width="940" height="120" fill="#fff" stroke="#e2e8f0" rx="6" />
+              
+              <!-- Row 1 Filters -->
+              <text x="50" y="175" fill="#475569" font-size="11" font-weight="bold">FOLIO</text>
+              <rect x="50" y="180" width="120" height="28" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="60" y="198" fill="#94a3b8" font-size="12">AG-2026...</text>
+              
+              <text x="190" y="175" fill="#475569" font-size="11" font-weight="bold">CONCEPTO</text>
+              <rect x="190" y="180" width="200" height="28" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="200" y="198" fill="#94a3b8" font-size="12">Buscar concepto...</text>
+              
+              <text x="410" y="175" fill="#475569" font-size="11" font-weight="bold">BENEFICIARIO</text>
+              <rect x="410" y="180" width="200" height="28" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="420" y="198" fill="#94a3b8" font-size="12">Juan Pérez...</text>
+              
+              <text x="630" y="175" fill="#475569" font-size="11" font-weight="bold">ORGANIZACIÓN (CENTRO DE COSTO)</text>
+              <rect x="630" y="180" width="310" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="640" y="198" fill="#0f172a" font-size="11">Juzgado 1° de Primera Instancia ▼</text>
+
+              <!-- Row 2 Filters -->
+              <text x="50" y="225" fill="#475569" font-size="11" font-weight="bold">FACTURA (CFDI)</text>
+              <rect x="50" y="230" width="180" height="28" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="60" y="248" fill="#94a3b8" font-size="12">ABCD-1234...</text>
+              
+              <text x="250" y="225" fill="#475569" font-size="11" font-weight="bold">ESTATUS</text>
+              <rect x="250" y="230" width="140" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="260" y="248" fill="#0f172a" font-size="11">Todos ▼</text>
+
+              <!-- Buttons -->
+              <rect x="410" y="230" width="100" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="460" y="248" fill="#334155" font-size="12" font-weight="bold" text-anchor="middle">🔍 Buscar</text>
+              <text x="540" y="248" fill="#2563eb" font-size="12" font-weight="bold" text-decoration="underline" cursor="pointer">Limpiar filtros</text>
+
+              <!-- Data Grid -->
+              <rect x="30" y="290" width="940" height="380" fill="#fff" stroke="#e2e8f0" rx="6" />
+              
+              <!-- Grid Header -->
+              <rect x="30" y="290" width="940" height="40" fill="#f1f5f9" stroke="#e2e8f0" />
+              <text x="50" y="315" fill="#475569" font-size="11" font-weight="bold">FOLIO</text>
+              <text x="140" y="315" fill="#475569" font-size="11" font-weight="bold">FECHA</text>
+              <text x="230" y="315" fill="#475569" font-size="11" font-weight="bold">CONCEPTO / BENEFICIARIO</text>
+              <text x="580" y="315" fill="#475569" font-size="11" font-weight="bold">TIPO DE PAGO</text>
+              <text x="730" y="315" fill="#475569" font-size="11" font-weight="bold">ESTATUS</text>
+              <text x="880" y="315" fill="#475569" font-size="11" font-weight="bold">ACCIONES</text>
+
+              <!-- Row 1: Captura -->
+              <rect x="30" y="330" width="940" height="60" fill="#fff" stroke="#f1f5f9" />
+              <text x="50" y="355" fill="#0f172a" font-size="12" font-weight="bold">AG-2026-001</text>
+              <text x="140" y="355" fill="#475569" font-size="12">15/05/2026</text>
+              <text x="230" y="355" fill="#0f172a" font-size="12" font-weight="bold">Pago de papelería mensual</text>
+              <text x="230" y="372" fill="#64748b" font-size="11">Oficentro S.A. de C.V.</text>
+              <text x="580" y="355" fill="#475569" font-size="12">1 - Pago a Proveedores</text>
+              <rect x="730" y="343" width="70" height="20" fill="#f0ede6" stroke="#d0cabc" rx="10" />
+              <text x="765" y="357" fill="#5a5a5a" font-size="10" font-weight="bold" text-anchor="middle">CAPTURA</text>
+              <rect x="880" y="345" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="892" y="361" fill="#334155" font-size="12" text-anchor="middle">✏️</text>
+              <rect x="910" y="345" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="922" y="361" fill="#991b1b" font-size="12" text-anchor="middle">🗑️</text>
+
+              <!-- Row 2: En Revisión -->
+              <rect x="30" y="390" width="940" height="60" fill="#f8fafc" stroke="#f1f5f9" />
+              <text x="50" y="415" fill="#0f172a" font-size="12" font-weight="bold">AG-2026-002</text>
+              <text x="140" y="415" fill="#475569" font-size="12">16/05/2026</text>
+              <text x="230" y="415" fill="#0f172a" font-size="12" font-weight="bold">Viáticos comisión Xalapa</text>
+              <text x="230" y="432" fill="#64748b" font-size="11">Juan Pérez López</text>
+              <text x="580" y="415" fill="#475569" font-size="12">2 - Viáticos y Pasajes</text>
+              <rect x="730" y="403" width="80" height="20" fill="#fffbeb" stroke="#f5d565" rx="10" />
+              <text x="770" y="417" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">EN REVISIÓN</text>
+              <rect x="880" y="405" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="892" y="421" fill="#334155" font-size="12" text-anchor="middle">👁️</text>
+              <rect x="910" y="405" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="922" y="421" fill="#334155" font-size="12" text-anchor="middle">🖨️</text>
+
+              <!-- Row 3: Autorizado -->
+              <rect x="30" y="450" width="940" height="60" fill="#fff" stroke="#f1f5f9" />
+              <text x="50" y="475" fill="#0f172a" font-size="12" font-weight="bold">AG-2026-003</text>
+              <text x="140" y="475" fill="#475569" font-size="12">18/05/2026</text>
+              <text x="230" y="475" fill="#0f172a" font-size="12" font-weight="bold">Mantenimiento de clima central</text>
+              <text x="230" y="492" fill="#64748b" font-size="11">Climas Industriales del Golfo</text>
+              <text x="580" y="475" fill="#475569" font-size="12">1 - Pago a Proveedores</text>
+              <rect x="730" y="463" width="80" height="20" fill="#fef08a" stroke="#eab308" rx="10" />
+              <text x="770" y="477" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">AUTORIZADO</text>
+              <rect x="880" y="465" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="892" y="481" fill="#334155" font-size="12" text-anchor="middle">👁️</text>
+              <rect x="910" y="465" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="922" y="481" fill="#334155" font-size="12" text-anchor="middle">🖨️</text>
+
+              <!-- Row 4: Pagado -->
+              <rect x="30" y="510" width="940" height="60" fill="#f8fafc" stroke="#f1f5f9" />
+              <text x="50" y="535" fill="#0f172a" font-size="12" font-weight="bold">AG-2026-004</text>
+              <text x="140" y="535" fill="#475569" font-size="12">20/05/2026</text>
+              <text x="230" y="535" fill="#0f172a" font-size="12" font-weight="bold">Fondo rotatorio caja chica</text>
+              <text x="230" y="552" fill="#64748b" font-size="11">Juzgado 1° de Primera Instancia</text>
+              <text x="580" y="535" fill="#475569" font-size="12">3 - Fondo Rotatorio</text>
+              <rect x="730" y="523" width="60" height="20" fill="#edf8ef" stroke="#8fd19e" rx="10" />
+              <text x="760" y="537" fill="#166534" font-size="10" font-weight="bold" text-anchor="middle">PAGADO</text>
+              <rect x="880" y="525" width="24" height="24" fill="#f1f5f9" rx="4" />
+              <text x="892" y="541" fill="#334155" font-size="12" text-anchor="middle">👁️</text>
+
+              <!-- Pagination -->
+              <rect x="30" y="620" width="940" height="50" fill="#fff" rx="6" />
+              <text x="50" y="650" fill="#64748b" font-size="12">Mostrando 1 a 4 de 42 registros</text>
+              
+              <rect x="850" y="635" width="30" height="24" fill="#f1f5f9" rx="4" />
+              <text x="865" y="651" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle"><</text>
+              <rect x="885" y="635" width="30" height="24" fill="#183125" rx="4" />
+              <text x="900" y="651" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">1</text>
+              <rect x="920" y="635" width="30" height="24" fill="#f1f5f9" rx="4" />
+              <text x="935" y="651" fill="#334155" font-size="11" font-weight="bold" text-anchor="middle">2</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- WF3: Formulario de captura (valores) -->
+      <div id="wf3" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar">3. Modal: Formulario de Captura (Valores)</div>
+          <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+            <svg viewBox="0 0 1100 900" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+              <!-- Background / Browser Window Fake -->
+              <rect width="1100" height="900" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <!-- Modal Overlay -->
+              <rect width="1100" height="900" fill="rgba(0,0,0,0.6)" />
+              
+              <!-- Modal Container -->
+              <rect x="20" y="20" width="1060" height="860" fill="#fff" rx="6" stroke="#999" />
+              
+              <!-- Modal Header -->
+              <rect x="20" y="20" width="1060" height="40" fill="#1B3A2D" rx="6" />
+              <rect x="20" y="40" width="1060" height="20" fill="#1B3A2D" />
+              <text x="40" y="45" fill="#fff" font-size="14" font-weight="bold">AFECTACIÓN PRESUPUESTAL / ORDEN DE PAGO (Captura)</text>
+              <text x="1040" y="45" fill="#fff" font-size="14" font-weight="bold" cursor="pointer">X</text>
+              
+              <!-- SECCIÓN 1: ENCABEZADO -->
+              <text x="40" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">DATOS DEL ENCABEZADO</text>
+              <rect x="40" y="100" width="1020" height="230" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
+              
+              <!-- Fila 1: Folio, Fecha, Estatus, Tipo Movimiento -->
+              <text x="50" y="125" font-size="10" font-weight="bold" fill="#666">FOLIO PRESUPUESTAL</text>
+              <rect x="50" y="130" width="150" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="60" y="148" font-size="11" font-weight="bold" fill="#0f172a">AG-2026-001</text>
+
+              <text x="230" y="125" font-size="10" font-weight="bold" fill="#666">FECHA ELAB.</text>
+              <rect x="230" y="130" width="120" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="240" y="148" font-size="11" font-weight="bold" fill="#0f172a">15/05/2026</text>
+              
+              <text x="380" y="125" font-size="10" font-weight="bold" fill="#666">ESTATUS</text>
+              <rect x="380" y="130" width="120" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <rect x="390" y="134" width="70" height="20" fill="#f0ede6" stroke="#d0cabc" rx="10" />
+              <text x="425" y="148" fill="#5a5a5a" font-size="10" font-weight="bold" text-anchor="middle">CAPTURA</text>
+
+              <text x="530" y="125" font-size="10" font-weight="bold" fill="#666">TIPO DE MOVIMIENTO</text>
+              <rect x="530" y="130" width="250" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="540" y="148" font-size="11" fill="#0f172a">1 - Pago a Proveedores ▼</text>
+
+              <text x="810" y="125" font-size="10" font-weight="bold" fill="#666">AFECTA PPTO.</text>
+              <rect x="810" y="130" width="100" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="820" y="148" font-size="11" fill="#0f172a">☑ Sí</text>
+
+              <!-- Fila 2: Organización, Beneficiario, RFC -->
+              <text x="50" y="175" font-size="10" font-weight="bold" fill="#666">ORGANIZACIÓN</text>
+              <rect x="50" y="180" width="400" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="60" y="198" font-size="11" fill="#0f172a">01A01 - PRESIDENCIA DEL TRIBUNAL SUPERIOR ▼</text>
+
+              <text x="480" y="175" font-size="10" font-weight="bold" fill="#666">NOMBRE DEL PROVEEDOR O BENEFICIARIO</text>
+              <rect x="480" y="180" width="350" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="490" y="198" font-size="11" fill="#0f172a">Oficentro S.A. de C.V. ▼</text>
+
+              <text x="860" y="175" font-size="10" font-weight="bold" fill="#666">RFC</text>
+              <rect x="860" y="180" width="150" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="870" y="198" font-size="11" fill="#0f172a">OFI991231XX1</text>
+
+              <!-- Fila 3: Concepto -->
+              <text x="50" y="225" font-size="10" font-weight="bold" fill="#666">CONCEPTO</text>
+              <rect x="50" y="230" width="960" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="60" y="248" font-size="11" fill="#0f172a">Pago de papelería mensual</text>
+
+              <!-- Padding space until actions -->
+              <!-- SECCIÓN 2: BOTONES DE ACCIONES -->
+              <text x="40" y="325" font-size="12" font-weight="bold" fill="#1B3A2D">ACCIONES DEL TRÁMITE</text>
+              <rect x="40" y="335" width="1020" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
+              
+              <rect x="50" y="345" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+              <text x="120" y="365" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">💾 Guardar</text>
+
+              <rect x="210" y="345" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
+              <text x="280" y="365" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">🗑️ Eliminar</text>
+
+              <rect x="880" y="345" width="160" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="960" y="365" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">🖨️ Generar Anexo 9</text>
+
+              <!-- SECCIÓN 3: MOVIMIENTOS EN MODO GRID -->
+              <text x="40" y="420" font-size="12" font-weight="bold" fill="#1B3A2D">AFECTACIÓN PRESUPUESTAL (Basado en estructura de Anexo 9)</text>
+              
+              <!-- Grid Header -->
+              <rect x="40" y="430" width="1020" height="30" fill="#f1f5f9" stroke="#ccc" />
+              <text x="50" y="450" fill="#333" font-size="9" font-weight="bold">ORG.</text>
+              <text x="100" y="450" fill="#333" font-size="9" font-weight="bold">FUN.</text>
+              <text x="140" y="450" fill="#333" font-size="9" font-weight="bold">PROG.</text>
+              <text x="190" y="450" fill="#333" font-size="9" font-weight="bold">SUB.</text>
+              <text x="230" y="450" fill="#333" font-size="9" font-weight="bold">PROY.</text>
+              <text x="280" y="450" fill="#333" font-size="9" font-weight="bold">PARTIDA</text>
+              <text x="340" y="450" fill="#333" font-size="9" font-weight="bold">FTE.</text>
+              <text x="380" y="450" fill="#333" font-size="9" font-weight="bold">T. G.</text>
+              <text x="430" y="450" fill="#333" font-size="9" font-weight="bold">CONCEPTO ESPECÍFICO</text>
+              <text x="660" y="450" fill="#333" font-size="9" font-weight="bold">UUID FACTURA</text>
+              <text x="890" y="450" fill="#333" font-size="9" font-weight="bold">IMPORTE</text>
+              <text x="1010" y="450" fill="#333" font-size="9" font-weight="bold">ACCIÓN</text>
+
+              <!-- Grid Row 1 (Saved) -->
+              <rect x="40" y="460" width="1020" height="35" fill="#fff" stroke="#e2e8f0" />
+              <!-- Read Only Structure fields derived from Center/Partida -->
+              <text x="50" y="482" fill="#64748b" font-size="10">01A</text>
+              <text x="100" y="482" fill="#64748b" font-size="10">121</text>
+              <text x="140" y="482" fill="#64748b" font-size="10">E7</text>
+              <text x="190" y="482" fill="#64748b" font-size="10">02</text>
+              <text x="230" y="482" fill="#64748b" font-size="10">01</text>
+              <!-- Captured Data -->
+              <text x="280" y="482" fill="#0f172a" font-size="10" font-weight="bold">21101</text>
+              <text x="340" y="482" fill="#64748b" font-size="10">1</text>
+              <text x="380" y="482" fill="#64748b" font-size="10">1</text>
+              
+              <text x="430" y="482" fill="#0f172a" font-size="10">Papel bond y lápices</text>
+              <text x="660" y="482" fill="#0f172a" font-size="10">A1B2C3D4-E5F6...</text>
+              <text x="890" y="482" fill="#1B3A2D" font-size="11" font-weight="bold">$5,000.00</text>
+              
+              <rect x="1010" y="468" width="24" height="20" fill="#f1f5f9" rx="3" />
+              <text x="1022" y="482" fill="#991b1b" font-size="11" text-anchor="middle">🗑️</text>
+
+              <!-- Grid Row 2 (Saved) -->
+              <rect x="40" y="495" width="1020" height="35" fill="#f8fafc" stroke="#e2e8f0" />
+              <text x="50" y="517" fill="#64748b" font-size="10">01A</text>
+              <text x="100" y="517" fill="#64748b" font-size="10">121</text>
+              <text x="140" y="517" fill="#64748b" font-size="10">E7</text>
+              <text x="190" y="517" fill="#64748b" font-size="10">02</text>
+              <text x="230" y="517" fill="#64748b" font-size="10">01</text>
+              <text x="280" y="517" fill="#0f172a" font-size="10" font-weight="bold">21201</text>
+              <text x="340" y="517" fill="#64748b" font-size="10">1</text>
+              <text x="380" y="517" fill="#64748b" font-size="10">1</text>
+              
+              <text x="430" y="517" fill="#0f172a" font-size="10">Tóner para impresoras</text>
+              <text x="660" y="517" fill="#0f172a" font-size="10">A1B2C3D4-E5F6...</text>
+              <text x="890" y="517" fill="#1B3A2D" font-size="11" font-weight="bold">$2,500.00</text>
+              
+              <rect x="1010" y="503" width="24" height="20" fill="#f1f5f9" rx="3" />
+              <text x="1022" y="517" fill="#991b1b" font-size="11" text-anchor="middle">🗑️</text>
+
+              <!-- Grid Row 3 (Input Mode) -->
+              <rect x="40" y="530" width="1020" height="40" fill="#fff" stroke="#cbd5e1" stroke-width="2" />
+              <text x="50" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="100" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="140" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="190" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="230" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              
+              <rect x="275" y="538" width="55" height="24" fill="#fff" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+              <text x="280" y="555" fill="#94a3b8" font-size="10">Buscar🔍</text>
+              
+              <text x="340" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              <text x="380" y="555" fill="#94a3b8" font-size="9" font-style="italic">Auto</text>
+              
+              <rect x="425" y="538" width="220" height="24" fill="#fff" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+              <text x="430" y="555" fill="#94a3b8" font-size="10">Capturar concepto...</text>
+              
+              <rect x="655" y="538" width="220" height="24" fill="#fff" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+              <text x="660" y="555" fill="#94a3b8" font-size="10">Seleccionar UUID...</text>
+
+              <rect x="885" y="538" width="90" height="24" fill="#fff" stroke="#94a3b8" rx="2" stroke-dasharray="2,2"/>
+              <text x="890" y="555" fill="#1B3A2D" font-size="11" font-weight="bold">$0.00</text>
+
+              <rect x="990" y="540" width="25" height="20" fill="#1B3A2D" rx="3" />
+              <text x="1002" y="554" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">✓</text>
+              <rect x="1020" y="540" width="25" height="20" fill="#fff" stroke="#ccc" rx="3" />
+              <text x="1032" y="554" fill="#666" font-size="10" font-weight="bold" text-anchor="middle">X</text>
+
+              <!-- Add Button & Totals -->
+              <rect x="40" y="570" width="1020" height="35" fill="#e8ecea" stroke="#e2e8f0" />
+              <rect x="50" y="577" width="100" height="22" fill="#1B3A2D" rx="3" />
+              <text x="100" y="592" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">+ Agregar línea</text>
+              
+              <text x="760" y="592" fill="#000" font-size="11" font-weight="bold">SUMA (TOTAL AFECTACIÓN):</text>
+              <text x="965" y="592" fill="#1B3A2D" font-size="14" font-weight="bold" text-anchor="end">$7,500.00</text>
+
+              <!-- Totals Blocks from Anexo 9 -->
+              <rect x="730" y="615" width="330" height="60" fill="#fff" stroke="#cbd5e1" rx="4" />
+              <text x="740" y="635" fill="#666" font-size="10" font-weight="bold">(-) DEVOLUCIÓN:</text>
+              <text x="1040" y="635" fill="#64748b" font-size="11" font-weight="bold" text-anchor="end">$0.00</text>
+              <text x="740" y="650" fill="#666" font-size="10" font-weight="bold">(-) RETENCIÓN:</text>
+              <text x="1040" y="650" fill="#64748b" font-size="11" font-weight="bold" text-anchor="end">$0.00</text>
+              <text x="740" y="665" fill="#000" font-size="11" font-weight="bold">(=) NETO A PAGAR:</text>
+              <text x="1040" y="665" fill="#1B3A2D" font-size="12" font-weight="bold" text-anchor="end">$7,500.00</text>
+
+              <!-- CERRAR MODAL -->
+              <rect x="430" y="770" width="200" height="40" fill="#e2e8f0" rx="4" />
+              <text x="530" y="795" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- WF4: Formulario de captura (parámetros) -->
+      <div id="wf4" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar">4. Modal: Formulario de Captura (Mapeo a Base de Datos)</div>
+          <div class="wf-svg-area" style="padding: 20px; background: #222; overflow-x: auto; text-align: center;">
+            <svg viewBox="0 0 1100 900" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', sans-serif">
+              <!-- Background / Browser Window Fake -->
+              <rect width="1100" height="900" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+              <!-- Modal Overlay -->
+              <rect width="1100" height="900" fill="rgba(0,0,0,0.6)" />
+              
+              <!-- Modal Container -->
+              <rect x="20" y="20" width="1060" height="860" fill="#fff" rx="6" stroke="#999" />
+              
+              <!-- Modal Header -->
+              <rect x="20" y="20" width="1060" height="40" fill="#1B3A2D" rx="6" />
+              <rect x="20" y="40" width="1060" height="20" fill="#1B3A2D" />
+              <text x="40" y="45" fill="#fff" font-size="14" font-weight="bold">AFECTACIÓN PRESUPUESTAL / ORDEN DE PAGO (Data Binding)</text>
+              <text x="1040" y="45" fill="#fff" font-size="14" font-weight="bold" cursor="pointer">X</text>
+              
+              <!-- SECCIÓN 1: ENCABEZADO -->
+              <text x="40" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">DATOS DEL ENCABEZADO (fn_abc_afectacion_encabezado)</text>
+              <rect x="40" y="100" width="1020" height="230" fill="#f8fafc" stroke="#e2e8f0" rx="4" />
+              
+              <!-- Fila 1: Folio, Fecha, Estatus, Tipo Movimiento -->
+              <text x="50" y="125" font-size="10" font-weight="bold" fill="#666">FOLIO PRESUPUESTAL (OUT)</text>
+              <rect x="50" y="130" width="150" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="60" y="148" font-family="'Consolas', monospace" font-size="11" font-weight="bold" fill="#c678dd">{folio}</text>
+
+              <text x="230" y="125" font-size="10" font-weight="bold" fill="#666">FECHA ELAB. (OUT)</text>
+              <rect x="230" y="130" width="120" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="240" y="148" font-family="'Consolas', monospace" font-size="11" font-weight="bold" fill="#c678dd">{fecha}</text>
+              
+              <text x="380" y="125" font-size="10" font-weight="bold" fill="#666">ESTATUS (OUT)</text>
+              <rect x="380" y="130" width="120" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <rect x="390" y="134" width="70" height="20" fill="#f0ede6" stroke="#d0cabc" rx="10" />
+              <text x="425" y="148" fill="#5a5a5a" font-family="'Consolas', monospace" font-size="10" font-weight="bold" text-anchor="middle">{estatus}</text>
+
+              <text x="530" y="125" font-size="10" font-weight="bold" fill="#666">TIPO DE MOVIMIENTO (IN)</text>
+              <rect x="530" y="130" width="250" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="540" y="148" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_tipo_pago</text>
+
+              <text x="810" y="125" font-size="10" font-weight="bold" fill="#666">AFECTA PPTO. (IN)</text>
+              <rect x="810" y="130" width="100" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="820" y="148" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_afecta_ppto</text>
+
+              <!-- Fila 2: Organización, Beneficiario, RFC -->
+              <text x="50" y="175" font-size="10" font-weight="bold" fill="#666">ORGANIZACIÓN (IN)</text>
+              <rect x="50" y="180" width="400" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="60" y="198" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_f_centro_costo_id</text>
+
+              <text x="480" y="175" font-size="10" font-weight="bold" fill="#666">NOMBRE DEL PROVEEDOR O BENEFICIARIO (IN)</text>
+              <rect x="480" y="180" width="350" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="490" y="198" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_f_proveedor_id | @p_f_empleado_id</text>
+
+              <text x="860" y="175" font-size="10" font-weight="bold" fill="#666">RFC (OUT)</text>
+              <rect x="860" y="180" width="150" height="28" fill="#e2e8f0" stroke="#94a3b8" rx="3" stroke-dasharray="2,2"/>
+              <text x="870" y="198" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">{rfc}</text>
+
+              <!-- Fila 3: Concepto -->
+              <text x="50" y="225" font-size="10" font-weight="bold" fill="#666">CONCEPTO (IN)</text>
+              <rect x="50" y="230" width="960" height="28" fill="#fff" stroke="#cbd5e1" rx="3" />
+              <text x="60" y="248" font-family="'Consolas', monospace" font-size="11" fill="#c678dd" font-weight="bold">@p_concepto</text>
+              
+              <!-- Hidden Row ID Note -->
+              <text x="50" y="280" fill="#e11d48" font-family="'Consolas', monospace" font-size="11">Hidden Key: @p_ag_id (UUID del encabezado)</text>
+
+              <!-- SECCIÓN 2: BOTONES DE ACCIONES -->
+              <text x="40" y="325" font-size="12" font-weight="bold" fill="#1B3A2D">ACCIONES DEL TRÁMITE</text>
+              <rect x="40" y="335" width="1020" height="50" fill="#f4f6f5" stroke="#ccc" rx="4" />
+              
+              <rect x="50" y="345" width="140" height="30" fill="#fff" stroke="#1B3A2D" rx="4"/>
+              <text x="120" y="365" fill="#1B3A2D" font-size="11" font-weight="bold" text-anchor="middle">💾 @p_accion = 1 o 2</text>
+
+              <rect x="210" y="345" width="140" height="30" fill="#fff" stroke="#991B1B" rx="4"/>
+              <text x="280" y="365" fill="#991B1B" font-size="11" font-weight="bold" text-anchor="middle">🗑️ @p_accion = 3</text>
+
+              <!-- SECCIÓN 3: MOVIMIENTOS EN MODO GRID -->
+              <text x="40" y="420" font-size="12" font-weight="bold" fill="#1B3A2D">AFECTACIÓN PRESUPUESTAL (fn_abc_afectacion_detalles)</text>
+              
+              <!-- Grid Header -->
+              <rect x="40" y="430" width="1020" height="30" fill="#f1f5f9" stroke="#ccc" />
+              <text x="50" y="450" fill="#333" font-size="9" font-weight="bold">ORG.</text>
+              <text x="100" y="450" fill="#333" font-size="9" font-weight="bold">FUN.</text>
+              <text x="140" y="450" fill="#333" font-size="9" font-weight="bold">PROG.</text>
+              <text x="190" y="450" fill="#333" font-size="9" font-weight="bold">SUB.</text>
+              <text x="230" y="450" fill="#333" font-size="9" font-weight="bold">PROY.</text>
+              <text x="280" y="450" fill="#333" font-size="9" font-weight="bold">PARTIDA</text>
+              <text x="340" y="450" fill="#333" font-size="9" font-weight="bold">FTE.</text>
+              <text x="380" y="450" fill="#333" font-size="9" font-weight="bold">T. G.</text>
+              <text x="430" y="450" fill="#333" font-size="9" font-weight="bold">CONCEPTO ESPECÍFICO</text>
+              <text x="660" y="450" fill="#333" font-size="9" font-weight="bold">UUID FACTURA</text>
+              <text x="890" y="450" fill="#333" font-size="9" font-weight="bold">IMPORTE</text>
+              <text x="1010" y="450" fill="#333" font-size="9" font-weight="bold">ACCIÓN</text>
+
+              <!-- Grid Row 1 (Input Mode) -->
+              <rect x="40" y="460" width="1020" height="40" fill="#fff" stroke="#cbd5e1" stroke-width="2" />
+              
+              <!-- Inherited outputs -->
+              <text x="50" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{org}</text>
+              <text x="100" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{fun}</text>
+              <text x="140" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{prg}</text>
+              <text x="190" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{sub}</text>
+              <text x="230" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{pry}</text>
+              
+              <!-- Captured Partida -->
+              <rect x="275" y="468" width="55" height="24" fill="#fff" stroke="#cbd5e1" rx="2" />
+              <text x="280" y="485" fill="#c678dd" font-family="'Consolas', monospace" font-size="10" font-weight="bold">@p_f_par</text>
+              
+              <text x="340" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{fte}</text>
+              <text x="380" y="485" fill="#94a3b8" font-size="10" font-family="'Consolas', monospace">{tg}</text>
+              
+              <!-- Captured Concepto -->
+              <rect x="425" y="468" width="220" height="24" fill="#fff" stroke="#cbd5e1" rx="2" />
+              <text x="430" y="485" fill="#c678dd" font-family="'Consolas', monospace" font-size="10" font-weight="bold">@p_concepto</text>
+              
+              <!-- External UUID -->
+              <rect x="655" y="468" width="220" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="2" stroke-dasharray="2,2"/>
+              <text x="660" y="485" fill="#94a3b8" font-family="'Consolas', monospace" font-size="10">{uuid_cfdi}</text>
+
+              <!-- Captured Monto -->
+              <rect x="885" y="468" width="90" height="24" fill="#fff" stroke="#cbd5e1" rx="2" />
+              <text x="890" y="485" fill="#c678dd" font-family="'Consolas', monospace" font-size="11" font-weight="bold">@p_monto</text>
+
+              <!-- Action button for inserting -->
+              <rect x="990" y="470" width="25" height="20" fill="#1B3A2D" rx="3" />
+              <text x="1002" y="484" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">✓</text>
+              <rect x="1020" y="470" width="25" height="20" fill="#fff" stroke="#ccc" rx="3" />
+              <text x="1032" y="484" fill="#666" font-size="10" font-weight="bold" text-anchor="middle">X</text>
+
+              <text x="50" y="520" fill="#e11d48" font-family="'Consolas', monospace" font-size="11">Hidden Keys para la partida: @p_ag_id, @p_detalle_id</text>
+
+              <!-- Add Button & Totals -->
+              <rect x="40" y="540" width="1020" height="35" fill="#e8ecea" stroke="#e2e8f0" />
+              <rect x="50" y="547" width="100" height="22" fill="#1B3A2D" rx="3" />
+              <text x="100" y="562" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">+ @p_accion=1</text>
+              
+              <!-- CERRAR MODAL -->
+              <rect x="430" y="650" width="200" height="40" fill="#e2e8f0" rx="4" />
+              <text x="530" y="675" fill="#333" font-size="12" font-weight="bold" text-anchor="middle">Cerrar Formulario</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+
+
+      
+<!-- Script for WF Tabs -->
+      <script>
+      function switchWfTab(btn, panelId) {
+        if(btn.style.opacity === "0.5") return; // disabled
+        const container = btn.closest('.doc-section');
+        container.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+        container.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        container.querySelector('#' + panelId).classList.add('active');
+      }
+      </script>
+    
+    <!-- 9. Reglas Críticas de Negocio -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">9</span> Reglas Críticas de Negocio</div>
+      <p>Las siguientes reglas rigen la integridad de la información y la lógica de validación tanto en el Backend (Stored Procedures) como en el Frontend (Formulario de Captura). No deben ser omitidas por ningún desarrollador.</p>
+      
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Regla / Restricción</th>
+            <th>Nivel</th>
+            <th>Comportamiento esperado (Validación)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight: bold; color: #1B3A2D;">RN-01: Bloqueo por Estatus Workflow</td>
+            <td>Backend / UI</td>
+            <td>La edición y eliminación (física o lógica) de una cabecera y sus partidas solo está permitida si <code>estatus_workflow</code> es <code>'CAPTURA'</code> o <code>'RECHAZADO'</code>. Si está en <code>'VALIDADO'</code>, <code>'AUTORIZADO'</code> o <code>'PAGADO'</code>, la base de datos abortará la transacción.</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #1B3A2D;">RN-02: Determinación del Beneficiario Único</td>
+            <td>Backend / UI</td>
+            <td>Dependiendo del <code>tipo_pago</code> seleccionado, solo se debe guardar el ID en un único campo de beneficiario, estableciendo los demás en nulo. Ejemplo: Si <code>tipo_pago = 1</code> (Proveedores), <code>f_proveedor_id</code> es obligatorio y <code>f_empleado_id</code> / <code>f_ua_id</code> deben ser NULOS obligatoriamente.</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #1B3A2D;">RN-03: Derivación de la Estructura Programática</td>
+            <td>Frontend</td>
+            <td>El usuario analista no debe capturar manualmente las claves Programáticas (Programa, Subprograma, Proyecto, Fuente y Tipo de Gasto). El frontend las debe recuperar del cruce paramétrico entre el Centro de Costo (Organización) seleccionado en la cabecera, y la Partida Específica seleccionada en el grid.</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #991b1b;">RN-04: Tope de Disponibilidad Presupuestal</td>
+            <td>Backend (SP)</td>
+            <td>Al invocar <code>fn_abc_afectacion_detalles</code> (Inserción de partida), el SP debe consultar la vista o servicio de suficiencia SAFPOJ. Si el <code>@p_importe_solicitado</code> excede el saldo de esa estructura programática, se devuelve <code>cod_resultado = -1</code> ("Saldo insuficiente") y se hace ROLLBACK de esa partida.</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #1B3A2D;">RN-05: Modificación de Partidas Restrictiva</td>
+            <td>Backend (SP)</td>
+            <td>Para modificar un monto en el grid de partidas (Update), se recomienda eliminar la partida y volverla a insertar para disparar limpiamente la re-validación del saldo presupuestal, evitando desfases aritméticos en la concurrencia de presupuestos.</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #1B3A2D;">RN-06: Aislamiento del Ejercicio Fiscal</td>
+            <td>Frontend / BD</td>
+            <td>El <code>ejercicio_fiscal</code> jamás se solicita al capturista. El backend lo inyecta directamente desde la variable de entorno o sesión activa. La base de datos rechaza cualquier manipulación ajena gracias a su particionamiento nativo.</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #1B3A2D;">RN-07: Relación con el Módulo CFDI (Fase 2)</td>
+            <td>Arquitectura</td>
+            <td>Aunque la selección de XMLs / UUID se pospone en la UI, la sumatoria del <code>monto</code> de las partidas capturadas deberá coincidir en el futuro de manera exacta con el <code>importe_total</code> neto de los comprobantes asociados a la afectación.</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #1B3A2D;">RN-08: Segregación del Capítulo 1000 (Nómina / RH)</td>
+            <td>BD / Frontend</td>
+            <td>Los usuarios pertenecientes al área de <strong>Recursos Humanos (RH)</strong> tendrán acceso exclusivo para visualizar, capturar y gestionar las afectaciones correspondientes a Nómina (<code>tipo_pago = 4</code> / Capítulo 1000). El resto de los usuarios (Tesorería, etc.) solo podrán gestionar los tipos de pago ajenos a RH (Proveedores, Viáticos, etc.), ocultándose mutuamente la información para garantizar la confidencialidad de la nómina.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- 10. Puntos de Integración -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">10</span> Puntos de Integración (Interoperabilidad)</div>
+      <p>El Módulo de Afectación de Gastos no opera de manera aislada. Funciona como el engrane principal que conecta el presupuesto autorizado con la ejecución del pago en tesorería, interactuando con los siguientes ecosistemas del SIAF-PJEV:</p>
+      
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Módulo Origen / Destino</th>
+            <th>Tipo de Interacción</th>
+            <th>Descripción del flujo de datos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Sistema de Presupuesto (SAFPOJ)</strong></td>
+            <td><span class="mod-badge badge-s" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd;">Lectura en Tiempo Real</span></td>
+            <td>Durante la captura de detalles, se consume el techo financiero (Disponibilidad Presupuestal) del cruce Programático-Estructural. Sin esta validación, la base de datos no permite afectar la partida.</td>
+          </tr>
+          <tr>
+            <td><strong>Módulo de Facturación (CFDI)</strong></td>
+            <td><span class="mod-badge badge-s" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">Lectura y Vinculación (Fase 2)</span></td>
+            <td>El módulo extrae los datos duros de los XML timbrados (UUID, RFC, Subtotal, IVA, Retenciones de ISR/IVA) y los vincula mediante la tabla <code>_cfdi</code> para evitar la recaptura de importes.</td>
+          </tr>
+          <tr>
+            <td><strong>Tesorería y Bancos (Dispersión)</strong></td>
+            <td><span class="mod-badge badge-s" style="background:#dcfce7; color:#15803d; border-color:#bbf7d0;">Salida de Datos (Trigger)</span></td>
+            <td>Una vez que la Afectación de Gasto llega al estatus <code>'AUTORIZADO'</code>, se convierte en el insumo directo (Orden de Pago) para que Bancos genere los <em>layouts</em> bancarios (txt). Al confirmarse la transferencia, Bancos actualiza la afectación a <code>'PAGADO'</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>Gestión de Proveedores / RRHH</strong></td>
+            <td><span class="mod-badge badge-s" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd;">Lectura de Catálogos</span></td>
+            <td>El módulo consume el Padrón de Proveedores (para trámites de compras) y la plantilla de RRHH (para viáticos o comprobaciones de nómina) garantizando que los pagos se emitan a entidades legalmente registradas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- 11. Impacto Contable -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">11</span> Impacto Contable (Armonización CONAC)</div>
+      <p>Conforme a la Ley General de Contabilidad Gubernamental, este módulo es el principal detonador de las pólizas automatizadas de egresos. La aprobación de una afectación de gasto transita por los siguientes momentos contables y registros de libro diario:</p>
+      
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Evento en el Sistema</th>
+            <th>Impacto Presupuestal</th>
+            <th>Generación de Póliza Contable (Automática)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>El Jefe de Control Presupuestal cambia el estatus a <code>VALIDADO</code></strong></td>
+            <td>Se registra el <strong>3er Tiempo Contable (Gasto Comprometido)</strong>. El sistema aparta el presupuesto para cada cuenta de gasto (Partida), disminuyendo el disponible y aumentando el comprometido.</td>
+            <td><em>No genera póliza contable</em>, únicamente afecta los saldos de los clasificadores presupuestales.</td>
+          </tr>
+          <tr>
+            <td><strong>El Director Administrativo firma y cambia el estatus a <code>AUTORIZADO</code> (Orden de Pago)</strong></td>
+            <td>El sistema mueve automáticamente el presupuesto del tercer tiempo contable hasta el <strong>Gasto Ejercido</strong> por cada cuenta de gasto (transitándolo por el Devengado y Ejercido de manera secuencial).</td>
+            <td>
+              <strong>Genera Póliza de Diario (Devengado):</strong><br>
+              <span style="color: #1B3A2D; font-weight:bold;">[+] Cargo:</span> Cuentas de Gastos (Ej. 5000 - Gastos de Funcionamiento) por el Subtotal.<br>
+              <span style="color: #991B1B; font-weight:bold;">[-] Abono:</span> Pasivo Circulante <strong>(Utiliza la `cuenta_contable_abono` generada en la cabecera)</strong> por el Importe Neto.<br>
+              <span style="color: #991B1B; font-weight:bold;">[-] Abono:</span> Pasivo por Retenciones (Ej. 2117 - ISR / IVA Retenido).
+            </td>
+          </tr>
+          <tr>
+            <td><strong>El área de Tesorería transfiere el recurso y cambia el estatus a <code>PAGADO</code></strong></td>
+            <td>Se registra el momento del <strong>Gasto Pagado</strong>. Concluye el ciclo presupuestal del egreso.</td>
+            <td>
+              <strong>Genera Póliza de Egreso (Pago):</strong><br>
+              <span style="color: #1B3A2D; font-weight:bold;">[+] Cargo:</span> Cancelación del Pasivo por el Importe Neto.<br>
+              <span style="color: #991B1B; font-weight:bold;">[-] Abono:</span> Bancos / Efectivo y Equivalentes (Ej. 1112 - Bancos Tesorería).
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- 12. Control de Cambios -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">12</span> Control de Cambios</div>
+      <p>Historial de versiones y modificaciones estructurales de este documento de Análisis Funcional.</p>
+      
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th>Versión</th>
+            <th>Fecha</th>
+            <th>Autor</th>
+            <th>Descripción de los Cambios</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1.0</strong></td>
+            <td>09/07/2026</td>
+            <td>Julio C Barrales</td>
+            <td>Creación inicial del documento. Definición del modelo de datos particionado, Stored Procedures base, wireframes alineados al Anexo 9 institucional y establecimiento de las reglas críticas de negocio (Tope presupuestal, segregación RRHH).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+<script>
+  function showDBTab(tabId, btn) {
+    const container = btn.closest('.doc-section');
+    container.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+    container.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    container.querySelector('#db-' + tabId).classList.add('active');
+  }
+</script>
+<script>
+  function showSP(spId, btn) {
+    const container = btn.closest('.doc-section');
+    container.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+    container.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    container.querySelector('#sp-' + spId).classList.add('active');
+  }
+</script>
+</body>
+</html>
+
+
+
+

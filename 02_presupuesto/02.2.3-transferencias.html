@@ -25,7 +25,20 @@
   .badge-p { background:var(--pjev-exito-bg); color:var(--pjev-exito-text); border:1px solid var(--pjev-exito-borde); }
   
   .conac-alert { background:#fff3cd; border:1px solid #ffeeba; color:#856404; padding:10px 15px; border-radius:6px; font-size:13px; margin:15px 0; display:flex; gap:10px; align-items:center; }
-</style>
+
+  .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .sp-panel { display: none; }
+  .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .http-method { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; color: white; width: 60px; text-align: center; margin-right: 12px; }
+  .method-get { background: #3b82f6; }
+  .method-post { background: #10b981; }
+  .method-put { background: #f59e0b; }
+  .method-delete { background: #ef4444; }
+  </style>
 </head>
 <body>
 <div class="doc-main-inner">
@@ -81,151 +94,1063 @@
     <!-- 4. MODELO DE DATOS -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <div class="siaf-alert" style="background:#fee2e2; border-left:4px solid #ef4444; padding:12px; margin-bottom:15px; font-size:13px; color:#7f1d1d;">
+        <strong>⚠️ Atención Eunice (DBA / Backend):</strong> La tabla <code>presupuesto.transferencias_ppto_detalles</code> y sus procedimientos almacenados resultaron ser "código fantasma" no utilizado. Favor de ejecutar un <code>DROP TABLE</code> y <code>DROP FUNCTION</code> en la base de datos para mantener la arquitectura limpia. Todo el detalle se almacena directamente en <code>transferencias_recalendario_meses</code>.
+      </div>
       <table class="props-table">
         <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Cabecera: <code>presupuesto.transferencia</code></strong></td></tr>
-        <tr><td><code>tr_id</code></td><td><code>BIGINT PK</code></td><td>Identificador único.</td></tr>
-        <tr><td><code>tr_folio</code></td><td><code>VARCHAR(20)</code></td><td>Ej. TR-TSJ-001.</td></tr>
-        <tr><td><code>tr_justificacion</code></td><td><code>TEXT</code></td><td>Justificación legal/motivo.</td></tr>
-        <tr><td><code>tr_bandera_especial</code></td><td><code>BOOLEAN</code></td><td>TRUE = Aprobada por Consejo/Pdte para cruzar capítulos.</td></tr>
-        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Detalle: <code>presupuesto.transferencia_detalle</code></strong></td></tr>
-        <tr><td><code>trd_tipo</code></td><td><code>CHAR(1)</code></td><td>'R' = Reducción (Origen) / 'A' = Ampliación (Destino).</td></tr>
-        <tr><td><code>trd_monto</code></td><td><code>DECIMAL</code></td><td>Importe a transferir.</td></tr>
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Cabecera: <code>presupuesto.transferencias_ppto</code></strong></td></tr>
+        <tr><td><code>TR_NO</code></td><td><code>BIGINT PK</code></td><td>Identificador único.</td></tr>
+        <tr><td><code>TR_FOLIO</code></td><td><code>VARCHAR(20)</code></td><td>Folio asignado, Ej. TR-TSJ-001.</td></tr>
+        <tr><td><code>TR_TIPO</code></td><td><code>SMALLINT</code></td><td>Tipo de transferencia (1=Compensada, 2=Líquida).</td></tr>
+        <tr><td><code>TR_FECHA</code></td><td><code>DATE</code></td><td>Fecha de registro.</td></tr>
+        <tr><td><code>TR_EJERCICIO</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal.</td></tr>
+        <tr><td><code>TR_PE_ORIGEN</code></td><td><code>INTEGER</code></td><td>Clave ID de presupuesto egresos (reducción).</td></tr>
+        <tr><td><code>TR_PE_DESTINO</code></td><td><code>INTEGER</code></td><td>Clave ID de presupuesto egresos (ampliación).</td></tr>
+        <tr><td><code>TR_IMPORTE</code></td><td><code>NUMERIC(16,2)</code></td><td>Monto total a transferir (> 0).</td></tr>
+        <tr><td><code>TR_CONCEPTO</code></td><td><code>VARCHAR(500)</code></td><td>Justificación/motivo (Min. 50 caracteres).</td></tr>
+        <tr><td><code>TR_DOCUMENTO_SOPORTE</code></td><td><code>VARCHAR(200)</code></td><td>No. de oficio soporte.</td></tr>
+        <tr><td><code>TR_POLIZA_NO</code></td><td><code>INTEGER</code></td><td>Póliza contable generada.</td></tr>
+        <tr><td><code>TR_ESTATUS</code></td><td><code>SMALLINT</code></td><td>1=Borrador, 2=Autorizado, 3=Contabilizado, 4=Cancelado.</td></tr>
+        <tr><td><code>USUARIO_C</code> / <code>FECHA_C</code></td><td><code>VARCHAR</code> / <code>TIMESTAMP</code></td><td>Auditoría de creación.</td></tr>
+        <tr><td><code>USUARIO_M</code> / <code>FECHA_M</code></td><td><code>VARCHAR</code> / <code>TIMESTAMP</code></td><td>Auditoría de modificación.</td></tr>
+
+        <tr style="background:#f4f6f5;"><td colspan="3"><strong>Detalle Mensual: <code>presupuesto.transferencias_recalendario_meses</code></strong></td></tr>
+        <tr><td><code>TRM_NO</code></td><td><code>BIGINT PK</code></td><td>Identificador de la recalendarización.</td></tr>
+        <tr><td><code>TRM_TR_NO</code></td><td><code>BIGINT</code></td><td>Llave foránea a la transferencia (TR_NO).</td></tr>
+        <tr><td><code>TRM_PE_NO</code></td><td><code>INTEGER</code></td><td>Clave de partida afectada.</td></tr>
+        <tr><td><code>TRM_TIPO_AFECTACION</code></td><td><code>SMALLINT</code></td><td>1 = Reducción / 2 = Ampliación.</td></tr>
+        <tr><td><code>TRM_MES_ENE</code> a <code>TRM_MES_DIC</code></td><td><code>NUMERIC(16,2)</code></td><td>Monto a afectar para cada uno de los 12 meses.</td></tr>
+        <tr><td><code>TRM_TOTAL_AFECTADO</code></td><td><code>NUMERIC(16,2)</code></td><td>Debe ser exactamente la suma de los 12 meses.</td></tr>
+        <tr><td><code>TRM_ESTATUS</code></td><td><code>INTEGER</code></td><td>Estatus del recalendario.</td></tr>
+        <tr><td><code>USUARIO_C</code> / <code>FECHA_C</code></td><td><code>VARCHAR</code> / <code>TIMESTAMP</code></td><td>Auditoría de creación.</td></tr>
+        <tr><td><code>USUARIO_M</code> / <code>FECHA_M</code></td><td><code>VARCHAR</code> / <code>TIMESTAMP</code></td><td>Auditoría de modificación.</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 5. STORED PROCEDURES -->
+        <!-- 5. STORED PROCEDURES -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
-      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong><code>presupuesto.sp_leer_transferencia</code></strong> (Devuelve lista general)</li>
-        <li><strong><code>presupuesto.fn_abc_transferencia</code></strong> (Guarda la cabecera y el detalle)</li>
-        <li><strong><code>presupuesto.sp_autorizar_transferencia</code></strong> (Valida saldo final y detona afectación)</li>
-      </ul>
+      <p>A continuación se detalla la lógica de los procedimientos de base de datos encargados de las transacciones (ABC) y las consultas (Leer) para el Módulo de Transferencias Presupuestales.</p>
+      
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('sp1',this)">fn_abc_transferencias_ppto</button>
+        <button class="sp-tab" onclick="showSP('sp2',this)">fn_leer_transferencias_ppto</button>
+        <button class="sp-tab" onclick="showSP('sp3',this)">fn_abc_transferencias_recalendario_meses</button>
+        <button class="sp-tab" onclick="showSP('sp4',this)">fn_leer_transferencias_recalendario_meses</button>
+        <button class="sp-tab" onclick="showSP('sp7',this)">fn_contabilizar_transferencias_ppto</button>
+        <button class="sp-tab" onclick="showSP('sp8',this)">fn_cambiar_estatus_transferencia</button>
+      </div>
+
+      <!-- TAB 1: fn_abc_transferencias_ppto -->
+      <div id="sp-sp1" class="sp-panel active">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_id_transferencia</code></td><td><code>INT</code></td><td>Obligatorio para Acción 3 (Cambio) y 4 (Baja).</td></tr>
+            <tr><td><code>p_fecha</code></td><td><code>DATE</code></td><td>Fecha de registro de la transferencia.</td></tr>
+            <tr><td><code>p_folio</code></td><td><code>VARCHAR</code></td><td>Folio de la transferencia (si es nulo en Alta, se autogenera).</td></tr>
+            <tr><td><code>p_justificacion</code></td><td><code>TEXT</code></td><td>Concepto y motivo de la transferencia (Min 50 chars).</td></tr>
+            <tr><td><code>p_monto_total</code></td><td><code>NUMERIC</code></td><td>Importe total de la transferencia.</td></tr>
+            <tr><td><code>p_pe_ejercicio_trabajo</code></td><td><code>INT</code></td><td>Ejercicio fiscal de la sesión actual.</td></tr>
+            <tr><td><code>p_mes_trabajo</code></td><td><code>SMALLINT</code></td><td>Mes de la sesión para validación de periodo abierto.</td></tr>
+            <tr><td><code>p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario que realiza la acción.</td></tr>
+            <tr><td><code>p_accion</code></td><td><code>INT</code></td><td>2: Alta, 3: Modificación, 4: Baja Lógica (Cancela a estatus 4).</td></tr>
+            <tr><td><code>p_tr_tipo</code></td><td><code>SMALLINT</code></td><td>Tipo de transferencia (1, 2 o 3).</td></tr>
+            <tr><td><code>p_pe_origen</code></td><td><code>BIGINT</code></td><td>ID de la clave presupuestal origen.</td></tr>
+            <tr><td><code>p_pe_destino</code></td><td><code>BIGINT</code></td><td>ID de la clave presupuestal destino.</td></tr>
+            <tr><td><code>p_documento_soporte</code></td><td><code>VARCHAR</code></td><td>Oficio que ampara el movimiento.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>0 (Éxito), 1 (Error de validación) o -2 (Excepción SQL).</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje descriptivo.</td></tr>
+            <tr><td><code>{id_transferencia}</code></td><td><code>INT</code></td><td>ID (TR_NO) de la transferencia.</td></tr>
+            <tr><td><code>{TR_FOLIO}</code></td><td><code>VARCHAR</code></td><td>Folio generado o modificado.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> presupuesto.fn_abc_transferencias_ppto(
+    p_id_transferencia integer DEFAULT NULL,
+    p_fecha date DEFAULT NULL,
+    p_folio character varying DEFAULT NULL,
+    p_justificacion text DEFAULT NULL,
+    p_monto_total numeric DEFAULT 0,
+    p_pe_ejercicio_trabajo integer DEFAULT NULL,
+    p_mes_trabajo smallint DEFAULT NULL,
+    p_usuario character varying DEFAULT NULL,
+    p_accion integer DEFAULT NULL,
+    p_tr_tipo smallint DEFAULT NULL,
+    p_pe_origen bigint DEFAULT NULL,
+    p_pe_destino bigint DEFAULT NULL,
+    p_documento_soporte character varying DEFAULT NULL
+)
+ RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER AS $function$
+ DECLARE 
+    v_id integer := p_id_transferencia;
+    v_folio character varying := p_folio;
+    v_consecutivo integer;
+    v_periodo_abierto boolean;
+ BEGIN
+    -- 1. Validacion de Periodo de Escritura
+    IF p_pe_ejercicio_trabajo IS NOT NULL AND p_mes_trabajo IS NOT NULL THEN
+        SELECT config.fn_periodo_permite_escritura(p_pe_ejercicio_trabajo, p_mes_trabajo) INTO v_periodo_abierto;
+        IF NOT COALESCE(v_periodo_abierto, true) THEN
+            RETURN jsonb_build_object('cod_resultado', 1, 'msg_resultado', 'El periodo correspondiente al ejercicio/mes no permite escritura.');
+        END IF;
+    END IF;
+
+    CASE p_accion
+        WHEN 2 THEN -- ALTA
+            IF v_folio IS NULL OR v_folio = '' OR v_folio = 'S/F' OR v_folio = 'S/O' THEN
+                SELECT COALESCE(MAX(SUBSTRING("TR_FOLIO" FROM 6)::integer), 0) + 1
+                INTO v_consecutivo
+                FROM presupuesto.transferencias_ppto
+                WHERE "TR_EJERCICIO" = p_pe_ejercicio_trabajo AND "TR_FOLIO" LIKE 'OAJ/T%';
+                v_folio := 'OAJ/T' || LPAD(v_consecutivo::text, 3, '0');
+            END IF;
+
+            INSERT INTO presupuesto.transferencias_ppto (
+                "TR_EJERCICIO", "TR_FOLIO", "TR_TIPO", "TR_FECHA",
+                "TR_PE_ORIGEN", "TR_PE_DESTINO", "TR_IMPORTE", "TR_CONCEPTO",
+                "TR_DOCUMENTO_SOPORTE", "TR_ESTATUS", "USUARIO_C", "FECHA_C"
+            ) VALUES (
+                p_pe_ejercicio_trabajo, v_folio, COALESCE(p_tr_tipo, 1), COALESCE(p_fecha, now()::date),
+                p_pe_origen::integer, p_pe_destino::integer, p_monto_total,
+                COALESCE(p_justificacion, 'S/O'), COALESCE(p_documento_soporte, 'S/O'),
+                1, COALESCE(p_usuario, 'sistema'), now()
+            ) RETURNING "TR_NO" INTO v_id;
+
+        WHEN 3 THEN -- CAMBIO
+            UPDATE presupuesto.transferencias_ppto 
+            SET "TR_IMPORTE" = p_monto_total, "TR_CONCEPTO" = COALESCE(p_justificacion, "TR_CONCEPTO"),
+                "TR_PE_ORIGEN" = p_pe_origen::integer, "TR_PE_DESTINO" = p_pe_destino::integer,
+                "TR_DOCUMENTO_SOPORTE" = COALESCE(p_documento_soporte, "TR_DOCUMENTO_SOPORTE"),
+                "TR_FECHA" = COALESCE(p_fecha, "TR_FECHA"), "TR_TIPO" = COALESCE(p_tr_tipo, "TR_TIPO"),
+                "USUARIO_M" = p_usuario, "FECHA_M" = now()
+            WHERE "TR_NO" = v_id AND "TR_ESTATUS" = 1;
+            IF NOT FOUND THEN RETURN jsonb_build_object('cod_resultado', 1, 'msg_resultado', 'Registro no encontrado o no modificable.'); END IF;
+
+        WHEN 4 THEN -- BAJA LÓGICA
+            UPDATE presupuesto.transferencias_ppto SET "TR_ESTATUS" = 4, "USUARIO_M" = p_usuario, "FECHA_M" = now() WHERE "TR_NO" = v_id;
+            IF NOT FOUND THEN RETURN jsonb_build_object('cod_resultado', 1, 'msg_resultado', 'Registro no encontrado.'); END IF;
+    END CASE;
+
+    RETURN jsonb_build_object('cod_resultado', 0, 'msg_resultado', 'OK', 'id_transferencia', v_id, 'TR_FOLIO', v_folio);
+ EXCEPTION WHEN OTHERS THEN 
+    RETURN jsonb_build_object('cod_resultado', -2, 'msg_resultado', 'Error: ' || SQLERRM);
+ END;$function$</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: fn_leer_transferencias_ppto -->
+      <div id="sp-sp2" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_id</code></td><td><code>BIGINT</code></td><td>Filtro opcional por ID único (TR_NO). Menor a 0 devuelve mock vacío.</td></tr>
+            <tr><td><code>p_folio</code></td><td><code>VARCHAR</code></td><td>Filtro opcional LIKE por folio.</td></tr>
+            <tr><td><code>p_tipo</code></td><td><code>SMALLINT</code></td><td>Filtro opcional por tipo de transferencia.</td></tr>
+            <tr><td><code>p_estatus</code></td><td><code>SMALLINT</code></td><td>Filtro opcional por estatus (1, 2, 3, 4).</td></tr>
+            <tr><td><code>p_page</code> / <code>p_limit</code></td><td><code>INT</code></td><td>Parámetros de paginación de resultados.</td></tr>
+            <tr><td><code>p_pe_ejercicio_trabajo</code></td><td><code>INT</code></td><td>Ejercicio fiscal actual del usuario.</td></tr>
+            <tr><td><code>p_accion</code></td><td><code>INT</code></td><td>Debe ser 1.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{error}</code></td><td><code>INT</code></td><td>0 (Éxito), 1 (Error).</td></tr>
+            <tr><td><code>{mensaje}</code></td><td><code>VARCHAR</code></td><td>"OK" o descripción del error.</td></tr>
+            <tr><td><code>{rowcount}</code></td><td><code>INT</code></td><td>Cantidad de registros devueltos.</td></tr>
+            <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">NODO {data} (Arreglo JSON)</td></tr>
+            <tr><td><code>{tr_no}, {tr_folio}, {tr_importe}, {origen}, {destino}...</code></td><td><code>MIXED</code></td><td>Columnas de cabecera con sub-objetos para partida origen y destino.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> presupuesto.fn_leer_transferencias_ppto(
+    p_id bigint DEFAULT NULL,
+    p_folio character varying DEFAULT NULL,
+    p_tipo smallint DEFAULT NULL,
+    p_pe_ejercicio integer DEFAULT NULL,
+    p_estatus smallint DEFAULT NULL,
+    p_pe_origen bigint DEFAULT NULL,
+    p_pe_destino bigint DEFAULT NULL,
+    p_fecha_desde date DEFAULT NULL,
+    p_fecha_hasta date DEFAULT NULL,
+    p_page integer DEFAULT 1,
+    p_limit integer DEFAULT 50,
+    p_pe_ejercicio_trabajo integer DEFAULT NULL,
+    p_mes_trabajo smallint DEFAULT NULL,
+    p_usuario character varying DEFAULT NULL,
+    p_accion integer DEFAULT 1
+) RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER AS $function$
+DECLARE 
+    v_result JSONB; 
+    v_offset INTEGER; 
+    v_PE_EJERCICIO INTEGER := COALESCE(p_PE_EJERCICIO_trabajo, config."devuelve_ejercicio"());
+BEGIN
+    IF p_accion <> 1 THEN RETURN jsonb_build_object('error', 1, 'mensaje', 'Acción no soportada.', 'data', '[]'::jsonb); END IF;
+    
+    IF p_id < 0 THEN
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'PE_EJERCICIO', v_PE_EJERCICIO, 'rowcount', 1, 'data', jsonb_build_array(jsonb_build_object('tr_no', NULL, 'tr_folio', NULL, 'tr_PE_EJERCICIO', v_PE_EJERCICIO, 'tr_estatus', 1)));
+    END IF;
+    
+    v_offset := (GREATEST(p_page, 1) - 1) * GREATEST(p_limit, 1);
+    
+    SELECT jsonb_agg(t) INTO v_result FROM (
+        SELECT tr."TR_NO" as tr_no, tr."TR_FOLIO" as tr_folio, tr."TR_TIPO" as tr_tipo, tr."TR_FECHA" as tr_fecha, tr."TR_EJERCICIO" as tr_PE_EJERCICIO, tr."TR_IMPORTE" as tr_importe, tr."TR_ESTATUS" as tr_estatus,
+               tr."TR_CONCEPTO" as tr_concepto, tr."TR_DOCUMENTO_SOPORTE" as tr_documento_soporte,
+               jsonb_build_object('pe_no', peo."PE_NO") AS origen, jsonb_build_object('pe_no', ped."PE_NO") AS destino
+        FROM presupuesto.transferencias_ppto tr
+        LEFT JOIN presupuesto.presupuesto_egresos peo ON tr."TR_PE_ORIGEN" = peo."PE_NO" AND peo."PE_EJERCICIO" = v_PE_EJERCICIO
+        LEFT JOIN presupuesto.presupuesto_egresos ped ON tr."TR_PE_DESTINO" = ped."PE_NO" AND ped."PE_EJERCICIO" = v_PE_EJERCICIO
+        WHERE tr."TR_EJERCICIO" = v_PE_EJERCICIO
+          AND (p_id IS NULL OR tr."TR_NO" = p_id)
+          AND (p_folio IS NULL OR tr."TR_FOLIO" ILIKE '%' || p_folio || '%')
+          AND (p_tipo IS NULL OR tr."TR_TIPO" = p_tipo)
+          AND (p_estatus IS NULL OR tr."TR_ESTATUS" = p_estatus)
+        ORDER BY tr."TR_NO" DESC LIMIT GREATEST(p_limit, 1) OFFSET v_offset
+    ) t;
+    
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'PE_EJERCICIO', v_PE_EJERCICIO, 'rowcount', COALESCE(jsonb_array_length(v_result), 0), 'data', COALESCE(v_result, '[]'::jsonb));
+EXCEPTION WHEN OTHERS THEN 
+    RETURN jsonb_build_object('error', 1, 'mensaje', SQLERRM, 'rowcount', 0, 'data', '[]'::jsonb);
+END;
+$function$</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: fn_abc_transferencias_recalendario_meses -->
+      <div id="sp-sp3" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_accion</code></td><td><code>INT</code></td><td>2: Alta, 3: Cambio, 4: Baja Lógica.</td></tr>
+            <tr><td><code>p_id_transferencia</code></td><td><code>INT</code></td><td>ID del trámite de transferencia padre.</td></tr>
+            <tr><td><code>p_pe_no</code></td><td><code>INT</code></td><td>Clave de presupuesto egresos (Partida) afectada.</td></tr>
+            <tr><td><code>p_ene</code> - <code>p_dic</code></td><td><code>NUMERIC</code></td><td>Importes mensuales por cada mes del año.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{cod_resultado}</code></td><td><code>INT</code></td><td>0 (Éxito), -1/1 (Error de validación) o -2 (Excepción).</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje detallado.</td></tr>
+            <tr><td><code>{id}</code></td><td><code>BIGINT</code></td><td>ID (TRM_NO) de la recalendarización generada/afectada.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> presupuesto.fn_abc_transferencias_recalendario_meses(
+    p_id_transferencia_recalendario bigint DEFAULT NULL,
+    p_id_transferencia integer DEFAULT NULL,
+    p_pe_no integer DEFAULT NULL,
+    p_ene numeric DEFAULT 0, p_feb numeric DEFAULT 0, p_mar numeric DEFAULT 0, p_abr numeric DEFAULT 0,
+    p_may numeric DEFAULT 0, p_jun numeric DEFAULT 0, p_jul numeric DEFAULT 0, p_ago numeric DEFAULT 0,
+    p_sep numeric DEFAULT 0, p_oct numeric DEFAULT 0, p_nov numeric DEFAULT 0, p_dic numeric DEFAULT 0,
+    p_pe_ejercicio_trabajo integer DEFAULT NULL,
+    p_mes_trabajo smallint DEFAULT NULL,
+    p_usuario character varying DEFAULT NULL,
+    p_accion integer DEFAULT NULL
+) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER AS $function$
+DECLARE
+    v_msg text; v_id bigint := p_id_transferencia_recalendario; v_periodo_abierto boolean;
+    v_PE_EJERCICIO_padre integer; v_estatus_padre integer;
+    v_total numeric := COALESCE(p_ene,0)+COALESCE(p_feb,0)+COALESCE(p_mar,0)+COALESCE(p_abr,0)+
+                       COALESCE(p_may,0)+COALESCE(p_jun,0)+COALESCE(p_jul,0)+COALESCE(p_ago,0)+
+                       COALESCE(p_sep,0)+COALESCE(p_oct,0)+COALESCE(p_nov,0)+COALESCE(p_dic,0);
+BEGIN
+    -- Validaciones Técnicas y de Periodo de Escritura...
+    -- Validación de Integridad con el Encabezado...
+
+    CASE p_accion
+        WHEN 2 THEN -- ALTA
+            INSERT INTO presupuesto.transferencias_recalendario_meses (
+                "TRM_TR_NO", "TRM_PE_NO", "TRM_TIPO_AFECTACION",
+                "TRM_MES_ENE", "TRM_MES_FEB", "TRM_MES_MAR", "TRM_MES_ABR",
+                "TRM_MES_MAY", "TRM_MES_JUN", "TRM_MES_JUL", "TRM_MES_AGO",
+                "TRM_MES_SEP", "TRM_MES_OCT", "TRM_MES_NOV", "TRM_MES_DIC",
+                "TRM_TOTAL_AFECTADO", "TRM_ESTATUS", "USUARIO_C", "FECHA_C"
+            ) VALUES (
+                p_id_transferencia::bigint, p_PE_NO::bigint, 1,
+                p_ene, p_feb, p_mar, p_abr, p_may, p_jun, p_jul, p_ago,
+                p_sep, p_oct, p_nov, p_dic, v_total, 1, p_usuario, now()
+            ) RETURNING "TRM_NO" INTO v_id;
+            v_msg := 'Recalendarización de transferencia registrada.';
+
+        WHEN 3 THEN -- CAMBIO
+            IF v_estatus_padre != 1 THEN RETURN jsonb_build_object('cod_resultado', 1, 'msg_resultado', 'No se puede modificar...'); END IF;
+            UPDATE presupuesto.transferencias_recalendario_meses
+            SET "TRM_MES_ENE" = p_ene, "TRM_MES_FEB" = p_feb, "TRM_MES_MAR" = p_mar, "TRM_MES_ABR" = p_abr,
+                "TRM_MES_MAY" = p_may, "TRM_MES_JUN" = p_jun, "TRM_MES_JUL" = p_jul, "TRM_MES_AGO" = p_ago,
+                "TRM_MES_SEP" = p_sep, "TRM_MES_OCT" = p_oct, "TRM_MES_NOV" = p_nov, "TRM_MES_DIC" = p_dic,
+                "TRM_TOTAL_AFECTADO" = v_total, "USUARIO_M" = p_usuario, "FECHA_M" = now()
+            WHERE "TRM_NO" = v_id AND "TRM_ESTATUS" = 1;
+            v_msg := 'Recalendarización de transferencia actualizada.';
+
+        WHEN 4 THEN -- BAJA LÓGICA
+            UPDATE presupuesto.transferencias_recalendario_meses SET "TRM_ESTATUS" = 4, "USUARIO_M" = p_usuario, "FECHA_M" = now() WHERE "TRM_NO" = v_id;
+            v_msg := 'Recalendarización eliminada lógicamente.';
+    END CASE;
+
+    RETURN jsonb_build_object('cod_resultado', 0, 'msg_resultado', v_msg, 'id', v_id);
+EXCEPTION WHEN OTHERS THEN RETURN jsonb_build_object('cod_resultado', -2, 'msg_resultado', 'Error: ' || SQLERRM);
+END;$function$</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: fn_leer_transferencias_recalendario_meses -->
+      <div id="sp-sp4" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_tr_no</code></td><td><code>BIGINT</code></td><td>Filtro principal por el ID de la Transferencia.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{trm_mes_ene} ... {trm_mes_dic}</code></td><td><code>NUMERIC</code></td><td>Desglose mes a mes (Ene-Dic) dentro del nodo data.</td></tr>
+            <tr><td><code>{trm_total_afectado}</code></td><td><code>NUMERIC</code></td><td>Total general del año.</td></tr>
+            <tr><td><code>{presupuesto_egreso}</code></td><td><code>JSONB</code></td><td>Objeto cruzado con PE_NO y clave presupuestal.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> presupuesto.fn_leer_transferencias_recalendario_meses(
+    p_id bigint DEFAULT NULL,
+    p_tr_no bigint DEFAULT NULL,
+    p_pe_no bigint DEFAULT NULL,
+    p_tipo_afectacion smallint DEFAULT NULL,
+    p_estatus integer DEFAULT NULL,
+    p_page integer DEFAULT 1,
+    p_limit integer DEFAULT 50,
+    p_pe_ejercicio_trabajo integer DEFAULT NULL,
+    p_mes_trabajo smallint DEFAULT NULL,
+    p_usuario character varying DEFAULT NULL,
+    p_accion integer DEFAULT 1
+) RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER AS $function$
+ DECLARE 
+    v_result JSONB; v_offset INTEGER; 
+    v_PE_EJERCICIO INTEGER := COALESCE(p_PE_EJERCICIO_trabajo, config."devuelve_ejercicio"());
+ BEGIN
+    -- Paginación y cruce con transferencias_ppto y presupuesto_egresos...
+    SELECT jsonb_agg(t) INTO v_result FROM (
+        SELECT m."TRM_NO" as trm_no, m."TRM_TR_NO" as trm_tr_no, m."TRM_PE_NO" as trm_pe_no, 
+               m."TRM_TIPO_AFECTACION" as trm_tipo_afectacion, m."TRM_MES_ENE" as trm_mes_ene, ...
+               m."TRM_MES_DIC" as trm_mes_dic, m."TRM_TOTAL_AFECTADO" as trm_total_afectado, m."TRM_ESTATUS" as trm_estatus, 
+               jsonb_build_object('tr_folio', tr."TR_FOLIO") AS transferencia, 
+               jsonb_build_object('pe_no', pe."PE_NO", 'pe_clavepptal', pe."PE_CLAVEPPTAL") AS presupuesto_egreso
+        FROM presupuesto.transferencias_recalendario_meses m
+        INNER JOIN presupuesto.transferencias_ppto tr ON m."TRM_TR_NO" = tr."TR_NO" AND tr."TR_EJERCICIO" = v_PE_EJERCICIO
+        INNER JOIN presupuesto.presupuesto_egresos pe ON m."TRM_PE_NO" = pe."PE_NO" AND pe."PE_EJERCICIO" = v_PE_EJERCICIO
+        WHERE (p_id IS NULL OR m."TRM_NO" = p_id) AND (p_tr_no IS NULL OR m."TRM_TR_NO" = p_tr_no)
+          AND (p_pe_no IS NULL OR m."TRM_PE_NO" = p_pe_no) AND (m."TRM_ESTATUS" = 1)
+        ORDER BY m."TRM_NO" ASC LIMIT GREATEST(p_limit, 1) OFFSET v_offset
+    ) t;
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'rowcount', COALESCE(jsonb_array_length(v_result), 0), 'data', COALESCE(v_result, '[]'::jsonb));
+ END;$function$</pre>
+          </div>
+        </div>
+      </div>
+      <!-- TAB 7: fn_contabilizar_transferencias_ppto -->
+      <div id="sp-sp7" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_tr_no</code></td><td><code>BIGINT</code></td><td>ID del trámite previamente Autorizado (Estatus 2).</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Impacto en Base de Datos</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>presupuesto_egresos_meses</code></td><td><code>UPDATE</code></td><td>Resta y Suma el recurso de las bolsas correspondientes validando que no se sobregire mes a mes (PEM_MES_ENE, PEM_MES_FEB...).</td></tr>
+            <tr><td><code>transferencias_ppto</code></td><td><code>UPDATE</code></td><td>Cambia el <code>TR_ESTATUS</code> a 3 (Contabilizada).</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> presupuesto.fn_contabilizar_transferencias_ppto(p_tr_no bigint, p_usuario character varying)
+ RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER AS $function$
+DECLARE 
+    v_estatus smallint; v_det record; v_disp record;
+BEGIN
+    SELECT "TR_ESTATUS" INTO v_estatus FROM presupuesto.transferencias_ppto WHERE "TR_NO" = p_tr_no;
+    IF v_estatus <> 2 THEN RETURN jsonb_build_object('error', 1, 'mensaje', 'Debe estar en estatus 2.'); END IF;
+
+    FOR v_det IN SELECT * FROM presupuesto.transferencias_recalendario_meses WHERE "TRM_TR_NO" = p_tr_no LOOP
+        SELECT * INTO v_disp FROM presupuesto.presupuesto_egresos_meses WHERE "PEM_PE_NO" = v_det."TRM_PE_NO" FOR UPDATE;
+        
+        IF v_det."TRM_TIPO_AFECTACION" = 1 THEN
+            -- BAJA: Validar sobregiro...
+            IF v_disp."PEM_MES_ENE" < v_det."TRM_MES_ENE" OR v_disp."PEM_MES_FEB" < v_det."TRM_MES_FEB" THEN
+                RETURN jsonb_build_object('error', 1, 'mensaje', 'Sobregiro detectado...');
+            END IF;
+            -- Aplicar BAJA (Update)
+            UPDATE presupuesto.presupuesto_egresos_meses SET "PEM_MES_ENE" = "PEM_MES_ENE" - v_det."TRM_MES_ENE" ...
+            WHERE "PEM_PE_NO" = v_det."TRM_PE_NO";
+        ELSIF v_det."TRM_TIPO_AFECTACION" = 2 THEN
+            -- Aplicar ALTA (Update)
+            UPDATE presupuesto.presupuesto_egresos_meses SET "PEM_MES_ENE" = "PEM_MES_ENE" + v_det."TRM_MES_ENE" ...
+            WHERE "PEM_PE_NO" = v_det."TRM_PE_NO";
+        END IF;
+
+        -- Actualizar Total
+        UPDATE presupuesto.presupuesto_egresos_meses SET
+           "PEM_CALENDARIZADO" = "PEM_MES_ENE"+"PEM_MES_FEB"+"PEM_MES_MAR"+"PEM_MES_ABR"...
+        WHERE "PEM_PE_NO" = v_det."TRM_PE_NO";
+    END LOOP;
+
+    UPDATE presupuesto.transferencias_ppto SET "TR_ESTATUS" = 3 WHERE "TR_NO" = p_tr_no;
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'Transferencia contabilizada.');
+EXCEPTION WHEN OTHERS THEN RETURN jsonb_build_object('error', 1, 'mensaje', 'Error al contabilizar: ' || SQLERRM);
+END;$function$</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 8: fn_cambiar_estatus_transferencia -->
+      <div id="sp-sp8" class="sp-panel">
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_tr_no</code></td><td><code>BIGINT</code></td><td>ID del trámite.</td></tr>
+            <tr><td><code>p_nuevo_estatus</code></td><td><code>SMALLINT</code></td><td>Ej. 2 para Autorizar, o 4 para Cancelar.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{error}</code></td><td><code>INT</code></td><td>0 (Éxito), 1 (Error).</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> presupuesto.fn_cambiar_estatus_transferencia(p_tr_no bigint, p_nuevo_estatus smallint, p_usuario character varying)
+ RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER AS $function$
+BEGIN
+    UPDATE presupuesto.transferencias_ppto 
+    SET "TR_ESTATUS" = p_nuevo_estatus
+    WHERE "TR_NO" = p_tr_no;
+    
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'Estatus actualizado a ' || p_nuevo_estatus);
+EXCEPTION WHEN OTHERS THEN 
+    RETURN jsonb_build_object('error', 1, 'mensaje', 'Error al cambiar estatus: ' || SQLERRM);
+END;
+$function$</pre>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- 6. SERVICIOS REST -->
+        <!-- 6. SERVICIOS REST -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <div class="section-title"><span class="section-num">6</span> Servicios REST (Backend API)</div>
+      <p style="font-size: 13px; color: var(--pjev-texto-muted); margin-bottom: 12px;">
+        En estricto apego al <strong>Estándar de Servicios REST (DOC-04)</strong> de la arquitectura de desarrollo, el módulo expone las operaciones CRUD mapeando correctamente los verbos HTTP hacia los Stored Procedures.
+      </p>
       <table class="props-table">
-        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Mapeo de Stored Procedure</th><th>Descripción / Acción</th></tr></thead>
         <tbody>
-        <tr><td><span class="method post">POST</span></td><td><code>/ppto/transferencia/leer</code></td><td>{ p_mes }</td><td>Consulta listado.</td></tr>
-        <tr><td><span class="method post">POST</span></td><td><code>/ppto/transferencia/abc</code></td><td>Dto Completo</td><td>Guarda validando Suma Cero.</td></tr>
-        <tr><td><span class="method post">POST</span></td><td><code>/ppto/transferencia/autorizar</code></td><td>{ p_tr_id }</td><td>Cambia estado a Aprobada.</td></tr>
+        <tr><td colspan="4" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">CABECERA Y FLUJO (TRANSFERENCIAS_PPTO)</td></tr>
+        <tr><td><span class="http-method method-get">GET</span></td><td><code>/api/presupuesto/transferencias-ppto</code></td><td><code>fn_leer_transferencias_ppto (p_id=NULL)</code></td><td>Lista las transferencias con filtrado paginado (vía query params).</td></tr>
+        <tr><td><span class="http-method method-get">GET</span></td><td><code>/api/presupuesto/transferencias-ppto/nuevo</code></td><td><code>fn_leer_transferencias_ppto (p_id=-1)</code></td><td>Devuelve la estructura mock vacía para inicializar formularios.</td></tr>
+        <tr><td><span class="http-method method-get">GET</span></td><td><code>/api/presupuesto/transferencias-ppto/:id</code></td><td><code>fn_leer_transferencias_ppto (p_id=:id)</code></td><td>Lectura individual de una transferencia.</td></tr>
+        <tr><td><span class="http-method method-post">POST</span></td><td><code>/api/presupuesto/transferencias-ppto</code></td><td><code>fn_abc_transferencias_ppto (accion=2)</code></td><td>Alta de una nueva transferencia cabecera.</td></tr>
+        <tr><td><span class="http-method method-put">PUT</span></td><td><code>/api/presupuesto/transferencias-ppto/:id</code></td><td><code>fn_abc_transferencias_ppto (accion=3)</code></td><td>Actualización/Cambio de la transferencia.</td></tr>
+        <tr><td><span class="http-method method-delete">DELETE</span></td><td><code>/api/presupuesto/transferencias-ppto/:id</code></td><td><code>fn_abc_transferencias_ppto (accion=4)</code></td><td>Baja lógica de la transferencia (Cancelado).</td></tr>
+
+        <tr><td colspan="4" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">RUTAS OPERATIVAS (ACCIONES ESPECIALES)</td></tr>
+        <tr><td><span class="http-method method-post">POST</span></td><td><code>/api/presupuesto/transferencias-ppto/lote/abc</code></td><td>Múltiples llamadas en TX</td><td>Guarda cabecera, detalles y recalendario atómicamente.</td></tr>
+        <tr><td><span class="http-method method-post">POST</span></td><td><code>/api/presupuesto/transferencias-ppto/:id/autorizar</code></td><td><code>fn_cambiar_estatus_transferencia</code></td><td>Valida estatus, marca autorizado y genera póliza.</td></tr>
+        <tr><td><span class="http-method method-post">POST</span></td><td><code>/api/presupuesto/transferencias-ppto/:id/contabilizar</code></td><td><code>fn_contabilizar_transferencias_ppto</code></td><td>Afectación física de los saldos (estatus 3).</td></tr>
+        <tr><td><span class="http-method method-put">PUT</span></td><td><code>/api/presupuesto/transferencias-ppto/:id/estatus</code></td><td><code>fn_cambiar_estatus_transferencia</code></td><td>Cambio operativo del estatus.</td></tr>
+
+        
+
+        <tr><td colspan="4" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">RECALENDARIO MENSUAL</td></tr>
+        <tr><td><span class="http-method method-get">GET</span></td><td><code>/api/presupuesto/transferencias-recalendario-meses</code></td><td><code>fn_leer_transferencias_recalendario...</code></td><td>Lista la matriz de Ene-Dic.</td></tr>
+        <tr><td><span class="http-method method-post">POST</span></td><td><code>/api/presupuesto/transferencias-recalendario-meses</code></td><td><code>fn_abc_transferencias_recalendario... (2)</code></td><td>Inserta la matriz mensual.</td></tr>
+        <tr><td><span class="http-method method-put">PUT</span></td><td><code>/api/presupuesto/transferencias-recalendario-meses/:id</code></td><td><code>fn_abc_transferencias_recalendario... (3)</code></td><td>Modifica los montos mensuales.</td></tr>
+        <tr><td><span class="http-method method-delete">DELETE</span></td><td><code>/api/presupuesto/transferencias-recalendario-meses/:id</code></td><td><code>fn_abc_transferencias_recalendario... (4)</code></td><td>Baja lógica del recalendario.</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 7. ACCIONES -->
+        <!-- 7. Acciones del Módulo -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
-      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong>Registro (CRUD):</strong> <code>[+ NUEVA TRANSFERENCIA]</code>. Acciones fila: <code>[✏ EDITAR]</code>, <code>[🗑 CANCELAR]</code>, <code>[✅ AUTORIZAR]</code>.</li>
-        <li><strong>Especiales:</strong> <code>[VERIFICAR SALDOS ORIGEN]</code> (A nivel backend antes de enviar).</li>
-        <li><strong>Reportes:</strong> <code>[🖨 IMPRIMIR OFICIO / FORMATO]</code>.</li>
-      </ul>
+      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo y Procedimientos</div>
+      <p>Esta sección mapea los eventos transaccionales del sistema con los pasos normativos y operativos. Cada acción puede alterar el estatus de la transferencia y detonar procesos subyacentes como la validación de saldos y la generación de pólizas contables.</p>
+      
+      <table class="props-table">
+        <thead><tr><th>Acción (Botón UI)</th><th>Rol Requerido</th><th>Cambio de Estatus</th><th>Paso Operativo / Regla de Negocio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Guardar Transferencia (Borrador)</strong></td>
+            <td>Enlace Administrativo / Capturista</td>
+            <td>Se mantiene en <span class="siaf-badge siaf-badge-registrado" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:2px 6px; border-radius:4px; font-size:11px;">1 (CAPTURA)</span></td>
+            <td>Paso Inicial: Se registran los datos de cabecera, el oficio soporte y la distribución de recalendarización (origen/destino). No afecta saldos reales aún.</td>
+          </tr>
+          <tr>
+            <td><strong>Enviar a Autorización</strong></td>
+            <td>Enlace Administrativo</td>
+            <td>De CAPTURA a <span class="siaf-badge siaf-badge-enviado" style="background:#e0e7ff; color:#3730a3; border:1px solid #c7d2fe; padding:2px 6px; border-radius:4px; font-size:11px;">2 (EN REVISIÓN)</span></td>
+            <td>El usuario de la Unidad Administrativa remite el trámite para su escrutinio por la Dirección de Presupuesto. A partir de aquí no puede editar.</td>
+          </tr>
+          <tr>
+            <td><strong>Autorizar (y Generar Póliza)</strong></td>
+            <td>Director / Control Presupuestal</td>
+            <td>A <span class="siaf-badge siaf-badge-autorizado" style="background:#dcfce7; color:#166534; border:1px solid #bbf7d0; padding:2px 6px; border-radius:4px; font-size:11px;">2 (AUTORIZADO)</span></td>
+            <td>Validación Normativa: Se verifica liquidez de la partida origen. Se <strong>crea automáticamente la póliza contable</strong> que asienta el movimiento de transferencia, referenciada en <code>TR_POLIZA_NO</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>Contabilizar (Afectación Física)</strong></td>
+            <td>Sistema / Control Presupuestal</td>
+            <td>De AUTORIZADO a <span class="siaf-badge" style="background:#fef08a; color:#854d0e; border:1px solid #fde047; padding:2px 6px; border-radius:4px; font-size:11px;">3 (CONTABILIZADA)</span></td>
+            <td>Paso Crítico: Ejecuta <code>fn_contabilizar_transferencias_ppto</code> para descontar físicamente los recursos del calendario de la partida origen e incrementarlos en la destino.</td>
+          </tr>
+          <tr>
+            <td><strong>Rechazar / Cancelar</strong></td>
+            <td>Autorizador / Capturista</td>
+            <td>A <span class="siaf-badge siaf-badge-cancelado" style="background:#fee2e2; color:#991b1b; border:1px solid #fecaca; padding:2px 6px; border-radius:4px; font-size:11px;">4 (CANCELADA)</span></td>
+            <td>El trámite queda nulo. Si la transferencia aún estaba en captura, el creador puede darla de baja lógica. Si estaba en revisión y hay un error, el autorizador la rechaza (Cancela).</td>
+          </tr>
+          <tr>
+            <td><strong>Imprimir Formato</strong></td>
+            <td>Cualquiera</td>
+            <td>Sin cambio</td>
+            <td>Generación del documento PDF (Layout/Oficio) que ampara la transferencia, necesario para las firmas físicas requeridas por auditoría.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- 8. DISEÑO DE INTERFACES -->
+            <!-- 8. DISEÑO DE INTERFACES -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
       
       <div class="wireframe-tabs">
-        <button class="wf-tab active" onclick="showWF('p1',this)">Pantalla Captura (Origen y Destino)</button>
+        <button class="wf-tab active" onclick="showWF('p1',this)">1. Listado Principal</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">2. Nueva Transferencia</button>
+        <button class="wf-tab" onclick="showWF('p3',this)">3. Modificar Transferencia</button>
+        <button class="wf-tab" onclick="showWF('p4',this)">4. Calendario Mensual</button>
       </div>
 
+      <!-- WF 1: LISTADO PRINCIPAL -->
       <div id="wf-p1" class="wf-panel active">
         <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Captura: Doble Panel con Desglose</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Pantalla de Inicio / Listado de Transferencias</span></div>
           <div class="wf-svg-area">
-            <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1000" height="450" fill="#fcfcfc" rx="4" stroke="#ddd"/>
+            <svg viewBox="0 0 1200 650" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1200" height="650" fill="#f8f7f5" rx="4" stroke="#ddd"/>
               
-              <!-- Cabecera -->
-              <rect x="20" y="20" width="960" height="50" fill="#f4f6f5" stroke="#ccc" rx="4"/>
-              <text x="30" y="40" font-size="11" font-weight="bold" fill="#666">Justificación:</text>
-              <rect x="110" y="27" width="500" height="25" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="120" y="44" font-size="11" fill="#333">Oficio OM-010-2026. Apoyo a la Dirección Gral. de Administración.</text>
+              <!-- Breadcrumb & Title -->
+              <text x="30" y="40" font-size="12" fill="#666">Panel / Presupuesto / Transferencias</text>
+              <text x="30" y="70" font-size="22" font-weight="bold" fill="#1f2937">Transferencias Presupuestales</text>
+              <rect x="990" y="45" width="180" height="36" fill="#1B3A2D" rx="6"/>
+              <text x="1080" y="68" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle">+ Nueva Transferencia</text>
               
-              <text x="630" y="40" font-size="11" font-weight="bold" fill="#666">Acuerdo TSJ:</text>
-              <rect x="710" y="30" width="15" height="15" fill="#fff" stroke="#ccc" rx="2"/>
-              <text x="735" y="42" font-size="10" fill="#666">(Habilitar Inter-capítulos)</text>
-
-              <!-- Panel ORIGEN (Izquierdo) -->
-              <rect x="20" y="90" width="470" height="250" fill="#FEF2F2" stroke="#FECACA" rx="4"/>
-              <rect x="20" y="90" width="470" height="30" fill="#FCA5A5" rx="4" />
-              <text x="255" y="110" font-size="12" font-weight="bold" fill="#7F1D1D" text-anchor="middle">ORIGEN (Reducciones)</text>
-
-              <!-- Row 1 Origen -->
-              <text x="30" y="140" font-size="10" fill="#666">Clave Ptal:</text>
-              <rect x="90" y="128" width="280" height="20" fill="#fff" stroke="#ccc" rx="2"/>
-              <text x="95" y="142" font-size="10" fill="#333">21100001-301... [Mat. de Oficina]</text>
+              <!-- Filters Panel -->
+              <rect x="30" y="100" width="1140" height="150" fill="#fff" stroke="#e5e7eb" rx="6"/>
               
-              <text x="380" y="140" font-size="10" fill="#666">Monto:</text>
-              <rect x="420" y="128" width="60" height="20" fill="#fff" stroke="#ccc" rx="2"/>
-              <text x="430" y="142" font-size="10" fill="#B91C1C">-$5,000</text>
-
-              <!-- Desglose de Cuenta Origen -->
-              <rect x="90" y="152" width="280" height="30" fill="#fff" stroke="#FCA5A5" stroke-dasharray="2,2"/>
-              <text x="95" y="165" font-size="9" fill="#666">Disponible: $12,500.00</text>
-              <text x="95" y="177" font-size="9" fill="#666">Comprometido: $4,000.00</text>
-
-              <!-- Panel DESTINO (Derecho) -->
-              <rect x="510" y="90" width="470" height="250" fill="#F0FDF4" stroke="#BBF7D0" rx="4"/>
-              <rect x="510" y="90" width="470" height="30" fill="#86EFAC" rx="4" />
-              <text x="745" y="110" font-size="12" font-weight="bold" fill="#14532D" text-anchor="middle">DESTINO (Ampliaciones)</text>
-
-              <!-- Row 1 Destino -->
-              <text x="520" y="140" font-size="10" fill="#666">Clave Ptal:</text>
-              <rect x="580" y="128" width="280" height="20" fill="#fff" stroke="#ccc" rx="2"/>
-              <text x="585" y="142" font-size="10" fill="#333">33400001-301... [Capacitación]</text>
+              <!-- Row 1 Filters -->
+              <text x="50" y="130" font-size="11" font-weight="bold" fill="#374151">Buscar Folio</text>
+              <rect x="50" y="140" width="500" height="30" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="60" y="160" font-size="12" fill="#9ca3af">Ej: OAJ/T001</text>
               
-              <text x="870" y="140" font-size="10" fill="#666">Monto:</text>
-              <rect x="910" y="128" width="60" height="20" fill="#fff" stroke="#ccc" rx="2"/>
-              <text x="920" y="142" font-size="10" fill="#15803D">+$5,000</text>
-
-              <!-- Desglose de Cuenta Destino -->
-              <rect x="580" y="152" width="280" height="30" fill="#fff" stroke="#86EFAC" stroke-dasharray="2,2"/>
-              <text x="585" y="165" font-size="9" fill="#666">Disponible actual: $0.00</text>
-              <text x="585" y="177" font-size="9" fill="#666">Presupuesto Nuevo: $5,000.00</text>
-
-              <!-- Totales -->
-              <rect x="20" y="360" width="960" height="60" fill="#f4f6f5" stroke="#ccc" rx="4"/>
-              <text x="400" y="385" font-size="13" font-weight="bold" fill="#666">Suma Reducciones:</text>
-              <text x="530" y="385" font-size="13" font-weight="bold" fill="#B91C1C">-$5,000.00</text>
-
-              <text x="400" y="405" font-size="13" font-weight="bold" fill="#666">Suma Ampliaciones:</text>
-              <text x="530" y="405" font-size="13" font-weight="bold" fill="#15803D">+$5,000.00</text>
+              <text x="580" y="130" font-size="11" font-weight="bold" fill="#374151">Estatus</text>
+              <rect x="580" y="140" width="570" height="30" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="590" y="160" font-size="12" fill="#374151">Todos</text>
+              <path d="M 1130 152 L 1140 152 L 1135 160 Z" fill="#9ca3af"/>
               
-              <line x1="630" y1="360" x2="630" y2="420" stroke="#ccc"/>
+              <!-- Row 2 Filters -->
+              <text x="50" y="195" font-size="11" font-weight="bold" fill="#374151">Organización</text>
+              <rect x="50" y="205" width="200" height="30" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="60" y="225" font-size="12" fill="#374151">Todas</text>
+              <path d="M 235 217 L 245 217 L 240 225 Z" fill="#9ca3af"/>
+              
+              <text x="270" y="195" font-size="11" font-weight="bold" fill="#374151">Función</text>
+              <rect x="270" y="205" width="200" height="30" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="280" y="225" font-size="12" fill="#374151">Todas</text>
+              <path d="M 455 217 L 465 217 L 460 225 Z" fill="#9ca3af"/>
+              
+              <text x="490" y="195" font-size="11" font-weight="bold" fill="#374151">Programa</text>
+              <rect x="490" y="205" width="220" height="30" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="500" y="225" font-size="12" fill="#374151">Todos</text>
+              <path d="M 695 217 L 705 217 L 700 225 Z" fill="#9ca3af"/>
+              
+              <text x="730" y="195" font-size="11" font-weight="bold" fill="#374151">Subprograma</text>
+              <rect x="730" y="205" width="200" height="30" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="740" y="225" font-size="12" fill="#374151">Todos</text>
+              <path d="M 915 217 L 925 217 L 920 225 Z" fill="#9ca3af"/>
 
-              <text x="650" y="395" font-size="15" font-weight="bold" fill="#333">Diferencia:</text>
-              <rect x="735" y="375" width="100" height="30" fill="#D1FAE5" rx="4"/>
-              <text x="785" y="395" font-size="15" font-weight="bold" fill="#047857" text-anchor="middle">$0.00</text>
+              <text x="950" y="195" font-size="11" font-weight="bold" fill="#374151">Proyecto</text>
+              <rect x="950" y="205" width="200" height="30" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="960" y="225" font-size="12" fill="#374151">Todos</text>
+              <path d="M 1135 217 L 1145 217 L 1140 225 Z" fill="#9ca3af"/>
 
-              <rect x="850" y="375" width="110" height="30" fill="#1B3A2D" rx="4"/>
-              <text x="905" y="395" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">GUARDAR</text>
+              <!-- Filters Footer -->
+              <text x="50" y="260" font-size="12" fill="#6b7280">Mostrando <tspan font-weight="bold" fill="#374151">3</tspan> transferencias.</text>
+              <rect x="1050" y="245" width="100" height="28" fill="#fff" stroke="#1B3A2D" rx="4"/>
+              <text x="1100" y="263" font-size="12" font-weight="bold" fill="#1B3A2D" text-anchor="middle">Limpiar filtros</text>
 
+              <!-- Table Panel -->
+              <rect x="30" y="290" width="1140" height="300" fill="#fff" stroke="#e5e7eb" rx="6"/>
+              
+              <!-- Columnas Btn -->
+              <rect x="1070" y="305" width="80" height="28" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="1110" y="323" font-size="11" font-weight="bold" fill="#374151" text-anchor="middle">Columnas</text>
+              
+              <!-- Table Headers -->
+              <rect x="30" y="345" width="1140" height="36" fill="#fcfbf9" stroke="#e5e7eb"/>
+              <text x="100" y="367" font-size="11" font-weight="bold" fill="#6b7280" text-anchor="middle">Folio ↑↓</text>
+              <text x="250" y="367" font-size="11" font-weight="bold" fill="#6b7280" text-anchor="middle">Importe ↑↓</text>
+              <text x="480" y="367" font-size="11" font-weight="bold" fill="#6b7280" text-anchor="middle">Documento Soporte ↑↓</text>
+              <text x="710" y="367" font-size="11" font-weight="bold" fill="#6b7280" text-anchor="middle">Fecha ↑↓</text>
+              <text x="860" y="367" font-size="11" font-weight="bold" fill="#6b7280" text-anchor="middle">Estatus ↑↓</text>
+              <text x="1040" y="367" font-size="11" font-weight="bold" fill="#6b7280" text-anchor="middle">Acciones</text>
+
+              <!-- Row 1 -->
+              <line x1="30" y1="381" x2="1170" y2="381" stroke="#e5e7eb"/>
+              <line x1="160" y1="345" x2="160" y2="520" stroke="#e5e7eb"/>
+              <line x1="330" y1="345" x2="330" y2="520" stroke="#e5e7eb"/>
+              <line x1="620" y1="345" x2="620" y2="520" stroke="#e5e7eb"/>
+              <line x1="800" y1="345" x2="800" y2="520" stroke="#e5e7eb"/>
+              <line x1="930" y1="345" x2="930" y2="520" stroke="#e5e7eb"/>
+
+              <text x="100" y="405" font-size="12" font-weight="bold" fill="#111827" text-anchor="middle">OAJ/T001</text>
+              <text x="250" y="405" font-size="12" font-weight="bold" fill="#111827" text-anchor="middle">$4,000.00</text>
+              <text x="480" y="405" font-size="12" fill="#374151" text-anchor="middle">OAJ/T001</text>
+              <text x="710" y="405" font-size="12" fill="#374151" text-anchor="middle">09 jul 2025</text>
+              <rect x="825" y="392" width="70" height="20" fill="#1f2937" rx="10"/>
+              <text x="860" y="406" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">Autorizado</text>
+              
+              <rect x="965" y="390" width="50" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="990" y="406" font-size="11" fill="#374151" text-anchor="middle">Editar</text>
+              <rect x="1025" y="390" width="90" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="1070" y="406" font-size="11" fill="#374151" text-anchor="middle">Descargar PDF</text>
+
+              <!-- Row 2 -->
+              <line x1="30" y1="427" x2="1170" y2="427" stroke="#e5e7eb"/>
+              <text x="100" y="451" font-size="12" font-weight="bold" fill="#111827" text-anchor="middle">OAJ/T002</text>
+              <text x="250" y="451" font-size="12" font-weight="bold" fill="#111827" text-anchor="middle">$1,000.00</text>
+              <text x="480" y="451" font-size="12" fill="#374151" text-anchor="middle">12564</text>
+              <text x="710" y="451" font-size="12" fill="#374151" text-anchor="middle">10 ene 2025</text>
+              <rect x="825" y="438" width="70" height="20" fill="#1f2937" rx="10"/>
+              <text x="860" y="452" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">Autorizado</text>
+
+              <rect x="965" y="436" width="50" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="990" y="452" font-size="11" fill="#374151" text-anchor="middle">Editar</text>
+              <rect x="1025" y="436" width="90" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="1070" y="452" font-size="11" fill="#374151" text-anchor="middle">Descargar PDF</text>
+
+              <!-- Row 3 -->
+              <line x1="30" y1="473" x2="1170" y2="473" stroke="#e5e7eb"/>
+              <text x="100" y="497" font-size="12" font-weight="bold" fill="#111827" text-anchor="middle">OAJ/T003</text>
+              <text x="250" y="497" font-size="12" font-weight="bold" fill="#111827" text-anchor="middle">$89,496.85</text>
+              <text x="480" y="497" font-size="12" fill="#374151" text-anchor="middle">OAJ/SIF/100/2025</text>
+              <text x="710" y="497" font-size="12" fill="#374151" text-anchor="middle">01 jul 2026</text>
+              <rect x="825" y="484" width="70" height="20" fill="#f3f4f6" stroke="#d1d5db" rx="10"/>
+              <text x="860" y="498" font-size="10" font-weight="bold" fill="#6b7280" text-anchor="middle">Borrador</text>
+
+              <rect x="940" y="482" width="50" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="965" y="498" font-size="11" fill="#374151" text-anchor="middle">Editar</text>
+              <rect x="995" y="482" width="90" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="1040" y="498" font-size="11" fill="#374151" text-anchor="middle">Descargar PDF</text>
+              <rect x="1090" y="482" width="60" height="24" fill="#1B3A2D" rx="4"/>
+              <text x="1120" y="498" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">Autorizar</text>
+
+              <!-- Table Footer -->
+              <line x1="30" y1="520" x2="1170" y2="520" stroke="#e5e7eb"/>
+              <text x="50" y="550" font-size="12" fill="#6b7280">Mostrando 1-3 de 3</text>
+              
+              <rect x="900" y="535" width="80" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="930" y="551" font-size="11" fill="#374151" text-anchor="middle">Mostrar 10</text>
+              
+              <rect x="990" y="535" width="24" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="1002" y="551" font-size="10" fill="#d1d5db" text-anchor="middle"><<</text>
+              <rect x="1020" y="535" width="24" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="1032" y="551" font-size="10" fill="#d1d5db" text-anchor="middle"><</text>
+              <text x="1075" y="551" font-size="11" fill="#374151" text-anchor="middle">Pág 1 de 1</text>
+              <rect x="1100" y="535" width="24" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="1112" y="551" font-size="10" fill="#d1d5db" text-anchor="middle">></text>
+              <rect x="1130" y="535" width="24" height="24" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="1142" y="551" font-size="10" fill="#d1d5db" text-anchor="middle">>></text>
             </svg>
           </div>
+        </div>
+      </div>
+
+      <!-- WF 2: NUEVA TRANSFERENCIA -->
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Nueva Transferencia Póliza</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+              <rect x="100" y="20" width="800" height="660" fill="#fff" rx="6" stroke="#e5e7eb" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.1))"/>
+              
+              <!-- Header -->
+              <rect x="100" y="20" width="800" height="50" fill="#1B3A2D" rx="6"/>
+              <path d="M 100 70 L 900 70 L 900 70 L 100 70 Z" fill="#1B3A2D"/>
+              <text x="130" y="52" font-size="18" font-weight="bold" fill="#fff">Nueva Transferencia Póliza</text>
+              <rect x="850" y="30" width="30" height="30" fill="#374151" rx="4"/>
+              <text x="865" y="50" font-size="16" fill="#fff" text-anchor="middle">x</text>
+
+              <!-- Row 1 -->
+              <text x="130" y="110" font-size="12" font-weight="bold" fill="#111827">Folio</text>
+              <rect x="130" y="120" width="180" height="36" fill="#f3f4f6" stroke="#d1d5db" rx="4"/>
+              
+              <text x="330" y="110" font-size="12" font-weight="bold" fill="#111827">Fecha *</text>
+              <rect x="330" y="120" width="200" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="345" y="143" font-size="14" fill="#6b7280">dd/mm/aaaa</text>
+              
+              <text x="550" y="110" font-size="12" font-weight="bold" fill="#111827">Oficio Soporte *</text>
+              <rect x="550" y="120" width="320" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="565" y="143" font-size="14" fill="#9ca3af">Ej. OAJ/123/2026</text>
+
+              <!-- Row 2 -->
+              <text x="130" y="185" font-size="12" font-weight="bold" fill="#111827">Justificación *</text>
+              <rect x="130" y="195" width="740" height="80" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="145" y="220" font-size="14" fill="#9ca3af">Mínimo 50 caracteres...</text>
+
+              <!-- Partidas -->
+              <text x="130" y="325" font-size="16" font-weight="bold" fill="#111827">Partidas Afectadas (N Bajas - N Altas)</text>
+              <line x1="130" y1="340" x2="870" y2="340" stroke="#e5e7eb" stroke-width="2"/>
+              
+              <rect x="530" y="305" width="160" height="30" fill="#fff" stroke="#991b1b" rx="4"/>
+              <text x="610" y="325" font-size="12" font-weight="bold" fill="#991b1b" text-anchor="middle">+ Agregar Origen (Baja)</text>
+              
+              <rect x="700" y="305" width="170" height="30" fill="#1B3A2D" rx="4"/>
+              <text x="785" y="325" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">+ Agregar Destino (Alta)</text>
+              
+              <!-- Table Headers Split -->
+              <rect x="130" y="360" width="740" height="150" fill="#fff" stroke="#d1d5db" rx="6"/>
+              <rect x="130" y="360" width="740" height="36" fill="#fcfbf9" stroke="#d1d5db"/>
+              <text x="170" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Tipo</text>
+              <text x="320" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Clave Presupuestal</text>
+              <text x="560" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Incremento (+)</text>
+              <text x="680" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Disminución (-)</text>
+              <text x="810" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Acciones</text>
+
+              <line x1="210" y1="360" x2="210" y2="396" stroke="#d1d5db"/>
+              <line x1="500" y1="360" x2="500" y2="396" stroke="#d1d5db"/>
+              <line x1="620" y1="360" x2="620" y2="396" stroke="#d1d5db"/>
+              <line x1="750" y1="360" x2="750" y2="396" stroke="#d1d5db"/>
+
+              <text x="500" y="440" font-size="14" fill="#374151" text-anchor="middle">No hay partidas agregadas.</text>
+
+              <!-- Totals directly under columns -->
+              <rect x="130" y="520" width="740" height="60" fill="#fcfbf9" stroke="#d1d5db" rx="6"/>
+              <text x="490" y="545" font-size="13" font-weight="bold" fill="#374151" text-anchor="end">Totales:</text>
+              <text x="610" y="545" font-size="13" font-weight="bold" fill="#15803d" text-anchor="end">$0.00</text>
+              <text x="730" y="545" font-size="13" font-weight="bold" fill="#991b1b" text-anchor="end">$0.00</text>
+              
+              <text x="490" y="565" font-size="12" font-weight="bold" fill="#374151" text-anchor="end">Diferencia (Debe ser $0.00):</text>
+              <text x="610" y="565" font-size="12" font-weight="bold" fill="#111827" text-anchor="end">$0.00</text>
+
+              <!-- Footer -->
+              <line x1="100" y1="620" x2="900" y2="620" stroke="#e5e7eb"/>
+              <rect x="580" y="630" width="190" height="34" fill="#1B3A2D" rx="4"/>
+              <text x="675" y="652" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle">Guardar Transferencia</text>
+              
+              <rect x="780" y="630" width="90" height="34" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="825" y="652" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle">Cerrar</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- WF 3: MODIFICAR TRANSFERENCIA -->
+      <div id="wf-p3" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Modificar Transferencia Póliza</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 780" xmlns="http://www.w3.org/2000/svg">
+              <rect x="100" y="20" width="800" height="740" fill="#fff" rx="6" stroke="#e5e7eb" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.1))"/>
+              
+              <!-- Header -->
+              <rect x="100" y="20" width="800" height="50" fill="#1B3A2D" rx="6"/>
+              <path d="M 100 70 L 900 70 L 900 70 L 100 70 Z" fill="#1B3A2D"/>
+              <text x="130" y="52" font-size="18" font-weight="bold" fill="#fff">Modificar Transferencia Póliza</text>
+              <rect x="850" y="30" width="30" height="30" fill="#374151" rx="4"/>
+              <text x="865" y="50" font-size="16" fill="#fff" text-anchor="middle">x</text>
+
+              <!-- Row 1 -->
+              <text x="130" y="110" font-size="12" font-weight="bold" fill="#111827">Folio</text>
+              <rect x="130" y="120" width="180" height="36" fill="#f3f4f6" stroke="#d1d5db" rx="4"/>
+              <text x="145" y="143" font-size="14" font-weight="bold" fill="#6b7280">OAJ/T001</text>
+              
+              <text x="330" y="110" font-size="12" font-weight="bold" fill="#111827">Fecha *</text>
+              <rect x="330" y="120" width="200" height="36" fill="#fcfcfc" stroke="#d1d5db" rx="4"/>
+              <text x="345" y="143" font-size="14" fill="#6b7280">09/07/2025</text>
+              
+              <text x="550" y="110" font-size="12" font-weight="bold" fill="#111827">Oficio Soporte *</text>
+              <rect x="550" y="120" width="320" height="36" fill="#fcfcfc" stroke="#d1d5db" rx="4"/>
+              <text x="565" y="143" font-size="14" fill="#6b7280">OAJ/T001</text>
+
+              <!-- Row 2 -->
+              <text x="130" y="185" font-size="12" font-weight="bold" fill="#111827">Justificación *</text>
+              <rect x="130" y="195" width="740" height="80" fill="#fcfcfc" stroke="#d1d5db" rx="4"/>
+              <text x="145" y="220" font-size="14" fill="#6b7280">Transferencia presupuestal prueba para generar poliza</text>
+
+              <!-- Partidas -->
+              <text x="130" y="325" font-size="16" font-weight="bold" fill="#111827">Partidas Afectadas (N Bajas - N Altas)</text>
+              <line x1="130" y1="340" x2="870" y2="340" stroke="#e5e7eb" stroke-width="2"/>
+
+              <!-- Table with Split Columns -->
+              <rect x="130" y="360" width="740" height="230" fill="#fff" stroke="#d1d5db" rx="6"/>
+              <rect x="130" y="360" width="740" height="36" fill="#fcfbf9" stroke="#d1d5db"/>
+              <text x="170" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Tipo</text>
+              <text x="320" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Clave Presupuestal</text>
+              <text x="560" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Incremento (+)</text>
+              <text x="680" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Disminución (-)</text>
+              <text x="810" y="383" font-size="12" font-weight="bold" fill="#6b7280" text-anchor="middle">Acciones</text>
+
+              <line x1="210" y1="360" x2="210" y2="550" stroke="#d1d5db"/>
+              <line x1="500" y1="360" x2="500" y2="550" stroke="#d1d5db"/>
+              <line x1="620" y1="360" x2="620" y2="550" stroke="#d1d5db"/>
+              <line x1="750" y1="360" x2="750" y2="550" stroke="#d1d5db"/>
+
+              <!-- Table Row 1 (Baja) -->
+              <line x1="130" y1="396" x2="870" y2="396" stroke="#d1d5db"/>
+              <text x="170" y="417" font-size="12" font-weight="bold" fill="#991b1b" text-anchor="middle">ORIGEN (-)</text>
+              <text x="220" y="412" font-size="10" font-weight="bold" fill="#111827">2910...502</text>
+              <text x="220" y="425" font-size="9" fill="#6b7280">REFACCIONES...</text>
+              <!-- Incremento vacio -->
+              <text x="730" y="417" font-size="12" font-weight="bold" fill="#111827" text-anchor="end">$3,000.00</text>
+              
+              <!-- Table Row 2 (Baja) -->
+              <line x1="130" y1="446" x2="870" y2="446" stroke="#d1d5db"/>
+              <text x="170" y="467" font-size="12" font-weight="bold" fill="#991b1b" text-anchor="middle">ORIGEN (-)</text>
+              <text x="220" y="462" font-size="10" font-weight="bold" fill="#111827">3750...601</text>
+              <text x="220" y="475" font-size="9" fill="#6b7280">VIÁTICOS...</text>
+              <text x="730" y="467" font-size="12" font-weight="bold" fill="#111827" text-anchor="end">$1,000.00</text>
+
+              <!-- Table Row 3 (Alta) -->
+              <line x1="130" y1="496" x2="870" y2="496" stroke="#d1d5db"/>
+              <text x="170" y="517" font-size="12" font-weight="bold" fill="#111827" text-anchor="middle">DESTINO (+)</text>
+              <text x="220" y="512" font-size="10" font-weight="bold" fill="#111827">3720...601</text>
+              <text x="220" y="525" font-size="9" fill="#6b7280">PASAJES...</text>
+              <text x="610" y="517" font-size="12" font-weight="bold" fill="#111827" text-anchor="end">$4,000.00</text>
+              <!-- Disminucion vacio -->
+              <line x1="130" y1="550" x2="870" y2="550" stroke="#d1d5db"/>
+
+              <!-- Totales -->
+              <rect x="130" y="600" width="740" height="60" fill="#fcfbf9" stroke="#d1d5db" rx="6"/>
+              <text x="490" y="625" font-size="13" font-weight="bold" fill="#374151" text-anchor="end">Totales:</text>
+              <text x="610" y="625" font-size="13" font-weight="bold" fill="#15803d" text-anchor="end">$4,000.00</text>
+              <text x="730" y="625" font-size="13" font-weight="bold" fill="#991b1b" text-anchor="end">$4,000.00</text>
+              
+              <text x="490" y="645" font-size="12" font-weight="bold" fill="#374151" text-anchor="end">Diferencia (Debe ser $0.00):</text>
+              <text x="610" y="645" font-size="12" font-weight="bold" fill="#111827" text-anchor="end">$0.00</text>
+
+              <!-- Footer -->
+              <line x1="100" y1="690" x2="900" y2="690" stroke="#e5e7eb"/>
+              <rect x="580" y="700" width="190" height="34" fill="#fff" stroke="#991b1b" rx="4"/>
+              <text x="675" y="722" font-size="14" font-weight="bold" fill="#991b1b" text-anchor="middle">Cancelar transferencias</text>
+              
+              <rect x="780" y="700" width="90" height="34" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="825" y="722" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle">Cerrar</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- WF 4: CALENDARIO MENSUAL -->
+      <div id="wf-p4" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Modal: Configurar Destino (Alta) / Origen (Baja)</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 1000 900" xmlns="http://www.w3.org/2000/svg">
+              <rect x="150" y="50" width="700" height="820" fill="#fff" rx="6" stroke="#e5e7eb" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.1))"/>
+              
+              <!-- Modal Header -->
+              <rect x="150" y="50" width="700" height="50" fill="#1B3A2D" rx="6"/>
+              <path d="M 150 100 L 850 100 L 850 100 L 150 100 Z" fill="#1B3A2D"/>
+              <text x="180" y="82" font-size="18" font-weight="bold" fill="#fff">Configurar Destino (Alta)</text>
+              <rect x="800" y="60" width="30" height="30" fill="#374151" rx="4"/>
+              <text x="815" y="80" font-size="16" fill="#fff" text-anchor="middle">x</text>
+              
+              <!-- Filtros Programáticos -->
+              <text x="180" y="130" font-size="10" font-weight="bold" fill="#6b7280" text-transform="uppercase">Organización</text>
+              <rect x="180" y="140" width="640" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+              
+              <text x="180" y="195" font-size="10" font-weight="bold" fill="#6b7280" text-transform="uppercase">Función</text>
+              <rect x="180" y="205" width="150" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+              
+              <text x="345" y="195" font-size="10" font-weight="bold" fill="#6b7280" text-transform="uppercase">Programa</text>
+              <rect x="345" y="205" width="150" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+              
+              <text x="510" y="195" font-size="10" font-weight="bold" fill="#6b7280" text-transform="uppercase">Subprograma</text>
+              <rect x="510" y="205" width="150" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+              
+              <text x="675" y="195" font-size="10" font-weight="bold" fill="#6b7280" text-transform="uppercase">Proyecto</text>
+              <rect x="675" y="205" width="145" height="30" fill="#fff" stroke="#ccc" rx="3"/>
+
+              <!-- Buscador -->
+              <text x="180" y="260" font-size="12" font-weight="bold" fill="#374151">Buscar Clave Presupuestal</text>
+              <rect x="180" y="270" width="640" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="195" y="293" font-size="14" fill="#9ca3af">Buscar clave filtrada...</text>
+              
+              <!-- Meses (Movidos hacia arriba) -->
+              <!-- Fila 1 -->
+              <text x="180" y="340" font-size="11" font-weight="bold" fill="#111827">ENE</text>
+              <rect x="180" y="350" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <text x="345" y="340" font-size="11" font-weight="bold" fill="#111827">FEB</text>
+              <rect x="345" y="350" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <text x="510" y="340" font-size="11" font-weight="bold" fill="#111827">MAR</text>
+              <rect x="510" y="350" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <text x="675" y="340" font-size="11" font-weight="bold" fill="#111827">ABR</text>
+              <rect x="675" y="350" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <!-- Fila 2 -->
+              <text x="180" y="420" font-size="11" font-weight="bold" fill="#111827">MAY</text>
+              <rect x="180" y="430" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <text x="345" y="420" font-size="11" font-weight="bold" fill="#111827">JUN</text>
+              <rect x="345" y="430" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <text x="510" y="420" font-size="11" font-weight="bold" fill="#111827">JUL</text>
+              <rect x="510" y="430" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <text x="675" y="420" font-size="11" font-weight="bold" fill="#111827">AGO</text>
+              <rect x="675" y="430" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <!-- Fila 3 -->
+              <text x="180" y="500" font-size="11" font-weight="bold" fill="#111827">SEP</text>
+              <rect x="180" y="510" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <text x="345" y="500" font-size="11" font-weight="bold" fill="#111827">OCT</text>
+              <rect x="345" y="510" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <text x="510" y="500" font-size="11" font-weight="bold" fill="#111827">NOV</text>
+              <rect x="510" y="510" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              
+              <text x="675" y="500" font-size="11" font-weight="bold" fill="#111827">DIC</text>
+              <rect x="675" y="510" width="145" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+
+              <!-- Action buttons underneath the months grid -->
+              <rect x="180" y="570" width="140" height="32" fill="#e5e7eb" rx="4"/>
+              <text x="250" y="590" font-size="11" font-weight="bold" fill="#374151" text-anchor="middle">Actualizar Totales</text>
+
+              <rect x="340" y="570" width="140" height="32" fill="#dbeafe" rx="4"/>
+              <text x="410" y="590" font-size="11" font-weight="bold" fill="#1d4ed8" text-anchor="middle">Calcular Diferencia</text>
+
+              <!-- Ayuda visual: Resumen de Totales del carrito (Movido al final) -->
+              <rect x="180" y="630" width="640" height="80" fill="#fef3c7" stroke="#fcd34d" rx="6"/>
+              <text x="200" y="650" font-size="13" font-weight="bold" fill="#9ca3af">Total Bajas:</text>
+              <text x="790" y="650" font-size="13" font-weight="bold" fill="#991b1b" text-anchor="end">$4,000.00</text>
+              <text x="200" y="670" font-size="13" font-weight="bold" fill="#9ca3af">Total Altas:</text>
+              <text x="790" y="670" font-size="13" font-weight="bold" fill="#15803d" text-anchor="end">$0.00</text>
+              <line x1="180" y1="680" x2="820" y2="680" stroke="#fcd34d"/>
+              <text x="200" y="697" font-size="13" font-weight="bold" fill="#15803d">Diferencia (Debe ser $0.00):</text>
+              <text x="790" y="697" font-size="13" font-weight="bold" fill="#111827" text-anchor="end">-$4,000.00</text>
+
+              <!-- Footer Modal -->
+              <line x1="150" y1="780" x2="850" y2="780" stroke="#e5e7eb" stroke-width="2"/>
+              <text x="180" y="820" font-size="18" font-weight="bold" fill="#111827">Total: $0.00</text>
+              
+              <rect x="560" y="800" width="100" height="36" fill="#fff" stroke="#d1d5db" rx="4"/>
+              <text x="610" y="823" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle">Cancelar</text>
+
+              <rect x="670" y="800" width="150" height="36" fill="#1B3A2D" rx="4"/>
+              <text x="745" y="823" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle">Agregar a Póliza</text>
+            </svg>
+          </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>
 
     <!-- 9. REGLAS DE NEGOCIO -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas (Normatividad CONAC y LGCG)</div>
+      
+      <div class="conac-alert" style="background:#e0e7ff; border-left:4px solid #3730a3; padding:12px; margin-bottom:15px; font-size:13px; color:#312e81;">
+        <strong>Particionamiento por Ejercicio Fiscal:</strong> A partir de 2024, para garantizar un desempeño óptimo y mantener la segregación de la contabilidad gubernamental, las tablas <code>transferencias_ppto</code> y <code>transferencias_recalendario_meses</code> están particionadas nativamente por la columna <code>EJERCICIO</code> mediante <code>PARTITION BY LIST</code> en PostgreSQL.
+      </div>
+
       <table class="props-table">
-        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th></tr></thead>
+        <thead><tr><th>Código</th><th>Regla / Justificación Normativa</th><th>Consecuencia / Acción del Sistema</th><th>Dónde se valida</th></tr></thead>
         <tbody>
-        <tr><td><strong>RN-TRA-01</strong></td><td>Suma Cero obligatoria.</td><td>El sistema inhabilita el botón GUARDAR si Diferencia != $0.00.</td><td>Frontend / SP</td></tr>
-        <tr><td><strong>RN-TRA-02</strong></td><td>Prohibición Inter-Capítulos.</td><td>Por defecto, el sistema prohíbe guardar si Origen y Destino cruzan diferentes capítulos de gasto o diferentes Tribunales.</td><td>SP</td></tr>
-        <tr><td><strong>RN-TRA-03</strong></td><td>Excepción de Consejo.</td><td>Si se marca el flag de "Acuerdo de Consejo", se omite la restricción RN-TRA-02.</td><td>Frontend / SP</td></tr>
-        <tr><td><strong>RN-TRA-04</strong></td><td>Protección de Piso Devengado.</td><td>Ninguna reducción puede superar el "Disponible" real.</td><td>SP</td></tr>
-        </tbody>
+        <tr><td><strong>RN-TRA-01</strong></td><td><strong>Suma Cero obligatoria:</strong> La suma de la calendarización (Ene-Dic) debe cuadrar exactamente con el Importe Total.</td><td>No se permite guardar si hay diferencias entre el Origen y el Destino.</td><td>Frontend / SP</td></tr>
+        <tr><td><strong>RN-TRA-02</strong></td><td><strong>Justificación Mínima:</strong> El campo de concepto debe detallar el Oficio de Solicitud claramente.</td><td>Se exigen mínimo 50 caracteres para ser aceptado.</td><td>Frontend / SP</td></tr>
+        <tr>
+          <td><strong>RN-TRA-03</strong></td>
+          <td><strong>Prohibición Inter-Capítulos (Art. 9 LGCG):</strong><br>El Procedimiento 11 exige apego a clasificadores CONAC. Las transferencias entre distintos capítulos de gasto (Ej. de Materiales 2000 a Servicios 3000) violan la disciplina financiera.</td>
+          <td>El Frontend lee el 1er dígito de la partida (substring 15). Si se mezcla, lanza alerta roja y bloquea la adición al carrito.</td>
+          <td>Frontend (UI)</td>
+        </tr>
+        <tr>
+          <td><strong>RN-TRA-04</strong></td>
+          <td><strong>Validación de Sesión Activa (Art. 37-38 LGCG):</strong><br>Los registros contables deben reflejarse en tiempo real. No se permite capturar transferencias con fecha de ejercicios dispares.</td>
+          <td>Si el año/mes del input de fecha no coincide con el <code>ejercicio/mes</code> activo de la sesión del usuario, se bloquea el guardado.</td>
+          <td>Frontend (UI)</td>
+        </tr>
+        <tr>
+          <td><strong>RN-TRA-05</strong></td>
+          <td><strong>Bloqueo de Meses Cerrados:</strong><br>Paso 23 del Procedimiento Interno dicta rechazar afectaciones a meses cerrados.</td>
+          <td>En el modal de captura, los inputs de los meses anteriores al mes activo de la sesión estarán <code>disabled</code> (bloqueados gráficamente).</td>
+          <td>Frontend (UI)</td>
+        </tr>
+        <tr><td><strong>RN-TRA-06</strong></td><td><strong>Protección de Piso Devengado:</strong> Ninguna reducción puede superar el "Disponible" real de la cuenta origen en el mes afectado.</td><td>Bloqueo transaccional.</td><td>Frontend / SP</td></tr>
+                <tr>
+          <td><strong>RN-TRA-07</strong></td>
+          <td><strong>Asignación de Folio:</strong><br>El <code>TR_FOLIO</code> es de solo lectura y se genera automáticamente al guardar la cabecera. Si es nueva transferencia, el campo se muestra vacío.</td>
+          <td>Se visualiza un bloque de "Folio" en modo <i>disabled</i> en la pantalla de captura.</td>
+          <td>Frontend / SP</td>
+        </tr>
+        <tr>
+          <td><strong>RN-TRA-08</strong></td>
+          <td><strong>Fecha Sugerida Inteligente (Días Hábiles):</strong><br>
+            <ul>
+              <li>Si Mes Activo == Mes Actual: Hoy.</li>
+              <li>Si Mes Activo &lt; Mes Actual: Último día hábil (Lun-Vie) del Mes Activo.</li>
+              <li>Si Mes Activo &gt; Mes Actual: Primer día (01) del Mes Activo.</li>
+            </ul>
+          </td>
+          <td>Al abrir el modal, la fecha se pre-calcula e inyecta al campo automáticamente basado en el ejercicio y mes de la sesión del usuario.</td>
+          <td>Frontend (UI)</td>
+        </tr>
+                <tr>
+          <td><strong>RN-TRA-09</strong></td>
+          <td><strong>Búsqueda Dinámica de Partidas:</strong><br>El catálogo de partidas a transferir se filtra consumiendo la función <code>presupuesto.fn_lista_partidas_por_clave</code>, pasando como parámetros Organización, Función, Programa, Subprograma y Proyecto. El Capítulo 1000 está excluido de las transferencias.</td>
+          <td>Modal (Alta / Baja): Los dropdowns de la estructura programática actúan en cascada para poblar el input de búsqueda predictiva.</td>
+          <td>Frontend / SP</td>
+        </tr>
+        <tr>
+          <td><strong>RN-TRA-10</strong></td>
+          <td><strong>Acción - Actualizar Totales:</strong><br>El botón "Actualizar Totales" dentro del modal recalcula en tiempo real las sumatorias de Total Bajas, Total Altas y la Diferencia, basándose en los montos capturados en la cuadrícula de los 12 meses.</td>
+          <td>Modal (Calendario Mensual)</td>
+          <td>Frontend (UI)</td>
+        </tr>
+        <tr>
+          <td><strong>RN-TRA-11</strong></td>
+          <td><strong>Acción - Calcular Diferencia (Auto-Balanceo):</strong><br>Al presionar "Calcular Diferencia", el sistema infiere el monto faltante para cuadrar el movimiento a cero (Total Altas = Total Bajas) y lo inyecta automáticamente en el input del <strong>mes correspondiente a la Fecha de Operación</strong> activa.</td>
+          <td>Modal (Calendario Mensual)</td>
+          <td>Frontend (UI)</td>
+        </tr>
+</tbody>
       </table>
     </div>
 
@@ -261,6 +1186,7 @@
     </div>
 
     <!-- 12. HISTORIAL DE CAMBIOS -->
+    <!-- 12. HISTORIAL DE CAMBIOS -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
       <table class="props-table">
@@ -270,6 +1196,12 @@
             <td>2026-06-06</td>
             <td>1.0</td>
             <td>Creación del Análisis Funcional de Transferencias (12 secciones).</td>
+            <td>Julio César Barrales Flores</td>
+          </tr>
+          <tr>
+            <td>2026-07-14</td>
+            <td>1.1</td>
+            <td>Reestructuración arquitectónica: Se estandarizan los Servicios REST, se añade particionamiento por Ejercicio a las tablas, y se integran Reglas de Negocio estrictas (LGCG y Procedimiento 11).</td>
             <td>Julio César Barrales Flores</td>
           </tr>
         </tbody>
@@ -526,6 +1458,15 @@ function showWF(id, btn) {
   document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+<script>
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
   btn.classList.add('active');
 }
 </script>

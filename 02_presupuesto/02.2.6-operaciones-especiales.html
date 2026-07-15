@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02.2.6-operaciones-especiales</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-p { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+  .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .sp-panel { display: none; }
+  .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Análisis Funcional</a> ›
+      <span>Presupuesto</span> ›
+      <span>Proceso</span> ›
+      <span>Operaciones Especiales Presupuestales</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">02.2.6</div>
+        <h1 class="elem-title">Operaciones Especiales Presupuestales</h1>
+        <p class="elem-desc">Consola centralizada para ejecutar movimientos y ajustes contables-presupuestarios extraordinarios requeridos por el área de Presupuesto, abarcando tanto afectaciones globales de Egresos como pólizas iniciales de Ingresos.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-p">Tipo: Herramientas de Administración Presupuestal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Este módulo actúa como una consola de administración que consolida rutinas masivas y operaciones especiales posteriores a la formulación del presupuesto. Su objetivo es automatizar procesos manuales complejos, aislando la lógica de negocio contable de los procesos transaccionales del día a día.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Disposición</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>LGCG</td><td>Art. 38 y 46</td><td>Garantizar el registro automático, concurrente y en tiempo real de las operaciones contables y presupuestarias.</td></tr>
+          <tr><td>CONAC</td><td>Manual de Contabilidad Gubernamental</td><td>El reconocimiento de los momentos contables de los egresos e ingresos a través de pólizas.</td></tr>
+          <tr><td>Normatividad Interna</td><td>Lineamientos de Presupuesto</td><td>Control estricto de las bolsas presupuestales centralizadas (ej. Capítulo 1000).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. ROLES QUE INTERVIENEN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Responsabilidad en el Sistema</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Director de Presupuesto</strong></td><td>Autoriza y detona la ejecución de las afectaciones masivas (ej. el compromiso del Capítulo 1000 y apertura de ingresos).</td></tr>
+          <tr><td><strong>Analista Presupuestal</strong></td><td>Verifica las operaciones ejecutadas y el correcto cuadre de los reportes y tableros tras la operación especial.</td></tr>
+          <tr><td><strong>SIAF-PJEV (Sistema)</strong></td><td>Calcula, genera y afecta automáticamente las pólizas correspondientes asegurando la consistencia e integridad de saldos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. OPERACIONES DE EGRESOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Operaciones de Egresos</div>
+      <p>Ajustes masivos y reclasificaciones sobre el presupuesto de egresos (Techo Presupuestal). Incluye operaciones críticas como:</p>
+      <ul>
+        <li style="margin-bottom: 8px;"><strong>Compromiso Presupuestal del Capítulo 1000:</strong> Automatización requerida para mover contablemente la totalidad del saldo del Capítulo 1000 (Servicios Personales) hacia el momento presupuestario de <em>Comprometido</em>. Se realiza mediante la generación y afectación de una Póliza Presupuestal masiva. Esto permite reservar el presupuesto de nómina de manera inmediata a inicios de ejercicio fiscal.</li>
+      </ul>
+    </div>
+
+    <!-- 5. OPERACIONES DE INGRESOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Operaciones de Ingresos</div>
+      <p>Tratamiento especial de la Ley de Ingresos, enfocado exclusivamente en las cifras originales y sus modificaciones, dejando fuera la transaccionalidad de recaudación. <strong>Importante:</strong> De acuerdo a la normativa de balance presupuestario, la ejecución de las operaciones de ingresos parte y debe encontrarse estrictamente fundamentada en la correcta captura de las operaciones de egresos correspondientes para mantener el equilibrio contable. Incluye:</p>
+      <ul>
+        <li style="margin-bottom: 8px;"><strong>Póliza de Apertura de Ingresos:</strong> Generación de la póliza contable automática que registra el estimado original (Apertura) al arrancar el ejercicio fiscal, impactando las cuentas de orden de Ingresos Estimados.</li>
+        <li style="margin-bottom: 8px;"><strong>Movimientos del Presupuesto de Ingresos:</strong> Interfaz para el registro manual y afectación de ampliaciones y reducciones sobre la Ley de Ingresos Estimada o Modificada (excluyendo la fase del Recaudado/Devengado, la cual pertenece enteramente a operaciones transaccionales o de Tesorería).</li>
+      </ul>
+    </div>
+
+    <!-- 6. DISEÑO DE INTERFACES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Consola de Ejecución (Wireframes)</div>
+      
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('egresos',this)">Egresos</button>
+        <button class="wf-tab" onclick="showWF('ingresos',this)">Ingresos</button>
+      </div>
+
+      <!-- WF: Egresos -->
+      <div id="wf-egresos" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Consola: Operaciones Especiales (Egresos)</span></div>
+          <div class="wf-svg-area" style="background:#f9fafb;">
+            <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="450" fill="#fcfcfc"/>
+              
+              <!-- Header -->
+              <text x="20" y="30" fill="#666" font-size="11">Panel / Presupuesto / Operaciones Especiales</text>
+              <text x="20" y="55" fill="#1B3A2D" font-size="20" font-weight="bold">Operaciones Especiales Presupuestales</text>
+              
+              <!-- Tabs UI -->
+              <rect x="20" y="90" width="220" height="35" fill="#1B3A2D" rx="4"/>
+              <text x="130" y="112" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Operaciones de Egresos</text>
+              
+              <rect x="250" y="90" width="220" height="35" fill="#f3f4f6" stroke="#ccc" rx="4"/>
+              <text x="360" y="112" fill="#666" font-size="12" font-weight="bold" text-anchor="middle">Operaciones de Ingresos</text>
+
+              <!-- Panel Egresos Activo -->
+              <rect x="20" y="140" width="960" height="280" fill="#fff" stroke="#e5e7eb" rx="6"/>
+              
+              <text x="40" y="170" fill="#333" font-size="14" font-weight="bold">Acciones Masivas de Egresos</text>
+              <line x1="40" y1="180" x2="940" y2="180" stroke="#eee" stroke-width="1"/>
+
+              <!-- Card 1: Capítulo 1000 -->
+              <rect x="40" y="200" width="440" height="150" fill="#f8eedc" stroke="#eab308" stroke-width="1" rx="6"/>
+              <rect x="55" y="215" width="30" height="30" fill="#eab308" rx="15"/>
+              <text x="70" y="235" fill="#fff" font-size="14" text-anchor="middle">⚡</text>
+              <text x="95" y="228" fill="#333" font-size="13" font-weight="bold">Compromiso Cap. 1000</text>
+              <text x="95" y="242" fill="#666" font-size="11">Servicios Personales</text>
+              <text x="55" y="275" fill="#555" font-size="11">Mueve todo el presupuesto del Capítulo 1000 al momento</text>
+              <text x="55" y="290" fill="#555" font-size="11">presupuestario de "Comprometido". Genera póliza masiva.</text>
+              <!-- Checkbox confirmación -->
+              <rect x="55" y="315" width="12" height="12" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="75" y="325" fill="#333" font-size="10">Entiendo la repercusión contable</text>
+              <!-- Ejecutar -->
+              <rect x="290" y="307" width="130" height="28" fill="#1B3A2D" rx="4"/>
+              <text x="355" y="325" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Generar Póliza</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- WF: Ingresos -->
+      <div id="wf-ingresos" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Consola: Operaciones Especiales (Ingresos)</span></div>
+          <div class="wf-svg-area" style="background:#f9fafb;">
+            <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="450" fill="#fcfcfc"/>
+              
+              <!-- Header -->
+              <text x="20" y="30" fill="#666" font-size="11">Panel / Presupuesto / Operaciones Especiales</text>
+              <text x="20" y="55" fill="#1B3A2D" font-size="20" font-weight="bold">Operaciones Especiales Presupuestales</text>
+              
+              <!-- Tabs UI -->
+              <rect x="20" y="90" width="220" height="35" fill="#f3f4f6" stroke="#ccc" rx="4"/>
+              <text x="130" y="112" fill="#666" font-size="12" font-weight="bold" text-anchor="middle">Operaciones de Egresos</text>
+              
+              <rect x="250" y="90" width="220" height="35" fill="#1B3A2D" rx="4"/>
+              <text x="360" y="112" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">Operaciones de Ingresos</text>
+
+              <!-- Panel Ingresos Activo -->
+              <rect x="20" y="140" width="960" height="280" fill="#fff" stroke="#e5e7eb" rx="6"/>
+              
+              <text x="40" y="170" fill="#333" font-size="14" font-weight="bold">Acciones Masivas de Ingresos</text>
+              <line x1="40" y1="180" x2="940" y2="180" stroke="#eee" stroke-width="1"/>
+
+              <!-- Card 1: Póliza de Apertura -->
+              <rect x="40" y="200" width="440" height="150" fill="#e0f2fe" stroke="#3b82f6" stroke-width="1" rx="6"/>
+              <rect x="55" y="215" width="30" height="30" fill="#3b82f6" rx="15"/>
+              <text x="70" y="235" fill="#fff" font-size="14" text-anchor="middle">💰</text>
+              <text x="95" y="228" fill="#333" font-size="13" font-weight="bold">Apertura de Ingresos</text>
+              <text x="95" y="242" fill="#666" font-size="11">Carga inicial de la Ley de Ingresos</text>
+              <text x="55" y="275" fill="#555" font-size="11">Registra el estimado original (Apertura) al arrancar</text>
+              <text x="55" y="290" fill="#555" font-size="11">el ejercicio fiscal impactando cuentas de orden.</text>
+              <!-- Checkbox confirmación -->
+              <rect x="55" y="315" width="12" height="12" fill="#fff" stroke="#ccc" rx="2"/>
+              <text x="75" y="325" fill="#333" font-size="10">Verificado Ley de Ingresos</text>
+              <!-- Ejecutar -->
+              <rect x="290" y="307" width="130" height="28" fill="#1B3A2D" rx="4"/>
+              <text x="355" y="325" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Ejecutar Apertura</text>
+
+              <!-- Card 2: Movimientos del Presupuesto de Ingresos -->
+              <rect x="500" y="200" width="440" height="150" fill="#f0fdf4" stroke="#22c55e" stroke-width="1" rx="6"/>
+              <rect x="515" y="215" width="30" height="30" fill="#22c55e" rx="15"/>
+              <text x="530" y="235" fill="#fff" font-size="14" text-anchor="middle">📈</text>
+              <text x="555" y="228" fill="#333" font-size="13" font-weight="bold">Movimientos al Presupuesto de Ingresos</text>
+              <text x="555" y="242" fill="#666" font-size="11">Amp. / Red. sobre Estimado o Modificado</text>
+              <text x="515" y="275" fill="#555" font-size="11">Registro manual y afectación de ampliaciones y reducciones</text>
+              <text x="515" y="290" fill="#555" font-size="11">excluyendo transaccionalidad de Recaudado/Devengado.</text>
+              <!-- Ejecutar -->
+              <rect x="750" y="307" width="130" height="28" fill="#1B3A2D" rx="4"/>
+              <text x="815" y="325" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Capturar Ajuste</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. PROCEDIMIENTOS ALMACENADOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Funciones y Procedimientos (Backend)</div>
+      <p>Cada acción desencadenada desde los botones de la consola ejecuta procedimientos específicos en la base de datos para generar las pólizas y afectaciones automáticas. <strong>Nota de Seguridad:</strong> Toda comunicación con los endpoints asociados a estas funciones debe estar implementada y documentada en <strong>Swagger</strong>, y el acceso debe ser estrictamente protegido validando el <strong>token JWT</strong>.</p>
+      <div class="sp-tabs">
+        <button class="sp-tab active" onclick="showSP('cap1000',this)">fn_generar_compromiso_capitulo_1000</button>
+        <button class="sp-tab" onclick="showSP('apertura',this)">fn_generar_poliza_apertura_ingresos</button>
+        <button class="sp-tab" onclick="showSP('modificacion',this)">fn_genera_movimiento_ingreso_modificacion</button>
+      </div>
+
+      <!-- SP: Cap 1000 -->
+      <div id="sp-cap1000" class="sp-panel active">
+        <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:12px;">Calcula el saldo total del Capítulo 1000 y genera la póliza presupuestal masiva que reclasifica el monto del <em>Aprobado/Modificado</em> al momento <em>Comprometido</em>.</p>
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_accion</code></td><td><code>VARCHAR</code></td><td>Acción a ejecutar.</td></tr>
+            <tr><td><code>p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario que detona la operación.</td></tr>
+            <tr><td><code>p_ejercicio</code></td><td><code>INT</code></td><td>Ejercicio fiscal afectado.</td></tr>
+            <tr><td><code>p_ip</code> / <code>p_mac</code></td><td><code>VARCHAR</code></td><td>Datos de auditoría (origen).</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{estatus}</code></td><td><code>INT</code></td><td>1 (Éxito) o 0 (Error).</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje descriptivo.</td></tr>
+            <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">NODO {data}</td></tr>
+            <tr><td><code>{folio}</code></td><td><code>VARCHAR</code></td><td>Folio de la póliza masiva.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> presupuesto.fn_generar_compromiso_capitulo_1000(
+  p_accion VARCHAR, p_usuario VARCHAR, p_ejercicio INT,
+  p_ip VARCHAR, p_mac VARCHAR
+) RETURNS JSON AS $$
+DECLARE
+  v_res JSON;
+  v_folio VARCHAR;
+BEGIN
+  -- 1. Validar que no se haya comprometido previamente
+  -- 2. Sumarizar saldos disponibles del Capítulo 1000
+  -- 3. Generar la póliza presupuestal de Egresos
+  -- 4. Afectar cuentas de orden (Aprobado/Modificado -> Comprometido)
+  
+  v_res := json_build_object('estatus', 1, 'msg_resultado', 'Póliza generada', 'data', json_build_object('folio', v_folio));
+  RETURN v_res;
+EXCEPTION WHEN OTHERS THEN
+  RETURN json_build_object('estatus', 0, 'msg_resultado', SQLERRM, 'data', null);
+END;
+$$ LANGUAGE plpgsql;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- SP: Apertura -->
+      <div id="sp-apertura" class="sp-panel">
+        <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:12px;">Toma el Presupuesto de Ingresos Estimado autorizado y genera la póliza de inicio de ejercicio que impacta las cuentas de orden de ingresos correspondientes.</p>
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_accion</code></td><td><code>VARCHAR</code></td><td>Acción a ejecutar.</td></tr>
+            <tr><td><code>p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario que detona la operación.</td></tr>
+            <tr><td><code>p_ejercicio</code></td><td><code>INT</code></td><td>Ejercicio fiscal.</td></tr>
+            <tr><td><code>p_ip</code> / <code>p_mac</code></td><td><code>VARCHAR</code></td><td>Datos de auditoría (origen).</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{estatus}</code></td><td><code>INT</code></td><td>1 (Éxito) o 0 (Error).</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje descriptivo.</td></tr>
+            <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">NODO {data}</td></tr>
+            <tr><td><code>{folio}</code></td><td><code>VARCHAR</code></td><td>Folio de la póliza de apertura de ingresos.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> presupuesto.fn_generar_poliza_apertura_ingresos(
+  p_accion VARCHAR, p_usuario VARCHAR, p_ejercicio INT,
+  p_ip VARCHAR, p_mac VARCHAR
+) RETURNS JSON AS $$
+DECLARE
+  v_res JSON;
+  v_folio VARCHAR;
+BEGIN
+  -- 1. Validar que el presupuesto estimado esté autorizado y cuadrado
+  -- 2. Generar la póliza de apertura de ingresos (Tipo I)
+  -- 3. Cargar a "Ley de Ingresos Estimada" contra "Ley de Ingresos por Ejecutar"
+  
+  v_res := json_build_object('estatus', 1, 'msg_resultado', 'Póliza ejecutada', 'data', json_build_object('folio', v_folio));
+  RETURN v_res;
+EXCEPTION WHEN OTHERS THEN
+  RETURN json_build_object('estatus', 0, 'msg_resultado', SQLERRM, 'data', null);
+END;
+$$ LANGUAGE plpgsql;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- SP: Modificacion -->
+      <div id="sp-modificacion" class="sp-panel">
+        <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:12px;">Endpoint transaccional que registra las Ampliaciones/Reducciones a la Ley de Ingresos y detona la póliza de afectación concurrente (Presupuesto Modificado de Ingresos).</p>
+        <table class="props-table">
+          <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_accion</code></td><td><code>VARCHAR</code></td><td>Acción a realizar ('A': Alta, 'M': Mod., 'B': Baja).</td></tr>
+            <tr><td><code>p_usuario</code></td><td><code>VARCHAR</code></td><td>Usuario que detona la operación.</td></tr>
+            <tr><td><code>p_ejercicio</code></td><td><code>INT</code></td><td>Ejercicio fiscal afectado.</td></tr>
+            <tr><td><code>p_tipo_movimiento</code></td><td><code>VARCHAR</code></td><td>'AMPLIACION' o 'REDUCCION'.</td></tr>
+            <tr><td><code>p_fecha_movimiento</code></td><td><code>DATE</code></td><td>Fecha en la que se aplicará el registro.</td></tr>
+            <tr><td><code>p_justificacion</code></td><td><code>TEXT</code></td><td>Justificación del movimiento de ingresos.</td></tr>
+            <tr><td><code>p_detalles</code></td><td><code>JSON</code></td><td>Arreglo con los CRI afectados y sus importes: [{cri, monto}].</td></tr>
+            <tr><td><code>p_ip</code> / <code>p_mac</code></td><td><code>VARCHAR</code></td><td>Auditoría y trazabilidad.</td></tr>
+          </tbody>
+        </table>
+        <table class="props-table" style="margin-top: 10px;">
+          <thead><tr><th>Valores Devueltos (OUT) JSON</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>{estatus}</code></td><td><code>INT</code></td><td>1 (Éxito) o 0 (Error).</td></tr>
+            <tr><td><code>{msg_resultado}</code></td><td><code>VARCHAR</code></td><td>Mensaje descriptivo.</td></tr>
+            <tr><td colspan="3" style="background:#f1f5f9; font-weight:bold; font-size:11px; color:#475569;">NODO {data}</td></tr>
+            <tr><td><code>{id}</code></td><td><code>BIGINT</code></td><td>ID del movimiento generado.</td></tr>
+            <tr><td><code>{folio}</code></td><td><code>VARCHAR</code></td><td>Folio de la póliza de ajuste.</td></tr>
+          </tbody>
+        </table>
+        <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 20px; margin-bottom: 8px;">Snippet PostgreSQL</h3>
+        <div class="code-wrap" style="margin-top: 0; max-height: 350px; overflow-y: auto;">
+          <div class="code-block">
+<pre><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> presupuesto.fn_genera_movimiento_ingreso_modificacion(
+  p_accion VARCHAR, p_usuario VARCHAR, p_ejercicio INT,
+  p_tipo_movimiento VARCHAR, p_fecha_movimiento DATE, p_justificacion TEXT,
+  p_detalles JSON, p_ip VARCHAR, p_mac VARCHAR
+) RETURNS JSON AS $$
+DECLARE
+  v_res JSON;
+  v_mod_id BIGINT;
+  v_folio VARCHAR;
+BEGIN
+  -- 1. Generar encabezado del ajuste a la Ley de Ingresos
+  -- 2. Insertar CRI afectados iterando p_detalles
+  -- 3. Detonar póliza concurrente que ajusta el Estimado/Modificado
+  -- 4. Validar el balance presupuestario (Ingresos vs Egresos)
+  
+  v_res := json_build_object('estatus', 1, 'msg_resultado', 'Ajuste capturado', 'data', json_build_object('id', v_mod_id, 'folio', v_folio));
+  RETURN v_res;
+EXCEPTION WHEN OTHERS THEN
+  RETURN json_build_object('estatus', 0, 'msg_resultado', SQLERRM, 'data', null);
+END;
+$$ LANGUAGE plpgsql;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+function showWF(id, btn) {
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('wf-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showSP(id, btn) {
+  document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

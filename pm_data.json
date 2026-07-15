@@ -1137,14 +1137,14 @@
         },
         {
             "id": "05.2.3",
-            "nombre": "Afectación pagos de RM derivados de un pedido",
+            "nombre": "Afectación de gastos de RM",
             "sistema": "Cuentas por Pagar",
             "subsistema": "Registro de gasto",
             "tipo_formulario": "Compuesto",
-            "analisis_funcional": 0,
+            "analisis_funcional": 1,
             "modo_codigo": "B",
-            "estado": "Análisis",
-            "desarrollador_asignado": "Daryl",
+            "estado": "En progreso",
+            "desarrollador_asignado": "Julio César",
             "analista_asignado": "Julio César",
             "avance_desarrollo": 0
         },
