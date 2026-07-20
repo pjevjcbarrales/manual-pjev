@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.1.7 Catálogo de Firmas — SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+body{padding:36px 44px 80px;background:var(--pjev-crema)}
+.code-wrap{background:var(--code-bg);color:var(--code-text);border-radius:8px;padding:18px;overflow:auto;margin:14px 0 22px;font-family:var(--font-mono);font-size:12px;line-height:1.55}
+.code-wrap pre{margin:0;white-space:pre}.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid var(--pjev-borde);margin-bottom:14px}
+.sp-tab,.wf-tab{padding:8px 14px;border:0;background:transparent;color:var(--pjev-texto-muted);cursor:pointer;font-weight:700;border-bottom:2px solid transparent;margin-bottom:-2px}
+.sp-tab.active,.wf-tab.active{color:var(--pjev-verde-oscuro);border-bottom-color:var(--pjev-verde-oscuro)}
+.sp-panel,.wf-panel{display:none}.sp-panel.active,.wf-panel.active{display:block}.wf-box{border:1px solid var(--pjev-borde);border-radius:8px;overflow:hidden;background:#fff}
+.wf-bar{padding:8px 14px;background:#f5f0e8;border-bottom:1px solid var(--pjev-borde);font-size:11px;font-weight:700;color:var(--pjev-texto-muted)}.wf-svg-area{padding:16px;overflow-x:auto}
+.note{padding:12px 14px;border-left:4px solid #2563eb;background:#eff6ff;color:#1e3a8a;margin:14px 0;font-size:13px}.ok-note{padding:12px 14px;border-left:4px solid #15803d;background:#f0fdf4;color:#14532d;margin:14px 0;font-size:13px}
+.method{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}.get{background:#e8f5e9;color:#1b5e20}.post{background:#e3f2fd;color:#0d47a1}.put{background:#fff3e0;color:#e65100}.delete{background:#fdecea;color:#991b1b}
+@media(max-width:640px){body{padding:20px 12px 60px}.sp-tab,.wf-tab{padding:8px}}
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+<div class="elem-breadcrumb"><a href="../index.html">Inicio</a> › <span>Recursos Materiales</span> › <span>Catálogos</span> › <span>07.1.7 Catálogo de Firmas</span></div>
+<div class="elem-header"><div><div class="elem-id">07.1.7</div><h1 class="elem-title">Catálogo de Firmas</h1><p class="elem-desc">Administra al empleado responsable de cada rol del módulo de Recursos Materiales, su adscripción, puesto, nombre de presentación y vigencia.</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><span class="elem-tag">Formulario simple</span><span class="elem-tag">Esquema: materiales</span><span class="elem-tag">Patrón: LEER + ABC</span></div></div></div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+ <p>El módulo mantiene una lista única de las personas responsables que pueden intervenir como <strong>Revisor, Autorizador, Remitente o Destinatario</strong> dentro de Recursos Materiales. Cada registro enlaza un rol predefinido con una organización vigente, un área perteneciente a esa organización, un puesto y un empleado activo de esa misma adscripción.</p>
+ <p>El campo <strong>Nombre con el que firma</strong> conserva la presentación que debe utilizarse en documentos, por ejemplo <em>“Dra. Paulina Ochoa Lara”</em>, sin modificar <code>config.catalogo_empleados.ce_nombre</code>. La vigencia inicial la captura el usuario; la vigencia final de un alta queda en <code>2099-12-31</code>. Para sustituir a una persona se cierra primero la vigencia anterior y después se registra la nueva, sin traslapar fechas.</p>
+ <div class="note"><strong>Alcance:</strong> este catálogo no crea documentos, no almacena imágenes de firma y no ejecuta procesos de suficiencia. Otros módulos de Recursos Materiales únicamente consultan quién ocupa cada rol en una fecha determinada.</div>
+</div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+ <table class="props-table"><thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead><tbody>
+  <tr><td>Manual Específico de Organización de la Dirección General de Administración</td><td>Estructura orgánica y atribuciones de Recursos Materiales</td><td>La responsabilidad documental debe corresponder a personal adscrito a las áreas institucionales reconocidas.</td></tr>
+  <tr><td>Manual General de Procedimientos Administrativos de Recursos Materiales</td><td>Intervención de responsables en revisión, autorización y remisión</td><td>Los documentos deben identificar a las personas responsables conforme a su cargo y adscripción vigentes.</td></tr>
+  <tr><td>Catálogos maestros SIAF-PJEV</td><td><code>config.catalogo_centros_costos</code>, <code>config.catalogo_ua</code> y <code>config.catalogo_empleados</code></td><td>Organización, área, puesto y empleado no se capturan libremente; se seleccionan de registros activos y relacionados.</td></tr>
+  <tr><td>DOC-03, DOC-04, DOC-05, DOC-06 y DOC-08</td><td>SP, REST, Prisma, formularios simples y análisis funcional</td><td>Exigen LEER/ABC, respuesta JSON uniforme, baja lógica, auditoría, modelo Prisma y 12 secciones con anexos.</td></tr>
+  <tr><td>Guía UI PJEV</td><td>FM-01, FM-03, DG-02, FB-06, FB-07 y B-19</td><td>Define consulta, acciones por fila, modal de formulario, confirmación de baja y buscador de empleados.</td></tr>
+  <tr><td>Definición funcional confirmada</td><td>20/07/2026</td><td>Roles cerrados; esquema <code>materiales</code>; nombre de firma libre; puesto obligatorio; fin abierto <code>31/12/2099</code>; sin traslape por rol.</td></tr>
+ </tbody></table>
+</div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+ <p>Los perfiles siguientes son permisos del sistema. No deben confundirse con los cuatro roles funcionales almacenados en el catálogo.</p>
+ <table class="props-table"><thead><tr><th>Perfil de seguridad</th><th>Acción permitida</th><th>Restricción</th></tr></thead><tbody>
+  <tr><td><strong>RM_ADMIN_FIRMAS</strong></td><td>Consultar, registrar, modificar y dar de baja lógica.</td><td>No crea roles ni captura empleados fuera de los catálogos.</td></tr>
+  <tr><td><strong>RM_CONSULTA_FIRMAS</strong></td><td>Consultar lista y detalle.</td><td>Sin permisos de escritura.</td></tr>
+  <tr><td><strong>SERVICIO_MATERIALES</strong></td><td>Consultar al responsable vigente de un rol para una fecha.</td><td>No modifica el catálogo.</td></tr>
+ </tbody></table>
+ <h3 style="font-size:14px;color:var(--pjev-verde-oscuro)">Roles funcionales predefinidos</h3>
+ <table class="props-table"><thead><tr><th>Valor técnico</th><th>Etiqueta</th><th>Uso</th></tr></thead><tbody>
+  <tr><td><code>REVISOR</code></td><td>Revisor</td><td>Responsable de revisar.</td></tr><tr><td><code>AUTORIZADOR</code></td><td>Autorizador</td><td>Responsable de autorizar.</td></tr><tr><td><code>REMITENTE</code></td><td>Remitente</td><td>Persona o autoridad que emite y remite.</td></tr><tr><td><code>DESTINATARIO</code></td><td>Destinatario</td><td>Persona o autoridad a quien se dirige.</td></tr>
+ </tbody></table>
+</div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+ <p>Tabla única: <strong><code>materiales.cat_firmas</code></strong>.</p>
+ <table class="props-table"><thead><tr><th>Campo</th><th>Tipo</th><th>Requerido</th><th>Descripción</th></tr></thead><tbody>
+  <tr><td><code>cf_id</code></td><td><code>BIGSERIAL PK</code></td><td>Sí</td><td>Identificador de la asignación.</td></tr>
+  <tr><td><code>cf_rol</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td>Uno de los cuatro valores cerrados.</td></tr>
+  <tr><td><code>cc_id</code></td><td><code>INT FK</code></td><td>Sí</td><td>Organización; FK a <code>config.catalogo_centros_costos.cc_id</code>.</td></tr>
+  <tr><td><code>cua_id</code></td><td><code>INT FK</code></td><td>Sí</td><td>Área; FK a <code>config.catalogo_ua.cua_id</code>.</td></tr>
+  <tr><td><code>cf_puesto</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Puesto seleccionado; coincide con <code>ce_puesto</code>.</td></tr>
+  <tr><td><code>ce_id</code></td><td><code>INT FK</code></td><td>Sí</td><td>Empleado; FK a <code>config.catalogo_empleados.ce_id</code>.</td></tr>
+  <tr><td><code>cf_nombre_firma</code></td><td><code>VARCHAR(200)</code></td><td>Sí</td><td>Nombre visible con título o tratamiento.</td></tr>
+  <tr><td><code>cf_vigencia_inicio</code></td><td><code>DATE</code></td><td>Sí</td><td>Primer día incluido.</td></tr>
+  <tr><td><code>cf_vigencia_fin</code></td><td><code>DATE</code></td><td>Sí</td><td>Último día incluido; en alta es <code>2099-12-31</code>.</td></tr>
+  <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td><code>1</code> utilizable; <code>0</code> baja lógica.</td></tr>
+  <tr><td><code>usuario_c</code>, <code>fecha_c</code></td><td><code>VARCHAR(20)</code>, <code>TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de creación.</td></tr>
+  <tr><td><code>usuario_m</code>, <code>fecha_m</code></td><td><code>VARCHAR(20)</code>, <code>TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de modificación o baja.</td></tr>
+ </tbody></table>
+ <div class="code-wrap"><pre>CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+CREATE TABLE materiales.cat_firmas (
+  cf_id BIGSERIAL PRIMARY KEY,
+  cf_rol VARCHAR(20) NOT NULL,
+  cc_id INTEGER NOT NULL REFERENCES config.catalogo_centros_costos(cc_id),
+  cua_id INTEGER NOT NULL REFERENCES config.catalogo_ua(cua_id),
+  cf_puesto VARCHAR(100) NOT NULL,
+  ce_id INTEGER NOT NULL REFERENCES config.catalogo_empleados(ce_id),
+  cf_nombre_firma VARCHAR(200) NOT NULL,
+  cf_vigencia_inicio DATE NOT NULL,
+  cf_vigencia_fin DATE NOT NULL DEFAULT DATE '2099-12-31',
+  estatus_registro SMALLINT NOT NULL DEFAULT 1,
+  usuario_c VARCHAR(20) NOT NULL,
+  fecha_c TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  usuario_m VARCHAR(20), fecha_m TIMESTAMPTZ(6),
+  CONSTRAINT ck_firma_rol CHECK
+    (cf_rol IN ('REVISOR','AUTORIZADOR','REMITENTE','DESTINATARIO')),
+  CONSTRAINT ck_firma_fechas CHECK (cf_vigencia_inicio &lt;= cf_vigencia_fin),
+  CONSTRAINT ck_firma_estatus CHECK (estatus_registro IN (0,1)),
+  CONSTRAINT ck_firma_textos CHECK
+    (BTRIM(cf_puesto) &lt;&gt; '' AND BTRIM(cf_nombre_firma) &lt;&gt; '')
+);
+
+ALTER TABLE materiales.cat_firmas ADD CONSTRAINT ex_firma_rol_sin_traslape
+EXCLUDE USING gist (
+  cf_rol WITH =,
+  daterange(cf_vigencia_inicio, cf_vigencia_fin + 1, '[)') WITH &amp;&amp;
+) WHERE (estatus_registro = 1);
+
+CREATE INDEX ix_firmas_empleado ON materiales.cat_firmas(ce_id);
+CREATE INDEX ix_firmas_adscripcion ON materiales.cat_firmas(cc_id,cua_id);
+CREATE INDEX ix_firmas_vigencia ON materiales.cat_firmas(cf_vigencia_inicio,cf_vigencia_fin);</pre></div>
+ <h3 style="font-size:14px;color:var(--pjev-verde-oscuro)">Modelo Prisma</h3>
+ <div class="code-wrap"><pre>model CatalogoFirma {
+  cf_id BigInt @id @default(autoincrement())
+  cf_rol String @db.VarChar(20)
+  cc_id Int
+  cua_id Int
+  cf_puesto String @db.VarChar(100)
+  ce_id Int
+  cf_nombre_firma String @db.VarChar(200)
+  cf_vigencia_inicio DateTime @db.Date
+  cf_vigencia_fin DateTime @default(dbgenerated("'2099-12-31'::date")) @db.Date
+  estatus_registro Int @default(1) @db.SmallInt
+  usuario_c String @db.VarChar(20)
+  fecha_c DateTime @default(now()) @db.Timestamptz(6)
+  usuario_m String? @db.VarChar(20)
+  fecha_m DateTime? @db.Timestamptz(6)
+  organizacion CatalogoCentroCostos @relation(fields:[cc_id],references:[cc_id])
+  area CatalogoUa @relation(fields:[cua_id],references:[cua_id])
+  empleado CatalogoEmpleado @relation(fields:[ce_id],references:[ce_id])
+  @@index([ce_id])
+  @@index([cc_id,cua_id])
+  @@map("cat_firmas")
+  @@schema("materiales")
+}</pre></div>
+ <p class="note">Prisma debe incluir <code>"materiales"</code> en <code>datasource.schemas</code> y los campos inversos <code>firmas CatalogoFirma[]</code> en los tres modelos de <code>config</code>.</p>
+</div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs) y Trigger</div>
+ <div class="tabs"><button class="sp-tab active" onclick="showSP('leer',this)">fn_leer</button><button class="sp-tab" onclick="showSP('abc',this)">fn_abc</button><button class="sp-tab" onclick="showSP('listas',this)">Listas</button><button class="sp-tab" onclick="showSP('trigger',this)">Trigger</button></div>
+ <div id="sp-leer" class="sp-panel active">
+  <table class="props-table"><thead><tr><th>Parámetro</th><th>Tipo</th><th>Uso</th></tr></thead><tbody><tr><td><code>p_cf_id</code></td><td><code>BIGINT</code></td><td><code>NULL</code> lista; <code>-1</code> alta; positivo detalle.</td></tr><tr><td><code>p_busqueda</code></td><td><code>VARCHAR</code></td><td>Nombre, empleado, puesto, organización o área.</td></tr><tr><td><code>p_rol</code></td><td><code>VARCHAR</code></td><td>Filtro opcional.</td></tr><tr><td><code>p_fecha</code></td><td><code>DATE</code></td><td>Fecha de consulta; default actual.</td></tr></tbody></table>
+  <div class="code-wrap"><pre>CREATE OR REPLACE FUNCTION materiales.fn_leer_catalogo_firmas(
+ p_cf_id BIGINT DEFAULT NULL, p_busqueda VARCHAR DEFAULT NULL,
+ p_rol VARCHAR DEFAULT NULL, p_fecha DATE DEFAULT CURRENT_DATE
+) RETURNS JSONB LANGUAGE plpgsql AS $$
+DECLARE v_data JSONB;
+BEGIN
+ IF p_cf_id = -1 THEN
+  v_data := jsonb_build_object(
+   'registro',jsonb_build_object('cf_id',0,'cf_rol',NULL,'cc_id',NULL,
+    'cua_id',NULL,'cf_puesto','','ce_id',NULL,'cf_nombre_firma','',
+    'cf_vigencia_inicio',CURRENT_DATE,'cf_vigencia_fin',DATE '2099-12-31'),
+   'roles',jsonb_build_array('REVISOR','AUTORIZADOR','REMITENTE','DESTINATARIO'));
+ ELSIF p_cf_id &gt; 0 THEN
+  SELECT to_jsonb(t) INTO v_data FROM (
+   SELECT f.*,cc.cc_clave_pptal,cc.cc_nombre AS organizacion,
+    u.cua_numua,u.cua_nombre AS area,e.ce_numemp,e.ce_nombre AS empleado
+   FROM materiales.cat_firmas f
+   JOIN config.catalogo_centros_costos cc ON cc.cc_id=f.cc_id
+   JOIN config.catalogo_ua u ON u.cua_id=f.cua_id
+   JOIN config.catalogo_empleados e ON e.ce_id=f.ce_id
+   WHERE f.cf_id=p_cf_id) t;
+  IF v_data IS NULL THEN
+   RETURN jsonb_build_object('cod_resultado',-1,'msg_resultado','La firma no existe.','data',NULL);
+  END IF;
+ ELSE
+  SELECT jsonb_build_object('registros',COALESCE(jsonb_agg(to_jsonb(t)),'[]'::jsonb))
+  INTO v_data FROM (
+   SELECT f.cf_id,f.cf_rol,f.cf_nombre_firma,e.ce_numemp,e.ce_nombre AS empleado,
+    cc.cc_nombre AS organizacion,u.cua_nombre AS area,f.cf_puesto,
+    f.cf_vigencia_inicio,f.cf_vigencia_fin,
+    CASE WHEN f.estatus_registro=0 THEN 'BAJA'
+     WHEN p_fecha NOT BETWEEN f.cf_vigencia_inicio AND f.cf_vigencia_fin THEN 'FUERA_DE_VIGENCIA'
+     WHEN e.estatus_registro&lt;&gt;1 OR cc.estatus_registro&lt;&gt;1 OR u.estatus_registro&lt;&gt;1
+      OR e.ce_cc_id IS DISTINCT FROM f.cc_id OR e.ce_ua IS DISTINCT FROM f.cua_id
+      OR UPPER(BTRIM(e.ce_puesto))&lt;&gt;UPPER(BTRIM(f.cf_puesto))
+      OR p_fecha NOT BETWEEN COALESCE(cc.cc_vigencia_inicio,DATE '1900-01-01')
+                         AND COALESCE(cc.cc_vigencia_fin,DATE '2099-12-31')
+     THEN 'NO_ELEGIBLE' ELSE 'VIGENTE' END AS vigencia
+   FROM materiales.cat_firmas f
+   JOIN config.catalogo_centros_costos cc ON cc.cc_id=f.cc_id
+   JOIN config.catalogo_ua u ON u.cua_id=f.cua_id
+   JOIN config.catalogo_empleados e ON e.ce_id=f.ce_id
+   WHERE (p_rol IS NULL OR f.cf_rol=UPPER(BTRIM(p_rol)))
+    AND (p_busqueda IS NULL OR concat_ws(' ',f.cf_nombre_firma,e.ce_numemp,
+     e.ce_nombre,f.cf_puesto,cc.cc_nombre,u.cua_nombre) ILIKE '%'||p_busqueda||'%')
+   ORDER BY f.cf_rol,f.cf_vigencia_inicio DESC) t;
+ END IF;
+ RETURN jsonb_build_object('cod_resultado',0,'msg_resultado','OK','data',v_data);
+EXCEPTION WHEN OTHERS THEN
+ RETURN jsonb_build_object('cod_resultado',-2,'msg_resultado',SQLERRM,'data',NULL);
+END; $$;</pre></div>
+ </div>
+ <div id="sp-abc" class="sp-panel">
+  <p>Acciones: <code>1=Alta</code>, <code>2=Cambio</code>, <code>3=Baja lógica</code>. <code>p_usuario</code> se obtiene del JWT.</p>
+  <div class="code-wrap"><pre>CREATE OR REPLACE FUNCTION materiales.fn_abc_catalogo_firmas(
+ p_accion SMALLINT,p_cf_id BIGINT DEFAULT NULL,p_cf_rol VARCHAR DEFAULT NULL,
+ p_cc_id INT DEFAULT NULL,p_cua_id INT DEFAULT NULL,p_cf_puesto VARCHAR DEFAULT NULL,
+ p_ce_id INT DEFAULT NULL,p_cf_nombre_firma VARCHAR DEFAULT NULL,
+ p_cf_vigencia_inicio DATE DEFAULT NULL,
+ p_cf_vigencia_fin DATE DEFAULT DATE '2099-12-31',
+ p_usuario VARCHAR DEFAULT NULL
+) RETURNS JSONB LANGUAGE plpgsql AS $$
+DECLARE v_id BIGINT; v_actual materiales.cat_firmas%ROWTYPE;
+BEGIN
+ IF p_accion NOT IN (1,2,3) OR NULLIF(BTRIM(p_usuario),'') IS NULL THEN
+  RETURN jsonb_build_object('cod_resultado',-1,'msg_resultado','Acción o usuario inválido.','data',NULL);
+ END IF;
+ IF p_accion=1 THEN
+  IF p_cf_vigencia_fin IS DISTINCT FROM DATE '2099-12-31' THEN
+   RETURN jsonb_build_object('cod_resultado',-1,'msg_resultado','Una alta debe terminar el 31/12/2099.','data',NULL);
+  END IF;
+  INSERT INTO materiales.cat_firmas(cf_rol,cc_id,cua_id,cf_puesto,ce_id,
+   cf_nombre_firma,cf_vigencia_inicio,cf_vigencia_fin,usuario_c)
+  VALUES(UPPER(BTRIM(p_cf_rol)),p_cc_id,p_cua_id,BTRIM(p_cf_puesto),p_ce_id,
+   BTRIM(p_cf_nombre_firma),p_cf_vigencia_inicio,DATE '2099-12-31',LEFT(p_usuario,20))
+  RETURNING cf_id INTO v_id;
+ ELSIF p_accion=2 THEN
+  SELECT * INTO v_actual FROM materiales.cat_firmas WHERE cf_id=p_cf_id FOR UPDATE;
+  IF NOT FOUND THEN RETURN jsonb_build_object('cod_resultado',-1,'msg_resultado','La firma no existe.','data',NULL); END IF;
+  IF v_actual.cf_vigencia_inicio&lt;=CURRENT_DATE AND
+   (UPPER(BTRIM(p_cf_rol)) IS DISTINCT FROM v_actual.cf_rol
+    OR p_cc_id IS DISTINCT FROM v_actual.cc_id OR p_cua_id IS DISTINCT FROM v_actual.cua_id
+    OR UPPER(BTRIM(p_cf_puesto)) IS DISTINCT FROM UPPER(BTRIM(v_actual.cf_puesto))
+    OR p_ce_id IS DISTINCT FROM v_actual.ce_id
+    OR p_cf_vigencia_inicio IS DISTINCT FROM v_actual.cf_vigencia_inicio) THEN
+   RETURN jsonb_build_object('cod_resultado',-1,
+    'msg_resultado','Una vigencia iniciada sólo permite cambiar nombre de firma o fecha final. Cierre y registre la sustitución.','data',NULL);
+  END IF;
+  UPDATE materiales.cat_firmas SET cf_rol=UPPER(BTRIM(p_cf_rol)),cc_id=p_cc_id,
+   cua_id=p_cua_id,cf_puesto=BTRIM(p_cf_puesto),ce_id=p_ce_id,
+   cf_nombre_firma=BTRIM(p_cf_nombre_firma),cf_vigencia_inicio=p_cf_vigencia_inicio,
+   cf_vigencia_fin=p_cf_vigencia_fin,usuario_m=LEFT(p_usuario,20),fecha_m=CURRENT_TIMESTAMP
+  WHERE cf_id=p_cf_id RETURNING cf_id INTO v_id;
+ ELSE
+  UPDATE materiales.cat_firmas SET estatus_registro=0,usuario_m=LEFT(p_usuario,20),
+   fecha_m=CURRENT_TIMESTAMP WHERE cf_id=p_cf_id AND estatus_registro=1 RETURNING cf_id INTO v_id;
+  IF v_id IS NULL THEN RETURN jsonb_build_object('cod_resultado',-1,'msg_resultado','La firma no existe o ya está de baja.','data',NULL); END IF;
+ END IF;
+ RETURN jsonb_build_object('cod_resultado',0,'msg_resultado','Operación realizada correctamente.','data',jsonb_build_object('cf_id',v_id));
+EXCEPTION WHEN exclusion_violation THEN
+ RETURN jsonb_build_object('cod_resultado',-1,'msg_resultado','Ya existe el mismo rol con vigencia traslapada.','data',NULL);
+WHEN SQLSTATE 'P0001' THEN
+ RETURN jsonb_build_object('cod_resultado',-1,'msg_resultado',SQLERRM,'data',NULL);
+WHEN OTHERS THEN
+ RETURN jsonb_build_object('cod_resultado',-2,'msg_resultado',SQLERRM,'data',NULL);
+END; $$;</pre></div>
+ </div>
+ <div id="sp-listas" class="sp-panel">
+  <table class="props-table"><thead><tr><th>Lista</th><th>Fuente y filtro</th></tr></thead><tbody><tr><td>Organización</td><td><code>config.fn_lista_organizaciones(ejercicio)</code>; activa y vigente.</td></tr><tr><td>Área</td><td><code>config.fn_lista_ua_por_clave_pptal(cc_clave_pptal)</code>.</td></tr><tr><td>Puesto</td><td>Valores distintos de empleados activos por organización y área.</td></tr><tr><td>Empleado</td><td>Activos que coincidan con organización, área y puesto.</td></tr></tbody></table>
+  <div class="code-wrap"><pre>CREATE OR REPLACE FUNCTION materiales.fn_lista_puestos_firma(p_cc_id INT,p_cua_id INT)
+RETURNS JSONB LANGUAGE sql STABLE AS $$
+ SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.puesto),'[]'::jsonb)
+ FROM (SELECT DISTINCT BTRIM(ce_puesto) AS puesto FROM config.catalogo_empleados
+  WHERE estatus_registro=1 AND ce_cc_id=p_cc_id AND ce_ua=p_cua_id
+   AND NULLIF(BTRIM(ce_puesto),'') IS NOT NULL) t; $$;
+
+CREATE OR REPLACE FUNCTION materiales.fn_lista_empleados_firma(
+ p_cc_id INT,p_cua_id INT,p_puesto VARCHAR,p_busqueda VARCHAR DEFAULT NULL
+) RETURNS JSONB LANGUAGE sql STABLE AS $$
+ SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.nombre),'[]'::jsonb)
+ FROM (SELECT ce_id AS id,ce_numemp AS numero,ce_nombre AS nombre,ce_puesto AS puesto
+  FROM config.catalogo_empleados WHERE estatus_registro=1
+   AND ce_cc_id=p_cc_id AND ce_ua=p_cua_id
+   AND UPPER(BTRIM(ce_puesto))=UPPER(BTRIM(p_puesto))
+   AND (p_busqueda IS NULL OR concat_ws(' ',ce_numemp,ce_nombre) ILIKE '%'||p_busqueda||'%')) t; $$;</pre></div>
+ </div>
+ <div id="sp-trigger" class="sp-panel">
+  <div class="code-wrap"><pre>CREATE OR REPLACE FUNCTION materiales.fn_validar_catalogo_firmas()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE v_cc config.catalogo_centros_costos%ROWTYPE;
+ v_emp config.catalogo_empleados%ROWTYPE;
+BEGIN
+ IF NEW.estatus_registro=0 THEN RETURN NEW; END IF;
+ NEW.cf_rol:=UPPER(BTRIM(NEW.cf_rol)); NEW.cf_puesto:=BTRIM(NEW.cf_puesto);
+ NEW.cf_nombre_firma:=BTRIM(NEW.cf_nombre_firma);
+ SELECT * INTO v_cc FROM config.catalogo_centros_costos WHERE cc_id=NEW.cc_id;
+ IF NOT FOUND OR v_cc.estatus_registro&lt;&gt;1 OR
+  NEW.cf_vigencia_inicio NOT BETWEEN COALESCE(v_cc.cc_vigencia_inicio,DATE '1900-01-01')
+   AND COALESCE(v_cc.cc_vigencia_fin,DATE '2099-12-31') THEN
+  RAISE EXCEPTION 'La organización no está vigente en la fecha inicial.' USING ERRCODE='P0001';
+ END IF;
+ IF NOT EXISTS(SELECT 1 FROM config.catalogo_ua u WHERE u.cua_id=NEW.cua_id
+  AND u.estatus_registro=1 AND (u.cua_clavepptal=v_cc.cc_clave_pptal OR v_cc.cc_ua_id=u.cua_id)) THEN
+  RAISE EXCEPTION 'El área no pertenece a la organización o no está activa.' USING ERRCODE='P0001';
+ END IF;
+ SELECT * INTO v_emp FROM config.catalogo_empleados WHERE ce_id=NEW.ce_id;
+ IF NOT FOUND OR v_emp.estatus_registro&lt;&gt;1 OR v_emp.ce_cc_id IS DISTINCT FROM NEW.cc_id
+  OR v_emp.ce_ua IS DISTINCT FROM NEW.cua_id
+  OR UPPER(BTRIM(v_emp.ce_puesto))&lt;&gt;UPPER(NEW.cf_puesto) THEN
+  RAISE EXCEPTION 'El empleado no pertenece a la organización, área y puesto.' USING ERRCODE='P0001';
+ END IF;
+ RETURN NEW;
+END; $$;
+CREATE TRIGGER trg_validar_catalogo_firmas
+BEFORE INSERT OR UPDATE OF cf_rol,cc_id,cua_id,cf_puesto,ce_id,
+ cf_nombre_firma,cf_vigencia_inicio,cf_vigencia_fin,estatus_registro
+ON materiales.cat_firmas FOR EACH ROW EXECUTE FUNCTION materiales.fn_validar_catalogo_firmas();</pre></div>
+ </div>
+</div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+ <table class="props-table"><thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead><tbody>
+  <tr><td><span class="method get">GET</span></td><td><code>/api/v1/materiales/catalogo-firmas</code></td><td><code>?q=&amp;rol=&amp;fecha=</code></td><td>Lista paginada.</td></tr>
+  <tr><td><span class="method get">GET</span></td><td><code>/api/v1/materiales/catalogo-firmas/nuevo</code></td><td>—</td><td>Inicializa modal con roles y fin 2099.</td></tr>
+  <tr><td><span class="method get">GET</span></td><td><code>/api/v1/materiales/catalogo-firmas/:id</code></td><td><code>id</code></td><td>Detalle.</td></tr>
+  <tr><td><span class="method post">POST</span></td><td><code>/api/v1/materiales/catalogo-firmas</code></td><td><code>{rol,organizacionId,areaId,puesto,empleadoId,nombreFirma,vigenciaInicio,vigenciaFin}</code></td><td>ABC acción 1.</td></tr>
+  <tr><td><span class="method put">PUT</span></td><td><code>/api/v1/materiales/catalogo-firmas/:id</code></td><td>Mismo DTO</td><td>ABC acción 2.</td></tr>
+  <tr><td><span class="method delete">DELETE</span></td><td><code>/api/v1/materiales/catalogo-firmas/:id</code></td><td>—</td><td>ABC acción 3; baja lógica.</td></tr>
+  <tr><td><span class="method get">GET</span></td><td><code>/api/v1/configuracion/listas/organizaciones</code></td><td><code>?ejercicio=</code></td><td>Organizaciones vigentes.</td></tr>
+  <tr><td><span class="method get">GET</span></td><td><code>/api/v1/configuracion/listas/unidad-por-cc/:ccId</code></td><td><code>ccId</code></td><td>Áreas de la organización.</td></tr>
+  <tr><td><span class="method get">GET</span></td><td><code>/api/v1/materiales/catalogo-firmas/puestos</code></td><td><code>?organizacionId=&amp;areaId=</code></td><td>Puestos disponibles.</td></tr>
+  <tr><td><span class="method get">GET</span></td><td><code>/api/v1/materiales/catalogo-firmas/empleados</code></td><td><code>?organizacionId=&amp;areaId=&amp;puesto=&amp;q=</code></td><td>Empleados elegibles para B-19.</td></tr>
+ </tbody></table>
+ <p>El controlador NestJS aplica JWT, roles y Swagger. El usuario de auditoría proviene del JWT y nunca del body. La respuesta siempre usa <code>{cod_resultado,msg_resultado,data}</code>.</p>
+</div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
+ <table class="props-table"><thead><tr><th>Acción</th><th>Comportamiento</th><th>Resultado</th></tr></thead><tbody>
+  <tr><td><strong>Consultar</strong></td><td>Busca por texto, filtra por rol y fecha.</td><td>Grid con estado calculado.</td></tr>
+  <tr><td><strong>Nuevo</strong></td><td>Abre FB-07, fija fin <code>31/12/2099</code> y habilita la cascada.</td><td>Alta acción 1.</td></tr>
+  <tr><td><strong>Editar</strong></td><td>Antes del inicio permite todos los campos; iniciada sólo nombre de firma y fin.</td><td>Cambio acción 2.</td></tr>
+  <tr><td><strong>Cerrar vigencia</strong></td><td>Cambia la fecha final; para sustitución se guarda antes del alta nueva.</td><td>El rol queda libre desde el día siguiente.</td></tr>
+  <tr><td><strong>Dar de baja</strong></td><td>Confirma con FB-06 y conserva la fila.</td><td>Baja lógica acción 3.</td></tr>
+ </tbody></table>
+</div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
+ <p>La consulta aplica FM-01 con DG-02. Alta y edición usan FB-07 con la organización de FM-03; la baja usa FB-06. Empleado usa B-19 porque es un catálogo amplio.</p>
+ <table class="props-table"><thead><tr><th>Campo</th><th>Componente</th><th>Regla de interacción</th></tr></thead><tbody>
+  <tr><td>Rol</td><td><code>SiafSelect</code></td><td>Cuatro opciones fijas; sin “Nuevo rol”.</td></tr>
+  <tr><td>Organización</td><td><code>SiafSelect</code></td><td>Centros vigentes para la fecha inicial.</td></tr>
+  <tr><td>Área</td><td><code>SiafSelect</code></td><td>Deshabilitada hasta elegir organización.</td></tr>
+  <tr><td>Puesto</td><td><code>SiafSelect</code></td><td>Deshabilitado hasta elegir área.</td></tr>
+  <tr><td>Empleado</td><td><code>SiafPicker</code></td><td>Busca número o nombre; exige puesto.</td></tr>
+  <tr><td>Nombre con el que firma</td><td><code>SiafInput</code></td><td>Obligatorio, máximo 200; sugiere el nombre del empleado y admite título.</td></tr>
+  <tr><td>Inicio / Fin</td><td><code>SiafInput type="date"</code></td><td>Fin inicial bloqueado en <code>2099-12-31</code>; al editar puede cerrarse.</td></tr>
+ </tbody></table>
+ <p><strong>Grid principal:</strong> Rol, Nombre con el que firma, Empleado, Organización, Área, Puesto, Vigencia y Acciones. No utiliza casillas ni acciones masivas.</p>
+ <div class="tabs"><button class="wf-tab active" onclick="showWF('grid',this)">Lista</button><button class="wf-tab" onclick="showWF('modal',this)">Modal ABC</button><button class="wf-tab" onclick="showWF('ejemplo',this)">Ejemplo</button></div>
+ <div id="wf-grid" class="wf-panel active"><div class="wf-box"><div class="wf-bar">WF-01 · Lista de firmas</div><div class="wf-svg-area">
+  <svg viewBox="0 0 1050 410" width="100%" role="img" aria-label="Wireframe lista de firmas">
+   <rect width="1050" height="410" fill="#f5f0e8"/><rect x="22" y="22" width="1006" height="366" rx="6" fill="#fff" stroke="#d4c9b5"/>
+   <text x="45" y="58" font-size="20" font-weight="700" fill="#183125">Catálogo de firmas</text><rect x="870" y="36" width="130" height="34" rx="4" fill="#183125"/><text x="935" y="58" text-anchor="middle" font-size="11" fill="#fff">+ Nueva firma</text>
+   <rect x="45" y="88" width="960" height="54" rx="4" fill="#fafafa" stroke="#d4c9b5"/><rect x="60" y="101" width="330" height="28" rx="3" fill="#fff" stroke="#d4c9b5"/><text x="72" y="119" font-size="10" fill="#777">Buscar nombre, empleado, puesto…</text><rect x="410" y="101" width="180" height="28" rx="3" fill="#fff" stroke="#d4c9b5"/><text x="422" y="119" font-size="10" fill="#555">Rol: Todos ▼</text>
+   <rect x="45" y="158" width="960" height="38" fill="#183125"/><g font-size="9" font-weight="700" fill="#fff"><text x="60" y="181">ROL</text><text x="170" y="181">NOMBRE DE FIRMA</text><text x="365" y="181">EMPLEADO</text><text x="520" y="181">ORGANIZACIÓN / ÁREA</text><text x="740" y="181">PUESTO</text><text x="875" y="181">VIGENCIA</text><text x="970" y="181">ACC.</text></g>
+   <g font-size="9" fill="#444"><text x="60" y="226">{rol}</text><text x="170" y="226">{nombre_firma}</text><text x="365" y="226">{numemp} · {nombre}</text><text x="520" y="218">{organización}</text><text x="520" y="234">{área}</text><text x="740" y="226">{puesto}</text><text x="875" y="218">{inicio}–{fin}</text><text x="875" y="234" fill="#15803d">{estado}</text><text x="970" y="226">✎ ⊘</text></g>
+   <line x1="45" y1="248" x2="1005" y2="248" stroke="#e5e0d8"/><text x="60" y="278" font-size="9" fill="#777">Editar y baja son iconos con tooltip; la selección masiva no aplica.</text>
+  </svg>
+ </div></div></div>
+ <div id="wf-modal" class="wf-panel"><div class="wf-box"><div class="wf-bar">WF-02 · Modal de alta/edición</div><div class="wf-svg-area">
+  <svg viewBox="0 0 900 650" width="100%" role="img" aria-label="Wireframe modal ABC">
+   <rect width="900" height="650" fill="#000" opacity=".18"/><rect x="120" y="35" width="660" height="580" rx="8" fill="#fff"/><text x="150" y="75" font-size="18" font-weight="700" fill="#183125">Nueva firma</text><text x="750" y="75" font-size="18" fill="#777">×</text><line x1="120" y1="95" x2="780" y2="95" stroke="#d4c9b5"/>
+   <g font-size="10" font-weight="700" fill="#555"><text x="150" y="125">ROL *</text><text x="460" y="125">ORGANIZACIÓN *</text><text x="150" y="200">ÁREA *</text><text x="460" y="200">PUESTO *</text><text x="150" y="275">EMPLEADO *</text><text x="150" y="350">NOMBRE CON EL QUE FIRMA *</text><text x="150" y="425">VIGENCIA INICIO *</text><text x="460" y="425">VIGENCIA FIN *</text></g>
+   <g fill="#fff" stroke="#c9c1b4"><rect x="150" y="135" width="270" height="36" rx="4"/><rect x="460" y="135" width="270" height="36" rx="4"/><rect x="150" y="210" width="270" height="36" rx="4"/><rect x="460" y="210" width="270" height="36" rx="4"/><rect x="150" y="285" width="580" height="36" rx="4"/><rect x="150" y="360" width="580" height="36" rx="4"/><rect x="150" y="435" width="270" height="36" rx="4"/><rect x="460" y="435" width="270" height="36" rx="4"/></g>
+   <g font-size="10" fill="#888"><text x="164" y="158">Seleccione… ▼</text><text x="474" y="158">Seleccione… ▼</text><text x="164" y="233">Seleccione organización primero</text><text x="474" y="233">Seleccione área primero</text><text x="164" y="308">Buscar número o nombre… ⌕</text><text x="164" y="383">Ej. Dra. Nombre Apellido</text><text x="164" y="458">AAAA-MM-DD</text><text x="474" y="458">2099-12-31</text></g>
+   <line x1="120" y1="520" x2="780" y2="520" stroke="#d4c9b5"/><rect x="535" y="548" width="90" height="34" rx="4" fill="#fff" stroke="#d4c9b5"/><text x="580" y="570" text-anchor="middle" font-size="11" fill="#555">Cancelar</text><rect x="640" y="548" width="110" height="34" rx="4" fill="#183125"/><text x="695" y="570" text-anchor="middle" font-size="11" fill="#fff">Guardar</text>
+  </svg>
+ </div></div></div>
+ <div id="wf-ejemplo" class="wf-panel"><div class="wf-box"><div class="wf-bar">WF-03 · Datos de negocio</div><div class="wf-svg-area"><table class="props-table"><tbody><tr><td>Rol</td><td><strong>REMITENTE</strong></td></tr><tr><td>Organización</td><td>06 · Dirección General de Administración</td></tr><tr><td>Área</td><td>Subdirección de Recursos Materiales</td></tr><tr><td>Puesto</td><td>Subdirectora de Recursos Materiales</td></tr><tr><td>Empleado</td><td>001234 · PAULINA OCHOA LARA</td></tr><tr><td>Nombre con el que firma</td><td>Dra. Paulina Ochoa Lara</td></tr><tr><td>Vigencia</td><td>20/07/2026 al 31/12/2099</td></tr></tbody></table></div></div></div>
+</div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+ <table class="props-table"><thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th></tr></thead><tbody>
+  <tr><td>RN-FIR-01</td><td>Sólo se admiten cuatro roles predefinidos.</td><td>Rechaza otro valor.</td><td>CHECK, ABC y DTO.</td></tr>
+  <tr><td>RN-FIR-02</td><td>No existe traslape para el mismo rol.</td><td>Alta/cambio devuelve <code>-1</code>.</td><td>EXCLUDE y ABC.</td></tr>
+  <tr><td>RN-FIR-03</td><td>Fechas inclusivas; inicio no supera al fin.</td><td>Rechazo.</td><td>CHECK.</td></tr>
+  <tr><td>RN-FIR-04</td><td>Toda alta termina en <code>2099-12-31</code>.</td><td>Rechaza otra fecha.</td><td>DEFAULT, ABC y UI.</td></tr>
+  <tr><td>RN-FIR-05</td><td>Organización activa y vigente en la fecha inicial.</td><td>No aparece o se rechaza.</td><td>Lista y trigger.</td></tr>
+  <tr><td>RN-FIR-06</td><td>Área activa y perteneciente a la organización.</td><td>No aparece o se rechaza.</td><td>Cascada y trigger.</td></tr>
+  <tr><td>RN-FIR-07</td><td>Puesto obligatorio proveniente de empleados elegibles.</td><td>No admite valor ajeno.</td><td>Lista y trigger.</td></tr>
+  <tr><td>RN-FIR-08</td><td>Empleado activo y coincidente en organización, área y puesto.</td><td>No aparece o se rechaza.</td><td>Picker y trigger.</td></tr>
+  <tr><td>RN-FIR-09</td><td>Nombre de firma obligatorio, máximo 200; no modifica <code>ce_nombre</code>.</td><td>Error inline.</td><td>DTO, trigger y UI.</td></tr>
+  <tr><td>RN-FIR-10</td><td>Vigencia iniciada no cambia rol, adscripción, puesto, empleado ni inicio.</td><td>Debe cerrar y crear sustitución.</td><td>ABC.</td></tr>
+  <tr><td>RN-FIR-11</td><td>Si los catálogos dejan de coincidir, el registro es <code>NO_ELEGIBLE</code>.</td><td>Consumidores no lo usan.</td><td>LEER.</td></tr>
+  <tr><td>RN-FIR-12</td><td>No hay borrado físico.</td><td>Conserva auditoría.</td><td>ABC acción 3.</td></tr>
+ </tbody></table>
+</div>
+
+<div class="doc-section">
+ <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
+ <table class="props-table"><thead><tr><th>Origen</th><th>Integración</th><th>Control</th></tr></thead><tbody>
+  <tr><td>Centros de costos</td><td>Organización, clave presupuestal y vigencia.</td><td>Activo y vigente al inicio.</td></tr>
+  <tr><td>Unidades administrativas</td><td>Áreas de la organización.</td><td><code>cua_clavepptal=cc_clave_pptal</code> o vínculo directo <code>cc_ua_id</code>.</td></tr>
+  <tr><td>Empleados</td><td>Puesto, número y nombre.</td><td><code>ce_cc_id</code>, <code>ce_ua</code>, <code>ce_puesto</code> y estado coinciden.</td></tr>
+  <tr><td>Módulos de Materiales</td><td>Consultan responsable por rol y fecha.</td><td>Sólo estado <code>VIGENTE</code>.</td></tr>
+ </tbody></table>
+ <div class="ok-note"><strong>Sin flujo documental:</strong> termina al guardar o consultar. No genera oficios, PDF, solicitudes, respuestas ni copias.</div>
+</div>
+
+<div class="doc-section"><div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div><table class="props-table"><thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead><tbody><tr><td><strong>No</strong></td><td>Configuración administrativa; no genera pólizas, momentos contables ni movimientos presupuestales.</td></tr></tbody></table></div>
+
+<div class="doc-section"><div class="section-title"><span class="section-num">12</span> Historial de Cambios</div><table class="props-table"><thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead><tbody><tr><td>20/07/2026</td><td>1.0</td><td>Análisis simplificado: tabla única, cuatro roles cerrados, cascada Organización–Área–Puesto–Empleado, nombre de firma y vigencias.</td><td>Dix Consultoría / PJEV</td></tr></tbody></table></div>
+
+<div id="module-flowchart" style="display:none">
+ <h2>07.1.7 Catálogo de Firmas — Diagrama Interfuncional</h2>
+ <svg viewBox="0 0 1000 480" width="100%" role="img" aria-label="Diagrama del catálogo de firmas">
+  <rect width="1000" height="480" fill="#fff" stroke="#d4c9b5"/><rect width="1000" height="50" fill="#183125"/><text x="500" y="31" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">Alta y consulta de responsables</text>
+  <rect y="50" width="330" height="430" fill="#f5f0e8" stroke="#d4c9b5"/><rect x="330" y="50" width="340" height="430" fill="#fff" stroke="#d4c9b5"/><rect x="670" y="50" width="330" height="430" fill="#f5f0e8" stroke="#d4c9b5"/>
+  <text x="165" y="80" text-anchor="middle" font-size="12" font-weight="700">Administrador RM</text><text x="500" y="80" text-anchor="middle" font-size="12" font-weight="700">SIAF-PJEV</text><text x="835" y="80" text-anchor="middle" font-size="12" font-weight="700">Catálogos / PostgreSQL</text>
+  <g fill="#fff" stroke="#183125"><rect x="50" y="115" width="230" height="58" rx="6"/><rect x="385" y="115" width="230" height="58" rx="6"/><rect x="720" y="115" width="230" height="58" rx="6"/><rect x="385" y="225" width="230" height="58" rx="6"/><rect x="720" y="225" width="230" height="58" rx="6"/><rect x="385" y="340" width="230" height="58" rx="6"/></g>
+  <g font-size="11" text-anchor="middle" fill="#183125"><text x="165" y="140">1. Abre Nueva firma</text><text x="165" y="157">y elige rol/inicio</text><text x="500" y="140">2. Carga la cascada</text><text x="500" y="157">Organización–Área–Puesto</text><text x="835" y="140">3. Devuelve sólo</text><text x="835" y="157">catálogos vigentes</text><text x="500" y="250">4. Selecciona empleado</text><text x="500" y="267">y nombre de firma</text><text x="835" y="250">5. Valida adscripción</text><text x="835" y="267">y ausencia de traslape</text><text x="500" y="365">6. Guarda y devuelve</text><text x="500" y="382">respuesta uniforme</text></g>
+  <g stroke="#183125" stroke-width="2" fill="none"><path d="M280 144H385"/><path d="M615 144H720"/><path d="M835 173V225"/><path d="M720 254H615"/><path d="M615 254H720"/><path d="M835 283V369H615"/></g>
+ </svg>
+</div>
+<div id="module-process-table" style="display:none"><h2>07.1.7 Catálogo de Firmas — Proceso Funcional</h2><table class="props-table"><thead><tr><th>Paso</th><th>Responsable</th><th>Entrada</th><th>Actividad</th><th>Salida</th></tr></thead><tbody>
+ <tr><td>1</td><td>Administrador RM</td><td>Necesidad de asignar rol</td><td>Abre modal y elige rol e inicio.</td><td>Fin 2099.</td></tr><tr><td>2</td><td>SIAF-PJEV</td><td>Inicio</td><td>Carga organizaciones vigentes.</td><td>Centros elegibles.</td></tr><tr><td>3</td><td>Administrador / SIAF</td><td>Organización</td><td>Selecciona área, puesto y empleado.</td><td>Empleado coincidente.</td></tr><tr><td>4</td><td>Administrador</td><td>Empleado</td><td>Captura nombre de firma.</td><td>Datos completos.</td></tr><tr><td>5</td><td>PostgreSQL</td><td>Registro</td><td>Valida catálogos, fechas, adscripción y traslape.</td><td>Éxito o error.</td></tr><tr><td>6</td><td>SIAF-PJEV</td><td>Respuesta</td><td>Cierra modal y refresca sólo con código 0.</td><td>Lista actualizada.</td></tr>
+</tbody></table></div>
+
+<div class="doc-footer"><div class="foot-center">Manual de Desarrollo SIAF-PJEV<br><span class="foot-gold">Dix Consultoría</span> · OAJ-DGA · 2026</div></div>
+</div>
+<script src="../shared.js"></script>
+<script>
+function showSP(id,btn){document.querySelectorAll('.sp-panel').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.sp-tab').forEach(x=>x.classList.remove('active'));document.getElementById('sp-'+id).classList.add('active');btn.classList.add('active')}
+function showWF(id,btn){document.querySelectorAll('.wf-panel').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.wf-tab').forEach(x=>x.classList.remove('active'));document.getElementById('wf-'+id).classList.add('active');btn.classList.add('active')}
+</script>
+</body>
+</html>

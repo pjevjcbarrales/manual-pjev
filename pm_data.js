@@ -1436,6 +1436,15 @@ const pmData = {
             "progreso": 0
         },
         {
+            "id": "07.1.7",
+            "nombre": "Catálogo de Firmas",
+            "desarrollador_asignado": "Sin asignar",
+            "avance_desarrollo": 0,
+            "iteracion_desarrollo": 0,
+            "tipo_formulario": "Simple",
+            "visitas": []
+        },
+        {
             "id": "07.2.1",
             "nombre": "Requerimientos de adquisiciones",
             "desarrollador_asignado": "Sin asignar",
