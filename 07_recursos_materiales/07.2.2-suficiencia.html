@@ -981,7 +981,7 @@ $$;</pre>
       <div class="section-title"><span class="section-num">10</span> Flujos de Integración (Impacto Transversal)</div>
       <p style="margin-top:10px; font-size:13px; color:#475569;">La Solicitud de Suficiencia Presupuestal es el gatillo inicial de la cadena de suministro y detona los siguientes impactos transversales:</p>
       <ul style="margin-top: 15px; font-size: 13px; color: #334155; line-height: 1.6; padding-left: 20px;">
-        <li style="margin-bottom: 10px;"><strong>Impacto hacia Presupuesto (Finanzas):</strong> Al accionar "Enviar", el registro aparece automáticamente en la bandeja del módulo <code>02.2.8</code> de la Subdirección de Recursos Financieros. Los montos solicitados entran en un estado de "Pre-reserva" (no utilizables por otras áreas mientras se dictamina).</li>
+        <li style="margin-bottom: 10px;"><strong>Impacto hacia Presupuesto (Finanzas):</strong> Al accionar "Enviar", el registro aparece automáticamente en la bandeja del módulo <code>02.2.10</code> de la Subdirección de Recursos Financieros. Los montos solicitados entran en un estado de "Pre-reserva" (no utilizables por otras áreas mientras se dictamina).</li>
         <li style="margin-bottom: 10px;"><strong>Impacto hacia Compras (Adquisiciones):</strong> Una suficiencia con <code>estatus_actual = 2</code> (Autorizado) se convierte en el insumo obligatorio para el módulo <code>07.2.2 Registro de Pedidos/Contratos</code>. Sin una suficiencia autorizada, el sistema bloquea cualquier intento de compromiso de compra.</li>
       </ul>
     </div>
@@ -1192,7 +1192,7 @@ $$;</pre>
   <!-- 3. Dictamen de Suficiencia -->
   <polygon points="340,405 560,405 545,455 325,455" class="node-data"/>
   <text x="450" y="425" class="node-text">3. Dictamen de Suficiencia</text>
-  <text x="450" y="440" class="node-sub">Evalúa Bandeja 02.2.8</text>
+  <text x="450" y="440" class="node-sub">Evalúa Bandeja 02.2.10</text>
   <path d="M 450 455 L 450 480" class="path-line"/>
 
   <!-- ¿Autoriza? -->
@@ -1280,7 +1280,7 @@ $$;</pre>
                   <tr>
                     <td><strong>Subdirección de Finanzas</strong></td>
                     <td><strong>3. Dictamen de Suficiencia</strong></td>
-                    <td>Revisa la bandeja operativa (Módulo 02.2.8) y decide Rechazar o Autorizar las partidas solicitadas.</td>
+                    <td>Revisa la bandeja operativa (Módulo 02.2.10) y decide Rechazar o Autorizar las partidas solicitadas.</td>
                     <td>Actualiza estatus. En caso de Rechazo, libera inmediatamente los saldos pre-reservados. En caso de Autorización, descuenta los saldos definitivamente.</td>
                   </tr>
                   <tr>

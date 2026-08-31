@@ -19,7 +19,7 @@ const pages = [
   { id: '03.3.1', filename: '03.3.1-descarga-contable-masiva.html', title: 'Descarga Contable Masiva', desc: 'Carga masiva de afectaciones contables.', group: '03.3 Procesos y Cierres' },
   { id: '03.3.2', filename: '03.3.2-conciliacion-bancaria.html', title: 'Conciliación Bancaria', desc: 'Conciliación bancaria automatizada (325) y manual (330).', group: '03.3 Procesos y Cierres' },
   { id: '03.3.3', filename: '03.3.3-conciliacion-ministraciones.html', title: 'Conciliación de Ministraciones', desc: 'Conciliación de Ministraciones (334).', group: '03.3 Procesos y Cierres' },
-  { id: '03.3.4', filename: '03.3.4-conciliacion-presupuesto-contable.html', title: 'Presupuestal vs Contable', desc: 'Ingresos y Egresos (278).', group: '03.3 Procesos y Cierres' },
+  { id: '03.4.6', filename: '03.3.4-conciliacion-presupuesto-contable.html', title: 'Conciliación entre egresos presupuestarios y gastos contables', desc: 'Formato de conciliación CONAC.', group: '03.4 Reportes contables' },
   { id: '03.3.5', filename: '03.3.5-conciliacion-intersistemas.html', title: 'Conciliación Inter-Sistemas', desc: 'Cruce con RRHH, Materiales y TCA (309, 302, 314).', group: '03.3 Procesos y Cierres' },
   { id: '03.3.6', filename: '03.3.6-conciliacion-obra-publica.html', title: 'Conciliación Obra Pública', desc: 'Conciliación Obra Pública en proceso (321).', group: '03.3 Procesos y Cierres' },
   

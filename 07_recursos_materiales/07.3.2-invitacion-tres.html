@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.3.2 Invitación a Cuando Menos Tres — SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.patch  { background:#fff8e1; color:#795548; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .wf-tab {
+    padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px;
+    border:1px solid var(--pjev-borde); background:var(--pjev-blanco);
+    cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s;
+  }
+  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
+  .wf-panel { display:none; }
+  .wf-panel.active { display:block; }
+  .wf-box {
+    border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden;
+    background:var(--pjev-blanco);
+  }
+  .wf-bar {
+    background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde);
+    padding:8px 14px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-bar-tag   { font-size:10px; color:var(--pjev-texto-muted); font-family:var(--font-mono); }
+  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; }
+  .wf-desc { font-size:12px; color:var(--pjev-texto-muted); padding:10px 14px 12px; border-top:1px solid var(--pjev-borde); line-height:1.5; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-b { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Manual Dev</a> ›
+      <span>Recursos Materiales</span> ›
+      <span>07.3.2 Invitación a Cuando Menos Tres</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">07.3.2</div>
+        <h1 class="elem-title">Invitación a Cuando Menos Tres Personas</h1>
+        <p class="elem-desc">Módulo avanzado para el registro y seguimiento del procedimiento de Invitación a Cuando Menos Tres Personas (Licitación Simplificada), controlando el envío de oficios, recepción de propuestas y emisión del fallo por el comité.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-b">Modo B — Por desarrollar</span>
+          <span class="mod-badge badge-c">Tipo: Compuesto (Maestro/Detalle Avanzado)</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">adq / invitacion-tres</code></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Cuando el monto estimado de la compra supera el umbral de adjudicación directa, la ley exige un procedimiento formal llamado "Invitación a Cuando Menos Tres Personas". Este módulo permite registrar los oficios de invitación enviados, capturar las propuestas técnicas y económicas en un acto de apertura formal, y registrar el Dictamen (Fallo) de adjudicación de la Comisión correspondiente.</p>
+    </div>
+
+    <!-- 2. MARCO NORMATIVO -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+      <table class="props-table">
+        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
+        <tbody>
+          <tr><td>Ley 539 Adquisiciones Veracruz</td><td>Art. 56</td><td>Obligación de invitar por escrito a un mínimo de tres proveedores cuyo giro coincida con los bienes solicitados.</td></tr>
+          <tr><td>Ley 539 Adquisiciones Veracruz</td><td>Art. 57</td><td>El acto de apertura de propuestas y el fallo deben constar en Actas Administrativas firmadas por los asistentes.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. ROLES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <table class="props-table">
+        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Analista Adquisiciones</strong></td><td>Registrar proveedores invitados, capturar propuestas.</td><td>No autoriza ni dictamina el fallo.</td></tr>
+          <tr><td><strong>Comisión de Aprovisionamiento</strong></td><td>Firmar las actas físicas (fuera del sistema).</td><td>El sistema exige la carga del acta escaneada para concluir el módulo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td colspan="3" style="background:#f1f5f9;font-weight:bold;">Encabezado: materiales.invitacion_tres</td></tr>
+          <tr><td><code>id_invitacion</code> <span class="badge-req">REQ</span></td><td><code>INT PK</code></td><td>Identificador único</td></tr>
+          <tr><td><code>id_requerimiento</code> <span class="badge-req">REQ</span></td><td><code>INT FK</code></td><td>Apunta al requerimiento origen</td></tr>
+          <tr><td><code>numero_oficio</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(50)</code></td><td>No. consecutivo del proceso de invitación</td></tr>
+          <tr><td><code>fecha_apertura</code> <span class="badge-req">REQ</span></td><td><code>DATETIME</code></td><td>Fecha programada para apertura de sobres</td></tr>
+          <tr><td><code>id_proveedor_ganador</code> <span class="badge-opt">OPC</span></td><td><code>INT FK</code></td><td>Proveedor adjudicado (null hasta el fallo)</td></tr>
+          <tr><td><code>ruta_acta_fallo</code> <span class="badge-opt">OPC</span></td><td><code>VARCHAR</code></td><td>Ruta del PDF escaneado del Acta de Fallo</td></tr>
+          <tr><td><code>estatus</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>0=Borrador, 1=Invitaciones Enviadas, 2=Apertura, 3=Fallo Emitido</td></tr>
+          <tr><td colspan="3" style="background:#f1f5f9;font-weight:bold;">Detalle: materiales.invitacion_proveedores</td></tr>
+          <tr><td><code>id_invitado</code> <span class="badge-req">REQ</span></td><td><code>INT PK</code></td><td>ID Movimiento Invitación</td></tr>
+          <tr><td><code>id_invitacion</code> <span class="badge-req">REQ</span></td><td><code>INT FK</code></td><td>Vinculación a la cabecera</td></tr>
+          <tr><td><code>id_proveedor</code> <span class="badge-req">REQ</span></td><td><code>INT FK</code></td><td>Proveedor que recibió invitación</td></tr>
+          <tr><td><code>asistencia_apertura</code> <span class="badge-req">REQ</span></td><td><code>BOOLEAN</code></td><td>¿Se presentó a la apertura?</td></tr>
+          <tr><td><code>propuesta_economica</code> <span class="badge-opt">OPC</span></td><td><code>NUMERIC(18,2)</code></td><td>Monto global ofertado (antes de desglose)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. STORED PROCEDURES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">5</span> Stored Procedures</div>
+      <h4 style="color: var(--pjev-verde-oscuro);"><code>materiales.fn_crud_invitacion</code></h4>
+      <table class="props-table">
+        <thead><tr><th>Parámetros (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>@accion</code></td><td><code>SMALLINT</code></td><td>1=Crear Evento, 2=Modificar Cabecera, 3=Emitir Fallo</td></tr>
+          <tr><td><code>@id_requerimiento</code></td><td><code>INT</code></td><td>Requerimiento origen</td></tr>
+          <tr><td><code>@fecha_apertura</code></td><td><code>DATETIME</code></td><td>Fecha del evento legal</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. SERVICIOS REST -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code class="method get">GET</code></td><td><code>/materiales/invitacion-tres</code></td><td>Lista eventos de invitación</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/materiales/invitacion-tres/:id/proveedores</code></td><td>Agrega proveedores a la lista de invitados</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/materiales/invitacion-tres/:id/fallo</code></td><td>Fija el fallo, actualiza el estado y detona la Suficiencia Definitiva</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. PANTALLAS (WIREFRAMES SVG) -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Diseño de Interfaces (UI)</div>
+      <div class="wireframe-tabs">
+        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer</button>
+        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_abc_evento</button>
+      </div>
+      <div id="wf-p1" class="wf-panel active">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Bandeja de Invitación a Tres</span><span class="wf-bar-tag">P1</span></div>
+          <div class="wf-svg-area">
+             <!-- Placeholder para SVG de bandeja -->
+             <svg width="600" height="200" style="background:#fff; border:1px solid #ccc;">
+               <rect x="20" y="20" width="560" height="30" fill="#1B3A6B"/>
+               <text x="30" y="40" fill="#fff" font-size="12">Invitación a Tres - Procesos Vigentes</text>
+               <line x1="20" y1="80" x2="580" y2="80" stroke="#ccc" />
+               <text x="30" y="70" font-size="11" fill="#333">INV-2026-004 | Computadoras | Apertura: 18/Ago/2026</text>
+             </svg>
+          </div>
+        </div>
+      </div>
+      <div id="wf-p2" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Gestión del Evento</span><span class="wf-bar-tag">P2</span></div>
+          <div class="wf-svg-area">
+             <!-- Placeholder para SVG del formulario -->
+             <svg width="600" height="300" style="background:#fff; border:1px solid #ccc;">
+               <rect x="20" y="20" width="560" height="30" fill="#1B3A6B"/>
+               <text x="30" y="40" fill="#fff" font-size="12">INV-2026-004: Apertura de Propuestas</text>
+
+               <text x="20" y="80" font-size="11" font-weight="bold">Proveedores Invitados:</text>
+               <rect x="20" y="90" width="560" height="90" fill="#f4f4f4" stroke="#ccc"/>
+               <text x="30" y="110" font-size="10">1. Dell México | Asistió: [X] | Monto: $150,000</text>
+               <text x="30" y="130" font-size="10">2. HP de México | Asistió: [X] | Monto: $148,000</text>
+               <text x="30" y="150" font-size="10">3. Lenovo | Asistió: [ ] | Monto: N/A</text>
+
+               <rect x="20" y="210" width="150" height="25" rx="5" fill="#DEAC50"/>
+               <text x="35" y="226" fill="#fff" font-size="10">Registrar Acta de Fallo</text>
+             </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. REGLAS CRÍTICAS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">8</span> Reglas de Negocio Críticas</div>
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia / Validación</th></tr></thead>
+        <tbody>
+          <tr><td>RN-IT-01</td><td>Mínimo Tres</td><td>El sistema no permite emitir el fallo si no hay al menos tres proveedores en la lista de invitados, salvo que se suba dictamen de excepción.</td></tr>
+          <tr><td>RN-IT-02</td><td>Obligatoriedad PDF</td><td>Debe adjuntarse el PDF del Acta de Fallo firmada físicamente por la Comisión.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+<script>
+  function showWF(id, btn) {
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('wf-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

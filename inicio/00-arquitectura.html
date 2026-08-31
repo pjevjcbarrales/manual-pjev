@@ -33,7 +33,7 @@
   <!-- 1. ESQUEMAS DE BASE DE DATOS -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">1</span> Esquemas por Sistema</div>
-    <p>Para evitar la saturación del esquema público y mantener la arquitectura modular, el sistema divide sus tablas y funciones lógicamente en **9 esquemas**. Cada módulo de la aplicación debe mapearse al esquema correspondiente en el ORM (Prisma).</p>
+    <p>Para evitar la saturación del esquema público y mantener la arquitectura modular, el sistema divide sus tablas y funciones por dominios funcionales. Cada módulo de la aplicación debe mapearse al esquema correspondiente en el ORM (Prisma).</p>
     
     <div class="schema-grid">
       <div class="schema-card core">
@@ -55,6 +55,10 @@
       <div class="schema-card">
         <div class="schema-name">presupuesto</div>
         <div class="schema-desc">Capa de control presupuestal y <em>Stored Procedures</em> encargados de procesar egresos e ingresos.</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-name">materiales</div>
+        <div class="schema-desc">Recursos Materiales: requerimientos, expedientes de compra, procedimientos de contratación, instrumentos, recepción, CFDI y eventos de integración hasta el devengado.</div>
       </div>
       <div class="schema-card">
         <div class="schema-name">cxc</div>
