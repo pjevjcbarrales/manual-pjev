@@ -131,17 +131,8 @@
   if (inmuebles) Object.assign(inmuebles, { rutas:['/cfg/cco/inmuebles','/cfg/catalogos/bienes-inmuebles'], fases:calificar('cfg',55), cumplimiento_final:53, estado:'Desarrollado; requiere estabilizacion', evidencia_actualizacion:'Propiedad funcional de Presupuesto; implementacion tecnica compartida en Configuracion.' });
   const contratos = buscar('02.1.4');
   if (contratos) Object.assign(contratos, { rutas:['/cfg/cco/contratos'], fases:calificar('cfg',55), cumplimiento_final:53, estado:'Desarrollado; requiere estabilizacion', evidencia_actualizacion:'Propiedad funcional de Presupuesto; implementacion tecnica compartida en Configuracion.' });
-  const bovedaCfdi = buscar('03.2.5');
-  if (bovedaCfdi) Object.assign(bovedaCfdi, {
-    id:'04.6.1',
-    sistema:'04 Tesorería',
-    subsistema:'04.6 Servicios transversales',
-    modulo:'Bóveda CFDI',
-    nombre:'Bóveda CFDI',
-    alcance:'Transversal para Tesorería, Contabilidad y procesos que reciben comprobantes fiscales',
-    opciones:['Recepción y resguardo de CFDI','Consulta y validación fiscal','Vinculación con pagos y comprobaciones'],
-    evidencia_actualizacion:'Propiedad funcional en Tesorería con alcance transversal; se conserva la documentación técnica legada de Contabilidad.'
-  });
+  const bovedaCfdiLegacy = modulos.findIndex((modulo) => modulo.id === '03.2.5');
+  if (bovedaCfdiLegacy >= 0) modulos.splice(bovedaCfdiLegacy, 1);
   const consola = buscar('02.3.4');
   if (consola) Object.assign(consola, {
     rutas:['/ppto/inf/consola','/ppto/inf/conac','/ppto/inf/consulta-global-mensual','/ppto/inf/avance-sector'], fases:calificar('ppto',75), cumplimiento_final:66,
@@ -269,74 +260,94 @@
   modulos.filter((modulo) => modulo.sistema === '03 Contabilidad' && /^03\.3\./.test(modulo.id))
     .forEach((modulo) => { modulo.subsistema = '03.3 Procesos y Cierres'; });
 
-  const tes = (id, sub, nombre, datos={}) => agregar(id,'04 Tesorería',sub,nombre,datos);
-  tes('04.1.1','04.1 Ingresos y Caja','Tipos de movimiento de ingreso',{perfil:'ing',f2:90,rutas:['/ing/tipos-mov'],responsable:'Eunice'});
-  tes('04.1.2','04.1 Ingresos y Caja','Conceptos de ingreso',{perfil:'ing',f2:90,rutas:['/ing/conceptos'],responsable:'Eunice',documentacion:'Documentado en el manual vigente'});
-  tes('04.1.3','04.1 Ingresos y Caja','Cuentas recaudadoras',{perfil:'cfg',f2:55,rutas:['/cfg/cat/cbancarios'],responsable:'Eunice',documentacion:'Documentado en el manual vigente'});
-  tes('04.1.4','04.1 Ingresos y Caja','Registro de ingresos',{perfil:'ing',f2:90,rutas:['/ing/ingresos-recurso'],responsable:'Eunice',opciones:['Devengado','Recaudado','Fuente de financiamiento y banco'],documentacion:'Documentado en el manual vigente'});
-  tes('04.1.5','04.1 Ingresos y Caja','Cuentas por cobrar legacy',{perfil:'ing',f2:40,rutas:['/ing/reg/cuentas-cobro'],responsable:'Eunice',documentacion:'Pendiente de actualizar'});
-  tes('04.1.6','04.1 Ingresos y Caja','Ministraciones',{responsable:'Eunice',estado:'Pendiente de desarrollo',alcance:'Caja registra ingreso en cuentas 4 y bancos y ejecuta la modificacion presupuestaria'});
-  tes('04.1.7','04.1 Ingresos y Caja','Reintegros de ingreso',{responsable:'Eunice',estado:'Pendiente',documentacion:'Analisis documentado; desarrollo pendiente'});
+  const ing = (id, sub, nombre, datos={}) => agregar(id,'04 Ingresos',sub,nombre,datos);
+  ing('04.1.1','04.1 Catálogos','Conceptos de ingreso',{perfil:'ing',f2:90,rutas:['/ing/conceptos'],responsable:'Eunice',documentacion:'Documentado en el manual vigente',opciones:['Ministraciones','Reintegros','Rendimientos','Otros conceptos']});
+  ing('04.1.2','04.1 Catálogos','Tipos de movimiento de ingreso',{perfil:'ing',f2:90,rutas:['/ing/tipos-mov'],responsable:'Eunice'});
+  ing('04.2.1','04.2 Registro','Registro y seguimiento de ingresos',{perfil:'ing',f2:90,rutas:['/ing/ingresos-recurso'],responsable:'Eunice',documentacion:'Documentado en el manual vigente',opciones:['Solicitudes y recepción de ministraciones','Depósitos','Rendimientos financieros','Reintegros y devoluciones','Aplicación presupuestaria','Correcciones y cancelaciones','Consulta y seguimiento'],evidencia:'Consolida las variantes de ingreso por tipo de movimiento y concepto. Fuentes de financiamiento y cuentas bancarias se reutilizan desde Configuración Inicial.'});
+  ing('04.3.1','04.3 Procesos','Conciliación de ministraciones',{perfil:'conta',f2:90,rutas:['/conta/proc/conciliacion-ministraciones'],responsable:'Eunice',estado:'Disponible parcialmente; requiere completar y validar',documentacion:'Documentado en el manual vigente'});
+  ing('04.3.2','04.3 Procesos','Cierre mensual de ingresos',{responsable:'Eunice',estado:'Pendiente de desarrollo'});
+  ing('04.4.1','04.4 Informes','Informes y control de ingresos',{responsable:'Eunice',estado:'Pendiente de desarrollo',opciones:['Ingresos por fuente, CRI, concepto y cuenta','Ministraciones solicitadas, recibidas y pendientes','Depósitos, reintegros y devoluciones','Rendimientos','Ingresos sin póliza o aplicación presupuestaria','Conciliación con Presupuesto, Contabilidad y bancos']});
 
-  tes('04.2.1','04.2 Cuentas por Pagar','Afectacion del gasto',{
-    perfil:'fin',f2:70,tope59:true,
-    rutas:['/fin/reg/afectaciongasto','/fin/reg/afectaciongasto-serviciospersonales'],
-    responsable:'Julio Cesar',
-    estado:'Desarrollo parcial; retirar datos ficticios de servicios personales',
-    opciones:['Recursos materiales','Captura general','Servicios personales','Previsualizacion contable por matrices'],
-    documentacion:'Documentado en el manual vigente',
-    evidencia:'El antiguo 04.2.2 Afectacion de servicios personales queda absorbido como opcion de este modulo.'
-  });
-  tes('04.2.3','04.2 Cuentas por Pagar','Viaticos y sujetos a comprobar',{responsable:'Daryl',estado:'Pendiente de desarrollo integral',opciones:['Afectacion','Orden de pago','Comprobacion','Reintegro'],documentacion:'Normativa localizada; analisis funcional pendiente',evidencia:'Validar contra MANUAL_VIATICOS_RECURSOSPUBLICOS_DGA.pdf.'});
-  tes('04.2.4','04.2 Cuentas por Pagar','Orden de pago',{responsable:'Daryl',estado:'Pendiente de desarrollo',opciones:['RH automatizada','RH manual','Recursos materiales','Gastos por comprobar'],evidencia:'Segundo paso del flujo: afectacion -> orden de pago -> envio a Caja.'});
-  tes('04.2.5','04.2 Cuentas por Pagar','Buzon de facturacion',{responsable:'Daryl',estado:'Pendiente'});
+  const cxp = (id, sub, nombre, datos={}) => agregar(id,'05 Cuentas por Pagar',sub,nombre,datos);
+  cxp('05.1.1','05.1 Catálogos','Requisitos documentales',{perfil:'rm',f2:90,rutas:['/adq/catad/docs_requisito'],responsable:'Daryl',documentacion:'Documentado en el manual vigente'});
+  cxp('05.1.2','05.1 Catálogos','Tarifas y zonas de viáticos',{responsable:'Daryl',estado:'Pendiente de desarrollo',documentacion:'Normativa localizada; análisis funcional pendiente'});
+  cxp('05.1.3','05.1 Catálogos','Conceptos de retención y deducción',{responsable:'Daryl',estado:'Pendiente de definición funcional',opciones:['Retenciones fiscales','Deducciones administrativas','Retenciones de nómina','Obligaciones a terceros','Entero de retenciones'],evidencia:'La implementación localizada es parcial; debe validarse el alcance antes de desarrollar el catálogo canónico.'});
+  cxp('05.2.1','05.2 Registro','Afectación del gasto',{perfil:'fin',f2:70,tope59:true,rutas:['/fin/reg/afectaciongasto','/fin/reg/afectaciongasto-serviciospersonales'],responsable:'Julio Cesar',estado:'Desarrollo parcial; retirar datos ficticios de servicios personales',documentacion:'Documentado en el manual vigente',opciones:['Nómina','Arrendamientos','Servicios básicos','Honorarios','Compra directa, pedido y contrato','Obra pública','Terceros institucionales','Viáticos y sujetos a comprobar','Fondo revolvente','Previsualización contable por matrices'],evidencia:'Los procedimientos son modalidades de la afectación y no módulos independientes.'});
+  cxp('05.2.2','05.2 Registro','Orden de pago',{responsable:'Daryl',estado:'Pendiente de desarrollo',opciones:['Servicios personales','Recursos materiales','Gastos por comprobar','Terceros institucionales'],evidencia:'Formaliza la obligación autorizada y su envío a la Bandeja de pagos.'});
+  cxp('05.2.3','05.2 Registro','Gastos a comprobar',{responsable:'Daryl',estado:'Pendiente de desarrollo',opciones:['Entrega de recursos','Responsable y fecha límite','Saldo pendiente','Reintegro']});
+  cxp('05.2.4','05.2 Registro','Comprobación y revisión de gastos',{responsable:'Daryl',estado:'Pendiente de desarrollo',opciones:['Recepción de comprobaciones','Facturas XML y PDF','Peajes y recibos','Validación fiscal y duplicados','Observaciones, aceptación o rechazo','Reintegros y cierre'],evidencia:'Fusiona comprobación, recepción y revisión y se vincula con Gastos a comprobar y el Repositorio CFDI.'});
+  cxp('05.3.1','05.3 Procesos','Pre-pólizas',{responsable:'Daryl',estado:'Pendiente de desarrollo'});
+  cxp('05.3.2','05.3 Procesos','Programación de pagos',{responsable:'Daryl',estado:'Pendiente de desarrollo'});
+  cxp('05.3.3','05.3 Procesos','Control y entero de retenciones',{responsable:'Daryl',estado:'Pendiente de desarrollo'});
+  cxp('05.3.4','05.3 Procesos','DIOT',{responsable:'Daryl',estado:'Pendiente de desarrollo'});
+  cxp('05.3.5','05.3 Procesos','Movimientos de fideicomisos',{responsable:'Eunice',estado:'Pendiente de desarrollo',documentacion:'Análisis heredado de Contabilidad; debe actualizarse'});
+  cxp('05.4.1','05.4 Informes','Informes de Cuentas por Pagar',{responsable:'Daryl',estado:'Pendiente de desarrollo',opciones:['Cuentas pendientes de pago','Órdenes por estado y beneficiario','Antigüedad de adeudos','Gastos a comprobar pendientes','Comprobaciones pendientes o rechazadas','Retenciones y obligaciones fiscales','Información para DIOT','Gastos por tipo, procedimiento y unidad administrativa','Movimientos de fideicomisos']});
 
-  tes('04.3.1','04.3 Caja y Pagos','Bandeja de pagos',{responsable:'Eunice',estado:'Pendiente de desarrollo',opciones:['Recepcion desde orden de pago','Validacion para pago','Envio a registro']});
-  tes('04.3.2','04.3 Caja y Pagos','Registro de pago',{responsable:'Eunice',estado:'Pendiente de desarrollo',opciones:['Fuente de pago','Cuenta bancaria','Medio de pago','Fecha y referencia']});
-  tes('04.3.3','04.3 Caja y Pagos','Transferencias electronicas (SPEI)',{responsable:'Eunice',estado:'Pendiente'});
-  tes('04.3.4','04.3 Caja y Pagos','Emision y control de cheques',{perfil:'cfg',f2:65,rutas:['/cfg/cat/chequeras'],responsable:'Eunice',estado:'Catalogo disponible; proceso de pago pendiente'});
-  tes('04.3.5','04.3 Caja y Pagos','Cancelacion y reintegro de pagos',{responsable:'Eunice',estado:'Pendiente'});
+  const pagos = (id, sub, nombre, datos={}) => agregar(id,'06 Pagos',sub,nombre,datos);
+  pagos('06.1.1','06.1 Catálogos','Medios de pago',{responsable:'Eunice',estado:'Pendiente de desarrollo',opciones:['Cheque','Transferencia electrónica','SPEI','Dispersión','Otros medios autorizados'],evidencia:'Bancos, chequeras y conceptos bancarios se reutilizan desde Configuración Inicial.'});
+  pagos('06.2.1','06.2 Registro','Bandeja de pagos',{responsable:'Eunice',estado:'Pendiente de desarrollo',opciones:['Recepción desde órdenes de pago','Priorización y fecha propuesta','Disponibilidad proyectada','Alertas y acciones permitidas']});
+  pagos('06.2.2','06.2 Registro','Registro y control de pagos',{responsable:'Eunice',estado:'Pendiente de desarrollo',opciones:['Cheques','Transferencias electrónicas','Programación de fecha y lote','Cuenta pagadora','Autorización y liberación','Aplicación del pago','Pago a terceros institucionales','Rechazo, cancelación, devolución y reexpedición'],evidencia:'Cheques, transferencias y pagos a terceros son modalidades del registro, no módulos independientes.'});
+  pagos('06.2.3','06.2 Registro','Traspasos entre cuentas',{responsable:'Eunice',estado:'Pendiente de desarrollo'});
+  pagos('06.2.4','06.2 Registro','Inversiones y rendimientos',{responsable:'Eunice',estado:'Segunda etapa',alcance:'Segunda etapa',opciones:['Colocaciones','Renovaciones y vencimientos','Retiros y reinversiones','Rendimientos']});
+  pagos('06.3.1','06.3 Procesos','Conciliación bancaria',{perfil:'conta',f2:60,rutas:['/conta/proc/conciliacion-bancaria'],responsable:'Eunice',estado:'Disponible parcialmente; requiere completar y validar',documentacion:'Documentado en el manual vigente'});
+  pagos('06.4.1','06.4 Informes','Informes de pagos y bancos',{responsable:'Eunice',estado:'Pendiente de desarrollo',opciones:['Pagos diarios','Programados, liberados, aplicados y cancelados','Libro de bancos','Disponibilidad financiera','Cheques y transferencias','Traspasos','Inversiones y rendimientos','Gastos de operación y liberación de recursos']});
 
-  tes('04.4.1','04.4 Control Bancario','Conciliacion bancaria',{perfil:'conta',f2:60,rutas:['/conta/proc/conciliacion-bancaria'],responsable:'Eunice',estado:'Disponible parcialmente bajo Contabilidad; definir propiedad final',documentacion:'Documentado en el manual vigente'});
-  tes('04.4.2','04.4 Control Bancario','Inversiones y rendimientos',{responsable:'Eunice',estado:'Pendiente'});
-  tes('04.4.3','04.4 Control Bancario','Reportes bancarios y libro de bancos',{responsable:'Eunice',estado:'Pendiente',opciones:['Analitico de saldos','Libro de bancos','Listado de pagos']});
-  tes('04.5.1','04.5 Obligaciones y Patrimonios','Fideicomisos',{responsable:'Eunice',estado:'Pendiente de desarrollo',documentacion:'Analisis heredado de Contabilidad; debe reclasificarse'});
-  tes('04.5.2','04.5 Obligaciones y Patrimonios','Retenciones y obligaciones fiscales',{responsable:'Eunice',estado:'Pendiente de desarrollo',documentacion:'Analisis heredado de Contabilidad; debe reclasificarse'});
+  const cfdi = (id, sub, nombre, datos={}) => agregar(id,'07 Repositorio CFDI',sub,nombre,datos);
+  cfdi('07.1.1','07.1 Registro','Bóveda CFDI',{perfil:'cfg',f2:55,rutas:['/cfg/documentos'],responsable:'Cristian',estado:'Segunda etapa',alcance:'Transversal para Tesorería, Contabilidad y procesos que reciben comprobantes fiscales',opciones:['Carga individual y masiva de XML','Asociación de PDF','Complementos de pago','Consulta fiscal','CFDI relacionados','Vinculación con expedientes','Descarga autorizada e historial'],documentacion:'Evidencia técnica disponible; análisis funcional integral pendiente',evidencia:'Cada CFDI debe registrarse una sola vez por UUID y hash; los demás módulos crean vínculos, no copias.'});
+  cfdi('07.2.1','07.2 Procesos','Validación y vinculación fiscal',{responsable:'Cristian',estado:'Segunda etapa',alcance:'Segunda etapa',opciones:['Validación estructural','Consulta ante SAT','Detección de duplicados','Vinculación con afectación, orden y pago','Vinculación con viáticos y gastos a comprobar','Control de complementos','CFDI sustituidos o cancelados','Integración del expediente digital']});
+  cfdi('07.3.1','07.3 Informes','Control y auditoría CFDI',{responsable:'Cristian',estado:'Segunda etapa',alcance:'Segunda etapa',opciones:['CFDI inválidos o cancelados','Duplicados o reutilizados','Comprobantes sin vincular','Complementos pendientes','Expedientes incompletos','Diferencias entre CFDI, afectación y pago','Trazabilidad y auditoría documental']});
 
-  const rm = (id,sub,nombre,datos={}) => agregar(id,'05 Materiales',sub,nombre,{
+  const rm = (id,sub,nombre,datos={}) => agregar(id,'08 Materiales',sub.replace(/^05\./, '08.'),nombre,{
     perfil:datos.rutas?.length ? (datos.perfil || 'rm') : null,
     estado:datos.estado || 'Stand by', alcance:'Stand by', ...datos
   });
-  rm('05.1.1','05.1 Catalogos de Adquisiciones','Documentos requisito',{rutas:['/adq/catad/docs_requisito'],f2:90,documentacion:'Documentado'});
-  rm('05.1.2','05.1 Catalogos de Adquisiciones','Matriz checklist',{rutas:['/adq/catad/matriz_checklist'],f2:75,documentacion:'Documentado'});
-  rm('05.1.3','05.1 Catalogos de Adquisiciones','Modalidades',{rutas:['/adq/catad/modalidades'],f2:90,documentacion:'Documentado'});
-  rm('05.1.4','05.1 Catalogos de Adquisiciones','Procedimientos de contratacion',{rutas:['/adq/catad/procedimientos'],f2:50,documentacion:'Pendiente de actualizar'});
-  rm('05.1.5','05.1 Catalogos de Adquisiciones','CUCOP',{rutas:['/cfg/cpp/cucop'],perfil:'cfg',f2:55,responsable:'Daryl',documentacion:'Catalogo compartido documentado'});
-  rm('05.2.1','05.2 Requerimientos','Requerimientos de adquisiciones',{rutas:['/adq/catad/req_adquisiciones'],f2:90,responsable:'Julio Cesar',documentacion:'Documentado'});
-  rm('05.2.2','05.2 Requerimientos','Expediente de compra',{opciones:['Cotizaciones e investigacion de mercado','Pedidos, ordenes y contratos','Recepcion y conformidad','Factura y CFDI']});
-  rm('05.3.1','05.3 Procedimientos de Contratacion','Adjudicacion directa',{documentacion:'Documentado; desarrollo integral pendiente'});
-  rm('05.3.2','05.3 Procedimientos de Contratacion','Invitacion a cuando menos tres',{documentacion:'Documentado; desarrollo integral pendiente'});
-  rm('05.3.3','05.3 Procedimientos de Contratacion','Licitacion publica',{documentacion:'Documentado; desarrollo integral pendiente'});
-  rm('05.3.4','05.3 Procedimientos de Contratacion','Formalizacion, recepcion y devengado',{opciones:['Formalizacion y comprometido','Recepcion, CFDI y devengado']});
-  rm('05.4.1','05.4 Reportes e Informes','Seguimiento de adquisiciones',{opciones:['Programa anual','Seguimiento de requerimientos','Cuadro comparativo','Seguimiento de procedimientos','Pedidos y contratos','Recepciones y CFDI','Trazabilidad y auditoria']});
+  rm('08.1.1','08.1 Catalogos de Adquisiciones','Documentos requisito',{rutas:['/adq/catad/docs_requisito'],f2:90,documentacion:'Documentado'});
+  rm('08.1.2','08.1 Catalogos de Adquisiciones','Matriz checklist',{rutas:['/adq/catad/matriz_checklist'],f2:75,documentacion:'Documentado'});
+  rm('08.1.3','08.1 Catalogos de Adquisiciones','Modalidades',{rutas:['/adq/catad/modalidades'],f2:90,documentacion:'Documentado'});
+  rm('08.1.4','08.1 Catalogos de Adquisiciones','Procedimientos de contratacion',{rutas:['/adq/catad/procedimientos'],f2:50,documentacion:'Pendiente de actualizar'});
+  rm('08.1.5','08.1 Catalogos de Adquisiciones','CUCOP',{rutas:['/cfg/cpp/cucop'],perfil:'cfg',f2:55,responsable:'Daryl',documentacion:'Catalogo compartido documentado'});
+  rm('08.2.1','08.2 Requerimientos','Requerimientos de adquisiciones',{rutas:['/adq/catad/req_adquisiciones'],f2:90,responsable:'Julio Cesar',documentacion:'Documentado'});
+  rm('08.2.2','08.2 Requerimientos','Expediente de compra',{opciones:['Cotizaciones e investigacion de mercado','Pedidos, ordenes y contratos','Recepcion y conformidad','Factura y CFDI']});
+  rm('08.3.1','08.3 Procedimientos de Contratacion','Adjudicacion directa',{documentacion:'Documentado; desarrollo integral pendiente'});
+  rm('08.3.2','08.3 Procedimientos de Contratacion','Invitacion a cuando menos tres',{documentacion:'Documentado; desarrollo integral pendiente'});
+  rm('08.3.3','08.3 Procedimientos de Contratacion','Licitacion publica',{documentacion:'Documentado; desarrollo integral pendiente'});
+  rm('08.3.4','08.3 Procedimientos de Contratacion','Formalizacion, recepcion y devengado',{opciones:['Formalizacion y comprometido','Recepcion, CFDI y devengado']});
+  rm('08.4.1','08.4 Reportes e Informes','Seguimiento de adquisiciones',{opciones:['Programa anual','Seguimiento de requerimientos','Cuadro comparativo','Seguimiento de procedimientos','Pedidos y contratos','Recepciones y CFDI','Trazabilidad y auditoria']});
+
+  const responsablesTesoreria = {
+    '04 Ingresos': 'Daryl',
+    '05 Cuentas por Pagar': 'Eunice',
+    '06 Pagos': 'Eunice',
+    '07 Repositorio CFDI': 'Cristian'
+  };
+  const responsablesPorModulo = {
+    '05.2.1': 'Julio Cesar'
+  };
 
   modulos.forEach(modulo => {
+    if (responsablesPorModulo[modulo.id] || responsablesTesoreria[modulo.sistema]) {
+      modulo.desarrollador_asignado = responsablesPorModulo[modulo.id] || responsablesTesoreria[modulo.sistema];
+    }
     const estadoAnterior = modulo.estado;
-    const diferido = modulo.sistema === '05 Materiales' || /fase 2|stand by|fuera del alcance/i.test(estadoAnterior);
+    const diferido = modulo.sistema === '08 Materiales' || /fase 2|segunda etapa|stand by|fuera del alcance/i.test(estadoAnterior);
     const parcial = /parcial|catálogo disponible|catalogo disponible|disponible parcialmente|requiere validación|requiere validacion/i.test(estadoAnterior);
     const pendienteValidacion = /pendiente de revisi[oó]n y validaci[oó]n funcional/i.test(estadoAnterior);
     const enDesarrollo = /^en desarrollo/i.test(estadoAnterior);
+    const reinicioIngresos = modulo.sistema === '04 Ingresos';
 
-    if (diferido) modulo.estado = 'Segunda etapa';
+    if (reinicioIngresos) modulo.estado = 'Pendiente de desarrollo';
+    else if (diferido) modulo.estado = 'Segunda etapa';
     else if (pendienteValidacion) modulo.estado = 'Pendiente de desarrollo';
     else if (enDesarrollo) modulo.estado = 'En desarrollo';
     else if (!modulo.rutas.length) modulo.estado = 'Pendiente de desarrollo';
     else if (parcial) modulo.estado = 'En desarrollo';
     else modulo.estado = 'Desarrollado';
 
-    modulo.detalle_estado = estadoAnterior === modulo.estado ? '' : estadoAnterior;
+    modulo.detalle_estado = reinicioIngresos
+      ? 'Existe desarrollo incipiente como antecedente, pero el módulo se desarrollará nuevamente desde cero.'
+      : (estadoAnterior === modulo.estado ? '' : estadoAnterior);
 
-    if (modulo.fases) {
+    if (modulo.fases && !reinicioIngresos) {
       modulo.evaluacion = {
         persistencia_logica: Math.round((modulo.fases.f2 + modulo.fases.f3) / 2),
         backend: modulo.fases.f4,
