@@ -10,3 +10,12 @@ desktop.ini
 *~
 .vscode/
 .idea/
+
+# Dependencies & Build
+node_modules/
+
+# Data and outputs
+outputs/
+*.xlsx
+*.xls
+backup_content.txt

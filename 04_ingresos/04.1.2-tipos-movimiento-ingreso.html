@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.1.2 Tipos de Movimiento de Ingreso — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-doc  { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-prop { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .tag-status { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.put    { background: #fff3e0; color: #e65100; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>04 · Ingresos</span> ›
+    <span>04.1 · Catálogos</span> ›
+    <span>04.1.2 Tipos de movimiento de ingreso</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.1.2</div>
+      <h1 class="elem-title">Tipos de movimiento de ingreso</h1>
+      <p class="elem-desc">Catálogo de control transaccional que parametriza qué acción operativa se ejecuta sobre un ingreso (registro esperado, devengo, recaudación, ajuste, reverso o cancelación) y su impacto en momentos contables CONAC.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Análisis funcional inicial (DOC-08)</span>
+        <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Eunice</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT DE DISTINCIÓN CONCEPTUAL -->
+  <div class="callout-box">
+    <div class="callout-title">📌 Distinción Crucial: Tipo de Movimiento vs. Concepto de Ingreso</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      • <strong>Concepto de Ingreso (04.1.1):</strong> Responde al <em>origen económico</em> del dinero (ej. <em>"Ministración estatal"</em>, <em>"Renta de inmuebles"</em>, <em>"Reintegro de viáticos"</em>).
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      • <strong>Tipo de Movimiento (04.1.2):</strong> Responde al <em>acto transaccional u operación financiera</em> que se ejecuta sobre dicho concepto (ej. <em>"Devengado"</em>, <em>"Recaudado"</em>, <em>"Cancelación"</em>, <em>"Reverso"</em>).
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      <em>Nota Histórica:</em> En versiones anteriores existió un documento borrador titulado <code>04.1.2-cuentas-recaudadoras.html</code>; el análisis funcional canónico determinó que las cuentas bancarias se reutilizan de <code>01.4.2</code> para evitar duplicidad, asignando formalmente el identificador <code>04.1.2</code> a los <strong>Tipos de movimiento de ingreso</strong>.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El catálogo <strong>04.1.2 Tipos de movimiento de ingreso</strong> es el motor de estados y reglas de transición del subsistema de ingresos. Rige el ciclo de vida de los derechos financieros del Poder Judicial, estableciendo qué operaciones son válidas en cada momento, qué secuencias deben respetarse y si la transacción detona pólizas contables automáticas o afecta el saldo pendiente por recaudar.</p>
+    <p>Este catálogo impide inconsistencias operativas graves, tales como registrar una recaudación sin derecho devengado previo (a menos que se trate expresamente de una operación simultánea), recaudar importes superiores al saldo pendiente, o cancelar movimientos ya contabilizados mediante borrado directo.</p>
+  </div>
+
+  <!-- 2. OBJETIVO Y ALCANCE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Objetivo y Alcance</div>
+    <p><strong>Objetivo:</strong> Normar y automatizar los efectos funcionales, presupuestarios y contables de cada operación sobre los ingresos institucionales, asegurando el estricto apego a los momentos contables establecidos por la Ley General de Contabilidad Gubernamental.</p>
+
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th style="width:50%;">Dentro del Alcance</th>
+          <th style="width:50%;">Fuera del Alcance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5;">
+              <li>Catálogo parametrizable de 10 tipos de movimientos de ingreso.</li>
+              <li>Definición de momentos contables asociados: Devengado (8.1.4) y Recaudado (8.1.5).</li>
+              <li>Reglas de validación de secuencia previa permitida.</li>
+              <li>Afectación matemática del saldo pendiente de cobro.</li>
+              <li>Trazabilidad inmutable: las cancelaciones se registran como contramovimientos.</li>
+              <li>Banderas de requerimiento de autorización jerárquica.</li>
+            </ul>
+          </td>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5; color:#991b1b;">
+              <li>Reapertura de periodos cerrados (reside exclusivamente en <code>04.3.2</code>).</li>
+              <li>Carga de comprobantes escaneados o contratos en PDF.</li>
+              <li>Firmas electrónicas avanzadas o sellos digitales.</li>
+              <li>Lógica contable libre capturada por el usuario.</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. ORIGEN DE LOS REQUERIMIENTOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Origen y Sustento de los Requerimientos</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th style="width:25%;">Clasificación</th>
+          <th style="width:35%;">Requerimiento Específico</th>
+          <th style="width:40%;">Sustento y Evidencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Diferenciación estricta de momentos: Devengado (8.1.4) y Recaudado (8.1.5).</td>
+          <td>LGCG Art. 38, 42 y CONAC: los ingresos deben reconocerse en el momento del derecho de cobro y en la percepción física de los fondos. La cuenta 8.1.5 jamás debe usarse como devengo.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Reconocimiento simultáneo en operaciones al contado o en ventanilla.</td>
+          <td>Manual de Contabilidad Gubernamental: cuando el devengo y la recaudación ocurren al mismo tiempo, debe detonarse la matriz simultánea de ingresos.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-pjev">Evidencia Manual PJEV</span></td>
+          <td>Flujo de recepción de oficios, depósitos y cobro de derechos en juzgados.</td>
+          <td>Manual de Procedimientos de Recursos Financieros PJEV: define la expectativa de radicación de ministraciones y el posterior cobro mediante SPEI o cheque de SEFIPLAN.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-doc">Evidencia Doc. Fuente</span></td>
+          <td>Cédulas de ajustes bancarios, cancelaciones y reversos de pagos no cobrados.</td>
+          <td>Cédulas de trabajo de fin de mes donde se asientan reversos por cheques caducos o transferencias rebotadas por cuenta CLABE errónea.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-prop">Propuesta de Diseño</span></td>
+          <td>Matriz transaccional de 10 tipos de movimientos con validación secuencial.</td>
+          <td>Arquitectura SIAF-PJEV: elimina operaciones arbitrarias garantizando que el sistema valide si existe saldo o movimiento previo antes de permitir la transacción.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. CATÁLOGO DE LOS 10 TIPOS DE MOVIMIENTO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Catálogo de Referencia (10 Tipos de Movimiento)</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th style="width:10%;">Clave</th>
+          <th style="width:22%;">Tipo de Movimiento</th>
+          <th style="width:14%;">Naturaleza</th>
+          <th style="width:16%;">Momento CONAC</th>
+          <th style="width:12%;">Póliza</th>
+          <th style="width:26%;">Efecto Funcional y Presupuestario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>REG_ESP</code></td>
+          <td><strong>Registro esperado</strong></td>
+          <td>Sin efecto $</td>
+          <td>Expectativa (N/A)</td>
+          <td>No</td>
+          <td>Registra oficio o notificación de cobro futuro. Habilita seguimiento.</td>
+        </tr>
+        <tr>
+          <td><code>DEV</code></td>
+          <td><strong>Devengado</strong></td>
+          <td>Incremento</td>
+          <td>Devengado (8.1.4)</td>
+          <td>Sí</td>
+          <td>Nace el derecho formal de cobro. Afecta cuentas por cobrar (1.1.2.2).</td>
+        </tr>
+        <tr>
+          <td><code>REC</code></td>
+          <td><strong>Recaudado</strong></td>
+          <td>Incremento</td>
+          <td>Recaudado (8.1.5)</td>
+          <td>Sí</td>
+          <td>Abono bancario en firme. Reduce cuentas por cobrar y saldo pendiente.</td>
+        </tr>
+        <tr>
+          <td><code>REC_SIM</code></td>
+          <td><strong>Devengado y recaudado simultáneo</strong></td>
+          <td>Incremento</td>
+          <td>Simultáneo (8.1.4/5)</td>
+          <td>Sí</td>
+          <td>Aplica para ingresos directos de caja o banco en una sola operación.</td>
+        </tr>
+        <tr>
+          <td><code>APL_DEP</code></td>
+          <td><strong>Aplicación de depósito</strong></td>
+          <td>Sin efecto $</td>
+          <td>Operativo</td>
+          <td>No</td>
+          <td>Vincula un depósito bancario a un ingreso esperado o distribución.</td>
+        </tr>
+        <tr>
+          <td><code>AJU</code></td>
+          <td><strong>Ajuste</strong></td>
+          <td>Mixto (+ / -)</td>
+          <td>Regularización</td>
+          <td>Sí / Opc.</td>
+          <td>Corrige diferencias monetarias menores justificadas (requiere catálogo 04.1.3).</td>
+        </tr>
+        <tr>
+          <td><code>CAN</code></td>
+          <td><strong>Cancelación</strong></td>
+          <td>Disminución</td>
+          <td>Contra-asiento</td>
+          <td>Sí</td>
+          <td>Anula un ingreso o depósito sin borrar el historial; exige motivo 04.1.3.</td>
+        </tr>
+        <tr>
+          <td><code>REV</code></td>
+          <td><strong>Reverso</strong></td>
+          <td>Disminución</td>
+          <td>Contramovimiento</td>
+          <td>Sí</td>
+          <td>Cancela un cobro por cheque rebotado o transferencia devuelta.</td>
+        </tr>
+        <tr>
+          <td><code>RECLAS</code></td>
+          <td><strong>Reclasificación</strong></td>
+          <td>Sin efecto neto</td>
+          <td>Reclasificación</td>
+          <td>Sí</td>
+          <td>Cambia CRI, Fuente o Capítulo con balance neto $0.00.</td>
+        </tr>
+        <tr>
+          <td><code>REGUL</code></td>
+          <td><strong>Regularización</strong></td>
+          <td>Mixto (+ / -)</td>
+          <td>Cierre / Ajuste</td>
+          <td>Sí</td>
+          <td>Asiento compensatorio de conciliación o cierre anual.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. DICCIONARIO DE CAMPOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Diccionario de Campos del Tipo de Movimiento</div>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>tipo_movimiento_id</code></td><td>BigInt (PK)</td><td>Sí</td><td>Identificador único del movimiento.</td></tr>
+        <tr><td><code>clave</code></td><td>Varchar(15)</td><td>Sí</td><td>Código nemotécnico (ej. <code>DEV</code>, <code>REC</code>, <code>CAN</code>). Único.</td></tr>
+        <tr><td><code>nombre</code></td><td>Varchar(60)</td><td>Sí</td><td>Nombre formal del tipo de movimiento.</td></tr>
+        <tr><td><code>descripcion</code></td><td>Text</td><td>Sí</td><td>Explicación de la operativa y alcance contable.</td></tr>
+        <tr><td><code>naturaleza</code></td><td>Enum</td><td>Sí</td><td><code>INCREMENTO</code>, <code>DISMINUCION</code> o <code>SIN_EFECTO_MONETARIO</code>.</td></tr>
+        <tr><td><code>momento_contable_asociado</code></td><td>Enum</td><td>Sí</td><td><code>ESTIMADO</code>, <code>DEVENGADO</code>, <code>RECAUDADO</code>, <code>SIMULTANEO</code> o <code>NO_APLICA</code>.</td></tr>
+        <tr><td><code>genera_poliza</code></td><td>Boolean</td><td>Sí</td><td>Indica si detona asiento en el libro diario de contabilidad (03.2.1).</td></tr>
+        <tr><td><code>matriz_aplicable_id</code></td><td>BigInt (FK)</td><td>No</td><td>Referencia a la matriz de conversión en <code>03.1.2</code>.</td></tr>
+        <tr><td><code>requiere_movimiento_previo</code></td><td>Boolean</td><td>Sí</td><td><code>true</code> si exige la existencia previa de otro movimiento.</td></tr>
+        <tr><td><code>tipo_movimiento_previo_permitido</code></td><td>Varchar(50)</td><td>No</td><td>Claves admitidas como antecedente (ej. <code>DEV</code> para un <code>REC</code>).</td></tr>
+        <tr><td><code>permite_aplicacion_parcial</code></td><td>Boolean</td><td>Sí</td><td><code>true</code> si el importe puede ser menor al total del registro padre.</td></tr>
+        <tr><td><code>requiere_autorizacion</code></td><td>Boolean</td><td>Sí</td><td><code>true</code> para movimientos críticos (Cancelaciones, Ajustes mayores).</td></tr>
+        <tr><td><code>permite_periodo_cerrado</code></td><td>Boolean</td><td>Sí</td><td>Estrictamente <code>false</code> para operaciones ordinarias.</td></tr>
+        <tr><td><code>afecta_saldo_pendiente</code></td><td>Boolean</td><td>Sí</td><td><code>true</code> si disminuye o incrementa el saldo por cobrar.</td></tr>
+        <tr><td><code>estado_resultante</code></td><td>Varchar(30)</td><td>Sí</td><td>Estatus en el que queda el ingreso padre tras la operación.</td></tr>
+        <tr><td><code>orden_flujo</code></td><td>SmallInt</td><td>Sí</td><td>Secuencia numérica para ordenar el ciclo de vida.</td></tr>
+        <tr><td><code>vigencia_inicio</code> / <code>vigencia_fin</code></td><td>Date</td><td>Sí/No</td><td>Periodo de vigencia legal y operativa.</td></tr>
+        <tr><td><code>estatus</code></td><td>SmallInt</td><td>Sí</td><td><code>1</code> = Activo, <code>0</code> = Inactivo.</td></tr>
+        <tr><td><code>observaciones</code></td><td>Text</td><td>No</td><td>Reglas técnicas y notas para desarrolladores.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. STORED PROCEDURES (LEER Y ABC) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Gobernanza transaccional en PostgreSQL (esquema <code>ingresos</code>) bajo convención <code>SECURITY DEFINER</code> y respuesta JSONB <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>.
+    </p>
+
+    <!-- 6.1 LEER -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.1. Procedimiento LEER (<code>ingresos.fn_leer_tipo_movimiento</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario activo de sesión.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal en curso.</td></tr>
+        <tr><td><code>p_buscar</code></td><td><code>VARCHAR(100)</code></td><td>Texto libre por clave o nombre (opcional).</td></tr>
+        <tr><td><code>p_tipo_movimiento_id</code></td><td><code>BIGINT</code></td><td>ID específico para detalle modal (NULL para listado completo).</td></tr>
+        <tr><td><code>p_estatus</code></td><td><code>SMALLINT</code></td><td>1 = Activos, 0 = Inactivos, NULL = Todos.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_tipo_movimiento(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_buscar VARCHAR DEFAULT NULL,
+    p_tipo_movimiento_id BIGINT DEFAULT NULL,
+    p_estatus SMALLINT DEFAULT 1
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'tipo_movimiento_id', tm.tipo_movimiento_id,
+            'clave', tm.clave,
+            'nombre', tm.nombre,
+            'descripcion', tm.descripcion,
+            'naturaleza', tm.naturaleza,
+            'momento_contable_asociado', tm.momento_contable_asociado,
+            'genera_poliza', tm.genera_poliza,
+            'matriz_aplicable_id', tm.matriz_aplicable_id,
+            'requiere_movimiento_previo', tm.requiere_movimiento_previo,
+            'tipo_movimiento_previo_permitido', tm.tipo_movimiento_previo_permitido,
+            'permite_aplicacion_parcial', tm.permite_aplicacion_parcial,
+            'requiere_autorizacion', tm.requiere_autorizacion,
+            'permite_periodo_cerrado', tm.permite_periodo_cerrado,
+            'afecta_saldo_pendiente', tm.afecta_saldo_pendiente,
+            'estado_resultante', tm.estado_resultante,
+            'orden_flujo', tm.orden_flujo,
+            'vigencia_inicio', tm.vigencia_inicio,
+            'vigencia_fin', tm.vigencia_fin,
+            'estatus', tm.estatus
+        ) ORDER BY tm.orden_flujo, tm.clave
+    ) INTO v_data
+    FROM ingresos.tipo_movimiento tm
+    WHERE (p_tipo_movimiento_id IS NULL OR tm.tipo_movimiento_id = p_tipo_movimiento_id)
+      AND (p_estatus IS NULL OR tm.estatus = p_estatus)
+      AND (p_buscar IS NULL OR tm.clave ILIKE '%' || p_buscar || '%' OR tm.nombre ILIKE '%' || p_buscar || '%');
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', COALESCE(v_data, '[]'::jsonb));
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', '[]'::jsonb);
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 6.2 ABC -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">6.2. Procedimiento ABC (<code>ingresos.fn_crud_tipo_movimiento</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario que ejecuta la transacción.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal.</td></tr>
+        <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1</code> = Alta · <code>2</code> = Cambio · <code>3</code> = Baja lógica (Inactivar) · <code>4</code> = Reactivar.</td></tr>
+        <tr><td><code>p_tipo_movimiento_id</code></td><td><code>BIGINT</code></td><td>NULL en Alta; ID existente en Cambio/Baja.</td></tr>
+        <tr><td><code>p_clave</code></td><td><code>VARCHAR(15)</code></td><td>Clave nemotécnica única (ej. <code>DEV</code>, <code>REC</code>).</td></tr>
+        <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con nombre, momento contable, banderas y precedencias.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_crud_tipo_movimiento(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_accion SMALLINT,
+    p_tipo_movimiento_id BIGINT,
+    p_clave VARCHAR,
+    p_datos JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_id BIGINT;
+    v_count INT;
+BEGIN
+    -- 1 = ALTA
+    IF p_accion = 1 THEN
+        SELECT COUNT(*) INTO v_count FROM ingresos.tipo_movimiento WHERE clave = UPPER(TRIM(p_clave));
+        IF v_count > 0 THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La clave del tipo de movimiento ya existe.');
+        END IF;
+
+        INSERT INTO ingresos.tipo_movimiento (
+            clave, nombre, descripcion, naturaleza, momento_contable_asociado,
+            genera_poliza, matriz_aplicable_id, requiere_movimiento_previo,
+            tipo_movimiento_previo_permitido, permite_aplicacion_parcial,
+            requiere_autorizacion, permite_periodo_cerrado, afecta_saldo_pendiente,
+            estado_resultante, orden_flujo, vigencia_inicio, vigencia_fin, estatus,
+            usuario_c, fecha_c
+        ) VALUES (
+            UPPER(TRIM(p_clave)),
+            p_datos->>'nombre',
+            p_datos->>'descripcion',
+            p_datos->>'naturaleza',
+            p_datos->>'momento_contable_asociado',
+            COALESCE((p_datos->>'genera_poliza')::BOOLEAN, false),
+            (p_datos->>'matriz_aplicable_id')::BIGINT,
+            COALESCE((p_datos->>'requiere_movimiento_previo')::BOOLEAN, false),
+            p_datos->>'tipo_movimiento_previo_permitido',
+            COALESCE((p_datos->>'permite_aplicacion_parcial')::BOOLEAN, false),
+            COALESCE((p_datos->>'requiere_autorizacion')::BOOLEAN, false),
+            false, -- estrictamente prohibido en periodos cerrados
+            COALESCE((p_datos->>'afecta_saldo_pendiente')::BOOLEAN, false),
+            p_datos->>'estado_resultante',
+            COALESCE((p_datos->>'orden_flujo')::SMALLINT, 99),
+            COALESCE((p_datos->>'vigencia_inicio')::DATE, CURRENT_DATE),
+            (p_datos->>'vigencia_fin')::DATE,
+            1, p_usuario, CURRENT_TIMESTAMP
+        ) RETURNING tipo_movimiento_id INTO v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tipo de movimiento registrado exitosamente.', 'data', jsonb_build_object('tipo_movimiento_id', v_id));
+
+    -- 2 = CAMBIO
+    ELSIF p_accion = 2 THEN
+        UPDATE ingresos.tipo_movimiento SET
+            nombre = COALESCE(p_datos->>'nombre', nombre),
+            descripcion = COALESCE(p_datos->>'descripcion', descripcion),
+            naturaleza = COALESCE(p_datos->>'naturaleza', naturaleza),
+            momento_contable_asociado = COALESCE(p_datos->>'momento_contable_asociado', momento_contable_asociado),
+            genera_poliza = COALESCE((p_datos->>'genera_poliza')::BOOLEAN, genera_poliza),
+            matriz_aplicable_id = (p_datos->>'matriz_aplicable_id')::BIGINT,
+            requiere_movimiento_previo = COALESCE((p_datos->>'requiere_movimiento_previo')::BOOLEAN, requiere_movimiento_previo),
+            tipo_movimiento_previo_permitido = p_datos->>'tipo_movimiento_previo_permitido',
+            permite_aplicacion_parcial = COALESCE((p_datos->>'permite_aplicacion_parcial')::BOOLEAN, permite_aplicacion_parcial),
+            requiere_autorizacion = COALESCE((p_datos->>'requiere_autorizacion')::BOOLEAN, requiere_autorizacion),
+            afecta_saldo_pendiente = COALESCE((p_datos->>'afecta_saldo_pendiente')::BOOLEAN, afecta_saldo_pendiente),
+            estado_resultante = COALESCE(p_datos->>'estado_resultante', estado_resultante),
+            orden_flujo = COALESCE((p_datos->>'orden_flujo')::SMALLINT, orden_flujo),
+            fecha_fin_vigencia = (p_datos->>'fecha_fin_vigencia')::DATE,
+            usuario_m = p_usuario, fecha_m = CURRENT_TIMESTAMP
+        WHERE tipo_movimiento_id = p_tipo_movimiento_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tipo de movimiento actualizado.', 'data', jsonb_build_object('tipo_movimiento_id', p_tipo_movimiento_id));
+
+    -- 3 = BAJA LÓGICA (INACTIVAR)
+    ELSIF p_accion = 3 THEN
+        UPDATE ingresos.tipo_movimiento SET estatus = 0, usuario_m = p_usuario, fecha_m = CURRENT_TIMESTAMP
+        WHERE tipo_movimiento_id = p_tipo_movimiento_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tipo de movimiento inactivado.', 'data', jsonb_build_object('tipo_movimiento_id', p_tipo_movimiento_id));
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no permitida.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 7. SERVICIOS API REST (SWAGGER / OPENAPI) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/tipos-movimiento</code></td>
+          <td>Query: <code>{ buscar?, estatus? }</code></td>
+          <td>Listado ordenado por flujo para combos y validaciones de interfaz.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/tipos-movimiento/:id</code></td>
+          <td>Param: <code>id (BigInt)</code></td>
+          <td>Detalle completo de precedencias y reglas del tipo de movimiento.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/tipos-movimiento</code></td>
+          <td>Body: <code>CreateTipoMovimientoDto</code></td>
+          <td>Registra nuevo tipo de movimiento validando clave única.</td>
+        </tr>
+        <tr>
+          <td><code class="method put">PUT</code></td>
+          <td><code>/api/v1/ingresos/tipos-movimiento/:id</code></td>
+          <td>Body: <code>UpdateTipoMovimientoDto</code></td>
+          <td>Modifica reglas de encadenamiento y momentos contables asociados.</td>
+        </tr>
+        <tr>
+          <td><code class="method patch">PATCH</code></td>
+          <td><code>/api/v1/ingresos/tipos-movimiento/:id/estatus</code></td>
+          <td>Body: <code>{ estatus: 0 | 1 }</code></td>
+          <td>Baja lógica o reactivación del tipo de movimiento.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>// NestJS Controller: TiposMovimientoController
+@ApiTags('04.1.2 Tipos de Movimiento de Ingreso')
+@Controller('api/v1/ingresos/tipos-movimiento')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class TiposMovimientoController {
+  constructor(private readonly tiposMovService: TiposMovimientoService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Listar tipos de movimiento de ingreso' })
+  @ApiResponse({ status: 200, description: 'Listado recuperado exitosamente.' })
+  async listar(@CurrentUser() user: UserSession, @Query() query: FiltrosTipoMovDto) {
+    return this.tiposMovService.leer(user, query);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Crear nuevo tipo de movimiento' })
+  async crear(@CurrentUser() user: UserSession, @Body() dto: CreateTipoMovimientoDto) {
+    return this.tiposMovService.crear(user, dto);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Actualizar tipo de movimiento' })
+  async actualizar(@Param('id') id: string, @CurrentUser() user: UserSession, @Body() dto: UpdateTipoMovimientoDto) {
+    return this.tiposMovService.actualizar(user, BigInt(id), dto);
+  }
+
+  @Patch(':id/estatus')
+  @ApiOperation({ summary: 'Inactivar o reactivar tipo de movimiento' })
+  async cambiarEstatus(@Param('id') id: string, @CurrentUser() user: UserSession, @Body() dto: EstatusDto) {
+    return this.tiposMovService.cambiarEstatus(user, BigInt(id), dto.estatus);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. FLUJOS DE REFERENCIA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Flujos Operativos de Referencia</div>
+    
+    <div style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:6px; padding:16px; margin-bottom:16px;">
+      <h4 style="margin:0 0 8px; color:var(--pjev-verde-oscuro); font-size:12px;">Flujo A · Ingreso Notificado / Esperado (Ministraciones SEFIPLAN)</h4>
+      <p style="font-family:var(--font-mono); font-size:12px; line-height:1.7; margin:0; color:#1e293b;">
+        <strong>[REG_ESP]</strong> Ingreso Esperado (Oficio)<br>
+        &nbsp;&nbsp;↓<br>
+        <strong>[DEV]</strong> Devengado (Póliza 8.1.4 y Cuentas por Cobrar 1.1.2.2)<br>
+        &nbsp;&nbsp;↓<br>
+        <strong>[REC]</strong> Recaudado Parcial o Total (Depósito Bancario SPEI en 1.1.1.2 y 8.1.5)<br>
+        &nbsp;&nbsp;↓<br>
+        <strong>[APL_DEP]</strong> Aplicado a Techos Presupuestales (Capítulos 1000 a 5000)<br>
+        &nbsp;&nbsp;↓<br>
+        <strong>[CONC]</strong> Conciliado en 04.3.1
+      </p>
+    </div>
+
+    <div style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:6px; padding:16px;">
+      <h4 style="margin:0 0 8px; color:var(--pjev-verde-oscuro); font-size:12px;">Flujo B · Ingreso Recibido Directamente (Rendimientos / Caja Central)</h4>
+      <p style="font-family:var(--font-mono); font-size:12px; line-height:1.7; margin:0; color:#1e293b;">
+        Depósito Bancario Recibido en Cuenta Institucional (*4012)<br>
+        &nbsp;&nbsp;↓<br>
+        <strong>[REC_SIM]</strong> Devengado y Recaudado Simultáneo (Matriz 8.1.4 y 8.1.5 en el mismo acto)<br>
+        &nbsp;&nbsp;↓<br>
+        <strong>[APL_DEP]</strong> Aplicado a Cuenta y Fondo de Ingresos Propios (113)<br>
+        &nbsp;&nbsp;↓<br>
+        <strong>[CONC]</strong> Conciliado en 04.3.1
+      </p>
+    </div>
+  </div>
+
+  <!-- 9. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Reglas de Negocio del Tipo de Movimiento</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-MOV-01 · Validación de Secuencia Previa</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Un movimiento de tipo <code>REC</code> (Recaudado) no puede registrarse si el ingreso no se encuentra previamente en estado <code>DEV</code> (Devengado), a menos que se opere mediante <code>REC_SIM</code>.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-MOV-02 · Límite de Recaudación vs. Saldo Pendiente</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          La suma de movimientos de recaudación (<code>REC</code>) no puede exceder el importe total del ingreso devengado. Cualquier excedente requiere un movimiento de ampliación o ajuste autorizado.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-MOV-03 · Prohibición de Borrado Físico (Inmutabilidad)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Ningún movimiento contabilizado puede borrarse ni editarse. Las correcciones deben realizarse mediante un movimiento compensatorio (<code>CAN</code>, <code>REV</code> o <code>AJU</code>), exigiendo obligatoriamente un motivo tipificado del catálogo <code>04.1.3</code>.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-MOV-04 · Autorización Obligatoria para Movimientos Críticos</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Los movimientos de cancelación o ajuste mayor requieren que el usuario cuente con rol de Jefatura de Ingresos o Dirección de Administración.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 10. PROPUESTA VISUAL (WIREFRAMES) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Propuesta Visual de Interfaz (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">1. Catálogo de Tipos de Movimiento</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">2. Modal de Configuración y Precedencias</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Diagrama de Transición de Momentos</button>
+    </div>
+
+    <!-- WF1: GRID -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">04.1.2 Catálogo de Tipos de Movimiento · Control de Ciclo de Vida</span>
+          <span style="font-size:10px; color:#666;">Momentos Contables CONAC y Efecto $</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="360" fill="#f8fafc" rx="4"/>
+            <rect x="15" y="15" width="930" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="30" y="42" font-size="13" font-weight="bold" fill="#183125">Tipos de Movimiento de Ingreso (10 Tipos Registrados)</text>
+            <rect x="800" y="23" width="130" height="28" fill="#183125" rx="3"/>
+            <text x="865" y="41" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nuevo Tipo</text>
+
+            <rect x="15" y="70" width="930" height="26" fill="#183125"/>
+            <text x="25" y="87" font-size="9" font-weight="bold" fill="#ffffff">ORDEN</text>
+            <text x="80" y="87" font-size="9" font-weight="bold" fill="#ffffff">CLAVE</text>
+            <text x="160" y="87" font-size="9" font-weight="bold" fill="#ffffff">NOMBRE</text>
+            <text x="350" y="87" font-size="9" font-weight="bold" fill="#ffffff">NATURALEZA</text>
+            <text x="480" y="87" font-size="9" font-weight="bold" fill="#ffffff">MOMENTO CONAC</text>
+            <text x="630" y="87" font-size="9" font-weight="bold" fill="#ffffff">PÓLIZA</text>
+            <text x="710" y="87" font-size="9" font-weight="bold" fill="#ffffff">PREVIO EXIGIDO</text>
+            <text x="870" y="87" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ESTATUS</text>
+
+            <!-- Row 1 DEV -->
+            <rect x="15" y="98" width="930" height="32" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="118" font-size="10" fill="#64748b">1</text>
+            <text x="80" y="118" font-size="10" font-weight="bold" fill="#0284c7">DEV</text>
+            <text x="160" y="118" font-size="10" font-weight="bold" fill="#1e293b">Devengado</text>
+            <text x="350" y="118" font-size="10" fill="#15803d">+ Incremento</text>
+            <text x="480" y="118" font-size="10" fill="#334155">Devengado (8.1.4)</text>
+            <text x="630" y="118" font-size="10" fill="#15803d">Sí (Diario)</text>
+            <text x="710" y="118" font-size="10" fill="#64748b">REG_ESP / Ninguno</text>
+            <rect x="845" y="105" width="50" height="18" fill="#dcfce7" rx="9"/>
+            <text x="870" y="118" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+
+            <!-- Row 2 REC -->
+            <rect x="15" y="132" width="930" height="32" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="35" y="152" font-size="10" fill="#64748b">2</text>
+            <text x="80" y="152" font-size="10" font-weight="bold" fill="#0284c7">REC</text>
+            <text x="160" y="152" font-size="10" font-weight="bold" fill="#1e293b">Recaudado</text>
+            <text x="350" y="152" font-size="10" fill="#15803d">+ Incremento</text>
+            <text x="480" y="152" font-size="10" fill="#334155">Recaudado (8.1.5)</text>
+            <text x="630" y="152" font-size="10" fill="#15803d">Sí (Caja/Banco)</text>
+            <text x="710" y="152" font-size="10" font-weight="bold" fill="#92400e">Exige DEV</text>
+            <rect x="845" y="139" width="50" height="18" fill="#dcfce7" rx="9"/>
+            <text x="870" y="152" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+
+            <!-- Row 3 CAN -->
+            <rect x="15" y="166" width="930" height="32" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="186" font-size="10" fill="#64748b">7</text>
+            <text x="80" y="186" font-size="10" font-weight="bold" fill="#991b1b">CAN</text>
+            <text x="160" y="186" font-size="10" font-weight="bold" fill="#1e293b">Cancelación</text>
+            <text x="350" y="186" font-size="10" fill="#b91c1c">- Disminución</text>
+            <text x="480" y="186" font-size="10" fill="#64748b">Contra-asiento</text>
+            <text x="630" y="186" font-size="10" fill="#15803d">Sí (Reverso)</text>
+            <text x="710" y="186" font-size="10" font-weight="bold" fill="#991b1b">Exige Motivo 04.1.3</text>
+            <rect x="845" y="173" width="50" height="18" fill="#dcfce7" rx="9"/>
+            <text x="870" y="186" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+
+            <text x="25" y="320" font-size="9" fill="#64748b">Garantiza inmutabilidad y orden estricto de momentos contables conforme a CONAC.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: MODAL PRECEDENCIAS -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Modal de Configuración de Precedencias y Permisos</span>
+          <span style="font-size:10px; color:#666;">Alta / Edición de Tipo de Movimiento</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="360" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <rect x="0" y="0" width="960" height="45" fill="#183125"/>
+            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Configurar Reglas del Tipo de Movimiento: REC (Recaudado)</text>
+            <text x="935" y="28" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+
+            <text x="30" y="75" font-size="10" font-weight="bold" fill="#183125">CLAVE:</text>
+            <rect x="30" y="82" width="120" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="40" y="98" font-size="10" fill="#1e293b">REC</text>
+
+            <text x="170" y="75" font-size="10" font-weight="bold" fill="#183125">NOMBRE:</text>
+            <rect x="170" y="82" width="300" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="180" y="98" font-size="10" fill="#1e293b">Recaudado (Abono Bancario Efectivo)</text>
+
+            <text x="490" y="75" font-size="10" font-weight="bold" fill="#183125">MOMENTO CONAC:</text>
+            <rect x="490" y="82" width="220" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="500" y="98" font-size="10" fill="#1e293b">8.1.5 Ley Recaudada ▼</text>
+
+            <rect x="30" y="125" width="900" height="150" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="45" y="148" font-size="11" font-weight="bold" fill="#0369a1">CONDICIONES DE ENCADENAMIENTO Y RESTRICCIONES:</text>
+            
+            <text x="45" y="175" font-size="10" fill="#1e293b">[✓] Requiere movimiento previo obligatorio (Precedencia)</text>
+            <text x="65" y="195" font-size="9" fill="#64748b">→ Movimiento antecedente permitido: [DEV] Devengado</text>
+
+            <text x="45" y="225" font-size="10" fill="#1e293b">[✓] Permite cobro en parcialidades (1 ingreso : N depósitos)</text>
+            <text x="45" y="250" font-size="10" fill="#1e293b">[✓] Afecta y disminuye saldo pendiente de cobro</text>
+
+            <text x="500" y="175" font-size="10" fill="#1e293b">[✓] Genera póliza de ingresos en bancos (1.1.1.2)</text>
+            <text x="500" y="200" font-size="10" fill="#64748b">[  ] Requiere autorización jerárquica extraordinaria</text>
+            <text x="500" y="225" font-size="10" fill="#991b1b">[  ] Permite ejecución en periodo contable cerrado (PROHIBIDO)</text>
+
+            <rect x="790" y="300" width="140" height="32" fill="#183125" rx="4"/>
+            <text x="860" y="320" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar Cambios</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: TRANSICIÓN -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Diagrama de Transición de Momentos Contables y Ciclo de Vida</span>
+          <span style="font-size:10px; color:#666;">Cuentas 8.1.4 y 8.1.5</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 320" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="320" fill="#f8fafc" rx="4"/>
+            
+            <!-- Box 1 -->
+            <rect x="40" y="60" width="180" height="90" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="130" y="85" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">1. EXPECTATIVA</text>
+            <text x="130" y="105" font-size="10" fill="#1e293b" text-anchor="middle">[REG_ESP]</text>
+            <text x="130" y="125" font-size="9" fill="#64748b" text-anchor="middle">Sin afectación $</text>
+
+            <line x1="220" y1="105" x2="270" y2="105" stroke="#0284c7" stroke-width="2"/>
+
+            <!-- Box 2 -->
+            <rect x="270" y="60" width="190" height="90" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="365" y="85" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">2. DERECHO EXIGIBLE</text>
+            <text x="365" y="105" font-size="10" font-weight="bold" fill="#15803d" text-anchor="middle">[DEV] Devengado</text>
+            <text x="365" y="125" font-size="9" fill="#15803d" text-anchor="middle">Abona: 8.1.4 Devengada</text>
+
+            <line x1="460" y1="105" x2="510" y2="105" stroke="#0284c7" stroke-width="2"/>
+
+            <!-- Box 3 -->
+            <rect x="510" y="60" width="200" height="90" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="610" y="85" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">3. COBRO EFECTIVO</text>
+            <text x="610" y="105" font-size="10" font-weight="bold" fill="#15803d" text-anchor="middle">[REC] Recaudado</text>
+            <text x="610" y="125" font-size="9" fill="#15803d" text-anchor="middle">Abona: 8.1.5 Recaudada</text>
+
+            <line x1="710" y1="105" x2="760" y2="105" stroke="#0284c7" stroke-width="2"/>
+
+            <!-- Box 4 -->
+            <rect x="760" y="60" width="160" height="90" fill="#ecfdf5" stroke="#a7f3d0" rx="5"/>
+            <text x="840" y="85" font-size="11" font-weight="bold" fill="#065f46" text-anchor="middle">4. CONCILIACIÓN</text>
+            <text x="840" y="105" font-size="10" font-weight="bold" fill="#065f46" text-anchor="middle">[CONC] Conciliado</text>
+            <text x="840" y="125" font-size="9" fill="#065f46" text-anchor="middle">Saldo = $0.00</text>
+
+            <!-- Bottom Cancel Box -->
+            <rect x="380" y="200" width="240" height="70" fill="#fee2e2" stroke="#fca5a5" rx="5"/>
+            <text x="500" y="225" font-size="11" font-weight="bold" fill="#991b1b" text-anchor="middle">CONTRAMOVIMIENTO [CAN / REV]</text>
+            <text x="500" y="245" font-size="9" fill="#7f1d1d" text-anchor="middle">Reverso contable inmutable con motivo tipificado (04.1.3)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 11. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Casos de Prueba</div>
+    <table class="props-table">
+      <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Condición de Entrada</th><th>Resultado Esperado</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-MOV-01</strong></td>
+          <td>Secuencia válida Devengado → Recaudado.</td>
+          <td>Ingreso con estatus <code>DEV</code> activo. Se registra depósito bancario por el importe total.</td>
+          <td>Póliza 8.1.5 generada, estado pasa a <code>REC</code> y saldo pendiente es $0.00.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-MOV-02</strong></td>
+          <td>Bloqueo de Recaudado sin Devengo previo.</td>
+          <td>Intentar registrar <code>REC</code> directo sobre un ingreso en estado <code>REG_ESP</code>.</td>
+          <td>El motor bloquea la operación requiriendo devengo o modalidad simultánea.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-MOV-03</strong></td>
+          <td>Recaudación parcial válida (1:N).</td>
+          <td>Devengo por $10,000,000. Se recibe primer abono por $4,000,000.</td>
+          <td>El estado pasa a Parcial y el saldo pendiente se fija exactamente en $6,000,000.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-MOV-04</strong></td>
+          <td>Cancelación con reverso inmutable.</td>
+          <td>Ejecutar cancelación de recibo con motivo de ajuste tipificado.</td>
+          <td>Se genera póliza de contra-asiento; el registro original permanece intacto en bitácora.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 12. INTEGRACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Integración con Otros Módulos</div>
+    <ul>
+      <li><strong>04.2.1 Registro de Ingresos:</strong> Cada botón de acción transaccional ejecuta un Tipo de Movimiento parametrizado en este catálogo.</li>
+      <li><strong>04.1.3 Motivos de Ajuste:</strong> Las operaciones de tipo <code>AJU</code>, <code>CAN</code>, <code>REV</code> y <code>RECLAS</code> exigen la selección obligatoria de un motivo válido.</li>
+      <li><strong>03.2.1 Pólizas Contables:</strong> Detona las matrices automáticas en el libro diario de contabilidad gubernamental.</li>
+    </ul>
+  </div>
+
+  <!-- 13. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">13</span> Historial de Cambios</div>
+    <table class="props-table">
+      <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>v1.0.0</code></td>
+          <td>02/09/2026</td>
+          <td>Eunice / Julio César</td>
+          <td>Creación formal del Análisis Funcional Inicial (DOC-08) para 04.1.2 Tipos de movimiento de ingreso, estableciendo las reglas de secuencia, afectación de saldos y momentos CONAC 8.1.4 / 8.1.5.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+  function showWF(id, btn) {
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+    const target = document.getElementById('wf-' + id);
+    if (target) target.classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

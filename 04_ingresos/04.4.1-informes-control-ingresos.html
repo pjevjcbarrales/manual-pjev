@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.4.1 Informes y Control de Ingresos — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-doc  { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-prop { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .tag-status { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .report-card { background:#ffffff; border:1px solid var(--pjev-borde); border-radius:6px; padding:14px 18px; margin-bottom:12px; }
+    .report-card-title { font-size:13px; font-weight:bold; color:var(--pjev-verde-oscuro); display:flex; justify-content:space-between; align-items:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.put    { background: #fff3e0; color: #e65100; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>04 · Ingresos</span> ›
+    <span>04.4 · Informes</span> ›
+    <span>04.4.1 Informes y control de ingresos</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.4.1</div>
+      <h1 class="elem-title">Informes y control de ingresos</h1>
+      <p class="elem-desc">Centro analítico y concentrador de reportes operativos, presupuestarios, contables y de auditoría del sistema de Ingresos. Consolida 10 salidas de control sin dispersar la navegación en módulos redundantes.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Análisis funcional inicial (DOC-08)</span>
+        <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Eunice</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT DE DELIMITACIÓN ARQUITECTÓNICA -->
+  <div class="callout-box">
+    <div class="callout-title">📌 Principios de Concentración y No Duplicidad</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      <strong>1. Módulo Único Concentrador:</strong> En lugar de crear pantallas independientes para cada informe, <code>04.4.1</code> agrupa las 10 salidas de consulta mediante un selector interno parametrizado con filtros comunes y especializados.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      <strong>2. Consumo No Duplicativo del Estado Analítico de Ingresos:</strong> La lógica canónica y oficial de la matriz CONAC reside en Presupuesto (<code>02.3.4.6</code>). Desde este módulo se proporciona una vista especializada que consume el cálculo oficial sin duplicar motores contables en frontend.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      <strong>3. Enmascaramiento y Seguridad:</strong> Todas las cuentas bancarias institucionales se presentan enmascaradas (ej. <code>*4012</code>). No se administran oficios, archivos, sellos ni firmas en esta etapa.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>04.4.1 Informes y control de ingresos</strong> constituye la plataforma de inteligencia financiera y rendición de cuentas del Poder Judicial del Estado de Veracruz en materia de ingresos públicos. Centraliza la emisión de reportes gerenciales, cédulas analíticas y estados financieros requeridos por la Dirección General de Administración, Contabilidad, Tesorería y los órganos de fiscalización interna y externa (ORFIS).</p>
+    <p>La arquitectura del concentrador se apoya en 10 opciones de consulta agrupadas bajo una misma consola que homogeneiza los criterios de filtrado temporal, orgánico y presupuestal. Cada informe extrae los datos directamente de las transacciones operativas registradas en <code>04.2.1</code> y conciliadas en <code>04.3.1</code>, garantizando que los saldos y cifras sean inalterables y cuadren con la contabilidad gubernamental.</p>
+  </div>
+
+  <!-- 2. OBJETIVO Y ALCANCE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Objetivo y Alcance</div>
+    <p><strong>Objetivo:</strong> Proveer una visión fidedigna, oportuna y trazable de los flujos de entrada de recursos, saldos por percibir, depósitos bancarios, excepciones operativas y momentos contables devengados y recaudados en el ejercicio fiscal.</p>
+    
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th style="width:50%;">Dentro del Alcance</th>
+          <th style="width:50%;">Fuera del Alcance (Exclusiones)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5;">
+              <li>10 opciones de consulta analítica y de control interno.</li>
+              <li>Filtros dinámicos por ejercicio, periodo, CRI, fuente, capítulo, órgano y banco.</li>
+              <li>Enmascaramiento de datos sensibles de cuentas bancarias y depositantes.</li>
+              <li>Cálculo en línea de subtotales, totales generales y saldos pendientes.</li>
+              <li>Identificación y seguimiento de depósitos en custodia (no identificados).</li>
+              <li>Trazabilidad completa mediante pie de página con fecha/hora y usuario.</li>
+              <li>Documentación de salidas a pantalla, exportación a Excel, PDF e impresión.</li>
+            </ul>
+          </td>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5; color:#991b1b;">
+              <li>Carga, previsualización o almacenamiento de archivos PDF/XML adjuntos.</li>
+              <li>Gestión de oficios de correspondencia, folios documentales o expedientes digitales.</li>
+              <li>Firmas electrónicas avanzadas o sellado digital criptográfico.</li>
+              <li>Lógica de cálculo o reglas contables hardcodeadas en el frontend.</li>
+              <li>Generación de pólizas o asientos desde los informes (los informes son de solo lectura).</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. DISTINCIÓN DEL ORIGEN DE REQUERIMIENTOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Origen y Sustento de los Requerimientos</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th style="width:25%;">Clasificación</th>
+          <th style="width:35%;">Requerimiento Específico</th>
+          <th style="width:40%;">Sustento y Evidencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Estructura canónica del Estado Analítico de Ingresos (CRI).</td>
+          <td>Ley General de Contabilidad Gubernamental y Lineamientos CONAC: presentación obligatoria de los momentos Estimado, Modificado, Devengado (8.1.4), Recaudado (8.1.5) y Diferencias por Rubro.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Trazabilidad y no manipulación de cifras en reportes públicos.</td>
+          <td>Postulados Básicos de Contabilidad Gubernamental (Registro e Integración Presupuestaria): los informes no deben permitir captura manual de importes; las cifras se derivan de las transacciones operativas.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-pjev">Evidencia Manual PJEV</span></td>
+          <td>Relación de depósitos devengados y seguimiento de ministraciones.</td>
+          <td>Manual de Procedimientos de Recursos Financieros PJEV (Procedimiento de Caja y Bancos): control cruzado de fichas de depósito, fecha valor y calendario oficial de SEFIPLAN.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-doc">Evidencia Doc. Fuente</span></td>
+          <td>Cédulas de trabajo de corte de caja, reintegros y rentas de juzgados.</td>
+          <td>Expedientes físicos donde se desglosan recibos por arrendamiento de inmuebles, reintegros de viáticos y depósitos referenciados en ventanilla bancaria.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-prop">Propuesta de Diseño</span></td>
+          <td>Consolidación de 10 opciones bajo un único concentrador analítico 04.4.1.</td>
+          <td>Estrategia arquitectónica SIAF-PJEV: sustituye la proliferación de pantallas aisladas por una consola unificada con filtros compartidos y navegación fluida.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. ACTORES Y PERMISOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Actores y Permisos</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Rol Institucional</th><th>Acceso y Consultas Habilitadas</th><th>Nivel de Datos Visible</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Analista de Ingresos / Caja</strong></td>
+          <td>Consultas operativas diarias: Ingresos esperados, Relación de depósitos, Depósitos pendientes y Auxiliar.</td>
+          <td>Cuentas bancarias enmascaradas; detalles transaccionales de su área.</td>
+        </tr>
+        <tr>
+          <td><strong>Jefe del Departamento de Ingresos</strong></td>
+          <td>Acceso total a las 10 opciones, exportación de cédulas, informes de cierre y diferencias de conciliación.</td>
+          <td>Acceso corporativo integral con visualización de saldos institucionales.</td>
+        </tr>
+        <tr>
+          <td><strong>Jefatura de Contabilidad</strong></td>
+          <td>Consulta de Ingresos por clasificación, Estado Analítico de Ingresos y Estado del Cierre Mensual.</td>
+          <td>Enlace directo con balanza de comprobación y libros de diario/mayor.</td>
+        </tr>
+        <tr>
+          <td><strong>Órgano Interno de Control / Auditoría</strong></td>
+          <td>Consulta histórica de todas las opciones, cédulas de incidencias y bitácora de cierres.</td>
+          <td>Modo auditoría inmutable de solo lectura con trazabilidad de usuarios y marcas temporales.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. CATÁLOGO DE LOS 10 INFORMES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Catálogo Detallado de los 10 Informes Internos</div>
+
+    <!-- 1. INGRESOS ESPERADOS Y RECIBIDOS -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>1. Ingresos Esperados y Recibidos</span>
+        <span class="mod-badge" style="background:#e0f2fe; color:#0369a1;">Operativo / Control Financiero</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Confronta la expectativa formal de cobro contra los depósitos bancarios efectivos, vigilando el saldo pendiente y el desfase en días.
+      </p>
+      <table class="props-table" style="font-size:12px;">
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Descripción / Regla</th></tr></thead>
+        <tbody>
+          <tr><td><code>Folio del ingreso</code></td><td>Alfanumérico</td><td>Identificador único asignado en <code>04.2.1</code> (ej. <code>ING-2026-0045</code>).</td></tr>
+          <tr><td><code>Modalidad</code></td><td>Badge</td><td><code>ESPERADO</code> (notificado) o <code>RECIBIDO</code> (abono directo).</td></tr>
+          <tr><td><code>Concepto</code></td><td>Texto</td><td>Concepto de ingreso del catálogo maestro <code>04.1.1</code>.</td></tr>
+          <tr><td><code>Importe esperado</code></td><td>Moneda ($)</td><td>Monto programado en la notificación u oficio de origen.</td></tr>
+          <tr><td><code>Importe recibido</code></td><td>Moneda ($)</td><td>Monto efectivamente ingresado al banco en abono en firme.</td></tr>
+          <tr><td><code>Importe aplicado</code></td><td>Moneda ($)</td><td>Monto con distribución presupuestaria confirmada.</td></tr>
+          <tr><td><code>Saldo pendiente</code></td><td>Moneda ($)</td><td><code>Importe Esperado - Importe Aplicado</code> (mayor o igual a cero).</td></tr>
+          <tr><td><code>Diferencia</code></td><td>Moneda ($)</td><td><code>Importe Recibido - Importe Esperado</code>.</td></tr>
+          <tr><td><code>Fecha esperada</code></td><td>Fecha</td><td>Fecha estimada de radicación o cobro.</td></tr>
+          <tr><td><code>Fecha operación</code></td><td>Fecha</td><td>Fecha asentada por la institución bancaria en el extracto.</td></tr>
+          <tr><td><code>Fecha valor</code></td><td>Fecha</td><td>Fecha efectiva de disponibilidad líquida de los fondos.</td></tr>
+          <tr><td><code>Días de desfase</code></td><td>Entero</td><td>Días naturales transcurridos entre la fecha esperada y la de operación.</td></tr>
+          <tr><td><code>Estado</code></td><td>Tag</td><td>Borrador, Esperado, Parcial, Recibido, Aplicado, Cancelado.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2. RELACIÓN DE DEPÓSITOS -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>2. Relación de Depósitos</span>
+        <span class="mod-badge" style="background:#ecfdf5; color:#065f46;">Bancos / Caja Central</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Bitácora cronológica de todos los abonos en cuentas institucionales, incluyendo depósitos plenamente identificados, parciales y no identificados.
+      </p>
+      <table class="props-table" style="font-size:12px;">
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Descripción / Regla</th></tr></thead>
+        <tbody>
+          <tr><td><code>Fecha de operación</code> / <code>Fecha valor</code></td><td>Fecha</td><td>Fechas registradas en el extracto bancario.</td></tr>
+          <tr><td><code>Banco</code></td><td>Texto</td><td>Institución bancaria receptora (ej. <em>Santander México</em>).</td></tr>
+          <tr><td><code>Cuenta receptora</code></td><td>Texto</td><td>Número de cuenta institucional enmascarado (ej. <code>*4012</code>).</td></tr>
+          <tr><td><code>Referencia bancaria</code></td><td>Texto</td><td>Clave de rastreo SPEI, número de autorización o folio de ventanilla.</td></tr>
+          <tr><td><code>Origen o depositante</code></td><td>Texto</td><td>Ente o persona que realizó la transferencia o depósito.</td></tr>
+          <tr><td><code>Importe depositado</code></td><td>Moneda ($)</td><td>Monto bruto acreditado por la institución bancaria.</td></tr>
+          <tr><td><code>Concepto</code></td><td>Texto</td><td>Concepto asignado (o <em>"Por tipificar"</em> si no está identificado).</td></tr>
+          <tr><td><code>Ingreso relacionado</code></td><td>Folio</td><td>Folio del ingreso esperado vinculado en <code>04.2.1</code>.</td></tr>
+          <tr><td><code>Importe aplicado</code></td><td>Moneda ($)</td><td>Fracción del depósito vinculada a una distribución.</td></tr>
+          <tr><td><code>Saldo sin aplicar</code></td><td>Moneda ($)</td><td><code>Importe depositado - Importe aplicado</code>.</td></tr>
+          <tr><td><code>Estado identificación/aplicación</code></td><td>Tag</td><td>Identificado, Parcialmente aplicado, Depósito no identificado.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. INGRESOS POR CLASIFICACIÓN -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>3. Ingresos por Clasificación (Matriz Multidimensional)</span>
+        <span class="mod-badge" style="background:#f3e8ff; color:#6b21a8;">Presupuestal / Analítico</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Permite agrupar dinámicamente los recursos por Concepto, CRI, Fuente, Fondo, Capítulo, Órgano, Unidad y Cuenta Bancaria con subtotales y total general.
+      </p>
+      <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+        <strong>Agrupaciones disponibles:</strong> Concepto de ingreso (04.1.1) • Clave CRI (01.2.7) • Fuente de financiamiento (01.2.4) • Fondo específico • Capítulo de gasto destino (1000, 2000, 3000, 5000) • Órgano / Unidad administrativa ejecutora (01.2.1) • Cuenta bancaria • Ejercicio y Periodo.
+      </p>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:0;">
+        <strong>Columnas del reporte:</strong> Nivel de Agrupación, Descripción Clasificador, Número de Registros, Importe Devengado ($), Importe Recaudado ($), Porcentaje de Participación (%), Subtotales por Nivel y Total Consolidado.
+      </p>
+    </div>
+
+    <!-- 4. MINISTRACIONES -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>4. Ministraciones (Seguimiento del Subsidio Estatal)</span>
+        <span class="mod-badge" style="background:#eff6ff; color:#1e40af;">Vista Especializada SEFIPLAN</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Cédula de control del recurso estatal transferido por SEFIPLAN. No constituye un módulo independiente, sino una opción parametrizada en este concentrador.
+      </p>
+      <table class="props-table" style="font-size:12px;">
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Descripción / Regla</th></tr></thead>
+        <tbody>
+          <tr><td><code>Ejercicio y Periodo</code></td><td>Texto</td><td>Año y mes de afectación (ej. <em>2026 - Febrero</em>).</td></tr>
+          <tr><td><code>Ministración</code></td><td>Texto</td><td>Identificación del pago: 1ª quincena, 2ª quincena o pago único.</td></tr>
+          <tr><td><code>Referencia externa</code></td><td>Texto</td><td>Número de oficio o acuerdo SEFIPLAN (sin adjunto).</td></tr>
+          <tr><td><code>Fecha esperada</code> / <code>Fecha recepción</code></td><td>Fecha</td><td>Fecha oficial de calendario vs. fecha real de dispersión.</td></tr>
+          <tr><td><code>Importe esperado / recibido / aplicado</code></td><td>Moneda ($)</td><td>Montos de confronta financiera al centavo.</td></tr>
+          <tr><td><code>Distribución por capítulo</code></td><td>Texto</td><td>Desglose de techos habilitados (Cap. 1000, 2000, 3000, 5000).</td></tr>
+          <tr><td><code>Fuente de financiamiento</code> / <code>Órgano</code></td><td>Texto</td><td>111 Recursos Fiscales / Dirección General de Administración.</td></tr>
+          <tr><td><code>Saldo pendiente</code> / <code>Diferencia</code></td><td>Moneda ($)</td><td>Control de retenciones o entregas parciales del Estado.</td></tr>
+          <tr><td><code>Estado de conciliación</code></td><td>Tag</td><td>Coincidente, Con desfase, Parcial, Con diferencia.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. REINTEGROS, RENTAS Y OTROS INGRESOS -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>5. Reintegros, Rentas y Otros Ingresos Institucionales</span>
+        <span class="mod-badge" style="background:#fef3c7; color:#854d0e;">Ingresos Propios / Operativo</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Desglose transaccional de ingresos no provenientes del subsidio ordinario, con estricto enmascaramiento de datos personales y bancarios.
+      </p>
+      <table class="props-table" style="font-size:12px;">
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Descripción / Regla</th></tr></thead>
+        <tbody>
+          <tr><td><code>Folio interno</code> / <code>Fecha</code></td><td>Alfanumérico / Fecha</td><td>Identificador del ingreso en <code>04.2.1</code> y fecha de captura.</td></tr>
+          <tr><td><code>Origen o depositante</code></td><td>Texto protegido</td><td>Nombre de servidor público o arrendatario (con enmascaramiento por privacidad).</td></tr>
+          <tr><td><code>Referencia</code></td><td>Texto</td><td>Folio de orden CxP original (en reintegros) o contrato de arrendamiento.</td></tr>
+          <tr><td><code>Importe</code></td><td>Moneda ($)</td><td>Monto cobrado en ventanilla o transferencia.</td></tr>
+          <tr><td><code>Fuente de financiamiento</code></td><td>Texto</td><td>113 Ingresos Propios u origen del reintegro.</td></tr>
+          <tr><td><code>Capítulo relacionado</code></td><td>Entero</td><td>Partida presupuestal reintegrada al gasto (cuando aplique).</td></tr>
+          <tr><td><code>Cuenta receptora</code></td><td>Texto enmascarado</td><td>Cuenta de depósito institucional (ej. <code>*4012</code>).</td></tr>
+          <tr><td><code>Estado de aplicación</code> / <code>Póliza</code></td><td>Tag / Texto</td><td>Estatus y número de póliza contable asociada.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. DEPÓSITOS PENDIENTES DE IDENTIFICAR O APLICAR -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>6. Depósitos Pendientes de Identificar o Aplicar (Informe de Excepciones)</span>
+        <span class="mod-badge" style="background:#fee2e2; color:#991b1b;">Auditoría / Excepciones</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Panel de anomalías e inconsistencias para supervisión diaria de la Jefatura de Tesorería. Evita rezagos de partidas no tipificadas.
+      </p>
+      <table class="props-table" style="font-size:12px;">
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Descripción / Regla</th></tr></thead>
+        <tbody>
+          <tr><td><code>Tipo de excepción</code></td><td>Tag</td><td>Depósito no identificado, Parcialmente aplicado, Esperado sin depósito, Sin distribución, Con diferencia o Sin póliza.</td></tr>
+          <tr><td><code>Referencia / Folio</code></td><td>Texto</td><td>Identificador bancario o folio del ingreso en conflicto.</td></tr>
+          <tr><td><code>Fecha de acreditación</code></td><td>Fecha</td><td>Fecha del movimiento bancario o registro inicial.</td></tr>
+          <tr><td><code>Importe pendiente / en custodia</code></td><td>Moneda ($)</td><td>Valor económico que requiere aclaración o distribución.</td></tr>
+          <tr><td><code>Antigüedad</code></td><td>Entero (días)</td><td>Días naturales transcurridos desde la detección del evento.</td></tr>
+          <tr><td><code>Responsable de atención</code></td><td>Texto</td><td>Analista de ingresos o cajero asignado para solventar.</td></tr>
+          <tr><td><code>Observación de seguimiento</code></td><td>Texto</td><td>Acciones realizadas ante el banco o el área solicitante.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. DIFERENCIAS DE CONCILIACIÓN -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>7. Diferencias de Conciliación</span>
+        <span class="mod-badge" style="background:#fed7aa; color:#9a3412;">Cotejo 04.3.1</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Listado exhaustivo de discrepancias emanadas del módulo <code>04.3.1 Conciliación de ingresos</code> clasificadas por causa de origen.
+      </p>
+      <table class="props-table" style="font-size:12px;">
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Descripción / Regla</th></tr></thead>
+        <tbody>
+          <tr><td><code>Tipo de diferencia</code></td><td>Tag</td><td>Diferencia de importe, Desfase de fecha, Recepción parcial, Depósito duplicado, Cuenta incorrecta o Clasificación pendiente.</td></tr>
+          <tr><td><code>Importe discrepante ($)</code></td><td>Moneda ($)</td><td>Valor absoluto y signo de la variación detectada.</td></tr>
+          <tr><td><code>Desfase de fecha</code></td><td>Entero (días)</td><td>Días de adelanto (+) o retraso (-) respecto a la fecha esperada.</td></tr>
+          <tr><td><code>Observación y justificación</code></td><td>Texto</td><td>Nota técnica asentada en la cédula de conciliación.</td></tr>
+          <tr><td><code>Responsable de aclaración</code></td><td>Texto</td><td>Usuario responsable de solventar la diferencia.</td></tr>
+          <tr><td><code>Fecha detección / aclaración</code></td><td>Fecha</td><td>Trazabilidad temporal del ciclo de vida de la inconsistencia.</td></tr>
+          <tr><td><code>Estado</code></td><td>Tag</td><td>Pendiente, En aclaración, Aclarado con nota, Ajustado vía catálogo 04.1.3.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 8. AUXILIAR DE INGRESOS -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>8. Auxiliar de Ingresos (Historial Cronológico Completo)</span>
+        <span class="mod-badge" style="background:#faf5ff; color:#6b21a8;">Contable / Auditoría</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Kárdex cronológico que reconstruye la historia transaccional completa de cada registro de ingreso y sus movimientos de ajuste o cancelación.
+      </p>
+      <table class="props-table" style="font-size:12px;">
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Descripción / Regla</th></tr></thead>
+        <tbody>
+          <tr><td><code>Folio interno</code> / <code>Fecha</code></td><td>Alfanumérico / Fecha</td><td>Identificador del movimiento y fecha contable de afectación.</td></tr>
+          <tr><td><code>Concepto</code> / <code>Tipo de movimiento</code></td><td>Texto / Tag</td><td>Concepto (04.1.1) y Tipo de movimiento (04.1.2: Devengado, Recaudado, Ajuste, Cancelación, Reverso).</td></tr>
+          <tr><td><code>Importe devengado</code></td><td>Moneda ($)</td><td>Afectación al momento contable del derecho exigible (8.1.4).</td></tr>
+          <tr><td><code>Importe recaudado</code></td><td>Moneda ($)</td><td>Afectación al momento contable de cobro efectivo (8.1.5).</td></tr>
+          <tr><td><code>Ajustes / Cancelaciones</code></td><td>Moneda ($)</td><td>Modificaciones netas con motivo del catálogo <code>04.1.3</code>.</td></tr>
+          <tr><td><code>Saldo acumulado</code></td><td>Moneda ($)</td><td>Saldo presupuestal vivo resultante de la operación.</td></tr>
+          <tr><td><code>Póliza contable</code> / <code>Usuario</code></td><td>Texto</td><td>Número de póliza generada y usuario responsable de la captura.</td></tr>
+          <tr><td><code>Periodo presupuestal</code></td><td>Texto</td><td>Ejercicio y mes contable correspondiente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 9. ESTADO DEL CIERRE MENSUAL -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>9. Estado del Cierre Mensual</span>
+        <span class="mod-badge" style="background:#f1f5f9; color:#334155;">Procesos 04.3.2</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Cédula de certificación del estatus de los 12 periodos mensuales del ejercicio, reflejando incidencias, fechas de sellado y reaperturas.
+      </p>
+      <table class="props-table" style="font-size:12px;">
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Descripción / Regla</th></tr></thead>
+        <tbody>
+          <tr><td><code>Periodo (Mes)</code></td><td>Texto</td><td>Enero a Diciembre del ejercicio fiscal seleccionado.</td></tr>
+          <tr><td><code>Estado del cierre</code></td><td>Tag</td><td>Abierto, En revisión, Con incidencias, Listo para cierre, Cerrado, Reabierto.</td></tr>
+          <tr><td><code>Totales del periodo ($)</code></td><td>Moneda ($)</td><td>Esperado, Recibido, Aplicado y Contabilizado (cuadre al 100%).</td></tr>
+          <tr><td><code>Depósitos no identificados</code></td><td>Entero / Moneda</td><td>Número de abonos y monto en custodia pendiente de aclaración.</td></tr>
+          <tr><td><code>Diferencias pendientes / Incidencias</code></td><td>Entero</td><td>Partidas que requirieron justificación o quedaron abiertas.</td></tr>
+          <tr><td><code>Fecha de cierre</code> / <code>Usuario</code></td><td>Timestamp / Texto</td><td>Fecha, hora exacta y nombre del funcionario que ejecutó el cierre.</td></tr>
+          <tr><td><code>Reaperturas extraordinarias</code></td><td>Texto</td><td>Historial de autorizaciones y folios de reapertura (si existieron).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. ESTADO ANALÍTICO DE INGRESOS -->
+    <div class="report-card">
+      <div class="report-card-title">
+        <span>10. Estado Analítico de Ingresos (Vista Oficial CONAC)</span>
+        <span class="mod-badge" style="background:#dcfce7; color:#15803d;">Normativo CONAC / Enlace a 02.3.4.6</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 8px;">
+        Vista analítica conectada a la fuente canónica de Presupuesto (<code>02.3.4.6</code>) que presenta los momentos contables oficiales clasificados por el CRI.
+      </p>
+      <table class="props-table" style="font-size:12px;">
+        <thead><tr><th>Columna CONAC</th><th>Definición Técnica</th><th>Fuente Canónica de Datos</th></tr></thead>
+        <tbody>
+          <tr><td><code>Rubro de Ingreso (CRI)</code></td><td>Clasificador por Rubros de Ingresos a 2 o 3 dígitos.</td><td>Catálogo oficial <code>01.2.7</code>.</td></tr>
+          <tr><td><code>Estimado</code></td><td>Ley de Ingresos aprobada para el ejercicio fiscal.</td><td>Presupuesto autorizado de ingresos (02.1.2 / 02.2.6).</td></tr>
+          <tr><td><code>Ampliaciones y Reducciones</code></td><td>Adecuaciones y modificaciones líquidas al presupuesto.</td><td>Movimientos presupuestales de ingresos (02.2.6).</td></tr>
+          <tr><td><code>Modificado</code></td><td>Presupuesto vigente: <code>Estimado + Ampliaciones - Reducciones</code>.</td><td>Cálculo aritmético normativo.</td></tr>
+          <tr><td><code>Devengado</code></td><td>Derecho de cobro formalmente devengado en el periodo.</td><td>Cuentas de orden <strong>8.1.4</strong> (Pólizas devengo <code>04.2.1</code>).</td></tr>
+          <tr><td><code>Recaudado</code></td><td>Ingresos efectivamente percibidos en cuentas bancarias.</td><td>Cuentas de orden <strong>8.1.5</strong> (Pólizas recaudo <code>04.2.1</code>).</td></tr>
+          <tr><td><code>Diferencia</code></td><td>Variación final del ejercicio: <code>Recaudado - Estimado</code>.</td><td>Superávit (+) o Déficit (-) recaudatorio contra la meta.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- 6. FILTROS GENERALES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Filtros Generales y Particulares</div>
+    <p>El concentrador cuenta con una barra de control superior con <strong>filtros comunes</strong> que se sincronizan con todos los reportes, complementada con selectores especializados que se activan según el informe seleccionado:</p>
+    
+    <table class="props-table">
+      <thead><tr><th>Parámetro de Filtro</th><th>Alcance</th><th>Comportamiento y Reglas</th></tr></thead>
+      <tbody>
+        <tr><td><code>Ejercicio Fiscal</code></td><td>Común (Obligatorio)</td><td>Por defecto el año activo (ej. 2026). Permite consultar históricos cerrados.</td></tr>
+        <tr><td><code>Periodo (Mes / Rango)</code></td><td>Común (Obligatorio)</td><td>Selector de mes único (1 a 12) o rango de meses acumulados (ej. Enero-Marzo).</td></tr>
+        <tr><td><code>Rango de Fechas</code></td><td>Común (Opcional)</td><td>Filtro de fecha natural de operación bancaria o registro.</td></tr>
+        <tr><td><code>Modalidad</code></td><td>Común</td><td>Todas / Solo Ingresos Esperados / Solo Ingresos Recibidos.</td></tr>
+        <tr><td><code>Estado del Registro / Conciliación</code></td><td>Común</td><td>Filtrado por estatus operativo o resultado de conciliación.</td></tr>
+        <tr><td><code>Concepto de Ingreso / CRI</code></td><td>Especializado</td><td>Selección de rubros específicos del catálogo <code>04.1.1</code> o código CRI.</td></tr>
+        <tr><td><code>Fuente de Financiamiento / Fondo</code></td><td>Especializado</td><td>Recursos Fiscales, Propios, FASP o bolsas etiquetadas.</td></tr>
+        <tr><td><code>Capítulo de Gasto Destino</code></td><td>Especializado</td><td>Capítulos 1000, 2000, 3000, 5000 asignados en la distribución.</td></tr>
+        <tr><td><code>Órgano / Unidad Administrativa</code></td><td>Especializado</td><td>Unidad ejecutora receptora de la asignación de techo.</td></tr>
+        <tr><td><code>Cuenta Bancaria Receptora</code></td><td>Especializado</td><td>Selector con cuentas institucionales enmascaradas (ej. <em>Santander *4012</em>).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. STORED PROCEDURES (LEER Y ABC) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      El motor de consulta analítica, agregaciones financieras y cola de exportación para los 10 informes institucionales reside en PostgreSQL bajo <code>SECURITY DEFINER</code> y estructura JSONB unificada <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>.
+    </p>
+
+    <!-- 7.1 LEER -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">7.1. Procedimiento LEER (<code>ingresos.fn_leer_informes_ingresos</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario activo en sesión.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal de análisis.</td></tr>
+        <tr><td><code>p_tipo_informe</code></td><td><code>SMALLINT</code></td><td>Identificador del reporte solicitado (1 a 10).</td></tr>
+        <tr><td><code>p_periodo_ini</code></td><td><code>SMALLINT</code></td><td>Mes de inicio del rango (1 a 12).</td></tr>
+        <tr><td><code>p_periodo_fin</code></td><td><code>SMALLINT</code></td><td>Mes final del rango (1 a 12).</td></tr>
+        <tr><td><code>p_filtros</code></td><td><code>JSONB</code></td><td>Payload con filtros específicos: <code>concepto_id</code>, <code>fuente_id</code>, <code>cuenta_id</code>, <code>estatus</code>, etc.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_informes_ingresos(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_tipo_informe SMALLINT,
+    p_periodo_ini SMALLINT,
+    p_periodo_fin SMALLINT,
+    p_filtros JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_data JSONB;
+    v_resumen JSONB;
+BEGIN
+    -- REPORTE 1: INGRESOS ESPERADOS Y RECIBIDOS
+    IF p_tipo_informe = 1 THEN
+        SELECT COALESCE(jsonb_agg(
+            jsonb_build_object(
+                'folio_ingreso', i.folio_interno,
+                'modalidad', i.modalidad,
+                'concepto', COALESCE(c.descripcion_corta, 'Por tipificar'),
+                'importe_esperado', CASE WHEN i.modalidad = 'ESPERADO' THEN i.importe_total ELSE 0.00 END,
+                'importe_recibido', CASE WHEN i.modalidad = 'RECIBIDO' THEN i.importe_total ELSE (i.importe_total - i.saldo_pendiente) END,
+                'importe_aplicado', COALESCE(dist.total_dist, 0.00),
+                'saldo_pendiente', i.saldo_pendiente,
+                'fecha_esperada', i.fecha_esperada,
+                'fecha_operacion', i.fecha_operacion_bancaria,
+                'estatus', i.estatus
+            ) ORDER BY i.ingreso_id DESC
+        ), '[]'::jsonb) INTO v_data
+        FROM ingresos.ingreso i
+        LEFT JOIN ingresos.concepto_ingreso c ON i.concepto_ingreso_id = c.concepto_id
+        LEFT JOIN (
+            SELECT ingreso_id, SUM(importe_distribuido) AS total_dist
+            FROM ingresos.ingreso_distribucion WHERE estatus_registro = 1 GROUP BY ingreso_id
+        ) dist ON i.ingreso_id = dist.ingreso_id
+        WHERE i.ejercicio_fiscal = p_ejercicio
+          AND i.periodo BETWEEN p_periodo_ini AND p_periodo_fin
+          AND i.estatus_registro = 1;
+
+        SELECT jsonb_build_object(
+            'total_esperado', COALESCE(SUM(importe_total) FILTER (WHERE modalidad = 'ESPERADO'), 0.00),
+            'total_recibido', COALESCE(SUM(importe_total) FILTER (WHERE modalidad = 'RECIBIDO'), 0.00),
+            'total_saldo_pendiente', COALESCE(SUM(saldo_pendiente), 0.00)
+        ) INTO v_resumen
+        FROM ingresos.ingreso
+        WHERE ejercicio_fiscal = p_ejercicio AND periodo BETWEEN p_periodo_ini AND p_periodo_fin AND estatus_registro = 1;
+
+    -- REPORTE 2: RELACIÓN DE DEPÓSITOS
+    ELSIF p_tipo_informe = 2 THEN
+        SELECT COALESCE(jsonb_agg(
+            jsonb_build_object(
+                'fecha_operacion', i.fecha_operacion_bancaria,
+                'fecha_valor', i.fecha_valor,
+                'banco', cb.banco_nombre,
+                'cuenta_receptora', '****' || RIGHT(cb.numero_cuenta, 4),
+                'referencia_bancaria', i.referencia_bancaria,
+                'origen_depositante', i.origen_depositante,
+                'importe_depositado', i.importe_total,
+                'concepto', COALESCE(c.descripcion_corta, 'Por tipificar'),
+                'saldo_sin_aplicar', i.saldo_pendiente,
+                'estatus', i.estatus
+            ) ORDER BY i.fecha_operacion_bancaria DESC
+        ), '[]'::jsonb) INTO v_data
+        FROM ingresos.ingreso i
+        LEFT JOIN cfg.cuenta_bancaria cb ON i.cuenta_bancaria_id = cb.cuenta_id
+        LEFT JOIN ingresos.concepto_ingreso c ON i.concepto_ingreso_id = c.concepto_id
+        WHERE i.ejercicio_fiscal = p_ejercicio
+          AND i.modalidad = 'RECIBIDO'
+          AND i.periodo BETWEEN p_periodo_ini AND p_periodo_fin
+          AND i.estatus_registro = 1;
+
+        v_resumen := jsonb_build_object('total_depositos', COALESCE(jsonb_array_length(v_data), 0));
+
+    -- REPORTE 10: ESTADO ANALÍTICO DE INGRESOS (CONAC)
+    ELSIF p_tipo_informe = 10 THEN
+        SELECT COALESCE(jsonb_agg(
+            jsonb_build_object(
+                'cri_clave', cri.clave,
+                'cri_descripcion', cri.descripcion,
+                'estimado', COALESCE(p.estimado, 0.00),
+                'ampliaciones_reducciones', COALESCE(p.adecuaciones, 0.00),
+                'modificado', COALESCE(p.modificado, 0.00),
+                'devengado', COALESCE(m.devengado, 0.00),
+                'recaudado', COALESCE(m.recaudado, 0.00),
+                'diferencia', (COALESCE(m.recaudado, 0.00) - COALESCE(p.estimado, 0.00))
+            ) ORDER BY cri.clave ASC
+        ), '[]'::jsonb) INTO v_data
+        FROM cfg.cri cri
+        LEFT JOIN (
+            SELECT cri_id, SUM(estimado) AS estimado, SUM(adecuaciones) AS adecuaciones, SUM(modificado) AS modificado
+            FROM presupuesto.ingreso_estimado WHERE ejercicio_fiscal = p_ejercicio GROUP BY cri_id
+        ) p ON cri.cri_id = p.cri_id
+        LEFT JOIN (
+            SELECT cri_id, SUM(devengado) AS devengado, SUM(recaudado) AS recaudado
+            FROM ingresos.vw_momentos_conac WHERE ejercicio_fiscal = p_ejercicio AND periodo BETWEEN p_periodo_ini AND p_periodo_fin GROUP BY cri_id
+        ) m ON cri.cri_id = m.cri_id
+        WHERE cri.estatus_registro = 1;
+
+        v_resumen := '{}'::jsonb;
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Tipo de informe no implementado en esta etapa.');
+    END IF;
+
+    -- Registrar acceso en auditoría
+    INSERT INTO ingresos.reporte_bitacora (
+        usuario, ejercicio_fiscal, tipo_informe, periodo_ini, periodo_fin, fecha_consulta
+    ) VALUES (
+        p_usuario, p_ejercicio, p_tipo_informe, p_periodo_ini, p_periodo_fin, CURRENT_TIMESTAMP
+    );
+
+    RETURN jsonb_build_object(
+        'error', 0, 'mensaje', 'OK',
+        'resumen', COALESCE(v_resumen, '{}'::jsonb),
+        'data', COALESCE(v_data, '[]'::jsonb)
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM);
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 7.2 ABC -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">7.2. Procedimiento ABC (<code>ingresos.fn_crud_informes_ingresos</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario que solicita la exportación o descarga.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal del informe.</td></tr>
+        <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1</code> = Encolar generación de archivo exportable · <code>2</code> = Registrar descarga con firma de auditoría.</td></tr>
+        <tr><td><code>p_tipo_informe</code></td><td><code>SMALLINT</code></td><td>Tipo de informe solicitado (1 a 10).</td></tr>
+        <tr><td><code>p_parametros</code></td><td><code>JSONB</code></td><td>Payload con formato (<code>PDF</code> | <code>XLSX</code>) y filtros aplicados.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_crud_informes_ingresos(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_accion SMALLINT,
+    p_tipo_informe SMALLINT,
+    p_parametros JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_export_id BIGINT;
+    v_folio VARCHAR(30);
+BEGIN
+    -- 1 = ENCOLAR GENERACIÓN DE EXPORTABLE (PDF / EXCEL)
+    IF p_accion = 1 THEN
+        v_folio := 'REP-' || p_tipo_informe || '-' || TO_CHAR(CURRENT_TIMESTAMP, 'YYYYMMDD-HH24MISS');
+
+        INSERT INTO ingresos.reporte_cola_exportacion (
+            folio_solicitud, tipo_informe, formato, ejercicio_fiscal,
+            parametros_filtro, estatus, usuario_c, fecha_c
+        ) VALUES (
+            v_folio, p_tipo_informe, p_parametros->>'formato', p_ejercicio,
+            p_parametros, 'PENDIENTE', p_usuario, CURRENT_TIMESTAMP
+        ) RETURNING export_id INTO v_export_id;
+
+        RETURN jsonb_build_object(
+            'error', 0,
+            'mensaje', 'Solicitud de exportación encolada correctamente.',
+            'data', jsonb_build_object('export_id', v_export_id, 'folio', v_folio)
+        );
+
+    -- 2 = REGISTRAR DESCARGA EXITOSA AUDITABLE
+    ELSIF p_accion = 2 THEN
+        UPDATE ingresos.reporte_cola_exportacion SET
+            estatus = 'DESCARGADO',
+            fecha_descarga = CURRENT_TIMESTAMP
+        WHERE export_id = (p_parametros->>'export_id')::BIGINT;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Descarga auditada.');
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no soportada.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. SERVICIOS API REST (SWAGGER / OPENAPI) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/informes/:tipoId</code></td>
+          <td>Query: <code>{ ejercicio, periodoIni, periodoFin, conceptoId?, fuenteId?, estatus? }</code></td>
+          <td>Retorna los datos y resumen analítico del reporte solicitado (1 a 10).</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/informes/:tipoId/exportar</code></td>
+          <td>Body: <code>{ ejercicio, periodoIni, periodoFin, formato: 'PDF' | 'XLSX', filtros }</code></td>
+          <td>Encola la generación del archivo con marca temporal y pie de página de auditoría.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/informes/descargar/:exportId</code></td>
+          <td>Param: <code>exportId</code></td>
+          <td>Descarga el binario generado y asienta el registro de entrega en la bitácora institucional.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>// NestJS Controller: InformesIngresosController
+@ApiTags('04.4.1 Informes y Control de Ingresos')
+@Controller('api/v1/ingresos/informes')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class InformesIngresosController {
+  constructor(private readonly informesService: InformesIngresosService) {}
+
+  @Get(':tipoId')
+  @ApiOperation({ summary: 'Consultar datos de cualquiera de los 10 informes de ingresos' })
+  async consultarInforme(
+    @Param('tipoId') tipoId: number,
+    @CurrentUser() user: UserSession,
+    @Query() query: FiltrosReporteDto
+  ) {
+    return this.informesService.leer(user, tipoId, query);
+  }
+
+  @Post(':tipoId/exportar')
+  @ApiOperation({ summary: 'Solicitar exportación oficial a PDF membretado o Excel' })
+  async exportarInforme(
+    @Param('tipoId') tipoId: number,
+    @CurrentUser() user: UserSession,
+    @Body() dto: ExportarReporteDto
+  ) {
+    return this.informesService.solicitarExportacion(user, tipoId, dto);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 9. SALIDAS Y MECANISMOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Salidas y Mecanismos de Exportación</div>
+    <p>Toda emisión de información a través de <code>04.4.1</code> respeta estándares institucionales de seguridad, trazabilidad y legibilidad:</p>
+    <ul>
+      <li style="margin-bottom:8px;"><strong>Consulta en Pantalla:</strong> Paginación dinámica (25, 50, 100 registros), ordenamiento por columnas, totales flotantes y enlaces de navegación directa al registro fuente.</li>
+      <li style="margin-bottom:8px;"><strong>Exportación a Excel (XLSX):</strong> Salida tabulada con fórmulas de suma en subtotales, encabezado institucional y parámetros de filtro aplicados. <em>(Documentado a nivel de diseño; desarrollo en backend pendiente).</em></li>
+      <li style="margin-bottom:8px;"><strong>Exportación a PDF / Impresión:</strong> Formato institucional membretado (orientación horizontal), pie de página obligatorio con marca temporal (<code>Fecha y hora de generación: DD/MM/AAAA HH:MM:SS</code>), foliado correlativo (<code>Página X de Y</code>) y mención expresa del <code>Usuario que generó el informe</code>.</li>
+    </ul>
+  </div>
+
+  <!-- 10. REGLAS DE NEGOCIO Y CÁLCULO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Reglas de Negocio y Cálculo</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REP-01 · Datos de Origen Transaccional (Cero Captura Libre)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Todos los importes, fechas y estatus mostrados en los reportes se derivan estrictamente de las operaciones asentadas en base de datos. Ningún usuario puede editar o sobreescribir cifras dentro de la interfaz de informes.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REP-02 · Cuadre Aritmético Multidimensional</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Los totales presentados en el <em>Reporte 3 (Ingresos por clasificación)</em> deben cuadrar al centavo contra la suma de movimientos del <em>Reporte 8 (Auxiliar de ingresos)</em> y contra los saldos aplicados del <em>Reporte 1</em>.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REP-03 · Enmascaramiento de Seguridad Bancaria y Privacidad</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Los números de cuenta bancaria receptora siempre se desplegarán enmascarando los primeros dígitos, mostrando únicamente los últimos cuatro (ej. <code>*4012</code>). En reintegros de personal, los nombres de personas físicas se restringirán conforme a la normativa de protección de datos personales.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REP-04 · Tratamiento Excepcional de Depósitos No Identificados</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Los abonos bancarios no identificados no se clasifican automáticamente como ingresos devengados ni presupuestarios; se reflejan en una partida separada de custodia temporal hasta su tipificación.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REP-05 · Inmutabilidad y Cero Lógica Contable en Frontend</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          La lógica contable, agregaciones y consolidaciones residen exclusivamente en Stored Procedures y vistas de PostgreSQL. El frontend solo consume el JSON tipado resultante sin aplicar reglas de negocio arbitrarias.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 11. PROPUESTA VISUAL (WIREFRAMES) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Propuesta Visual de Interfaz (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">1. Consola Central y Filtros</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">2. Reporte: Esperados y Recibidos</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Reporte: Relación de Depósitos</button>
+      <button class="wf-tab" onclick="showWF('wf4',this)">4. Vista: Estado Analítico CONAC</button>
+    </div>
+
+    <!-- WF1: CONSOLA PRINCIPAL -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Consola de Informes y Control de Ingresos · Selector de Reportes</span>
+          <span style="font-size:10px; color:#666;">Filtros Comunes y Acciones de Salida</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 420" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="420" fill="#f8fafc" rx="4"/>
+            <!-- Header Toolbar -->
+            <rect x="15" y="15" width="930" height="50" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="44" font-size="13" font-weight="bold" fill="#183125">04.4.1 Informes y Control de Ingresos</text>
+            <rect x="620" y="25" width="140" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="690" y="44" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">📥 Exportar XLS</text>
+            <rect x="770" y="25" width="160" height="30" fill="#183125" rx="4"/>
+            <text x="850" y="44" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">🖨 Imprimir Cédula</text>
+
+            <!-- Selector del Reporte Activo -->
+            <rect x="15" y="75" width="930" height="45" fill="#ecfdf5" stroke="#a7f3d0" rx="4"/>
+            <text x="30" y="102" font-size="11" font-weight="bold" fill="#065f46">SELECCIONE EL INFORME:</text>
+            <rect x="180" y="86" width="460" height="24" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="190" y="102" font-size="10" fill="#1e293b">1. Ingresos esperados y recibidos (Control de saldos) ▼</text>
+            <rect x="650" y="86" width="130" height="24" fill="#0284c7" rx="3"/>
+            <text x="715" y="102" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Consultar Informe</text>
+
+            <!-- Grid de Filtros Comunes -->
+            <rect x="15" y="130" width="930" height="60" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="30" y="152" font-size="9" font-weight="bold" fill="#64748b">EJERCICIO:</text>
+            <rect x="30" y="158" width="70" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="35" y="173" font-size="10" fill="#1e293b">2026 ▼</text>
+
+            <text x="115" y="152" font-size="9" font-weight="bold" fill="#64748b">PERIODO:</text>
+            <rect x="115" y="158" width="90" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="120" y="173" font-size="10" fill="#1e293b">Febrero ▼</text>
+
+            <text x="220" y="152" font-size="9" font-weight="bold" fill="#64748b">FUENTE FINANC.:</text>
+            <rect x="220" y="158" width="160" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="225" y="173" font-size="10" fill="#1e293b">111 Recursos Fiscales ▼</text>
+
+            <text x="395" y="152" font-size="9" font-weight="bold" fill="#64748b">CUENTA BANCARIA:</text>
+            <rect x="395" y="158" width="170" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="400" y="173" font-size="10" fill="#1e293b">Santander *4012 ▼</text>
+
+            <text x="580" y="152" font-size="9" font-weight="bold" fill="#64748b">CAPÍTULO DESTINO:</text>
+            <rect x="580" y="158" width="140" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="585" y="173" font-size="10" fill="#1e293b">Todos los capítulos ▼</text>
+
+            <text x="735" y="152" font-size="9" font-weight="bold" fill="#64748b">MODALIDAD:</text>
+            <rect x="735" y="158" width="110" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="740" y="173" font-size="10" fill="#1e293b">Todas ▼</text>
+
+            <rect x="855" y="158" width="75" height="22" fill="#334155" rx="3"/>
+            <text x="892" y="173" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Aplicar</text>
+
+            <!-- Cards de Acceso a los 10 Informes -->
+            <text x="15" y="212" font-size="11" font-weight="bold" fill="#183125">CATÁLOGO DE INFORMES DISPONIBLES EN ESTA CONSOLA:</text>
+            
+            <rect x="15" y="222" width="220" height="85" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="25" y="242" font-size="10" font-weight="bold" fill="#0369a1">1. Esperados y Recibidos</text>
+            <text x="25" y="258" font-size="9" fill="#64748b">Control de saldos y desfases.</text>
+            <text x="25" y="292" font-size="9" font-weight="bold" fill="#0284c7">Ver reporte ↗</text>
+
+            <rect x="250" y="222" width="220" height="85" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="260" y="242" font-size="10" font-weight="bold" fill="#0369a1">2. Relación de Depósitos</text>
+            <text x="260" y="258" font-size="9" fill="#64748b">Abonos, SPEI y no identificados.</text>
+            <text x="260" y="292" font-size="9" font-weight="bold" fill="#0284c7">Ver reporte ↗</text>
+
+            <rect x="485" y="222" width="220" height="85" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="495" y="242" font-size="10" font-weight="bold" fill="#0369a1">3. Por Clasificación</text>
+            <text x="495" y="258" font-size="9" fill="#64748b">CRI, Fuente, Cap. y Órgano.</text>
+            <text x="495" y="292" font-size="9" font-weight="bold" fill="#0284c7">Ver reporte ↗</text>
+
+            <rect x="720" y="222" width="225" height="85" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="730" y="242" font-size="10" font-weight="bold" fill="#0369a1">4. Ministraciones</text>
+            <text x="730" y="258" font-size="9" fill="#64748b">Seguimiento subsidio SEFIPLAN.</text>
+            <text x="730" y="292" font-size="9" font-weight="bold" fill="#0284c7">Ver reporte ↗</text>
+
+            <!-- Bottom Row Cards -->
+            <rect x="15" y="318" width="220" height="85" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="25" y="338" font-size="10" font-weight="bold" fill="#0369a1">6. Depósitos Pendientes</text>
+            <text x="25" y="354" font-size="9" fill="#64748b">Informe de anomalías y no ID.</text>
+            <text x="25" y="388" font-size="9" font-weight="bold" fill="#0284c7">Ver reporte ↗</text>
+
+            <rect x="250" y="318" width="220" height="85" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="260" y="338" font-size="10" font-weight="bold" fill="#0369a1">7. Diferencias Conciliación</text>
+            <text x="260" y="354" font-size="9" fill="#64748b">Discrepancias y aclaraciones.</text>
+            <text x="260" y="388" font-size="9" font-weight="bold" fill="#0284c7">Ver reporte ↗</text>
+
+            <rect x="485" y="318" width="220" height="85" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="495" y="338" font-size="10" font-weight="bold" fill="#0369a1">8. Auxiliar de Ingresos</text>
+            <text x="495" y="354" font-size="9" fill="#64748b">Kárdex cronológico de pólizas.</text>
+            <text x="495" y="388" font-size="9" font-weight="bold" fill="#0284c7">Ver reporte ↗</text>
+
+            <rect x="720" y="318" width="225" height="85" fill="#dcfce7" stroke="#86efac" rx="4"/>
+            <text x="730" y="338" font-size="10" font-weight="bold" fill="#15803d">10. Estado Analítico CONAC</text>
+            <text x="730" y="354" font-size="9" fill="#065f46">Vista oficial ligada a 02.3.4.6.</text>
+            <text x="730" y="388" font-size="9" font-weight="bold" fill="#15803d">Ver reporte ↗</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: REPORTE ESPERADOS Y RECIBIDOS -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Reporte 1 · Ingresos Esperados y Recibidos</span>
+          <span style="font-size:10px; color:#666;">Cédula de Confronta de Saldos</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="380" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <rect x="15" y="15" width="930" height="28" fill="#183125"/>
+            <text x="25" y="33" font-size="9" font-weight="bold" fill="#ffffff">FOLIO</text>
+            <text x="110" y="33" font-size="9" font-weight="bold" fill="#ffffff">CONCEPTO</text>
+            <text x="240" y="33" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">ESPERADO ($)</text>
+            <text x="340" y="33" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">RECIBIDO ($)</text>
+            <text x="440" y="33" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">APLICADO ($)</text>
+            <text x="540" y="33" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">PENDIENTE ($)</text>
+            <text x="630" y="33" font-size="9" font-weight="bold" fill="#ffffff">F. BANCARIA</text>
+            <text x="720" y="33" font-size="9" font-weight="bold" fill="#ffffff">DESFASE</text>
+            <text x="820" y="33" font-size="9" font-weight="bold" fill="#ffffff">ESTADO</text>
+
+            <rect x="15" y="45" width="930" height="32" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="66" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0045</text>
+            <text x="110" y="66" font-size="10" fill="#1e293b">Ministración Ordinaria</text>
+            <text x="240" y="66" font-size="10" fill="#1e293b" text-anchor="end">45,000,000.00</text>
+            <text x="340" y="66" font-size="10" fill="#15803d" text-anchor="end">45,000,000.00</text>
+            <text x="440" y="66" font-size="10" fill="#15803d" text-anchor="end">45,000,000.00</text>
+            <text x="540" y="66" font-size="10" fill="#64748b" text-anchor="end">0.00</text>
+            <text x="630" y="66" font-size="10" fill="#334155">20/02/2026</text>
+            <text x="720" y="66" font-size="10" fill="#b45309">+5 días</text>
+            <rect x="800" y="52" width="75" height="18" fill="#ede9fe" rx="9"/>
+            <text x="837" y="65" font-size="9" font-weight="bold" fill="#5b21b6" text-anchor="middle">APLICADO</text>
+
+            <rect x="15" y="79" width="930" height="32" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="100" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0048</text>
+            <text x="110" y="100" font-size="10" fill="#1e293b">Convenio Fortalecimiento</text>
+            <text x="240" y="100" font-size="10" fill="#1e293b" text-anchor="end">10,000,000.00</text>
+            <text x="340" y="100" font-size="10" fill="#15803d" text-anchor="end">6,000,000.00</text>
+            <text x="440" y="100" font-size="10" fill="#15803d" text-anchor="end">6,000,000.00</text>
+            <text x="540" y="100" font-size="10" font-weight="bold" fill="#b45309" text-anchor="end">4,000,000.00</text>
+            <text x="630" y="100" font-size="10" fill="#334155">22/02/2026</text>
+            <text x="720" y="100" font-size="10" fill="#64748b">0 días</text>
+            <rect x="800" y="86" width="75" height="18" fill="#fed7aa" rx="9"/>
+            <text x="837" y="99" font-size="9" font-weight="bold" fill="#9a3412" text-anchor="middle">PARCIAL</text>
+
+            <rect x="15" y="113" width="930" height="32" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="134" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0046</text>
+            <text x="110" y="134" font-size="10" fill="#1e293b">Rendimientos Financieros</text>
+            <text x="240" y="134" font-size="10" fill="#64748b" text-anchor="end">0.00</text>
+            <text x="340" y="134" font-size="10" fill="#15803d" text-anchor="end">128,450.32</text>
+            <text x="440" y="134" font-size="10" fill="#15803d" text-anchor="end">128,450.32</text>
+            <text x="540" y="134" font-size="10" fill="#64748b" text-anchor="end">0.00</text>
+            <text x="630" y="134" font-size="10" fill="#334155">26/02/2026</text>
+            <text x="720" y="134" font-size="10" fill="#64748b">N/A</text>
+            <rect x="800" y="120" width="75" height="18" fill="#ede9fe" rx="9"/>
+            <text x="837" y="133" font-size="9" font-weight="bold" fill="#5b21b6" text-anchor="middle">APLICADO</text>
+
+            <!-- Total Row -->
+            <rect x="15" y="150" width="930" height="32" fill="#f1f5f9" stroke="#cbd5e1"/>
+            <text x="110" y="171" font-size="10" font-weight="bold" fill="#183125">TOTALES DEL PERIODO:</text>
+            <text x="240" y="171" font-size="10" font-weight="bold" fill="#183125" text-anchor="end">$ 55,000,000.00</text>
+            <text x="340" y="171" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">$ 51,128,450.32</text>
+            <text x="440" y="171" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">$ 51,128,450.32</text>
+            <text x="540" y="171" font-size="10" font-weight="bold" fill="#b45309" text-anchor="end">$ 4,000,000.00</text>
+
+            <!-- Footer Meta -->
+            <text x="25" y="350" font-size="9" fill="#64748b">Página 1 de 1 · Fecha y hora de generación: 02/09/2026 12:20:15 · Generado por: Eunice (Jefa Tesorería)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: REPORTE RELACIÓN DE DEPÓSITOS -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Reporte 2 · Relación de Depósitos y Partidas No Identificadas</span>
+          <span style="font-size:10px; color:#666;">Cuentas Enmascaradas y Trazabilidad SPEI</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="360" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <rect x="15" y="15" width="930" height="28" fill="#183125"/>
+            <text x="25" y="33" font-size="9" font-weight="bold" fill="#ffffff">FECHA BANCO</text>
+            <text x="120" y="33" font-size="9" font-weight="bold" fill="#ffffff">CUENTA</text>
+            <text x="210" y="33" font-size="9" font-weight="bold" fill="#ffffff">REF. BANCARIA / SPEI</text>
+            <text x="400" y="33" font-size="9" font-weight="bold" fill="#ffffff">ORIGEN / DEPOSITANTE</text>
+            <text x="620" y="33" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">DEPOSITADO ($)</text>
+            <text x="730" y="33" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">APLICADO ($)</text>
+            <text x="840" y="33" font-size="9" font-weight="bold" fill="#ffffff">ESTADO IDENTIF.</text>
+
+            <!-- Row 1 -->
+            <rect x="15" y="45" width="930" height="32" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="66" font-size="10" fill="#1e293b">15/02/2026</text>
+            <text x="120" y="66" font-size="10" font-weight="bold" fill="#475569">Santander *4012</text>
+            <text x="210" y="66" font-size="10" fill="#0284c7">SPEI-SEFIPLAN-8819201</text>
+            <text x="400" y="66" font-size="10" fill="#1e293b">SEFIPLAN Gob. Estado</text>
+            <text x="620" y="66" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">20,000,000.00</text>
+            <text x="730" y="66" font-size="10" fill="#15803d" text-anchor="end">20,000,000.00</text>
+            <rect x="790" y="52" width="95" height="18" fill="#dcfce7" rx="9"/>
+            <text x="837" y="65" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">IDENTIFICADO</text>
+
+            <!-- Row 2 -->
+            <rect x="15" y="79" width="930" height="32" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="100" font-size="10" fill="#1e293b">24/02/2026</text>
+            <text x="120" y="100" font-size="10" font-weight="bold" fill="#475569">Santander *4012</text>
+            <text x="210" y="100" font-size="10" fill="#0284c7">AUT-884129 - Ventanilla</text>
+            <text x="400" y="100" font-size="10" fill="#94a3b8">Por Identificar...</text>
+            <text x="620" y="100" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">32,500.00</text>
+            <text x="730" y="100" font-size="10" fill="#64748b" text-anchor="end">0.00</text>
+            <rect x="790" y="86" width="105" height="18" fill="#f3e8ff" stroke="#d8b4fe" rx="9"/>
+            <text x="842" y="99" font-size="9" font-weight="bold" fill="#6b21a8" text-anchor="middle">NO IDENTIFICADO</text>
+
+            <text x="25" y="330" font-size="9" fill="#64748b">Nota: Las cuentas bancarias se muestran enmascaradas conforme a la directriz de seguridad de datos.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF4: ESTADO ANALÍTICO CONAC -->
+    <div id="wf-wf4" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Reporte 10 · Estado Analítico de Ingresos (Estructura CONAC)</span>
+          <span style="font-size:10px; color:#666;">Vista Canónica Enlazada a 02.3.4.6</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="380" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            
+            <rect x="15" y="15" width="930" height="40" fill="#183125"/>
+            <text x="25" y="38" font-size="9" font-weight="bold" fill="#ffffff">RUBRO DE INGRESOS (CRI)</text>
+            <text x="320" y="38" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">ESTIMADO ($)</text>
+            <text x="440" y="38" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">AMP / RED ($)</text>
+            <text x="560" y="38" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">MODIFICADO ($)</text>
+            <text x="680" y="38" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">DEVENGADO ($)</text>
+            <text x="800" y="38" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">RECAUDADO ($)</text>
+            <text x="920" y="38" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">DIFERENCIA ($)</text>
+
+            <!-- Line 1 CRI 1 -->
+            <rect x="15" y="58" width="930" height="30" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="78" font-size="10" font-weight="bold" fill="#1e293b">1.1 Impuestos / Derechos</text>
+            <text x="320" y="78" font-size="10" fill="#1e293b" text-anchor="end">1,200,000.00</text>
+            <text x="440" y="78" font-size="10" fill="#64748b" text-anchor="end">0.00</text>
+            <text x="560" y="78" font-size="10" fill="#1e293b" text-anchor="end">1,200,000.00</text>
+            <text x="680" y="78" font-size="10" fill="#1e293b" text-anchor="end">450,000.00</text>
+            <text x="800" y="78" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">450,000.00</text>
+            <text x="920" y="78" font-size="10" fill="#b45309" text-anchor="end">-750,000.00</text>
+
+            <!-- Line 2 CRI 4 -->
+            <rect x="15" y="90" width="930" height="30" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="110" font-size="10" font-weight="bold" fill="#1e293b">1.4 Productos (Rendimientos)</text>
+            <text x="320" y="110" font-size="10" fill="#1e293b" text-anchor="end">800,000.00</text>
+            <text x="440" y="110" font-size="10" fill="#64748b" text-anchor="end">0.00</text>
+            <text x="560" y="110" font-size="10" fill="#1e293b" text-anchor="end">800,000.00</text>
+            <text x="680" y="110" font-size="10" fill="#1e293b" text-anchor="end">280,450.32</text>
+            <text x="800" y="110" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">280,450.32</text>
+            <text x="920" y="110" font-size="10" fill="#b45309" text-anchor="end">-519,549.68</text>
+
+            <!-- Line 3 CRI 9 -->
+            <rect x="15" y="122" width="930" height="30" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="142" font-size="10" font-weight="bold" fill="#1e293b">1.9 Transferencias y Subsidios</text>
+            <text x="320" y="142" font-size="10" fill="#1e293b" text-anchor="end">540,000,000.00</text>
+            <text x="440" y="142" font-size="10" fill="#15803d" text-anchor="end">+10,000,000.00</text>
+            <text x="560" y="142" font-size="10" fill="#1e293b" text-anchor="end">550,000,000.00</text>
+            <text x="680" y="142" font-size="10" fill="#1e293b" text-anchor="end">95,000,000.00</text>
+            <text x="800" y="142" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">95,000,000.00</text>
+            <text x="920" y="142" font-size="10" fill="#b45309" text-anchor="end">-455,000,000.00</text>
+
+            <!-- Total Bar -->
+            <rect x="15" y="160" width="930" height="34" fill="#ecfdf5" stroke="#a7f3d0"/>
+            <text x="25" y="182" font-size="10" font-weight="bold" fill="#065f46">TOTAL CONSOLIDADO CONAC:</text>
+            <text x="320" y="182" font-size="10" font-weight="bold" fill="#065f46" text-anchor="end">$ 542,000,000.00</text>
+            <text x="440" y="182" font-size="10" font-weight="bold" fill="#065f46" text-anchor="end">$ 10,000,000.00</text>
+            <text x="560" y="182" font-size="10" font-weight="bold" fill="#065f46" text-anchor="end">$ 552,000,000.00</text>
+            <text x="680" y="182" font-size="10" font-weight="bold" fill="#065f46" text-anchor="end">$ 95,730,450.32</text>
+            <text x="800" y="182" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">$ 95,730,450.32</text>
+            <text x="920" y="182" font-size="10" font-weight="bold" fill="#92400e" text-anchor="end">-$ 456,269,549.68</text>
+
+            <text x="25" y="340" font-size="9" fill="#64748b">Fuente canónica vinculada: 02.3.4.6 Estado Analítico de Ingresos (Presupuesto). Sin duplicación de motor de cálculo.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 12. INTEGRACIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Integración con Registro, Procesos, Presupuesto y Contabilidad</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Subsistema / Módulo Enlazado</th><th>Naturaleza del Enlace</th><th>Mecanismo y Consumo de Datos</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>04.2.1 Registro de Ingresos</strong></td>
+          <td>Consumo Primario Transaccional</td>
+          <td>Extrae los importes esperados, recibidos, aplicados, cuentas y referencias para los reportes 1, 2, 4 y 5.</td>
+        </tr>
+        <tr>
+          <td><strong>04.3.1 Conciliación de Ingresos</strong></td>
+          <td>Alimentación de Cédulas de Diferencias</td>
+          <td>Provee los datos analíticos para el Reporte 7 (Diferencias de conciliación) y el estado de cuadre en Reporte 1.</td>
+        </tr>
+        <tr>
+          <td><strong>04.3.2 Cierre Mensual de Ingresos</strong></td>
+          <td>Certificación de Periodos</td>
+          <td>Alimenta el Reporte 9 (Estado del cierre mensual) mostrando las incidencias, fechas de cierre y bitácora de reaperturas.</td>
+        </tr>
+        <tr>
+          <td><strong>02.3.4.6 Presupuesto (Edo. Analítico Ingresos)</strong></td>
+          <td>Enlace Canónico Oficial CONAC</td>
+          <td>Proporciona el cálculo oficial del Estado Analítico de Ingresos para el Reporte 10 sin duplicar lógica en el concentrador.</td>
+        </tr>
+        <tr>
+          <td><strong>03 · Contabilidad Gubernamental</strong></td>
+          <td>Validación de Cuentas de Orden y Libro Diario</td>
+          <td>Alimenta el Reporte 8 (Auxiliar de ingresos) asociando las pólizas de devengo (8.1.4) y recaudado (8.1.5).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 13. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">13</span> Casos de Prueba y Escenarios de Validación</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>ID</th><th>Escenario de Prueba</th><th>Condición de Entrada</th><th>Resultado Esperado</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-REP-01</strong></td>
+          <td>Cuadre entre reporte por clasificación y auxiliar de ingresos.</td>
+          <td>Periodo Febrero 2026. Filtro: Fuente 111 Recursos Fiscales.</td>
+          <td>El total del Reporte 3 coincide exactamente con la suma neta de movimientos del Reporte 8 ($51,000,000.00).</td>
+        </tr>
+        <tr>
+          <td><strong>CP-REP-02</strong></td>
+          <td>Visibilidad y enmascaramiento en relación de depósitos.</td>
+          <td>Consulta de abonos bancarios del mes.</td>
+          <td>Todas las cuentas bancarias se visualizan como <code>*4012</code>; los depósitos no identificados aparecen señalizados en morado.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-REP-03</strong></td>
+          <td>Generación de vista CONAC con Estado Analítico enlazado.</td>
+          <td>Selección del Reporte 10 (Estado Analítico de Ingresos).</td>
+          <td>Se despliegan las 6 columnas normativas (Estimado a Diferencia) alimentadas directamente desde la fuente de <code>02.3.4.6</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-REP-04</strong></td>
+          <td>Trazabilidad en exportación e impresión.</td>
+          <td>Pulsar botón de impresión en cualquier informe.</td>
+          <td>El pie de página muestra: <code>Página X de Y · Fecha y hora: DD/MM/AAAA HH:MM:SS · Generado por: [Usuario]</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 14. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">14</span> Historial de Cambios</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción de Modificaciones</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>v1.0.0</code></td>
+          <td>02/09/2026</td>
+          <td>Eunice / Julio César</td>
+          <td>Creación formal del Análisis Funcional DOC-08 para 04.4.1 Informes y control de ingresos, concentrando los 10 reportes analíticos y enlazando canónicamente con el Estado Analítico CONAC.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+  function showWF(id, btn) {
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+    const target = document.getElementById('wf-' + id);
+    if (target) target.classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

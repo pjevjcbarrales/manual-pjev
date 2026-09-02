@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.1.3 Motivos de Ajuste o Cancelación — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-doc  { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-prop { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .tag-status { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .sev-info { background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+    .sev-ctrl { background:#fef9c3; color:#854d0e; border:1px solid #fde047; }
+    .sev-crit { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.put    { background: #fff3e0; color: #e65100; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>04 · Ingresos</span> ›
+    <span>04.1 · Catálogos</span> ›
+    <span>04.1.3 Motivos de ajuste o cancelación</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.1.3</div>
+      <h1 class="elem-title">Motivos de ajuste o cancelación</h1>
+      <p class="elem-desc">Catálogo institucional de control y auditoría que estandariza las causas por las cuales se corrige, cancela, revierte o reclasifica una operación de ingreso, sustituyendo las notas de texto libre por tipificaciones trazables.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Análisis funcional inicial (DOC-08)</span>
+        <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Eunice</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT DE JUSTIFICACIÓN Y CONTROL -->
+  <div class="callout-box">
+    <div class="callout-title">📌 Propuesta Institucional de Control y Auditoría</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      Este catálogo es una <strong>propuesta de control y trazabilidad</strong> del nuevo sistema SIAF-PJEV. No surge como una lista preexistente en manuales antiguos, sino como una solución a la debilidad de control interno que representaba permitir notas libres arbitrarias para anular o alterar cifras de recaudación.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      <em>Principio de Inmutabilidad:</em> Ningún ajuste o cancelación elimina físicamente registros contables. Cada motivo seleccionado detona un contramovimiento auditable que queda asentado con usuario, fecha, hora y justificación técnica.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El catálogo <strong>04.1.3 Motivos de ajuste o cancelación</strong> constituye la salvaguarda de gobernanza de datos en el subsistema de ingresos. Siempre que un analista o cajero requiera realizar una enmienda sobre un recibo de ingreso, un depósito aplicado o una distribución presupuestaria, el sistema le exigirá seleccionar obligatoriamente un motivo catalogado.</p>
+    <p>Cada motivo tipificado define el nivel de severidad de la enmienda (informativa, de control o crítica), determina si se requiere autorización jerárquica de la Jefatura de Tesorería o Contabilidad, y especifica si la corrección exige detonar una póliza contable de reverso o una reclasificación presupuestaria.</p>
+  </div>
+
+  <!-- 2. OBJETIVO Y ALCANCE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Objetivo y Alcance</div>
+    <p><strong>Objetivo:</strong> Estandarizar y auditar las causales de modificación sobre los registros de ingresos, erradicando la discrecionalidad y asegurando que cada ajuste mantenga una explicación documental tipificada ante auditorías internas y externas (ORFIS).</p>
+
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th style="width:50%;">Dentro del Alcance</th>
+          <th style="width:50%;">Fuera del Alcance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5;">
+              <li>Padrón de 19 motivos iniciales de corrección, reverso y cancelación.</li>
+              <li>Clasificación por severidad: Informativa, De Control o Crítica.</li>
+              <li>Asociación con el Tipo de Movimiento específico (<code>04.1.2</code>) al que aplica.</li>
+              <li>Regla obligatoria de captura de justificación para motivos genéricos ("Otro").</li>
+              <li>Exigencia de visto bueno de rol superior en motivos críticos.</li>
+              <li>Preservación inalterable del historial de motivos utilizados.</li>
+            </ul>
+          </td>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5; color:#991b1b;">
+              <li>Recepción física de acuerdos o escritos de inconformidad en papel.</li>
+              <li>Firmas electrónicas o cadenas criptográficas de validación.</li>
+              <li>Aprobaciones de reapertura mensual (gestionadas en <code>04.3.2</code>).</li>
+              <li>Borrado de pólizas del libro diario.</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. ORIGEN DE LOS REQUERIMIENTOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Origen y Sustento de los Requerimientos</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th style="width:25%;">Clasificación</th>
+          <th style="width:35%;">Requerimiento Específico</th>
+          <th style="width:40%;">Sustento y Evidencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Evidencia y justificación de cualquier modificación a los registros contables.</td>
+          <td>LGCG Art. 34 y Postulado Básico de Consistencia (CONAC): todo cambio o cancelación que afecte cifras presupuestales o patrimoniales debe documentar plenamente su causa técnica y sustento normativo.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-pjev">Evidencia Manual PJEV</span></td>
+          <td>Procedimiento de Aclaraciones y Correcciones de Caja.</td>
+          <td>Manual de Procedimientos de Recursos Financieros PJEV: prevé la corrección de errores en fichas de depósito y transferencias mediante cédulas de ajuste suscritas por el cajero general y el Jefe de Departamento.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-doc">Evidencia Doc. Fuente</span></td>
+          <td>Cédulas de trabajo de depósitos en tránsito y reclasificaciones de fondos.</td>
+          <td>Documentos físicos de trabajo del PJEV donde se asientan aclaraciones manuscritas como <em>"Error de cuenta bancaria"</em>, <em>"Duplicidad de captura"</em> o <em>"Reclasificación por oficio de SEFIPLAN"</em>.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-prop">Propuesta de Diseño</span></td>
+          <td>Catálogo tipificado con semáforo de severidad y rol autorizador.</td>
+          <td>Propuesta SIAF-PJEV: sustituye campos de texto abierto no indexables por un catálogo con reglas de negocio que protege la integridad institucional.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. CATÁLOGO DE LOS 19 MOTIVOS INICIALES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Catálogo de Referencia (19 Motivos Iniciales)</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th style="width:12%;">Clave</th>
+          <th style="width:26%;">Nombre del Motivo</th>
+          <th style="width:16%;">Movimiento Aplica</th>
+          <th style="width:12%;">Severidad</th>
+          <th style="width:12%;">Requiere Aut.</th>
+          <th style="width:22%;">Efecto / Condición</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>MOT-ERR-CAP</code></td>
+          <td><strong>Error de captura</strong></td>
+          <td>Ajuste / Cancelación</td>
+          <td><span class="tag-status sev-ctrl">Control</span></td>
+          <td>No</td>
+          <td>Dato no financiero erróneo en borrador.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-REG-DUP</code></td>
+          <td><strong>Registro duplicado</strong></td>
+          <td>Cancelación</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Jefe Ingresos)</td>
+          <td>Cancela registro gemelo por doble captura.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-IMP-INC</code></td>
+          <td><strong>Importe incorrecto</strong></td>
+          <td>Ajuste</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Jefe Ingresos)</td>
+          <td>Ajusta diferencia contra ficha bancaria.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-FEC-INC</code></td>
+          <td><strong>Fecha incorrecta</strong></td>
+          <td>Ajuste</td>
+          <td><span class="tag-status sev-ctrl">Control</span></td>
+          <td>No</td>
+          <td>Corrige fecha valor o de depósito.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-CTA-INC</code></td>
+          <td><strong>Cuenta bancaria incorrecta</strong></td>
+          <td>Reclasificación</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Contabilidad)</td>
+          <td>Traspaso entre cuentas 1.1.1.2 de bancos.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-CPT-INC</code></td>
+          <td><strong>Concepto incorrecto</strong></td>
+          <td>Reclasificación</td>
+          <td><span class="tag-status sev-ctrl">Control</span></td>
+          <td>No</td>
+          <td>Reasigna concepto dentro del mismo CRI.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-CRI-INC</code></td>
+          <td><strong>CRI incorrecto</strong></td>
+          <td>Reclasificación</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Contabilidad)</td>
+          <td>Afecta cuentas contables de ingreso (Clase 4).</td>
+        </tr>
+        <tr>
+          <td><code>MOT-FTE-INC</code></td>
+          <td><strong>Fuente financiamiento incorrecta</strong></td>
+          <td>Reclasificación</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Jefe Ingresos)</td>
+          <td>Reclasifica entre Fiscales y Propios.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-FND-INC</code></td>
+          <td><strong>Fondo incorrecto</strong></td>
+          <td>Reclasificación</td>
+          <td><span class="tag-status sev-ctrl">Control</span></td>
+          <td>No</td>
+          <td>Ajusta fondo específico o etiquetado.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-CAP-INC</code></td>
+          <td><strong>Capítulo incorrecto</strong></td>
+          <td>Reclasificación</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Presupuesto)</td>
+          <td>Reasigna techo entre Cap. 1000 a 5000.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-ORG-INC</code></td>
+          <td><strong>Órgano o unidad incorrecta</strong></td>
+          <td>Reclasificación</td>
+          <td><span class="tag-status sev-ctrl">Control</span></td>
+          <td>No</td>
+          <td>Corrige unidad administrativa ejecutora.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-DEP-NID</code></td>
+          <td><strong>Depósito no identificado</strong></td>
+          <td>Ajuste / Custodia</td>
+          <td><span class="tag-status sev-info">Informativa</span></td>
+          <td>No</td>
+          <td>Asigna partida temporal de custodia.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-DEP-API</code></td>
+          <td><strong>Depósito aplicado incorrectamente</strong></td>
+          <td>Reverso / Reclasif.</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Jefe Ingresos)</td>
+          <td>Desvincula depósito de ingreso erróneo.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-REF-INC</code></td>
+          <td><strong>Referencia bancaria incorrecta</strong></td>
+          <td>Ajuste</td>
+          <td><span class="tag-status sev-info">Informativa</span></td>
+          <td>No</td>
+          <td>Actualiza clave de rastreo SPEI o autorización.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-COR-CNT</code></td>
+          <td><strong>Corrección contable</strong></td>
+          <td>Reclasificación / Ajuste</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Contabilidad)</td>
+          <td>Ajuste derivado de arqueo o conciliación.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-RCL-PRE</code></td>
+          <td><strong>Reclasificación presupuestaria</strong></td>
+          <td>Reclasificación</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Presupuesto)</td>
+          <td>Alineación con adecuación presupuestal.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-SOL-RES</code></td>
+          <td><strong>Solicitud del área responsable</strong></td>
+          <td>Ajuste / Cancelación</td>
+          <td><span class="tag-status sev-ctrl">Control</span></td>
+          <td>Sí (Jefe Ingresos)</td>
+          <td>Petición formal de juzgado o unidad.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-OBS-AUD</code></td>
+          <td><strong>Observación de auditoría</strong></td>
+          <td>Todos los tipos</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Dirección Adm.)</td>
+          <td>Solvencia de pliego o recomendación OIC/ORFIS.</td>
+        </tr>
+        <tr>
+          <td><code>MOT-OTR-AUT</code></td>
+          <td><strong>Otro motivo autorizado</strong></td>
+          <td>Todos los tipos</td>
+          <td><span class="tag-status sev-crit">Crítica</span></td>
+          <td>Sí (Jefe Ingresos)</td>
+          <td><strong>Exige justificación obligatoria (mín. 20 car.)</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. DICCIONARIO DE CAMPOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Diccionario de Campos del Motivo</div>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>motivo_id</code></td><td>BigInt (PK)</td><td>Sí</td><td>Identificador único del motivo.</td></tr>
+        <tr><td><code>clave</code></td><td>Varchar(20)</td><td>Sí</td><td>Código institucional (ej. <code>MOT-REG-DUP</code>). Único.</td></tr>
+        <tr><td><code>nombre</code></td><td>Varchar(80)</td><td>Sí</td><td>Nombre claro de la causa de ajuste.</td></tr>
+        <tr><td><code>descripcion</code></td><td>Text</td><td>Sí</td><td>Descripción funcional del uso y alcances del motivo.</td></tr>
+        <tr><td><code>movimiento_aplica</code></td><td>Varchar(50)</td><td>Sí</td><td>Tipos de movimiento donde se habilita (<code>AJU</code>, <code>CAN</code>, <code>REV</code>, <code>RECLAS</code> o <code>TODOS</code>).</td></tr>
+        <tr><td><code>requiere_observacion_adicional</code></td><td>Boolean</td><td>Sí</td><td>Si es <code>true</code>, obliga al usuario a escribir una nota explicativa.</td></tr>
+        <tr><td><code>requiere_autorizacion</code></td><td>Boolean</td><td>Sí</td><td>Si es <code>true</code>, requiere visto bueno jerárquico antes de aplicar.</td></tr>
+        <tr><td><code>rol_autorizador</code></td><td>Varchar(60)</td><td>No</td><td>Rol que debe autorizar (ej. <em>Jefe de Ingresos</em>, <em>Contabilidad</em>).</td></tr>
+        <tr><td><code>requiere_reverso_contable</code></td><td>Boolean</td><td>Sí</td><td>Indica si detona póliza de contra-asiento en libros.</td></tr>
+        <tr><td><code>requiere_reclasificacion</code></td><td>Boolean</td><td>Sí</td><td>Indica si genera movimiento de reclasificación patrimonial/presupuestal.</td></tr>
+        <tr><td><code>severidad</code></td><td>Enum</td><td>Sí</td><td><code>INFORMATIVA</code>, <code>CONTROL</code> o <code>CRITICA</code>.</td></tr>
+        <tr><td><code>permite_uso_periodo_cerrado</code></td><td>Boolean</td><td>Sí</td><td>Estrictamente <code>false</code>. Los periodos cerrados no admiten ajustes directos.</td></tr>
+        <tr><td><code>vigencia_inicio</code> / <code>vigencia_fin</code></td><td>Date</td><td>Sí/No</td><td>Periodo de vigencia operativa.</td></tr>
+        <tr><td><code>estatus</code></td><td>SmallInt</td><td>Sí</td><td><code>1</code> = Activo, <code>0</code> = Inactivo.</td></tr>
+        <tr><td><code>observaciones</code></td><td>Text</td><td>No</td><td>Notas de auditoría y control de versiones.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. STORED PROCEDURES (LEER Y ABC) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Gobernanza transaccional en PostgreSQL (esquema <code>ingresos</code>) bajo convención <code>SECURITY DEFINER</code> y respuesta JSONB <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>.
+    </p>
+
+    <!-- 6.1 LEER -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.1. Procedimiento LEER (<code>ingresos.fn_leer_motivo_ajuste</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario activo de sesión.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal en curso.</td></tr>
+        <tr><td><code>p_buscar</code></td><td><code>VARCHAR(100)</code></td><td>Texto libre para buscar por clave o nombre (opcional).</td></tr>
+        <tr><td><code>p_movimiento_aplica</code></td><td><code>VARCHAR(20)</code></td><td>Filtro por tipo de movimiento que lo invoca (ej. <code>CAN</code>, <code>AJU</code>, <code>RECLAS</code>).</td></tr>
+        <tr><td><code>p_severidad</code></td><td><code>VARCHAR(20)</code></td><td>Filtro por nivel de severidad (<code>INFORMATIVA</code>, <code>CONTROL</code>, <code>CRITICA</code>).</td></tr>
+        <tr><td><code>p_motivo_id</code></td><td><code>BIGINT</code></td><td>ID específico (NULL para listado completo).</td></tr>
+        <tr><td><code>p_estatus</code></td><td><code>SMALLINT</code></td><td>1 = Activos, 0 = Inactivos, NULL = Todos.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_motivo_ajuste(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_buscar VARCHAR DEFAULT NULL,
+    p_movimiento_aplica VARCHAR DEFAULT NULL,
+    p_severidad VARCHAR DEFAULT NULL,
+    p_motivo_id BIGINT DEFAULT NULL,
+    p_estatus SMALLINT DEFAULT 1
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'motivo_id', m.motivo_id,
+            'clave', m.clave,
+            'nombre', m.nombre,
+            'descripcion', m.descripcion,
+            'movimiento_aplica', m.movimiento_aplica,
+            'requiere_observacion_adicional', m.requiere_observacion_adicional,
+            'requiere_autorizacion', m.requiere_autorizacion,
+            'rol_autorizador', m.rol_autorizador,
+            'requiere_reverso_contable', m.requiere_reverso_contable,
+            'requiere_reclasificacion', m.requiere_reclasificacion,
+            'severidad', m.severidad,
+            'permite_uso_periodo_cerrado', m.permite_uso_periodo_cerrado,
+            'vigencia_inicio', m.vigencia_inicio,
+            'vigencia_fin', m.vigencia_fin,
+            'estatus', m.estatus,
+            'total_usos', (
+                SELECT COUNT(*) FROM ingresos.ingreso_ajuste a WHERE a.motivo_id = m.motivo_id
+            )
+        ) ORDER BY m.severidad DESC, m.clave
+    ) INTO v_data
+    FROM ingresos.motivo_ajuste_cancelacion m
+    WHERE (p_motivo_id IS NULL OR m.motivo_id = p_motivo_id)
+      AND (p_movimiento_aplica IS NULL OR m.movimiento_aplica = 'TODOS' OR m.movimiento_aplica ILIKE '%' || p_movimiento_aplica || '%')
+      AND (p_severidad IS NULL OR m.severidad = p_severidad)
+      AND (p_estatus IS NULL OR m.estatus = p_estatus)
+      AND (p_buscar IS NULL OR m.clave ILIKE '%' || p_buscar || '%' OR m.nombre ILIKE '%' || p_buscar || '%');
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', COALESCE(v_data, '[]'::jsonb));
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', '[]'::jsonb);
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 6.2 ABC -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">6.2. Procedimiento ABC (<code>ingresos.fn_crud_motivo_ajuste</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario que ejecuta la transacción.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal.</td></tr>
+        <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1</code> = Alta · <code>2</code> = Cambio · <code>3</code> = Baja lógica (Inactivar) · <code>4</code> = Reactivar.</td></tr>
+        <tr><td><code>p_motivo_id</code></td><td><code>BIGINT</code></td><td>NULL en Alta; ID existente en Cambio/Baja.</td></tr>
+        <tr><td><code>p_clave</code></td><td><code>VARCHAR(20)</code></td><td>Clave nemotécnica institucional (ej. <code>MOT-REG-DUP</code>).</td></tr>
+        <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con nombre, severidad, reglas de autorización y flags.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_crud_motivo_ajuste(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_accion SMALLINT,
+    p_motivo_id BIGINT,
+    p_clave VARCHAR,
+    p_datos JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_id BIGINT;
+    v_count INT;
+BEGIN
+    -- 1 = ALTA
+    IF p_accion = 1 THEN
+        SELECT COUNT(*) INTO v_count FROM ingresos.motivo_ajuste_cancelacion WHERE clave = UPPER(TRIM(p_clave));
+        IF v_count > 0 THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La clave de motivo ya existe.');
+        END IF;
+
+        INSERT INTO ingresos.motivo_ajuste_cancelacion (
+            clave, nombre, descripcion, movimiento_aplica, requiere_observacion_adicional,
+            requiere_autorizacion, rol_autorizador, requiere_reverso_contable,
+            requiere_reclasificacion, severidad, permite_uso_periodo_cerrado,
+            vigencia_inicio, vigencia_fin, estatus, observaciones, usuario_c, fecha_c
+        ) VALUES (
+            UPPER(TRIM(p_clave)),
+            p_datos->>'nombre',
+            p_datos->>'descripcion',
+            COALESCE(p_datos->>'movimiento_aplica', 'TODOS'),
+            COALESCE((p_datos->>'requiere_observacion_adicional')::BOOLEAN, false),
+            COALESCE((p_datos->>'requiere_autorizacion')::BOOLEAN, false),
+            p_datos->>'rol_autorizador',
+            COALESCE((p_datos->>'requiere_reverso_contable')::BOOLEAN, false),
+            COALESCE((p_datos->>'requiere_reclasificacion')::BOOLEAN, false),
+            COALESCE(p_datos->>'severidad', 'CONTROL'),
+            false,
+            COALESCE((p_datos->>'vigencia_inicio')::DATE, CURRENT_DATE),
+            (p_datos->>'vigencia_fin')::DATE,
+            1, p_datos->>'observaciones', p_usuario, CURRENT_TIMESTAMP
+        ) RETURNING motivo_id INTO v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Motivo registrado exitosamente.', 'data', jsonb_build_object('motivo_id', v_id));
+
+    -- 2 = CAMBIO
+    ELSIF p_accion = 2 THEN
+        UPDATE ingresos.motivo_ajuste_cancelacion SET
+            nombre = COALESCE(p_datos->>'nombre', nombre),
+            descripcion = COALESCE(p_datos->>'descripcion', descripcion),
+            movimiento_aplica = COALESCE(p_datos->>'movimiento_aplica', movimiento_aplica),
+            requiere_observacion_adicional = COALESCE((p_datos->>'requiere_observacion_adicional')::BOOLEAN, requiere_observacion_adicional),
+            requiere_autorizacion = COALESCE((p_datos->>'requiere_autorizacion')::BOOLEAN, requiere_autorizacion),
+            rol_autorizador = p_datos->>'rol_autorizador',
+            requiere_reverso_contable = COALESCE((p_datos->>'requiere_reverso_contable')::BOOLEAN, requiere_reverso_contable),
+            requiere_reclasificacion = COALESCE((p_datos->>'requiere_reclasificacion')::BOOLEAN, requiere_reclasificacion),
+            severidad = COALESCE(p_datos->>'severidad', severidad),
+            fecha_fin_vigencia = (p_datos->>'fecha_fin_vigencia')::DATE,
+            observaciones = COALESCE(p_datos->>'observaciones', observaciones),
+            usuario_m = p_usuario, fecha_m = CURRENT_TIMESTAMP
+        WHERE motivo_id = p_motivo_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Motivo actualizado.', 'data', jsonb_build_object('motivo_id', p_motivo_id));
+
+    -- 3 = BAJA LÓGICA (INACTIVAR)
+    ELSIF p_accion = 3 THEN
+        UPDATE ingresos.motivo_ajuste_cancelacion SET estatus = 0, usuario_m = p_usuario, fecha_m = CURRENT_TIMESTAMP
+        WHERE motivo_id = p_motivo_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Motivo inactivado lógicamente.', 'data', jsonb_build_object('motivo_id', p_motivo_id));
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no soportada.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 7. SERVICIOS API REST (SWAGGER / OPENAPI) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/motivos-ajuste</code></td>
+          <td>Query: <code>{ buscar?, movimientoAplica?, severidad?, estatus? }</code></td>
+          <td>Lista motivos ordenados por severidad para selectores modales y grids.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/motivos-ajuste/:id</code></td>
+          <td>Param: <code>id (BigInt)</code></td>
+          <td>Detalle con reglas de justificación y rol autorizador.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/motivos-ajuste</code></td>
+          <td>Body: <code>CreateMotivoAjusteDto</code></td>
+          <td>Registra nuevo motivo institucional con nivel de severidad.</td>
+        </tr>
+        <tr>
+          <td><code class="method put">PUT</code></td>
+          <td><code>/api/v1/ingresos/motivos-ajuste/:id</code></td>
+          <td>Body: <code>UpdateMotivoAjusteDto</code></td>
+          <td>Actualiza descripción y parámetros de autorización.</td>
+        </tr>
+        <tr>
+          <td><code class="method patch">PATCH</code></td>
+          <td><code>/api/v1/ingresos/motivos-ajuste/:id/estatus</code></td>
+          <td>Body: <code>{ estatus: 0 | 1 }</code></td>
+          <td>Inactivación o reactivación lógica.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>// NestJS Controller: MotivosAjusteController
+@ApiTags('04.1.3 Motivos de Ajuste o Cancelación')
+@Controller('api/v1/ingresos/motivos-ajuste')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class MotivosAjusteController {
+  constructor(private readonly motivosService: MotivosAjusteService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Listar motivos de ajuste o cancelación' })
+  @ApiResponse({ status: 200, description: 'Catálogo de motivos recuperado.' })
+  async listar(@CurrentUser() user: UserSession, @Query() query: FiltrosMotivoDto) {
+    return this.motivosService.leer(user, query);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Crear nuevo motivo' })
+  async crear(@CurrentUser() user: UserSession, @Body() dto: CreateMotivoAjusteDto) {
+    return this.motivosService.crear(user, dto);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Actualizar motivo' })
+  async actualizar(@Param('id') id: string, @CurrentUser() user: UserSession, @Body() dto: UpdateMotivoAjusteDto) {
+    return this.motivosService.actualizar(user, BigInt(id), dto);
+  }
+
+  @Patch(':id/estatus')
+  @ApiOperation({ summary: 'Cambiar estatus de motivo' })
+  async cambiarEstatus(@Param('id') id: string, @CurrentUser() user: UserSession, @Body() dto: EstatusDto) {
+    return this.motivosService.cambiarEstatus(user, BigInt(id), dto.estatus);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Reglas de Negocio y Auditoría</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-MOT-01 · Prohibición de Motivo Genérico Vacío</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          El sistema bloqueará el guardado si se selecciona el motivo <code>MOT-OTR-AUT (Otro motivo autorizado)</code> y el usuario deja vacío el campo de justificación adicional. Se exige un texto mínimo explicativo de al menos 20 caracteres.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-MOT-02 · Aprobación Obligatoria en Severidad Crítica</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Todo ajuste o cancelación cuya causal sea calificada como <span class="tag-status sev-crit">Crítica</span> entrará en estado <em>Pendiente de Autorización</em> y no tendrá efecto contable ni presupuestario hasta que el rol autorizador asiente su validación.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-MOT-03 · Preservación de Motivos Históricos Inactivos</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Un motivo inactivado (<code>estatus = 0</code>) dejará de mostrarse en los selectores para nuevas operaciones, pero se conservará permanentemente visible en las consultas históricas de movimientos pasados.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-MOT-04 · Filtrado Contextual por Tipo de Movimiento</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          En las pantallas operativas de <code>04.2.1</code> y <code>04.3.1</code>, el combo de motivos únicamente listará aquellos compatibles con el tipo de acción ejecutada (ej. en cancelación no se mostrarán motivos exclusivos de reclasificación).
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 9. PROPUESTA VISUAL (WIREFRAMES) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Propuesta Visual de Interfaz (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">1. Catálogo de Motivos (Grid)</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">2. Modal de Configuración</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Aplicación en Operación Real</button>
+    </div>
+
+    <!-- WF1: GRID -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">04.1.3 Motivos de Ajuste o Cancelación · Administración</span>
+          <span style="font-size:10px; color:#666;">Control de Severidad y Autorizaciones</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="360" fill="#f8fafc" rx="4"/>
+            <rect x="15" y="15" width="930" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="30" y="42" font-size="13" font-weight="bold" fill="#183125">Motivos de Ajuste o Cancelación (19 Registros)</text>
+            <rect x="800" y="23" width="130" height="28" fill="#183125" rx="3"/>
+            <text x="865" y="41" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nuevo Motivo</text>
+
+            <rect x="15" y="70" width="930" height="26" fill="#183125"/>
+            <text x="25" y="87" font-size="9" font-weight="bold" fill="#ffffff">CLAVE</text>
+            <text x="140" y="87" font-size="9" font-weight="bold" fill="#ffffff">NOMBRE DEL MOTIVO</text>
+            <text x="380" y="87" font-size="9" font-weight="bold" fill="#ffffff">MOVIMIENTO APLICA</text>
+            <text x="540" y="87" font-size="9" font-weight="bold" fill="#ffffff">SEVERIDAD</text>
+            <text x="660" y="87" font-size="9" font-weight="bold" fill="#ffffff">AUTORIZACIÓN</text>
+            <text x="810" y="87" font-size="9" font-weight="bold" fill="#ffffff">REVERSO CNT</text>
+            <text x="910" y="87" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ESTATUS</text>
+
+            <!-- Row 1 -->
+            <rect x="15" y="98" width="930" height="32" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="118" font-size="10" font-weight="bold" fill="#0284c7">MOT-REG-DUP</text>
+            <text x="140" y="118" font-size="10" font-weight="bold" fill="#1e293b">Registro duplicado</text>
+            <text x="380" y="118" font-size="10" fill="#334155">Cancelación [CAN]</text>
+            <rect x="540" y="105" width="70" height="18" fill="#fee2e2" rx="9"/>
+            <text x="575" y="118" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">CRÍTICA</text>
+            <text x="660" y="118" font-size="10" font-weight="bold" fill="#183125">Jefe de Ingresos</text>
+            <text x="810" y="118" font-size="10" fill="#15803d">Sí</text>
+            <rect x="885" y="105" width="50" height="18" fill="#dcfce7" rx="9"/>
+            <text x="910" y="118" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+
+            <!-- Row 2 -->
+            <rect x="15" y="132" width="930" height="32" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="152" font-size="10" font-weight="bold" fill="#0284c7">MOT-CRI-INC</text>
+            <text x="140" y="152" font-size="10" font-weight="bold" fill="#1e293b">CRI incorrecto</text>
+            <text x="380" y="152" font-size="10" fill="#334155">Reclasificación [RECLAS]</text>
+            <rect x="540" y="139" width="70" height="18" fill="#fee2e2" rx="9"/>
+            <text x="575" y="152" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">CRÍTICA</text>
+            <text x="660" y="152" font-size="10" font-weight="bold" fill="#183125">Contabilidad</text>
+            <text x="810" y="152" font-size="10" fill="#15803d">Sí</text>
+            <rect x="885" y="139" width="50" height="18" fill="#dcfce7" rx="9"/>
+            <text x="910" y="152" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+
+            <!-- Row 3 -->
+            <rect x="15" y="166" width="930" height="32" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="186" font-size="10" font-weight="bold" fill="#0284c7">MOT-ERR-CAP</text>
+            <text x="140" y="186" font-size="10" font-weight="bold" fill="#1e293b">Error de captura</text>
+            <text x="380" y="186" font-size="10" fill="#334155">Ajuste / Cancelación</text>
+            <rect x="540" y="173" width="70" height="18" fill="#fef9c3" rx="9"/>
+            <text x="575" y="186" font-size="9" font-weight="bold" fill="#854d0e" text-anchor="middle">CONTROL</text>
+            <text x="660" y="186" font-size="10" fill="#64748b">No requerida</text>
+            <text x="810" y="186" font-size="10" fill="#64748b">Opcional</text>
+            <rect x="885" y="173" width="50" height="18" fill="#dcfce7" rx="9"/>
+            <text x="910" y="186" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+
+            <text x="25" y="320" font-size="9" fill="#64748b">Gobernanza de datos: previene justificaciones ambiguas y asegura pista de auditoría.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: MODAL CONFIGURACIÓN -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Modal de Definición de Motivo de Ajuste o Cancelación</span>
+          <span style="font-size:10px; color:#666;">Alta / Edición</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 360" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="360" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <rect x="0" y="0" width="960" height="45" fill="#183125"/>
+            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Configuración de Motivo: MOT-REG-DUP (Registro duplicado)</text>
+            <text x="935" y="28" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+
+            <text x="30" y="75" font-size="10" font-weight="bold" fill="#183125">CLAVE:</text>
+            <rect x="30" y="82" width="160" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="40" y="98" font-size="10" fill="#1e293b">MOT-REG-DUP</text>
+
+            <text x="210" y="75" font-size="10" font-weight="bold" fill="#183125">NOMBRE DEL MOTIVO:</text>
+            <rect x="210" y="82" width="360" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="220" y="98" font-size="10" fill="#1e293b">Registro duplicado (Doble captura de recibo)</text>
+
+            <text x="590" y="75" font-size="10" font-weight="bold" fill="#183125">SEVERIDAD:</text>
+            <rect x="590" y="82" width="160" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="600" y="98" font-size="10" fill="#991b1b">Crítica ▼</text>
+
+            <rect x="30" y="125" width="900" height="150" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="45" y="148" font-size="11" font-weight="bold" fill="#0369a1">CONDICIONES DE APLICACIÓN Y CONTROL:</text>
+
+            <text x="45" y="175" font-size="10" fill="#1e293b">[✓] Requiere justificación de texto obligatoria</text>
+            <text x="45" y="200" font-size="10" fill="#1e293b">[✓] Exige autorización de rol superior</text>
+            <text x="65" y="220" font-size="9" fill="#64748b">→ Rol autorizador: [Jefe del Departamento de Ingresos]</text>
+
+            <text x="500" y="175" font-size="10" fill="#1e293b">[✓] Detona póliza de reverso contable inmutable</text>
+            <text x="500" y="200" font-size="10" fill="#991b1b">[  ] Permite uso en periodos contables cerrados (PROHIBIDO)</text>
+
+            <rect x="790" y="300" width="140" height="32" fill="#183125" rx="4"/>
+            <text x="860" y="320" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar Motivo</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: APLICACIÓN EN OPERACIÓN REAL -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Consola Operativa 04.2.1 · Ejecución de Cancelación con Motivo Tipificado</span>
+          <span style="font-size:10px; color:#666;">Ventana Modal de Cancelación de Recibo</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 340" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="340" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <rect x="0" y="0" width="960" height="45" fill="#991b1b"/>
+            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Cancelar Registro de Ingreso: ING-2026-0049 ($1,000,000.00)</text>
+            <text x="935" y="28" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+
+            <text x="40" y="80" font-size="11" font-weight="bold" fill="#183125">SELECCIONE EL MOTIVO TIPIFICADO DE CANCELACIÓN:</text>
+            <rect x="40" y="90" width="880" height="28" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="50" y="108" font-size="10" fill="#1e293b">MOT-REG-DUP · Registro duplicado (Requiere autorización) ▼</text>
+
+            <text x="40" y="145" font-size="11" font-weight="bold" fill="#183125">JUSTIFICACIÓN TÉCNICA DETALLADA (OBLIGATORIA):</text>
+            <rect x="40" y="155" width="880" height="70" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="50" y="175" font-size="10" fill="#334155">El depósito ya había sido asentado previamente en el folio ING-2026-0045 por la cajera matutina.</text>
+            <text x="50" y="195" font-size="10" fill="#334155">Se cancela este duplicado para evitar doble acreditación presupuestaria en Cap. 1000.</text>
+
+            <rect x="40" y="240" width="880" height="35" fill="#fee2e2" stroke="#fca5a5" rx="3"/>
+            <text x="50" y="262" font-size="10" font-weight="bold" fill="#991b1b">AVISO: Esta operación generará una solicitud de autorización dirigida a la Lic. Eunice (Jefa Tesorería).</text>
+
+            <rect x="760" y="290" width="160" height="32" fill="#991b1b" rx="4"/>
+            <text x="840" y="310" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Solicitar Cancelación</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 10. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Casos de Prueba</div>
+    <table class="props-table">
+      <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Condición de Entrada</th><th>Resultado Esperado</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-MOT-01</strong></td>
+          <td>Rechazo de cancelación sin motivo tipificado.</td>
+          <td>Intentar pulsar "Cancelar Ingreso" en <code>04.2.1</code> sin seleccionar motivo.</td>
+          <td>El modal bloquea la acción exigiendo la selección de un motivo válido.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-MOT-02</strong></td>
+          <td>Bloqueo de motivo "Otro" sin justificación de texto.</td>
+          <td>Seleccionar <code>MOT-OTR-AUT</code> dejando el cuadro de texto vacío.</td>
+          <td>Alerta de validación: <em>"Debe ingresar una justificación detallada de al menos 20 caracteres."</em></td>
+        </tr>
+        <tr>
+          <td><strong>CP-MOT-03</strong></td>
+          <td>Flujo de autorización en severidad crítica.</td>
+          <td>Aplicar motivo <code>MOT-REG-DUP</code> por parte de un cajero.</td>
+          <td>El estado cambia a <em>Pendiente de Cancelación</em>; no afecta saldos hasta la firma del Jefe.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 11. INTEGRACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Integración con Otros Módulos</div>
+    <ul>
+      <li><strong>04.2.1 Registro de Ingresos:</strong> Los botones de "Ajustar o Cancelar" consumen este catálogo como lista obligatoria.</li>
+      <li><strong>04.3.1 Conciliación de Ingresos:</strong> Las aclaraciones de depósitos con diferencia registran motivos tipificados.</li>
+      <li><strong>04.4.1 Informes y Control:</strong> El *Reporte 7 (Diferencias de conciliación)* y el *Reporte 8 (Auxiliar)* desglosan las causas mediante este catálogo.</li>
+    </ul>
+  </div>
+
+  <!-- 12. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
+    <table class="props-table">
+      <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>v1.0.0</code></td>
+          <td>02/09/2026</td>
+          <td>Eunice / Julio César</td>
+          <td>Creación formal del Análisis Funcional Inicial (DOC-08) para 04.1.3 Motivos de ajuste o cancelación, con 19 causas tipificadas, matriz de severidad y reglas de auditoría.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+  function showWF(id, btn) {
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+    const target = document.getElementById('wf-' + id);
+    if (target) target.classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

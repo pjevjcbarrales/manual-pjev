@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.3.1 Conciliación de Ingresos — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-doc  { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-prop { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .tag-status { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .st-pendiente     { background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; }
+    .st-coincidente   { background:#dcfce7; color:#15803d; border:1px solid #86efac; }
+    .st-desfase       { background:#fef9c3; color:#854d0e; border:1px solid #fde047; }
+    .st-parcial       { background:#fed7aa; color:#9a3412; border:1px solid #fdba74; }
+    .st-diferencia    { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+    .st-noid          { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+    .st-pend-aplic    { background:#e0e7ff; color:#3730a3; border:1px solid #c7d2fe; }
+    .st-pend-contab   { background:#fae8ff; color:#86198f; border:1px solid #f0abfc; }
+    .st-conciliado    { background:#ccfbf1; color:#0f766e; border:1px solid #5eead4; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.put    { background: #fff3e0; color: #e65100; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>04 · Ingresos</span> ›
+    <span>04.3 · Procesos</span> ›
+    <span>04.3.1 Conciliación de ingresos</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.3.1</div>
+      <h1 class="elem-title">Conciliación de ingresos</h1>
+      <p class="elem-desc">Motor analítico de cotejo cuádruple: confronta el ingreso esperado contra el depósito bancario percibido, el importe efectivamente aplicado y la afectación contable-presupuestaria (Devengado 8.1.4 y Recaudado 8.1.5).</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Análisis funcional inicial (DOC-08)</span>
+        <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Eunice</span>
+        <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Antecedente: Conciliación Ministraciones (/conta/proc)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT DE DELIMITACIÓN ARQUITECTÓNICA -->
+  <div class="callout-box">
+    <div class="callout-title">📌 Delimitación Arquitectónica: Conciliación de Ingresos vs. Conciliación Bancaria General</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      <strong>1. Conciliación de Ingresos (Este módulo):</strong> Opera a nivel de operación de ingreso. Relaciona el flujo operativo entre <em>Ingreso Esperado</em> ↔ <em>Depósito Bancario Recibido</em> ↔ <em>Importe Aplicado</em> ↔ <em>Póliza Contable-Presupuestaria</em>. Abarca todos los conceptos de ingreso institucional y trata a <em>“Ministraciones”</em> como una vista o filtro interno preconfigurado, no como un módulo aislado.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      <strong>2. Conciliación Bancaria General (Módulo transversal 06.3.1 / 03.3.2):</strong> Compara la totalidad de cargos y abonos del libro de bancos institucional contra los estados de cuenta bancarios (incluyendo cheques en tránsito, dispersiones de nómina y pagos a proveedores). <strong>No se duplica en este subsistema.</strong>
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      <strong>3. Exclusión documental:</strong> En esta etapa <strong>no se administran oficios, archivos PDF/XML, firmas, sellos ni expedientes</strong>. Se utiliza exclusivamente la referencia externa y bancaria alfanumérica.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>04.3.1 Conciliación de ingresos</strong> provee al Poder Judicial del Estado de Veracruz un tablero de control y supervisión periódica para asegurar que ningún recurso financiero quede sin percibir, sin aplicar o sin respaldo en los libros contables y presupuestales de la institución.</p>
+    <p>La herramienta opera mediante un algoritmo de <strong>cotejo cuádruple simultáneo</strong>:</p>
+    <div style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 18px; margin:10px 0 16px; font-family:var(--font-mono); font-size:12px; color:var(--pjev-verde-oscuro); text-align:center; font-weight:bold;">
+      [Ingreso Esperado / Notificado] ↔ [Depósito Bancario Percibido] ↔ [Importe Aplicado a Distribución] ↔ [Póliza Contable-Presupuestaria]
+    </div>
+    <p>A diferencia de visiones tradicionales donde solo se conciliaban las transferencias de subsidio estatal, este módulo universaliza el proceso abarcando todas las naturalezas financieras:</p>
+    <ul>
+      <li><strong>Ministraciones de SEFIPLAN:</strong> fondos ordinarios, extraordinarios y calendarizados.</li>
+      <li><strong>Arrendamientos (Rentas):</strong> cobro de espacios asignados a terceros dentro de inmuebles judiciales.</li>
+      <li><strong>Reintegros de Personal:</strong> recursos no ejercidos de viáticos o gastos sujetos a comprobar.</li>
+      <li><strong>Rendimientos Financieros:</strong> intereses generados por cuentas bancarias productivas.</li>
+      <li><strong>Otros Conceptos:</strong> pagos de copias certificadas, reposiciones de credenciales, cheques caducos y depósitos en ventanilla.</li>
+      <li><strong>Depósitos No Identificados:</strong> abonos bancarios en firme que permanecen en custodia transitoria a la espera de tipificación.</li>
+    </ul>
+  </div>
+
+  <!-- 2. OBJETIVO Y ALCANCE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Objetivo y Alcance Funcional</div>
+    <p><strong>Objetivo Principal:</strong> Identificar con oportunidad discrepancias monetarias, desfases temporales de radicación y omisiones contables entre lo que el PJEV tenía derecho a recibir o recibió en bancos, y lo que efectivamente se encuentra distribuido y contabilizado en el presupuesto del ejercicio.</p>
+    
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th style="width:50%;">Dentro del Alcance</th>
+          <th style="width:50%;">Fuera del Alcance (Exclusiones)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5;">
+              <li>Cotejo automatizado entre importes esperados, bancarios y aplicados.</li>
+              <li>Diferenciación explícita entre diferencia de importe ($) y desfase de fechas (días).</li>
+              <li>Soporte de parcialidades: 1 ingreso esperado cubierto por varios depósitos (1 a N).</li>
+              <li>Soporte de consolidaciones: 1 depósito bancario que cubre varios ingresos (N a 1).</li>
+              <li>Cálculo en tiempo real del <em>Saldo Pendiente por Percibir</em>.</li>
+              <li>Control de depósitos no identificados como partidas en conciliación.</li>
+              <li>Validación de las cuentas presupuestarias de orden (8.1.4 Devengada y 8.1.5 Recaudada).</li>
+              <li>Registro de observaciones y notas de aclaración por partida sin alterar el histórico.</li>
+            </ul>
+          </td>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5; color:#991b1b;">
+              <li>Carga o gestión de oficios en PDF o digitalizaciones de fichas bancarias.</li>
+              <li>Expedientes electrónicos de ingresos, sellos digitales o firmas criptográficas.</li>
+              <li>Cálculo de intereses moratorios o recargos fiscales.</li>
+              <li>Modificación directa o destructiva de registros originales de caja o banco.</li>
+              <li>Conciliación de cheques expedidos o pagos a proveedores (corresponde a Pagos 06.3.1).</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. DISTINCIÓN DEL ORIGEN DE REQUERIMIENTOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Origen y Sustento de los Requerimientos</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th style="width:25%;">Clasificación</th>
+          <th style="width:35%;">Requerimiento Específico</th>
+          <th style="width:40%;">Sustento y Evidencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Uso estricto de cuentas presupuestarias: 8.1.4 Devengada y 8.1.5 Recaudada.</td>
+          <td>Manual de Contabilidad Gubernamental CONAC: la cuenta <strong>8.1.4</strong> refleja la Ley de Ingresos Devengada (derecho exigible) y la <strong>8.1.5</strong> la Ley de Ingresos Recaudada (percepción en efectivo o equivalentes). <em>Bajo ninguna regla debe denominarse a la 8.1.5 como devengado.</em></td>
+        </tr>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Registro concurrentemente cuadrado de la afectación presupuestal y patrimonial.</td>
+          <td>LGCG Art. 38 y 43: el momento del ingreso recaudado debe reflejar el incremento correlativo en las cuentas de activo circulante (1.1.1.2 Bancos).</td>
+        </tr>
+        <tr>
+          <td><span class="badge-pjev">Evidencia Manual PJEV</span></td>
+          <td>Conciliación mensual del calendario de ministraciones SEFIPLAN.</td>
+          <td>Procedimiento de Conciliación de Recursos Financieros PJEV: obligación de elaborar la cédula de diferencias entre las transferencias recibidas de la Secretaría y el presupuesto calendarizado.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-doc">Evidencia Doc. Fuente</span></td>
+          <td>Existencia de depósitos en parcialidades y desfasados de fecha valor.</td>
+          <td>Pólizas contables y fichas de depósito observadas en expedientes de entrega-recepción donde una ministración estatal se transfiere en 2 o 3 partidas dentro del mismo mes con desfases de 3 a 12 días.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-prop">Propuesta de Diseño</span></td>
+          <td>Unificación de todos los conceptos y depósitos no identificados en una sola consola.</td>
+          <td>Propuesta institucional SIAF-PJEV: sustituye la consulta dispersa por un motor unificado con 9 estados de conciliación y vinculación dinámica.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. ACTORES Y PERMISOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Actores y Permisos en el Proceso</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Acciones Permitidas</th>
+          <th>Restricciones y Controles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Analista de Ingresos</strong></td>
+          <td>Ejecutar conciliación automática, consultar detalles, asociar depósitos bancarios, capturar notas de aclaración y exportar cédulas.</td>
+          <td>No puede marcar partidas con diferencias como "Conciliadas" sin justificación validada.</td>
+        </tr>
+        <tr>
+          <td><strong>Cajero Central</strong></td>
+          <td>Consultar el tablero de depósitos pendientes de identificación y asociar referencias de caja.</td>
+          <td>No puede modificar pólizas contables ni alterar montos de depósitos ya conciliados.</td>
+        </tr>
+        <tr>
+          <td><strong>Jefe de Tesorería</strong></td>
+          <td>Aprobar aclaraciones de diferencias, autorizar vinculaciones de partidas complejas y turnar inconsistencias a Contabilidad.</td>
+          <td>Responsable de emitir la Cédula Mensual de Conciliación previa al Cierre del Periodo.</td>
+        </tr>
+        <tr>
+          <td><strong>Auditoría Interna</strong></td>
+          <td>Consulta de sólo lectura del histórico de conciliaciones, bitácora de diferencias y traza de ajustes.</td>
+          <td>Acceso irrestricto de consulta sin facultades transaccionales.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. FLUJO FUNCIONAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Flujo Funcional de la Conciliación</div>
+    <p>El proceso de conciliación se ejecuta de acuerdo con las siguientes fases operativas:</p>
+    
+    <div style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:6px; padding:16px; margin-bottom:16px;">
+      <div style="font-weight:bold; color:var(--pjev-verde-oscuro); margin-bottom:10px;">Diagrama Lógico del Flujo de Conciliación:</div>
+      <ol style="font-size:13px; line-height:1.7; padding-left:22px; margin:0;">
+        <li><strong>Definición de Criterios:</strong> El usuario selecciona el Ejercicio, Periodo (Mes) y opcionalmente filtra por Concepto, Fuente, Cuenta Bancaria o Estatus.</li>
+        <li><strong>Ejecución del Algoritmo:</strong> El sistema extrae en memoria:
+          <ul style="margin:4px 0;">
+            <li>Los ingresos esperados del periodo (módulo <code>04.2.1</code>).</li>
+            <li>Los abonos bancarios registrados en cuentas institucionales (<code>01.4.2</code>).</li>
+            <li>Las líneas de distribución presupuestaria aplicadas (Capítulo, Fuente, Fondo, Órgano).</li>
+            <li>Las pólizas presupuestarias generadas (cuentas <code>8.1.4</code> y <code>8.1.5</code>).</li>
+          </ul>
+        </li>
+        <li><strong>Evaluación de Consistencia:</strong> El motor compara referencias, fechas e importes determinando si existe coincidencia exacta, parcialidad, desfase de fecha o diferencia monetaria.</li>
+        <li><strong>Clasificación Automática:</strong> Cada partida se etiqueta con uno de los 9 estados de conciliación predefinidos.</li>
+        <li><strong>Tratamiento de Excepciones:</strong>
+          <ul style="margin:4px 0;">
+            <li><em>Si hay parcialidad:</em> se visualiza el saldo pendiente y se permite ligar depósitos complementarios.</li>
+            <li><em>Si hay depósito no identificado:</em> se mantiene como partida transitoria visible para caja.</li>
+            <li><em>Si hay diferencia monetaria:</em> se exige capturar observación y se turna a ajuste o reclasificación.</li>
+          </ul>
+        </li>
+        <li><strong>Emisión del Resultado:</strong> Se genera la Cédula de Conciliación con el balance de cifras cuadradas e incidencias pendientes.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 6. CAMPOS Y RESULTADOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Campos de Filtro y Cédula de Resultados</div>
+    
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">6.1 Panel de Filtros de Búsqueda</h3>
+    <table class="props-table" style="margin-bottom:20px;">
+      <thead>
+        <tr><th>Parámetro de Filtro</th><th>Tipo / Componente</th><th>Comportamiento / Valores</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>ejercicio</code></td><td>Selector numérico</td><td>Obligatorio. Ejercicio activo (ej. 2026).</td></tr>
+        <tr><td><code>periodo</code></td><td>Selector mes (1-12)</td><td>Obligatorio. Periodo presupuestal a conciliar.</td></tr>
+        <tr><td><code>concepto_ingreso_id</code></td><td>Select catálogo</td><td>Opcional. Permite filtrar por Ministraciones, Rentas, Reintegros, etc.</td></tr>
+        <tr><td><code>fuente_financiamiento_id</code></td><td>Select catálogo</td><td>Opcional. Filtrado por fuente de recursos (Fiscales, Propios, FASP).</td></tr>
+        <tr><td><code>capitulo_gasto</code></td><td>Select</td><td>Opcional. Capítulos 1000, 2000, 3000, 5000.</td></tr>
+        <tr><td><code>unidad_administrativa_id</code></td><td>Select catálogo</td><td>Opcional. Filtro por unidad u órgano ejecutor del gasto.</td></tr>
+        <tr><td><code>cuenta_bancaria_id</code></td><td>Select catálogo</td><td>Opcional. Cuenta institucional receptora.</td></tr>
+        <tr><td><code>estado_conciliacion</code></td><td>Select múltiple</td><td>Opcional. Filtrar por Coincidente, Con diferencia, Pendiente, etc.</td></tr>
+        <tr><td><code>rango_fechas</code></td><td>DateRangePicker</td><td>Opcional. Rango de fechas de operación bancaria.</td></tr>
+        <tr><td><code>referencia_busqueda</code></td><td>Input text</td><td>Opcional. Búsqueda por folio interno, ref. externa o clave SPEI.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">6.2 Cédula de Resultados de la Conciliación (Grid Detallado)</h3>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Columna</th>
+          <th>Tipo / Formato</th>
+          <th>Descripción y Regla de Cálculo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>folio_ingreso</code></td><td><code>VARCHAR(25)</code></td><td>Folio del registro en <code>04.2.1</code> (ej. <code>ING-2026-0045</code>).</td></tr>
+        <tr><td><code>modalidad</code></td><td><code>Badge</code></td><td><code>ESPERADO</code> o <code>RECIBIDO</code>.</td></tr>
+        <tr><td><code>concepto</code></td><td><code>VARCHAR(100)</code></td><td>Descripción del concepto de ingreso (catálogo <code>04.1.1</code>).</td></tr>
+        <tr><td><code>importe_esperado</code></td><td><code>DECIMAL(18,2)</code></td><td>Monto notificado en el registro esperado (Aviso/Oficio).</td></tr>
+        <tr><td><code>importe_recibido</code></td><td><code>DECIMAL(18,2)</code></td><td>Monto real acreditado en el estado de cuenta bancario.</td></tr>
+        <tr><td><code>importe_aplicado</code></td><td><code>DECIMAL(18,2)</code></td><td>Monto validado en las líneas de distribución presupuestaria.</td></tr>
+        <tr><td><code>saldo_pendiente</code></td><td><code>DECIMAL(18,2)</code></td><td><code>importe_esperado - importe_aplicado</code> (mayor o igual a cero).</td></tr>
+        <tr><td><code>diferencia</code></td><td><code>DECIMAL(18,2)</code></td><td><code>importe_recibido - importe_esperado</code>.</td></tr>
+        <tr><td><code>fecha_esperada</code></td><td><code>DATE</code></td><td>Fecha proyectada para la radicación del recurso.</td></tr>
+        <tr><td><code>fecha_operacion</code></td><td><code>DATE</code></td><td>Fecha efectiva de acreditación bancaria.</td></tr>
+        <tr><td><code>fecha_valor</code></td><td><code>DATE</code></td><td>Fecha de disponibilidad firme de los fondos.</td></tr>
+        <tr><td><code>dias_desfase</code></td><td><code>INT</code></td><td><code>fecha_operacion - fecha_esperada</code> (días naturales).</td></tr>
+        <tr><td><code>cuenta_receptora</code></td><td><code>VARCHAR(50)</code></td><td>Banco y número de cuenta institucional destino.</td></tr>
+        <tr><td><code>referencia_bancaria</code></td><td><code>VARCHAR(80)</code></td><td>Clave de rastreo SPEI, folio de depósito o autorización.</td></tr>
+        <tr><td><code>fuente_financiamiento</code></td><td><code>VARCHAR(60)</code></td><td>Fuente asignada en la distribución (ej. 111 Recursos Fiscales).</td></tr>
+        <tr><td><code>capitulo</code></td><td><code>INT</code></td><td>Capítulo de destino (ej. 1000 Servicios Personales).</td></tr>
+        <tr><td><code>estado_poliza</code></td><td><code>Badge</code></td><td>Generada (8.1.4/8.1.5) / Pendiente / Con error.</td></tr>
+        <tr><td><code>estado_conciliacion</code></td><td><code>Tag Estatus</code></td><td>Estado analítico resultante de la conciliación.</td></tr>
+        <tr><td><code>observaciones</code></td><td><code>TEXT</code></td><td>Notas de seguimiento, justificación de desfase o aclaración.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. STORED PROCEDURES (LEER Y ABC) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      El cotejo multidimensional y las resoluciones de conciliación residen en PostgreSQL bajo <code>SECURITY DEFINER</code> y estructura JSONB unificada <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>.
+    </p>
+
+    <!-- 7.1 LEER -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">7.1. Procedimiento LEER (<code>ingresos.fn_leer_conciliacion_ingresos</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario activo de sesión.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal en curso.</td></tr>
+        <tr><td><code>p_periodo</code></td><td><code>SMALLINT</code></td><td>Periodo o mes presupuestal a conciliar (1 a 12).</td></tr>
+        <tr><td><code>p_estado_conciliacion</code></td><td><code>VARCHAR(35)</code></td><td>Filtro analítico (<code>COINCIDENTE</code>, <code>PARCIAL</code>, <code>DIFERENCIA</code>, etc., o NULL para todos).</td></tr>
+        <tr><td><code>p_concepto_id</code></td><td><code>BIGINT</code></td><td>Filtro por concepto de ingreso (opcional).</td></tr>
+        <tr><td><code>p_cuenta_bancaria_id</code></td><td><code>BIGINT</code></td><td>Filtro por cuenta recaudadora (opcional).</td></tr>
+        <tr><td><code>p_buscar</code></td><td><code>VARCHAR(100)</code></td><td>Texto libre por folio, origen o referencia bancaria (opcional).</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_conciliacion_ingresos(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_periodo SMALLINT,
+    p_estado_conciliacion VARCHAR DEFAULT NULL,
+    p_concepto_id BIGINT DEFAULT NULL,
+    p_cuenta_bancaria_id BIGINT DEFAULT NULL,
+    p_buscar VARCHAR DEFAULT NULL
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_data JSONB;
+    v_resumen JSONB;
+BEGIN
+    -- Resumen de totales del periodo
+    SELECT jsonb_build_object(
+        'total_esperado', COALESCE(SUM(i.importe_total) FILTER (WHERE i.modalidad = 'ESPERADO'), 0.00),
+        'total_recibido', COALESCE(SUM(i.importe_total) FILTER (WHERE i.modalidad = 'RECIBIDO'), 0.00),
+        'total_aplicado', COALESCE(SUM(d.importe_distribuido), 0.00),
+        'total_diferencia', COALESCE(SUM(CASE WHEN i.modalidad = 'ESPERADO' THEN (i.importe_total - COALESCE(d.importe_distribuido,0)) ELSE 0.00 END), 0.00)
+    ) INTO v_resumen
+    FROM ingresos.ingreso i
+    LEFT JOIN (
+        SELECT ingreso_id, SUM(importe_distribuido) AS importe_distribuido
+        FROM ingresos.ingreso_distribucion
+        WHERE estatus_registro = 1 GROUP BY ingreso_id
+    ) d ON i.ingreso_id = d.ingreso_id
+    WHERE i.ejercicio_fiscal = p_ejercicio AND i.periodo = p_periodo AND i.estatus_registro = 1;
+
+    -- Partidas analíticas de conciliación (4 vías)
+    SELECT COALESCE(jsonb_agg(
+        jsonb_build_object(
+            'ingreso_id', i.ingreso_id,
+            'folio_interno', i.folio_interno,
+            'modalidad', i.modalidad,
+            'concepto_nombre', COALESCE(c.descripcion_corta, 'Sin concepto asignado'),
+            'importe_esperado', CASE WHEN i.modalidad = 'ESPERADO' THEN i.importe_total ELSE 0.00 END,
+            'importe_recibido', CASE WHEN i.modalidad = 'RECIBIDO' THEN i.importe_total ELSE (i.importe_total - i.saldo_pendiente) END,
+            'importe_aplicado', COALESCE(dist.total_distribuido, 0.00),
+            'saldo_pendiente', i.saldo_pendiente,
+            'diferencia', CASE 
+                WHEN i.modalidad = 'ESPERADO' THEN (i.importe_total - COALESCE(dist.total_distribuido,0.00))
+                ELSE 0.00 
+            END,
+            'fecha_esperada', i.fecha_esperada,
+            'fecha_operacion', i.fecha_operacion_bancaria,
+            'fecha_valor', i.fecha_valor,
+            'dias_desfase', CASE 
+                WHEN i.fecha_operacion_bancaria IS NOT NULL AND i.fecha_esperada IS NOT NULL 
+                THEN (i.fecha_operacion_bancaria - i.fecha_esperada)
+                ELSE 0 
+            END,
+            'cuenta_receptora', cb.numero_cuenta,
+            'banco_nombre', cb.banco_nombre,
+            'referencia_bancaria', i.referencia_bancaria,
+            'estado_poliza', CASE 
+                WHEN EXISTS(SELECT 1 FROM contabilidad.poliza_detalle pd WHERE pd.referencia = i.folio_interno) THEN 'GENERADA'
+                ELSE 'PENDIENTE'
+            END,
+            'estado_conciliacion', CASE
+                WHEN i.estatus = 'CANCELADO' THEN 'CANCELADO'
+                WHEN i.concepto_ingreso_id IS NULL THEN 'NO_IDENTIFICADO'
+                WHEN i.saldo_pendiente > 0 AND i.saldo_pendiente < i.importe_total THEN 'PARCIAL'
+                WHEN i.saldo_pendiente = 0 AND (i.fecha_operacion_bancaria - i.fecha_esperada) > 2 THEN 'COINCIDENTE_DESFASE'
+                WHEN i.saldo_pendiente = 0 THEN 'COINCIDENTE'
+                ELSE 'CON_DIFERENCIA'
+            END,
+            'observaciones', i.observaciones
+        ) ORDER BY i.ingreso_id DESC
+    ), '[]'::jsonb) INTO v_data
+    FROM ingresos.ingreso i
+    LEFT JOIN ingresos.concepto_ingreso c ON i.concepto_ingreso_id = c.concepto_id
+    LEFT JOIN cfg.cuenta_bancaria cb ON i.cuenta_bancaria_id = cb.cuenta_id
+    LEFT JOIN (
+        SELECT ingreso_id, SUM(importe_distribuido) AS total_distribuido
+        FROM ingresos.ingreso_distribucion
+        WHERE estatus_registro = 1 GROUP BY ingreso_id
+    ) dist ON i.ingreso_id = dist.ingreso_id
+    WHERE i.ejercicio_fiscal = p_ejercicio
+      AND i.periodo = p_periodo
+      AND (p_concepto_id IS NULL OR i.concepto_ingreso_id = p_concepto_id)
+      AND (p_cuenta_bancaria_id IS NULL OR i.cuenta_bancaria_id = p_cuenta_bancaria_id)
+      AND (p_buscar IS NULL OR i.folio_interno ILIKE '%' || p_buscar || '%' OR i.referencia_bancaria ILIKE '%' || p_buscar || '%' OR i.origen_depositante ILIKE '%' || p_buscar || '%')
+      AND i.estatus_registro = 1;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'OK',
+        'resumen', v_resumen,
+        'data', v_data
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', '[]'::jsonb);
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 7.2 ABC -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">7.2. Procedimiento ABC (<code>ingresos.fn_crud_conciliacion_ingresos</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario ejecutor.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal.</td></tr>
+        <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1</code> = Vincular depósito parcial/total · <code>2</code> = Registrar cédula de aclaración de diferencia · <code>3</code> = Sellar conciliación de partida.</td></tr>
+        <tr><td><code>p_ingreso_id</code></td><td><code>BIGINT</code></td><td>ID del ingreso esperado o base.</td></tr>
+        <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con IDs de depósitos asociados, motivos del catálogo 04.1.3 y justificación.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_crud_conciliacion_ingresos(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_accion SMALLINT,
+    p_ingreso_id BIGINT,
+    p_datos JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_importe_abono NUMERIC(18,2);
+    v_saldo_actual NUMERIC(18,2);
+BEGIN
+    -- 1 = VINCULAR DEPÓSITO PARCIAL O TOTAL
+    IF p_accion = 1 THEN
+        v_importe_abono := (p_datos->>'importe_abono')::NUMERIC(18,2);
+        
+        SELECT saldo_pendiente INTO v_saldo_actual
+        FROM ingresos.ingreso WHERE ingreso_id = p_ingreso_id;
+
+        IF v_saldo_actual IS NULL THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'El ingreso especificado no existe.');
+        END IF;
+
+        IF v_importe_abono > v_saldo_actual THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'El importe a vincular ($' || v_importe_abono || ') excede el saldo pendiente ($' || v_saldo_actual || ').');
+        END IF;
+
+        UPDATE ingresos.ingreso SET
+            saldo_pendiente = saldo_pendiente - v_importe_abono,
+            estatus = CASE WHEN (saldo_pendiente - v_importe_abono) = 0 THEN 'RECIBIDO' ELSE 'PARCIALMENTE_RECIBIDO' END,
+            usuario_m = p_usuario, fecha_m = CURRENT_TIMESTAMP
+        WHERE ingreso_id = p_ingreso_id;
+
+        -- Registrar vínculo en bitácora de conciliación
+        INSERT INTO ingresos.conciliacion_detalle (
+            ingreso_id, deposito_asociado_id, importe_vinculado, referencia_bancaria,
+            usuario_c, fecha_c
+        ) VALUES (
+            p_ingreso_id, (p_datos->>'deposito_id')::BIGINT, v_importe_abono,
+            p_datos->>'referencia_bancaria', p_usuario, CURRENT_TIMESTAMP
+        );
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Depósito vinculado exitosamente.');
+
+    -- 2 = ACLARACIÓN DE DIFERENCIA CON MOTIVO TIPIFICADO (04.1.3)
+    ELSIF p_accion = 2 THEN
+        IF NOT (p_datos ? 'motivo_id') THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Debe seleccionar un motivo de aclaración del catálogo 04.1.3.');
+        END IF;
+
+        INSERT INTO ingresos.conciliacion_aclaracion (
+            ingreso_id, motivo_id, justificacion, importe_diferencia,
+            usuario_c, fecha_c
+        ) VALUES (
+            p_ingreso_id, (p_datos->>'motivo_id')::BIGINT, p_datos->>'justificacion',
+            (p_datos->>'importe_diferencia')::NUMERIC(18,2), p_usuario, CURRENT_TIMESTAMP
+        );
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Aclaración de diferencia registrada.');
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no reconocida.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. SERVICIOS API REST (SWAGGER / OPENAPI) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/procesos/conciliacion</code></td>
+          <td>Query: <code>{ ejercicio, periodo, estado?, conceptoId?, cuentaId?, buscar? }</code></td>
+          <td>Ejecuta y retorna el cotejo de conciliación en 4 vías con resumen global.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/procesos/conciliacion/:id/partidas-banco</code></td>
+          <td>Param: <code>id (BigInt)</code></td>
+          <td>Lista los depósitos bancarios candidatos a vincularse a la partida.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/procesos/conciliacion/vincular</code></td>
+          <td>Body: <code>VincularDepositoDto</code></td>
+          <td>Asocia depósito bancario al ingreso recalculando el saldo pendiente.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/procesos/conciliacion/aclarar-diferencia</code></td>
+          <td>Body: <code>AclararDiferenciaDto (con motivoId 04.1.3)</code></td>
+          <td>Asienta justificación y motivo formal de discrepancia o desfase.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/procesos/conciliacion/emitir-cedula</code></td>
+          <td>Body: <code>{ ejercicio, periodo, formato: 'PDF' | 'EXCEL' }</code></td>
+          <td>Genera la Cédula Oficial de Conciliación Mensual certificada.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>// NestJS Controller: ConciliacionIngresosController
+@ApiTags('04.3.1 Conciliación de Ingresos')
+@Controller('api/v1/ingresos/procesos/conciliacion')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class ConciliacionIngresosController {
+  constructor(private readonly concilService: ConciliacionIngresosService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Ejecutar cotejo cuádruple de conciliación mensual' })
+  async obtenerCotejo(@CurrentUser() user: UserSession, @Query() query: FiltrosConciliacionDto) {
+    return this.concilService.leer(user, query);
+  }
+
+  @Post('vincular')
+  @ApiOperation({ summary: 'Vincular depósito bancario a ingreso en parcialidad' })
+  async vincularDeposito(@CurrentUser() user: UserSession, @Body() dto: VincularDepositoDto) {
+    return this.concilService.vincularDeposito(user, dto);
+  }
+
+  @Post('aclarar-diferencia')
+  @ApiOperation({ summary: 'Registrar justificación de diferencia con motivo 04.1.3' })
+  async aclararDiferencia(@CurrentUser() user: UserSession, @Body() dto: AclararDiferenciaDto) {
+    return this.concilService.aclararDiferencia(user, dto);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 9. ESTADOS DE CONCILIACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Estados de Conciliación</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Estado</th><th>Criterio Técnico / Lógico</th><th>Acción Requerida</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag-status st-coincidente">Coincidente</span></td>
+          <td>Importe esperado = Importe recibido = Importe aplicado. Fecha de banco dentro del margen programado. Póliza generada.</td>
+          <td>Ninguna. Registro conciliado en automático.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-desfase">Coincidente con desfase de fecha</span></td>
+          <td>Importes cuadran al centavo, pero la fecha bancaria excede en más de 2 días a la fecha esperada.</td>
+          <td>Informativo. Se registra el número de días de mora o adelanto de la transferencia.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-parcial">Parcial</span></td>
+          <td>Importe recibido es menor al esperado (saldo pendiente &gt; $0.00). Amparado en recepción en parcialidades.</td>
+          <td>Vigilar la llegada del depósito complementario o solicitar aclaración de saldo.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-diferencia">Con diferencia</span></td>
+          <td>Existe una discrepancia neta no atribuible a parcialidades entre el depósito bancario y el monto oficial.</td>
+          <td>Exige captura de nota de aclaración o detonar trámite de ajuste/reclasificación.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-noid">Depósito no identificado</span></td>
+          <td>Existe un abono bancario sin vinculación a ingreso esperado ni concepto institucional conocido.</td>
+          <td>Tesorería debe rastrear origen y asociar al concepto en <code>04.2.1</code>.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-pend-aplic">Pendiente de aplicación</span></td>
+          <td>Depósito bancario acreditado, pero sus líneas de distribución presupuestaria aún no han sido confirmadas.</td>
+          <td>Completar la distribución por capítulo y fuente en el módulo de registro.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-pend-contab">Pendiente de contabilización</span></td>
+          <td>Ingreso recibido y aplicado que aún no cuenta con póliza de devengo/recaudo en el libro diario.</td>
+          <td>Detonar generación de póliza automática o solicitar asiento contable.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-pendiente">Pendiente</span></td>
+          <td>Ingreso esperado cuya fecha límite no ha vencido y aún no presenta abono bancario.</td>
+          <td>En espera ordinaria de radicación bancaria.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-conciliado">Conciliado</span></td>
+          <td>Partida cerrada y validada por el Jefe de Tesorería, lista para el Cierre Mensual.</td>
+          <td>Cierre definitivo de la partida en el periodo.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 10. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Reglas de Negocio Críticas</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CONC-01 · Consistencia Cuádruple Estricta</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Para que una partida alcance el estatus definitivo de <span class="tag-status st-coincidente">Coincidente</span> o <span class="tag-status st-conciliado">Conciliado</span>, debe comprobarse que: <code>Importe Esperado = Importe Depositado en Banco = Importe Distribuido por Capítulos = Importe de Póliza Presupuestaria 8.1.5</code>. La tolerancia monetaria admitida es de <strong>$0.00</strong>.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CONC-02 · Justificación Obligatoria para Diferencias</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Toda partida con estado <span class="tag-status st-diferencia">Con diferencia</span> requiere obligatoriamente la captura de una nota explicativa y la selección de una causal tipificada del catálogo <code>04.1.3 (Motivos de ajuste o cancelación)</code> para poder emitir la cédula formal de cierre.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CONC-03 · Bloqueo al Cierre Mensual (04.3.2)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          El módulo de Cierre Mensual (<code>04.3.2</code>) no permitirá sellar el periodo si existen depósitos en estado <span class="tag-status st-pend-aplic">Pendiente de aplicación</span> o <span class="tag-status st-pend-contab">Pendiente de contabilización</span>.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CONC-04 · Tratamiento de Parcialidades y Saldos</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Cuando un ingreso esperado recibe transferencias fraccionadas, el sistema mantendrá la partida en estado <span class="tag-status st-parcial">Parcial</span> mostrando el saldo pendiente. La cuenta <code>8.1.5</code> solo se reconocerá por el monto efectivamente cobrado.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CONC-05 · Inmutabilidad de Registros Fuente</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          La conciliación es un proceso analítico de cotejo; <strong>bajo ninguna circunstancia modifica directamente los importes de los registros bancarios o de ingresos originales</strong>. Cualquier corrección debe generarse a través de los procedimientos de ajuste o reclasificación (catálogo <code>04.1.3</code>).
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CONC-06 · Consistencia Presupuestaria de Cuentas (CONAC)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          El monto recaudado se extrae exclusivamente de la cuenta presupuestaria <strong>8.1.5 (Ley de Ingresos Recaudada)</strong> originada por pólizas en firme. El derecho devengado se refleja en la cuenta <strong>8.1.4 (Ley de Ingresos Devengada)</strong>. Queda prohibida la introducción manual o libre de montos recaudados no sustentados en pólizas.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 11. ACCIONES Y WIREFRAMES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Propuesta Visual de Interfaz (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">1. Consola de Conciliación de Ingresos</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">2. Cédula Detalle de Cotejo Cuádruple</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Modal: Aclaración y Vinculación</button>
+    </div>
+
+    <!-- WF1: CONSOLA PRINCIPAL -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Consola de Conciliación de Ingresos · Búsqueda y Grid Analítico</span>
+          <span style="font-size:10px; color:#666;">Filtros Dinámicos · Cédula Mensual</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 430" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="430" fill="#f8fafc" rx="4"/>
+            <!-- Top Toolbar -->
+            <rect x="15" y="15" width="930" height="50" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="44" font-size="13" font-weight="bold" fill="#183125">04.3.1 Conciliación de Ingresos</text>
+            <rect x="580" y="25" width="160" height="30" fill="#183125" rx="4"/>
+            <text x="660" y="44" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">⚡ Ejecutar Conciliación</text>
+            <rect x="750" y="25" width="180" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="840" y="44" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">📥 Exportar Cédula XLS</text>
+
+            <!-- Filters Area -->
+            <rect x="15" y="75" width="930" height="52" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="30" y="96" font-size="9" font-weight="bold" fill="#64748b">EJERCICIO:</text>
+            <rect x="30" y="100" width="70" height="20" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="35" y="114" font-size="10" fill="#1e293b">2026 ▼</text>
+
+            <text x="110" y="96" font-size="9" font-weight="bold" fill="#64748b">PERIODO:</text>
+            <rect x="110" y="100" width="90" height="20" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="115" y="114" font-size="10" fill="#1e293b">Febrero ▼</text>
+
+            <text x="210" y="96" font-size="9" font-weight="bold" fill="#64748b">CONCEPTO:</text>
+            <rect x="210" y="100" width="170" height="20" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="215" y="114" font-size="10" fill="#1e293b">Todos los conceptos ▼</text>
+
+            <text x="390" y="96" font-size="9" font-weight="bold" fill="#64748b">CUENTA BANCARIA:</text>
+            <rect x="390" y="100" width="190" height="20" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="395" y="114" font-size="10" fill="#1e293b">Santander *4012 (Todas) ▼</text>
+
+            <text x="590" y="96" font-size="9" font-weight="bold" fill="#64748b">ESTADO CONCILIACIÓN:</text>
+            <rect x="590" y="100" width="160" height="20" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="595" y="114" font-size="10" fill="#1e293b">Con incidencias / Todos ▼</text>
+
+            <rect x="760" y="100" width="80" height="20" fill="#0284c7" rx="3"/>
+            <text x="800" y="114" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Filtrar</text>
+
+            <!-- Table Header -->
+            <rect x="15" y="137" width="930" height="26" fill="#183125"/>
+            <text x="25" y="154" font-size="9" font-weight="bold" fill="#ffffff">FOLIO</text>
+            <text x="110" y="154" font-size="9" font-weight="bold" fill="#ffffff">CONCEPTO</text>
+            <text x="240" y="154" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">ESPERADO ($)</text>
+            <text x="340" y="154" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">RECIBIDO ($)</text>
+            <text x="440" y="154" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">APLICADO ($)</text>
+            <text x="540" y="154" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">PENDIENTE ($)</text>
+            <text x="630" y="154" font-size="9" font-weight="bold" fill="#ffffff">F. BANCARIA</text>
+            <text x="710" y="154" font-size="9" font-weight="bold" fill="#ffffff">DESFASE</text>
+            <text x="790" y="154" font-size="9" font-weight="bold" fill="#ffffff">ESTADO</text>
+            <text x="910" y="154" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ACCIÓN</text>
+
+            <!-- Row 1: Coincidente con Desfase -->
+            <rect x="15" y="163" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="184" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0045</text>
+            <text x="110" y="184" font-size="10" fill="#1e293b">Ministración Ordinaria Feb</text>
+            <text x="240" y="184" font-size="10" fill="#1e293b" text-anchor="end">45,000,000.00</text>
+            <text x="340" y="184" font-size="10" fill="#15803d" text-anchor="end">45,000,000.00</text>
+            <text x="440" y="184" font-size="10" fill="#15803d" text-anchor="end">45,000,000.00</text>
+            <text x="540" y="184" font-size="10" fill="#64748b" text-anchor="end">0.00</text>
+            <text x="630" y="184" font-size="10" fill="#334155">20/02/2026</text>
+            <text x="710" y="184" font-size="10" font-weight="bold" fill="#b45309">+5 días</text>
+            <rect x="760" y="171" width="105" height="18" fill="#fef9c3" stroke="#fde047" rx="9"/>
+            <text x="812" y="184" font-size="9" font-weight="bold" fill="#854d0e" text-anchor="middle">DESFASE FECHA</text>
+            <rect x="885" y="170" width="45" height="20" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="907" y="184" font-size="10" fill="#334155" text-anchor="middle">Ver</text>
+
+            <!-- Row 2: Parcial -->
+            <rect x="15" y="197" width="930" height="34" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="218" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0048</text>
+            <text x="110" y="218" font-size="10" fill="#1e293b">Convenio Fortalecimiento</text>
+            <text x="240" y="218" font-size="10" fill="#1e293b" text-anchor="end">10,000,000.00</text>
+            <text x="340" y="218" font-size="10" fill="#15803d" text-anchor="end">6,000,000.00</text>
+            <text x="440" y="218" font-size="10" fill="#15803d" text-anchor="end">6,000,000.00</text>
+            <text x="540" y="218" font-size="10" font-weight="bold" fill="#b45309" text-anchor="end">4,000,000.00</text>
+            <text x="630" y="218" font-size="10" fill="#334155">22/02/2026</text>
+            <text x="710" y="218" font-size="10" fill="#64748b">0 días</text>
+            <rect x="760" y="205" width="105" height="18" fill="#fed7aa" stroke="#fdba74" rx="9"/>
+            <text x="812" y="218" font-size="9" font-weight="bold" fill="#9a3412" text-anchor="middle">PARCIAL</text>
+            <rect x="885" y="204" width="45" height="20" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="907" y="218" font-size="10" fill="#334155" text-anchor="middle">Ver</text>
+
+            <!-- Row 3: Depósito no identificado -->
+            <rect x="15" y="231" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="252" font-size="10" font-weight="bold" fill="#6b21a8">DEP-2026-0189</text>
+            <text x="110" y="252" font-size="10" fill="#64748b">Abono directo ventanilla</text>
+            <text x="240" y="252" font-size="10" fill="#94a3b8" text-anchor="end">0.00</text>
+            <text x="340" y="252" font-size="10" fill="#15803d" text-anchor="end">32,500.00</text>
+            <text x="440" y="252" font-size="10" fill="#94a3b8" text-anchor="end">0.00</text>
+            <text x="540" y="252" font-size="10" fill="#94a3b8" text-anchor="end">0.00</text>
+            <text x="630" y="252" font-size="10" fill="#334155">24/02/2026</text>
+            <text x="710" y="252" font-size="10" fill="#64748b">N/A</text>
+            <rect x="760" y="239" width="105" height="18" fill="#f3e8ff" stroke="#d8b4fe" rx="9"/>
+            <text x="812" y="252" font-size="9" font-weight="bold" fill="#6b21a8" text-anchor="middle">NO IDENTIFICADO</text>
+            <rect x="885" y="238" width="45" height="20" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="907" y="252" font-size="10" fill="#334155" text-anchor="middle">Ligar</text>
+
+            <!-- Bottom Control Summary -->
+            <rect x="15" y="295" width="930" height="110" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="318" font-size="11" font-weight="bold" fill="#183125">Resumen de Cédula de Conciliación (Febrero 2026):</text>
+            
+            <rect x="30" y="330" width="210" height="60" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="40" y="348" font-size="9" fill="#64748b">TOTAL ESPERADO (DEVENGADO 8.1.4):</text>
+            <text x="40" y="372" font-size="15" font-weight="bold" fill="#1e293b">$ 55,000,000.00</text>
+
+            <rect x="260" y="330" width="210" height="60" fill="#ecfdf5" stroke="#a7f3d0" rx="4"/>
+            <text x="270" y="348" font-size="9" fill="#065f46">TOTAL RECAUDADO EN BANCOS (8.1.5):</text>
+            <text x="270" y="372" font-size="15" font-weight="bold" fill="#15803d">$ 51,032,500.00</text>
+
+            <rect x="490" y="330" width="210" height="60" fill="#fffbeb" stroke="#fde68a" rx="4"/>
+            <text x="500" y="348" font-size="9" fill="#92400e">SALDO PENDIENTE POR COBRAR:</text>
+            <text x="500" y="372" font-size="15" font-weight="bold" fill="#b45309">$ 4,000,000.00</text>
+
+            <rect x="720" y="330" width="210" height="60" fill="#f3e8ff" stroke="#d8b4fe" rx="4"/>
+            <text x="730" y="348" font-size="9" fill="#6b21a8">PARTIDAS EN ACLARACIÓN / NO ID:</text>
+            <text x="730" y="372" font-size="15" font-weight="bold" fill="#6b21a8">1 Abono ($ 32,500.00)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: MODAL DETALLE 4 VÍAS -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Detalle de Cotejo Cuádruple · ING-2026-0048</span>
+          <span style="font-size:10px; color:#666;">Confronta 4 Vías de Control</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 400" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="400" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <!-- Modal Header -->
+            <rect x="0" y="0" width="960" height="45" fill="#183125"/>
+            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Cédula de Cuadre Cuádruple · ING-2026-0048 (Convenio Fortalecimiento)</text>
+            <text x="935" y="28" font-size="14" font-weight="bold" fill="#cbd5e1" text-anchor="end">✕</text>
+
+            <!-- 4 Cards comparison -->
+            <rect x="25" y="65" width="215" height="150" fill="#f8fafc" stroke="#cbd5e1" rx="5"/>
+            <text x="35" y="85" font-size="10" font-weight="bold" fill="#0369a1">1. INGRESO ESPERADO</text>
+            <line x1="35" y1="92" x2="230" y2="92" stroke="#e2e8f0"/>
+            <text x="35" y="110" font-size="9" fill="#64748b">Folio: ING-2026-0048</text>
+            <text x="35" y="126" font-size="9" fill="#64748b">Fecha Esperada: 22/02/2026</text>
+            <text x="35" y="142" font-size="9" fill="#64748b">Ref: OFI-CONV-2026</text>
+            <text x="35" y="180" font-size="11" font-weight="bold" fill="#1e293b">Monto: $ 10,000,000.00</text>
+
+            <rect x="255" y="65" width="215" height="150" fill="#ecfdf5" stroke="#a7f3d0" rx="5"/>
+            <text x="265" y="85" font-size="10" font-weight="bold" fill="#15803d">2. DEPÓSITO BANCARIO</text>
+            <line x1="265" y1="92" x2="460" y2="92" stroke="#a7f3d0"/>
+            <text x="265" y="110" font-size="9" fill="#065f46">Santander Cta *4012</text>
+            <text x="265" y="126" font-size="9" fill="#065f46">Fecha Banco: 22/02/2026</text>
+            <text x="265" y="142" font-size="9" fill="#065f46">SPEI: 881940124</text>
+            <text x="265" y="180" font-size="11" font-weight="bold" fill="#15803d">Recibido: $ 6,000,000.00</text>
+
+            <rect x="485" y="65" width="215" height="150" fill="#f8fafc" stroke="#cbd5e1" rx="5"/>
+            <text x="495" y="85" font-size="10" font-weight="bold" fill="#475569">3. DISTRIBUCIÓN APLICADA</text>
+            <line x1="495" y1="92" x2="690" y2="92" stroke="#e2e8f0"/>
+            <text x="495" y="110" font-size="9" fill="#64748b">Cap. 2000: $ 3,000,000.00</text>
+            <text x="495" y="126" font-size="9" fill="#64748b">Cap. 3000: $ 3,000,000.00</text>
+            <text x="495" y="142" font-size="9" fill="#64748b">Fte: 111 Rec. Fiscales</text>
+            <text x="495" y="180" font-size="11" font-weight="bold" fill="#1e293b">Aplicado: $ 6,000,000.00</text>
+
+            <rect x="715" y="65" width="220" height="150" fill="#f8fafc" stroke="#cbd5e1" rx="5"/>
+            <text x="725" y="85" font-size="10" font-weight="bold" fill="#86198f">4. PÓLIZAS CONTABLES</text>
+            <line x1="725" y1="92" x2="925" y2="92" stroke="#e2e8f0"/>
+            <text x="725" y="110" font-size="9" fill="#64748b">Póliza Devengo #401</text>
+            <text x="725" y="126" font-size="9" fill="#64748b">Cuenta 8.1.4: $ 10,000,000</text>
+            <text x="725" y="142" font-size="9" fill="#64748b">Póliza Recaudo #512 (8.1.5)</text>
+            <text x="725" y="180" font-size="11" font-weight="bold" fill="#86198f">Recaudada: $ 6,000,000.00</text>
+
+            <!-- Bottom Diagnosis Bar -->
+            <rect x="25" y="235" width="910" height="70" fill="#fffbeb" stroke="#fde68a" rx="4"/>
+            <text x="40" y="258" font-size="11" font-weight="bold" fill="#92400e">DIAGNÓSTICO: RECEPCIÓN PARCIAL EN ESPERA DE SEGUNDA EXHIBICIÓN</text>
+            <text x="40" y="278" font-size="10" fill="#78350f">• Importe Original Esperado: $ 10,000,000.00 | Total Percibido: $ 6,000,000.00 | Saldo Pendiente: $ 4,000,000.00</text>
+            <text x="40" y="293" font-size="10" fill="#78350f">• La póliza de recaudación (8.1.5) cuadra exactamente con el depósito bancario. Se mantiene saldo devengado en 8.1.4.</text>
+
+            <!-- Actions -->
+            <rect x="25" y="335" width="200" height="32" fill="#183125" rx="4"/>
+            <text x="125" y="355" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">🔗 Ligar Segundo Depósito</text>
+
+            <rect x="240" y="335" width="180" height="32" fill="#ffffff" stroke="#991b1b" rx="4"/>
+            <text x="330" y="355" font-size="11" font-weight="bold" fill="#991b1b" text-anchor="middle">Ajustar Diferencia</text>
+
+            <rect x="805" y="335" width="130" height="32" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="870" y="355" font-size="11" fill="#334155" text-anchor="middle">Cerrar Cédula</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: MODAL VINCULACION -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Vinculación de Depósito Bancario a Ingreso Esperado</span>
+          <span style="font-size:10px; color:#666;">Asociación de Partidas</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="380" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <rect x="0" y="0" width="960" height="45" fill="#0284c7"/>
+            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Asociar Abono Bancario a Ingreso Esperado Pendiente</text>
+            <text x="935" y="28" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+
+            <text x="25" y="75" font-size="11" font-weight="bold" fill="#0369a1">SELECCIONE EL ABONO BANCARIO NO IDENTIFICADO A VINCULAR:</text>
+            
+            <rect x="25" y="90" width="910" height="24" fill="#334155"/>
+            <text x="35" y="106" font-size="9" font-weight="bold" fill="#ffffff">SELECCIONAR</text>
+            <text x="140" y="106" font-size="9" font-weight="bold" fill="#ffffff">FECHA BANCO</text>
+            <text x="240" y="106" font-size="9" font-weight="bold" fill="#ffffff">CUENTA BANCARIA</text>
+            <text x="440" y="106" font-size="9" font-weight="bold" fill="#ffffff">REF. / SPEI / CLAVE</text>
+            <text x="680" y="106" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">IMPORTE ABONO ($)</text>
+            <text x="820" y="106" font-size="9" font-weight="bold" fill="#ffffff">ESTATUS</text>
+
+            <rect x="25" y="116" width="910" height="30" fill="#ffffff" stroke="#f1f5f9"/>
+            <circle cx="50" cy="131" r="5" fill="#0284c7"/>
+            <text x="140" y="135" font-size="10" fill="#1e293b">24/02/2026</text>
+            <text x="240" y="135" font-size="10" fill="#1e293b">Santander *4012 (Concentradora)</text>
+            <text x="440" y="135" font-size="10" fill="#64748b">AUT-884129 - Ventanilla</text>
+            <text x="680" y="135" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">32,500.00</text>
+            <text x="820" y="135" font-size="9" fill="#6b21a8">No Identificado</text>
+
+            <rect x="25" y="170" width="910" height="95" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="40" y="192" font-size="10" font-weight="bold" fill="#1e293b">ASOCIAR AL INGRESO ESPERADO:</text>
+            <rect x="40" y="200" width="400" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="50" y="217" font-size="10" fill="#334155">ING-2026-0047 · Pago de Renta Espacio Juzgado ($ 32,500.00) ▼</text>
+
+            <text x="460" y="192" font-size="10" font-weight="bold" fill="#1e293b">MOTIVO DE VINCULACIÓN / ACLARACIÓN:</text>
+            <rect x="460" y="200" width="455" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="470" y="217" font-size="10" fill="#64748b">Depósito aclarado tras cotejo de ficha física entregada por arrendatario.</text>
+
+            <rect x="25" y="300" width="120" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="85" y="320" font-size="11" fill="#64748b" text-anchor="middle">Cancelar</text>
+
+            <rect x="745" y="300" width="190" height="32" fill="#0284c7" rx="4"/>
+            <text x="840" y="320" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Confirmar Vinculación</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 12. INTEGRACIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Integraciones con Registro, Contabilidad y Bancos</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Subsistema Enlazado</th><th>Punto de Interfaz</th><th>Mecanismo y Regla de Consumo</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>04.2.1 Registro de Ingresos</strong></td>
+          <td>Consumo de Expectativas y Aplicaciones</td>
+          <td>Lee los folios en estado Esperado, Parcial y Recibido. Al vincular depósitos, actualiza el saldo pendiente en el registro fuente.</td>
+        </tr>
+        <tr>
+          <td><strong>03 · Contabilidad Gubernamental</strong></td>
+          <td>Verificación de Pólizas Devengo y Recaudo</td>
+          <td>Valida la existencia y correspondencia de la cuenta <strong>8.1.4</strong> (Devengado) y <strong>8.1.5</strong> (Recaudado), además de las cuentas de activo <strong>1.1.1.2</strong> (Bancos) y <strong>1.1.2.4</strong> (Cuentas por cobrar a corto plazo).</td>
+        </tr>
+        <tr>
+          <td><strong>01.4.2 Cuentas Bancarias Institucionales</strong></td>
+          <td>Extractos y Cuentas Oficiales</td>
+          <td>Confronta los depósitos bancarios contra las chequeras y cuentas autorizadas registradas en Configuración Inicial.</td>
+        </tr>
+        <tr>
+          <td><strong>04.3.2 Cierre Mensual de Ingresos</strong></td>
+          <td>Validación Previa Bloqueante</td>
+          <td>El Cierre Mensual consulta el estado de la conciliación; prohíbe el cierre si existen diferencias monetarias sin aclaración.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 13. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">13</span> Casos de Prueba y Escenarios de Validación</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>ID</th><th>Escenario de Prueba</th><th>Condición de Entrada</th><th>Resultado Esperado</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-CONC-01</strong></td>
+          <td>Conciliación exitosa de ministración con 5 días de retraso.</td>
+          <td>Esperado: $45,000,000 para el 15/02. Banco: $45,000,000 el 20/02.</td>
+          <td>Estado resultante: <span class="tag-status st-desfase">Coincidente con desfase de fecha</span> (+5 días). No genera diferencia de importe.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-CONC-02</strong></td>
+          <td>Identificación y cálculo de saldo en cobro parcial.</td>
+          <td>Esperado: $10,000,000. Depósito recibido y aplicado: $6,000,000.</td>
+          <td>Estado: <span class="tag-status st-parcial">Parcial</span>. Saldo pendiente = $4,000,000. Póliza 8.1.5 registrada por $6,000,000.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-CONC-03</strong></td>
+          <td>Bloqueo de conciliación por discrepancia de importe sin justificar.</td>
+          <td>Esperado: $1,500,000. Recibido en banco: $1,480,000 (diferencia de $20,000).</td>
+          <td>Estado: <span class="tag-status st-diferencia">Con diferencia</span>. El sistema prohíbe marcar la partida como conciliada hasta ingresar la aclaración.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-CONC-04</strong></td>
+          <td>Abono bancario huérfano (No identificado).</td>
+          <td>Abono de $32,500 sin referencia en ingresos esperados.</td>
+          <td>Estado: <span class="tag-status st-noid">Depósito no identificado</span>. Queda clasificado en custodia transitoria en la cédula.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 14. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">14</span> Historial de Cambios</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción de Modificaciones</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>v1.0.0</code></td>
+          <td>02/09/2026</td>
+          <td>Eunice / Julio César</td>
+          <td>Creación formal del Análisis Funcional DOC-08 para 04.3.1 Conciliación de ingresos, universalizando el cotejo cuádruple y reemplazando la visión restringida a ministraciones.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+  function showWF(id, btn) {
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+    const target = document.getElementById('wf-' + id);
+    if (target) target.classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

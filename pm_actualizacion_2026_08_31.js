@@ -261,12 +261,139 @@
     .forEach((modulo) => { modulo.subsistema = '03.3 Procesos y Cierres'; });
 
   const ing = (id, sub, nombre, datos={}) => agregar(id,'04 Ingresos',sub,nombre,datos);
-  ing('04.1.1','04.1 Catálogos','Conceptos de ingreso',{perfil:'ing',f2:90,rutas:['/ing/conceptos'],responsable:'Eunice',documentacion:'Documentado en el manual vigente',opciones:['Ministraciones','Reintegros','Rendimientos','Otros conceptos']});
-  ing('04.1.2','04.1 Catálogos','Tipos de movimiento de ingreso',{perfil:'ing',f2:90,rutas:['/ing/tipos-mov'],responsable:'Eunice'});
-  ing('04.2.1','04.2 Registro','Registro y seguimiento de ingresos',{perfil:'ing',f2:90,rutas:['/ing/ingresos-recurso'],responsable:'Eunice',documentacion:'Documentado en el manual vigente',opciones:['Solicitudes y recepción de ministraciones','Depósitos','Rendimientos financieros','Reintegros y devoluciones','Aplicación presupuestaria','Correcciones y cancelaciones','Consulta y seguimiento'],evidencia:'Consolida las variantes de ingreso por tipo de movimiento y concepto. Fuentes de financiamiento y cuentas bancarias se reutilizan desde Configuración Inicial.'});
-  ing('04.3.1','04.3 Procesos','Conciliación de ministraciones',{perfil:'conta',f2:90,rutas:['/conta/proc/conciliacion-ministraciones'],responsable:'Eunice',estado:'Disponible parcialmente; requiere completar y validar',documentacion:'Documentado en el manual vigente'});
-  ing('04.3.2','04.3 Procesos','Cierre mensual de ingresos',{responsable:'Eunice',estado:'Pendiente de desarrollo'});
-  ing('04.4.1','04.4 Informes','Informes y control de ingresos',{responsable:'Eunice',estado:'Pendiente de desarrollo',opciones:['Ingresos por fuente, CRI, concepto y cuenta','Ministraciones solicitadas, recibidas y pendientes','Depósitos, reintegros y devoluciones','Rendimientos','Ingresos sin póliza o aplicación presupuestaria','Conciliación con Presupuesto, Contabilidad y bancos']});
+  ing('04.1.1','04.1 Catálogos','Conceptos de ingreso',{
+    perfil:'ing',
+    f2:90,
+    rutas:['/ing/conceptos'],
+    responsable:'Eunice',
+    documentacion:'Análisis funcional canónico',
+    documento:'04_ingresos/04.1.1-conceptos-ingreso.html',
+    opciones:[
+      'Ministración estatal',
+      'Ministración etiquetada',
+      'Renta',
+      'Reintegros',
+      'Rendimientos',
+      'Venta de bases',
+      'Otros ingresos'
+    ],
+    evidencia:'Catálogo canónico para clasificar la naturaleza del ingreso y sus banderas de distribución presupuestaria y enlace a CRI y matrices contables.'
+  });
+  ing('04.1.2','04.1 Catálogos','Tipos de movimiento de ingreso',{
+    perfil:'ing',
+    f2:90,
+    rutas:['/ing/tipos-mov'],
+    responsable:'Eunice',
+    documentacion:'Análisis funcional inicial',
+    documento:'04_ingresos/04.1.2-tipos-movimiento-ingreso.html',
+    opciones:[
+      'Registro esperado',
+      'Devengado',
+      'Recaudado',
+      'Devengado y recaudado simultáneo',
+      'Aplicación de depósito',
+      'Ajuste',
+      'Cancelación',
+      'Reverso',
+      'Reclasificación',
+      'Regularización'
+    ],
+    evidencia:'Documentación funcional creada; implementación por verificar. Define el ciclo de vida y momentos contables 8.1.4 y 8.1.5.'
+  });
+  ing('04.1.3','04.1 Catálogos','Motivos de ajuste o cancelación',{
+    responsable:'Eunice',
+    estado:'Pendiente de desarrollo',
+    documentacion:'Análisis funcional inicial',
+    documento:'04_ingresos/04.1.3-motivos-ajuste-cancelacion.html',
+    opciones:[
+      'Error de captura',
+      'Registro duplicado',
+      'Importe incorrecto',
+      'Fecha incorrecta',
+      'Cuenta bancaria incorrecta',
+      'Concepto o CRI incorrecto',
+      'Fuente de financiamiento incorrecta',
+      'Fondo o capítulo incorrecto',
+      'Depósito no identificado',
+      'Corrección contable',
+      'Reclasificación presupuestaria',
+      'Otro motivo autorizado'
+    ],
+    evidencia:'Documentación funcional creada; desarrollo pendiente. Estandariza las causales de ajuste y cancelación con severidad y autorizaciones.'
+  });
+  ing('04.2.1','04.2 Registro','Registro de ingresos',{
+    responsable:'Eunice',
+    estado:'Pendiente de desarrollo',
+    documentacion:'Análisis funcional inicial',
+    documento:'04_ingresos/04.2.1-registro-ingresos.html',
+    opciones:[
+      'Nuevo ingreso esperado',
+      'Registrar ingreso recibido',
+      'Guardar borrador',
+      'Distribuir por capítulo y fuente',
+      'Vincular depósito',
+      'Consultar saldo pendiente',
+      'Ajustar o cancelar',
+      'Consultar seguimiento'
+    ]
+  });
+  ing('04.3.1','04.3 Procesos','Conciliación de ingresos',{
+    perfil:'conta',
+    f2:70,
+    rutas:['/conta/proc/conciliacion-ministraciones'],
+    responsable:'Eunice',
+    estado:'Disponible parcialmente; requiere completar y validar',
+    documentacion:'Análisis funcional inicial',
+    documento:'04_ingresos/04.3.1-conciliacion-ingresos.html',
+    opciones:[
+      'Ejecutar conciliación',
+      'Consultar detalle',
+      'Vincular depósito',
+      'Aplicar depósito',
+      'Registrar observación',
+      'Marcar diferencia como aclarada',
+      'Enviar a corrección',
+      'Exportar resultados',
+      'Consultar historial'
+    ],
+    evidencia:'Existe implementación previa orientada a ministraciones (/conta/proc/conciliacion-ministraciones); se documenta su ampliación integral para conciliar todos los conceptos de ingreso, parcialidades y depósitos no identificados.'
+  });
+  ing('04.3.2','04.3 Procesos','Cierre mensual de ingresos',{
+    responsable:'Eunice',
+    estado:'Pendiente de desarrollo',
+    documentacion:'Análisis funcional inicial',
+    documento:'04_ingresos/04.3.2-cierre-mensual-ingresos.html',
+    opciones:[
+      'Ejecutar validación previa',
+      'Consultar incidencias',
+      'Navegar al registro que requiere corrección',
+      'Registrar justificación',
+      'Cerrar mes',
+      'Solicitar reapertura',
+      'Reabrir con autorización',
+      'Consultar historial de cierres'
+    ],
+    evidencia:'Consola de certificación de 13 validaciones de integridad financiera, congelamiento transaccional y coordinación con Contabilidad y Presupuesto.'
+  });
+  ing('04.4.1','04.4 Informes','Informes y control de ingresos',{
+    responsable:'Eunice',
+    estado:'Pendiente de desarrollo',
+    documentacion:'Análisis funcional inicial',
+    documento:'04_ingresos/04.4.1-informes-control-ingresos.html',
+    opciones:[
+      'Ingresos esperados y recibidos',
+      'Relación de depósitos',
+      'Ingresos por clasificación',
+      'Ministraciones',
+      'Reintegros, rentas y otros ingresos',
+      'Depósitos pendientes',
+      'Diferencias de conciliación',
+      'Auxiliar de ingresos',
+      'Estado del cierre mensual',
+      'Estado Analítico de Ingresos'
+    ],
+    evidencia:'Concentrador analítico de 10 informes operativos, presupuestarios, contables y de control de ingresos; provee vista al Estado Analítico de Ingresos canónico de Presupuesto (02.3.4.6) sin duplicidad.'
+  });
 
   const cxp = (id, sub, nombre, datos={}) => agregar(id,'05 Cuentas por Pagar',sub,nombre,datos);
   cxp('05.1.1','05.1 Catálogos','Requisitos documentales',{perfil:'rm',f2:90,rutas:['/adq/catad/docs_requisito'],responsable:'Daryl',documentacion:'Documentado en el manual vigente'});
@@ -321,6 +448,13 @@
     '07 Repositorio CFDI': 'Cristian'
   };
   const responsablesPorModulo = {
+    '04.1.1': 'Eunice',
+    '04.1.2': 'Eunice',
+    '04.1.3': 'Eunice',
+    '04.2.1': 'Eunice',
+    '04.3.1': 'Eunice',
+    '04.3.2': 'Eunice',
+    '04.4.1': 'Eunice',
     '05.2.1': 'Julio Cesar'
   };
 
@@ -346,6 +480,12 @@
     modulo.detalle_estado = reinicioIngresos
       ? 'Existe desarrollo incipiente como antecedente, pero el módulo se desarrollará nuevamente desde cero.'
       : (estadoAnterior === modulo.estado ? '' : estadoAnterior);
+
+    if (modulo.id === '04.1.2') {
+      modulo.detalle_estado = 'Documentación funcional creada; implementación por verificar.';
+    } else if (modulo.id === '04.1.3') {
+      modulo.detalle_estado = 'Documentación funcional creada; desarrollo pendiente.';
+    }
 
     if (modulo.fases && !reinicioIngresos) {
       modulo.evaluacion = {

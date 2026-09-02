@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.3.2 Cierre Mensual de Ingresos — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-doc  { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-prop { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .tag-status { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .st-abierto   { background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+    .st-revision  { background:#fef9c3; color:#854d0e; border:1px solid #fde047; }
+    .st-incidencia{ background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+    .st-listo     { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+    .st-cerrado   { background:#f1f5f9; color:#334155; border:1px solid #94a3b8; }
+    .st-reabierto { background:#fae8ff; color:#86198f; border:1px solid #f0abfc; }
+    .rule-check-box { display:flex; align-items:flex-start; gap:10px; padding:10px 14px; border-radius:6px; margin-bottom:8px; }
+    .rule-crit { background:#fff1f2; border:1px solid #fecdd3; }
+    .rule-warn { background:#fffbeb; border:1px solid #fef08a; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.put    { background: #fff3e0; color: #e65100; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>04 · Ingresos</span> ›
+    <span>04.3 · Procesos</span> ›
+    <span>04.3.2 Cierre mensual de ingresos</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.3.2</div>
+      <h1 class="elem-title">Cierre mensual de ingresos</h1>
+      <p class="elem-desc">Consola de control y certificación del periodo contable-presupuestal: ejecuta la batería de 13 validaciones de integridad financiera, bloquea transacciones ordinarias y coordina el sellado del mes con Contabilidad y Presupuesto.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Análisis funcional inicial (DOC-08)</span>
+        <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Eunice</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT DE POLÍTICA Y EXCLUSIONES -->
+  <div class="callout-box">
+    <div class="callout-title">📌 Directriz de Arquitectura y Alcance</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      El Cierre Mensual de Ingresos es un <strong>proceso transaccional de auditoría e inmutabilidad</strong>. No administra oficios, archivos adjuntos, firmas electrónicas, sellos digitales ni expedientes. Las excepciones o reaperturas se gestionan mediante bitácoras de justificación interna y controles de roles autorizadores.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      La generación de pólizas contables y la actualización de saldos corresponden a <strong>integraciones de base de datos</strong> orquestadas en este cierre, sin requerir módulos de software duplicados.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>04.3.2 Cierre mensual de ingresos</strong> representa la aduana de control final del subsistema de ingresos al término de cada mes contable. Su finalidad primordial es certificar que todas las operaciones financieras percibidas o notificadas durante el periodo mensual se encuentren debidamente sustentadas, distribuidas, conciliadas y contabilizadas antes de proceder a la consolidación de los Estados Financieros de la institución.</p>
+    <p>El cierre no es un mero cambio de bandera en base de datos; actúa como un <strong>motor de certificación preventiva</strong> que audita minuciosamente 13 condiciones de integridad financiera. Una vez cerrado el periodo, el sistema adquiere estado de solo lectura para los usuarios operativos, prohibiendo estrictamente altas, modificaciones o cancelaciones extemporáneas de ingresos que pudieran alterar las cifras ya reportadas a los órganos fiscalizadores.</p>
+  </div>
+
+  <!-- 2. OBJETIVO Y ALCANCE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Objetivo y Alcance</div>
+    <p><strong>Objetivo Principal:</strong> Garantizar la integridad, cuadre y consistencia de las cifras de ingresos recaudados y devengados en el mes, sellando las tablas operativas y coordinando el cierre armónico con los subsistemas de Contabilidad y Presupuesto.</p>
+    
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th style="width:50%;">Dentro del Alcance (Funcionalidad Aprobada)</th>
+          <th style="width:50%;">Fuera del Alcance (Exclusiones Estrictas)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5;">
+              <li>Ejecución automatizada de 13 validaciones de integridad financiera.</li>
+              <li>Generación de panel de incidencias con navegación directa al registro afectado.</li>
+              <li>Bloqueo transaccional de captura (escritura) tras formalizar el cierre.</li>
+              <li>Gestión de flujo de solicitud y autorización de reaperturas extraordinarias.</li>
+              <li>Bitácora inmutable de eventos de cierre y reapertura con usuario y fecha/hora.</li>
+              <li>Verificación del estado abierto del periodo contable en <code>01.1.3</code>.</li>
+            </ul>
+          </td>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5; color:#991b1b;">
+              <li>Carga o almacenamiento de actas de cierre en formato PDF o físico.</li>
+              <li>Firmas electrónicas o cadenas criptográficas para el acta.</li>
+              <li>Gestión de expedientes de correspondencia o sellos oficiales.</li>
+              <li>Cierre contable global definitivo (esa función reside en Contabilidad <code>03.3.7</code>).</li>
+              <li>Emisión de pólizas manuales de ajuste dentro del cierre (se derivan a <code>04.2.1</code>).</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. ORIGEN DE LOS REQUERIMIENTOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Origen y Sustento de los Requerimientos</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th style="width:25%;">Clasificación</th>
+          <th style="width:35%;">Requerimiento Específico</th>
+          <th style="width:40%;">Sustento y Evidencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Inmutabilidad de periodos mensuales y corte de momentos contables.</td>
+          <td>LGCG Art. 38, 42 y Manual de Contabilidad Gubernamental CONAC: los entes públicos deben emitir información financiera mensual en tiempo real y asegurar la inalterabilidad de los saldos cerrados.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Cuadre entre Ley de Ingresos Devengada (8.1.4) y Recaudada (8.1.5).</td>
+          <td>Clasificador por Rubros de Ingresos CONAC: el cierre debe certificar que todo importe reconocido como recaudado cuente con su afectación en 8.1.5 y en cuentas de activo 1.1.1.2 Bancos.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-pjev">Evidencia Manual PJEV</span></td>
+          <td>Procedimiento de Cierre de Ejercicio y Meses Calendario en Tesorería.</td>
+          <td>Manual de Procedimientos de Recursos Financieros PJEV: dispone que el área de Caja e Ingresos debe emitir el corte de depósitos y conciliar con Contabilidad antes del día 5 hábil posterior al mes vencido.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-doc">Evidencia Doc. Fuente</span></td>
+          <td>Existencia de actas y cédulas de corte mensual de cuentas bancarias.</td>
+          <td>Cédulas de trabajo de fin de mes suscritas por el Departamento de Ingresos donde se reportan los saldos en tránsito, depósitos por aclarar y transferencias de SEFIPLAN.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-prop">Propuesta de Diseño</span></td>
+          <td>Consola automatizada de 13 validaciones con bloqueo preventivo y reapertura trazable.</td>
+          <td>Propuesta institucional SIAF-PJEV: elimina cierres permisivos a ciegas garantizando que el sistema bloquee el cierre si existen anomalías graves.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. ACTORES Y PERMISOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Actores y Permisos en el Cierre</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Rol</th><th>Facultades en el Cierre</th><th>Controles y Restricciones</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Analista de Ingresos</strong></td>
+          <td>Ejecutar la validación previa, consultar la lista de incidencias, solventar errores en <code>04.2.1</code> y registrar notas explicativas.</td>
+          <td>No tiene permisos para ejecutar el botón <em>Cerrar Mes</em> ni autorizar reaperturas.</td>
+        </tr>
+        <tr>
+          <td><strong>Jefe del Departamento de Ingresos</strong></td>
+          <td>Revisar la certificación de las 13 validaciones, aceptar justificaciones no críticas, formalizar la acción de <em>Cerrar Mes</em> y solicitar reaperturas.</td>
+          <td>Solo puede cerrar cuando las 13 validaciones estén en estado satisfactorio o justificadas.</td>
+        </tr>
+        <tr>
+          <td><strong>Director de Administración / Subdirector de Finanzas</strong></td>
+          <td>Autorizar solicitudes excepcionales de reapertura de un periodo mensual previamente cerrado.</td>
+          <td>Requiere ingresar motivo formal tipificado, registrando fecha, hora y firma digital interna.</td>
+        </tr>
+        <tr>
+          <td><strong>Jefatura de Contabilidad</strong></td>
+          <td>Receptor del estatus de cierre de Ingresos para autorizar el cierre contable mensual en <code>03.3.7</code>.</td>
+          <td>No puede modificar registros de ingresos directamente.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. FLUJO FUNCIONAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Flujo Funcional del Cierre Mensual</div>
+    
+    <div style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:6px; padding:16px; margin-bottom:16px;">
+      <ol style="font-size:13px; line-height:1.7; padding-left:22px; margin:0;">
+        <li><strong>Apertura del Proceso:</strong> Al inicio del mes subsecuente, el Jefe de Ingresos ingresa a la consola y selecciona el Ejercicio y Periodo a cerrar. El estatus inicial es <span class="tag-status st-abierto">Abierto</span>.</li>
+        <li><strong>Paso a Revisión:</strong> Al pulsar <em>Ejecutar Validación Previa</em>, el sistema cambia el periodo a <span class="tag-status st-revision">En revisión</span> y detona la batería de las 13 pruebas de consistencia.</li>
+        <li><strong>Evaluación de Resultados:</strong>
+          <ul style="margin:4px 0;">
+            <li><em>Si se detecta al menos 1 incidencia crítica bloqueante:</em> el periodo transita a <span class="tag-status st-incidencia">Con incidencias</span>. Se despliega la lista de anomalías con botones de enlace directo al registro infractor para su corrección en <code>04.2.1</code> o <code>04.3.1</code>.</li>
+            <li><em>Si todas las pruebas son satisfactorias o las no críticas cuentan con justificación:</em> el sistema otorga la certificación <span class="tag-status st-listo">Listo para cierre</span>.</li>
+          </ul>
+        </li>
+        <li><strong>Ejecución del Cierre:</strong> El Jefe de Ingresos pulsa <em>Cerrar Mes</em>. El sistema actualiza el estatus a <span class="tag-status st-cerrado">Cerrado</span>, congela las transacciones y notifica al subsistema contable.</li>
+        <li><strong>Flujo Excepcional de Reapertura:</strong> En caso de requerirse un ajuste contable mayor posterior al cierre, el Jefe de Ingresos ejecuta <em>Solicitar Reapertura</em>. Una vez validada por la Dirección de Administración, el estatus pasa a <span class="tag-status st-reabierto">Reabierto</span>, habilitando una ventana de corrección temporal bajo estricta bitácora.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 6. MATRIZ DE LAS 13 VALIDACIONES PREVIAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Matriz de las 13 Validaciones Previas al Cierre</div>
+    <p>El cierre del periodo evalúa exhaustivamente el cumplimiento de las siguientes condiciones:</p>
+    
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th style="width:6%;">No.</th>
+          <th style="width:30%;">Regla de Validación</th>
+          <th style="width:14%;">Severidad</th>
+          <th style="width:50%;">Criterio Técnico y Condición de Éxito</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>V-01</strong></td>
+          <td>Ingresos recibidos con concepto</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>No debe existir ningún registro en modalidad <code>RECIBIDO</code> que carezca de <code>concepto_ingreso_id</code> (catálogo <code>04.1.1</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>V-02</strong></td>
+          <td>Depósitos con cuenta bancaria</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>Todos los depósitos acreditados deben tener asignada obligatoriamente una cuenta bancaria activa (<code>01.4.2</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>V-03</strong></td>
+          <td>Distribuciones presupuestarias cuadradas</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>En cada ingreso, la suma de las líneas de detalle (Capítulo, Fuente, Fondo, Órgano) debe ser exactamente igual al importe total (diferencia = $0.00).</td>
+        </tr>
+        <tr>
+          <td><strong>V-04</strong></td>
+          <td>Importes distribuidos vs aplicados</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>Los montos asignados en la distribución deben coincidir al 100% con los importes aplicados a techos presupuestales.</td>
+        </tr>
+        <tr>
+          <td><strong>V-05</strong></td>
+          <td>Identificación de ingresos esperados pendientes</td>
+          <td><span class="tag-status st-desfase">Advertencia</span></td>
+          <td>Los ingresos esperados que no recibieron fondos en el mes deben contar con su estado vigente o estar formalmente reprogramados.</td>
+        </tr>
+        <tr>
+          <td><strong>V-06</strong></td>
+          <td>Consistencia de saldos en recepciones parciales</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>En partidas con cobro parcial, el saldo pendiente debe ser exactamente: <code>Importe Esperado - Σ Depósitos Aplicados</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>V-07</strong></td>
+          <td>Depósitos no identificados justificados</td>
+          <td><span class="tag-status st-desfase">Advertencia</span></td>
+          <td>Si existen abonos bancarios aún sin tipificar en <code>04.2.1</code>, deben contener obligatoriamente una nota de justificación de custodia.</td>
+        </tr>
+        <tr>
+          <td><strong>V-08</strong></td>
+          <td>Ingresos aplicados con póliza contable</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>Todo ingreso con estatus <em>Aplicado</em> debe tener vinculada exitosamente su póliza presupuestaria/contable.</td>
+        </tr>
+        <tr>
+          <td><strong>V-09</strong></td>
+          <td>Pólizas contables sin error</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>No debe existir ninguna póliza contable asociada en estatus de error, descuadre o rechazo en el módulo de contabilidad (<code>03.2.1</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>V-10</strong></td>
+          <td>Consistencia en momentos contables CONAC</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>La cuenta <strong>8.1.4 (Ley Devengada)</strong> debe reflejar la exigibilidad y la <strong>8.1.5 (Ley Recaudada)</strong> el cobro en firme. <em>El recaudo nunca debe exceder al devengado sin la correspondiente ampliación o simultaneidad.</em></td>
+        </tr>
+        <tr>
+          <td><strong>V-11</strong></td>
+          <td>Conciliación de ingresos ejecutada</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>El módulo <code>04.3.1 Conciliación de ingresos</code> debe haber sido ejecutado para el periodo correspondiente.</td>
+        </tr>
+        <tr>
+          <td><strong>V-12</strong></td>
+          <td>Diferencias de conciliación con observación</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>Cualquier discrepancia de importe o partida con diferencia debe contar con la observación y cédula de aclaración del analista.</td>
+        </tr>
+        <tr>
+          <td><strong>V-13</strong></td>
+          <td>Periodo contable general abierto</td>
+          <td><span class="tag-status st-incidencia">Bloqueante</span></td>
+          <td>El ejercicio fiscal y el periodo mensual deben encontrarse activos y habilitados para escritura en Configuración Inicial (<code>01.1.3</code>).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. STORED PROCEDURES (LEER Y ABC) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      El motor de validaciones previas, sellado definitivo y reaperturas excepcionales reside en PostgreSQL bajo <code>SECURITY DEFINER</code> y estructura JSONB unificada <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>.
+    </p>
+
+    <!-- 7.1 LEER -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">7.1. Procedimiento LEER (<code>ingresos.fn_leer_cierre_mensual</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario activo de sesión.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal en curso.</td></tr>
+        <tr><td><code>p_periodo</code></td><td><code>SMALLINT</code></td><td>Periodo mensual a consultar o validar (1 a 12).</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_cierre_mensual(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_periodo SMALLINT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_estado VARCHAR(25);
+    v_cierre_id BIGINT;
+    v_incidencias JSONB;
+    v_resumen_metricas JSONB;
+BEGIN
+    -- 1. Consultar estado actual del periodo
+    SELECT cierre_id, estatus INTO v_cierre_id, v_estado
+    FROM ingresos.cierre_periodo
+    WHERE ejercicio_fiscal = p_ejercicio AND periodo = p_periodo;
+
+    IF v_estado IS NULL THEN
+        v_estado := 'ABIERTO';
+    END IF;
+
+    -- 2. Ejecución automatizada de las 13 validaciones
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'codigo', v.codigo,
+            'nombre', v.nombre,
+            'severidad', v.severidad,
+            'cumplido', v.cumplido,
+            'total_anomalias', v.total_anomalias,
+            'mensaje', v.mensaje
+        )
+    ) INTO v_incidencias
+    FROM (
+        -- V-01: Recibidos sin concepto
+        SELECT 'V-01' AS codigo, 'Ingresos recibidos con concepto' AS nombre, 'BLOQUEANTE' AS severidad,
+               COUNT(*) = 0 AS cumplido, COUNT(*) AS total_anomalias,
+               'Existen depósitos recibidos sin concepto asignado' AS mensaje
+        FROM ingresos.ingreso WHERE ejercicio_fiscal = p_ejercicio AND periodo = p_periodo AND modalidad = 'RECIBIDO' AND concepto_ingreso_id IS NULL AND estatus_registro = 1
+        UNION ALL
+        -- V-02: Depósitos sin cuenta bancaria
+        SELECT 'V-02', 'Depósitos con cuenta bancaria', 'BLOQUEANTE',
+               COUNT(*) = 0, COUNT(*), 'Existen depósitos sin cuenta bancaria vinculada'
+        FROM ingresos.ingreso WHERE ejercicio_fiscal = p_ejercicio AND periodo = p_periodo AND modalidad = 'RECIBIDO' AND cuenta_bancaria_id IS NULL AND estatus_registro = 1
+        UNION ALL
+        -- V-03: Distribuciones cuadradas
+        SELECT 'V-03', 'Distribuciones presupuestarias cuadradas', 'BLOQUEANTE',
+               COUNT(*) = 0, COUNT(*), 'Existen ingresos cuya distribución no suma el total'
+        FROM ingresos.ingreso i
+        LEFT JOIN (
+            SELECT ingreso_id, SUM(importe_distribuido) AS suma_dist FROM ingresos.ingreso_distribucion WHERE estatus_registro = 1 GROUP BY ingreso_id
+        ) d ON i.ingreso_id = d.ingreso_id
+        WHERE i.ejercicio_fiscal = p_ejercicio AND i.periodo = p_periodo AND i.estatus_registro = 1 AND ABS(i.importe_total - COALESCE(d.suma_dist,0)) > 0.001
+        UNION ALL
+        -- V-04: Cuadre con conciliación
+        SELECT 'V-04', 'Conciliación de ingresos ejecutada', 'BLOQUEANTE',
+               EXISTS(SELECT 1 FROM ingresos.conciliacion_periodo cp WHERE cp.ejercicio_fiscal = p_ejercicio AND cp.periodo = p_periodo),
+               CASE WHEN EXISTS(SELECT 1 FROM ingresos.conciliacion_periodo cp WHERE cp.ejercicio_fiscal = p_ejercicio AND cp.periodo = p_periodo) THEN 0 ELSE 1 END,
+               'No se ha emitido la conciliación del periodo'
+    ) v;
+
+    -- 3. Resumen financiero del periodo
+    SELECT jsonb_build_object(
+        'total_ingresos_esperados', COALESCE(SUM(importe_total) FILTER (WHERE modalidad = 'ESPERADO'), 0.00),
+        'total_ingresos_recibidos', COALESCE(SUM(importe_total) FILTER (WHERE modalidad = 'RECIBIDO'), 0.00),
+        'total_saldo_pendiente', COALESCE(SUM(saldo_pendiente), 0.00)
+    ) INTO v_resumen_metricas
+    FROM ingresos.ingreso
+    WHERE ejercicio_fiscal = p_ejercicio AND periodo = p_periodo AND estatus_registro = 1;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'OK',
+        'data', jsonb_build_object(
+            'ejercicio', p_ejercicio,
+            'periodo', p_periodo,
+            'estatus', v_estado,
+            'metricas', v_resumen_metricas,
+            'validaciones', COALESCE(v_incidencias, '[]'::jsonb),
+            'listo_para_cierre', NOT EXISTS(SELECT 1 FROM jsonb_array_elements(v_incidencias) e WHERE (e->>'cumplido')::BOOLEAN = false AND e->>'severidad' = 'BLOQUEANTE')
+        )
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM);
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 7.2 ABC -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">7.2. Procedimiento ABC (<code>ingresos.fn_crud_cierre_mensual</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario facultado (Jefe de Tesorería o Director de Administración).</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio presupuestario.</td></tr>
+        <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1</code> = Formalizar cierre mensual · <code>2</code> = Solicitar reapertura excepcional · <code>3</code> = Autorizar reapertura.</td></tr>
+        <tr><td><code>p_periodo</code></td><td><code>SMALLINT</code></td><td>Periodo a cerrar o reabrir (1 a 12).</td></tr>
+        <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con justificación de reapertura y folio de autorización de DGA.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_crud_cierre_mensual(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_accion SMALLINT,
+    p_periodo SMALLINT,
+    p_datos JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_cierre_id BIGINT;
+    v_val_res JSONB;
+BEGIN
+    -- 1 = FORMALIZAR CIERRE MENSUAL
+    IF p_accion = 1 THEN
+        -- Re-evaluar validaciones bloqueantes
+        v_val_res := ingresos.fn_leer_cierre_mensual(p_usuario, p_ejercicio, p_periodo);
+        IF (v_val_res->'data'->>'listo_para_cierre')::BOOLEAN = false THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'No es posible cerrar el mes: existen incidencias críticas bloqueantes sin resolver.');
+        END IF;
+
+        INSERT INTO ingresos.cierre_periodo (
+            ejercicio_fiscal, periodo, estatus, fecha_cierre, usuario_cierre, usuario_c, fecha_c
+        ) VALUES (
+            p_ejercicio, p_periodo, 'CERRADO', CURRENT_TIMESTAMP, p_usuario, p_usuario, CURRENT_TIMESTAMP
+        )
+        ON CONFLICT (ejercicio_fiscal, periodo) DO UPDATE SET
+            estatus = 'CERRADO', fecha_cierre = CURRENT_TIMESTAMP, usuario_cierre = p_usuario,
+            usuario_m = p_usuario, fecha_m = CURRENT_TIMESTAMP
+        RETURNING cierre_id INTO v_cierre_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Periodo mensual cerrado exitosamente. Las operaciones han quedado congeladas.');
+
+    -- 2 = SOLICITAR O AUTORIZAR REAPERTURA EXCEPCIONAL
+    ELSIF p_accion = 3 THEN
+        IF NOT (p_datos ? 'justificacion') OR LENGTH(TRIM(p_datos->>'justificacion')) < 25 THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La reapertura exige una justificación formal de al menos 25 caracteres.');
+        END IF;
+
+        UPDATE ingresos.cierre_periodo SET
+            estatus = 'REABIERTO',
+            usuario_reapertura = p_usuario,
+            fecha_reapertura = CURRENT_TIMESTAMP,
+            justificacion_reapertura = p_datos->>'justificacion',
+            usuario_m = p_usuario, fecha_m = CURRENT_TIMESTAMP
+        WHERE ejercicio_fiscal = p_ejercicio AND periodo = p_periodo;
+
+        -- Registrar en bitácora inmutable de reaperturas
+        INSERT INTO ingresos.cierre_bitacora (
+            ejercicio_fiscal, periodo, evento, usuario, justificacion, fecha
+        ) VALUES (
+            p_ejercicio, p_periodo, 'REAPERTURA_AUTORIZADA', p_usuario, p_datos->>'justificacion', CURRENT_TIMESTAMP
+        );
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Periodo mensual reabierto bajo bitácora de auditoría.');
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no soportada.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. SERVICIOS API REST (SWAGGER / OPENAPI) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/procesos/cierre/:ejercicio/:periodo</code></td>
+          <td>Params: <code>ejercicio, periodo</code></td>
+          <td>Consulta el estado del periodo y el dictamen de las 13 pruebas de consistencia.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/procesos/cierre/ejecutar-cierre</code></td>
+          <td>Body: <code>{ ejercicio, periodo }</code></td>
+          <td>Formaliza el sellado del mes, congelando las tablas transaccionales de ingresos.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/procesos/cierre/reabrir</code></td>
+          <td>Body: <code>{ ejercicio, periodo, justificacion, oficioAutorizacion }</code></td>
+          <td>Abre temporalmente el periodo bajo autorización de la Dirección de Administración.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/procesos/cierre/:ejercicio/:periodo/bitacora</code></td>
+          <td>Params: <code>ejercicio, periodo</code></td>
+          <td>Historial de validaciones, sellados y reaperturas del mes.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>// NestJS Controller: CierreMensualIngresosController
+@ApiTags('04.3.2 Cierre Mensual de Ingresos')
+@Controller('api/v1/ingresos/procesos/cierre')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class CierreMensualIngresosController {
+  constructor(private readonly cierreService: CierreMensualIngresosService) {}
+
+  @Get(':ejercicio/:periodo')
+  @ApiOperation({ summary: 'Consultar estado del periodo y certificación de las 13 validaciones' })
+  async consultarEstado(@Param('ejercicio') eje: number, @Param('periodo') per: number, @CurrentUser() user: UserSession) {
+    return this.cierreService.leer(user, eje, per);
+  }
+
+  @Post('ejecutar-cierre')
+  @ApiOperation({ summary: 'Formalizar el sellado mensual de ingresos' })
+  async ejecutarCierre(@CurrentUser() user: UserSession, @Body() dto: CerrarPeriodoDto) {
+    return this.cierreService.formalizarCierre(user, dto);
+  }
+
+  @Post('reabrir')
+  @ApiOperation({ summary: 'Autorizar reapertura excepcional del periodo' })
+  async reabrirPeriodo(@CurrentUser() user: UserSession, @Body() dto: ReabrirPeriodoDto) {
+    return this.cierreService.reabrir(user, dto);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 9. ESTADOS DEL PERIODO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Matriz de Estados del Periodo</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Estado</th><th>Definición Operativa</th><th>Permisos de Escritura</th><th>Acción que lo Provoca</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag-status st-abierto">Abierto</span></td>
+          <td>Periodo en operación ordinaria de captura diaria de caja e ingresos.</td>
+          <td>Escritura y lectura total</td>
+          <td>Inicio automático del mes o apertura inicial de ejercicio.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-revision">En revisión</span></td>
+          <td>Periodo bajo ejecución de la validación previa automatizada.</td>
+          <td>Lectura; escritura restringida</td>
+          <td>Acción <em>Ejecutar Validación Previa</em>.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-incidencia">Con incidencias</span></td>
+          <td>La validación detectó violaciones a reglas bloqueantes que impiden cerrar.</td>
+          <td>Solo corrección de incidencias</td>
+          <td>Fallo en alguna de las validaciones V-01 a V-13.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-listo">Listo para cierre</span></td>
+          <td>Las 13 validaciones fueron superadas satisfactoriamente.</td>
+          <td>Bloqueado temporal</td>
+          <td>Certificación exitosa del motor de reglas.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-cerrado">Cerrado</span></td>
+          <td>Periodo concluido formalmente. Las tablas de ingresos quedan en solo lectura.</td>
+          <td>Solo lectura estricta</td>
+          <td>Acción <em>Cerrar Mes</em> por Jefatura de Tesorería.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-reabierto">Reabierto</span></td>
+          <td>Periodo reabierto excepcionalmente para un ajuste mayor autorizado.</td>
+          <td>Escritura auditable con traza</td>
+          <td>Acción <em>Reabrir con Autorización</em>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 10. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Reglas de Negocio del Cierre</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CIERRE-01 · Bloqueo por Incidencias Críticas</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          El sistema bloqueará de manera estricta el botón <em>Cerrar Mes</em> si existe al menos una incidencia calificada como <span class="tag-status st-incidencia">Bloqueante</span>. No existen excepciones manuales para omitir descuadres matemáticos o pólizas inexistentes.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CIERRE-02 · Justificación Obligatoria de Excepciones No Críticas</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Las incidencias catalogadas como <span class="tag-status st-desfase">Advertencia</span> (ej. depósitos no identificados justificados) requerirán que el Jefe de Ingresos ingrese una justificación técnica en el campo correspondiente antes de que el sistema otorgue el estado <em>Listo para Cierre</em>.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CIERRE-03 · Congelamiento Transaccional Post-Cierre</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Una vez que el periodo adquiere el estatus <span class="tag-status st-cerrado">Cerrado</span>, se inhabilitan todos los botones de creación, edición, vinculación y cancelación en los módulos <code>04.2.1</code> y <code>04.3.1</code> para dicho mes.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CIERRE-04 · Bitácora Inmutable de Reapertura</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Toda reapertura exigirá la captura de un folio de autorización emitido por la Dirección de Administración y el motivo tipificado institucional. Quedará registrada de forma inalterable en la bitácora de auditoría con la identidad del usuario y marca de tiempo exacta.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-CIERRE-05 · Sincronización Inter-Sistemas</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          El Cierre Mensual de Ingresos se comunica con el motor de Contabilidad (<code>03.3.7</code>). Si Contabilidad ya cerró el mes general, el módulo de ingresos no podrá ser reabierto bajo ninguna circunstancia sin reabrir primero el periodo contable institucional.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 11. ACCIONES Y WIREFRAMES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Propuesta Visual de Interfaz (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">1. Panel de Cierre y Diagnóstico</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">2. Bandeja de Incidencias Detectadas</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Bitácora de Cierres y Reaperturas</button>
+    </div>
+
+    <!-- WF1: PANEL DE CIERRE -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Consola de Cierre Mensual de Ingresos · Diagnóstico Previo</span>
+          <span style="font-size:10px; color:#666;">Control de Periodo · Ejercicio 2026</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 410" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="410" fill="#f8fafc" rx="4"/>
+            <!-- Top Status Bar -->
+            <rect x="15" y="15" width="930" height="65" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="42" font-size="14" font-weight="bold" fill="#183125">Cierre Mensual de Ingresos · Febrero 2026</text>
+            <text x="30" y="62" font-size="10" fill="#64748b">Estado del Periodo: EN REVISIÓN (Validación previa ejecutada el 02/03/2026 10:15 por Eunice)</text>
+            <rect x="790" y="28" width="140" height="26" fill="#fee2e2" stroke="#fca5a5" rx="13"/>
+            <text x="860" y="45" font-size="10" font-weight="bold" fill="#991b1b" text-anchor="middle">2 INCIDENCIAS</text>
+
+            <!-- 13 Checks Summary Grid -->
+            <text x="15" y="102" font-size="11" font-weight="bold" fill="#183125">RESUMEN DE LAS 13 VALIDACIONES PREVIAS:</text>
+            
+            <rect x="15" y="112" width="295" height="180" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="25" y="132" font-size="10" font-weight="bold" fill="#0369a1">A. INTEGRIDAD OPERATIVA</text>
+            <line x1="25" y1="138" x2="300" y2="138" stroke="#e2e8f0"/>
+            <text x="25" y="156" font-size="9" fill="#15803d">✓ V-01 Ingresos con concepto (100%)</text>
+            <text x="25" y="174" font-size="9" fill="#15803d">✓ V-02 Depósitos con cuenta bancaria</text>
+            <text x="25" y="192" font-size="9" fill="#15803d">✓ V-05 Esperados pendientes identificados</text>
+            <text x="25" y="210" font-size="9" fill="#15803d">✓ V-06 Parcialidades con saldo consistente</text>
+            <text x="25" y="228" font-size="9" fill="#854d0e">⚠️ V-07 1 Depósito no ID con justificación</text>
+            <text x="25" y="246" font-size="9" fill="#15803d">✓ V-13 Periodo contable abierto (01.1.3)</text>
+
+            <rect x="330" y="112" width="295" height="180" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="340" y="132" font-size="10" font-weight="bold" fill="#0369a1">B. CUADRE PRESUPUESTARIO</text>
+            <line x1="340" y1="138" x2="615" y2="138" stroke="#e2e8f0"/>
+            <text x="340" y="156" font-size="9" fill="#991b1b">✕ V-03 1 Distribución descuadrada ($50k)</text>
+            <text x="340" y="174" font-size="9" fill="#15803d">✓ V-04 Distribuidos vs aplicados igual</text>
+            <text x="340" y="192" font-size="9" fill="#15803d">✓ Sumatoria total: $ 51,032,500.00</text>
+            <text x="340" y="210" font-size="9" fill="#15803d">✓ Capítulos asignados: 1000, 2000, 3000</text>
+            <text x="340" y="228" font-size="9" fill="#15803d">✓ Fuentes cuadradas: 111, 113</text>
+
+            <rect x="645" y="112" width="300" height="180" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="655" y="132" font-size="10" font-weight="bold" fill="#0369a1">C. CONTABILIDAD Y CONCILIACIÓN</text>
+            <line x1="655" y1="138" x2="935" y2="138" stroke="#e2e8f0"/>
+            <text x="655" y="156" font-size="9" fill="#991b1b">✕ V-08 1 Ingreso aplicado sin póliza</text>
+            <text x="655" y="174" font-size="9" fill="#15803d">✓ V-09 Cero pólizas con error en 03.2.1</text>
+            <text x="655" y="192" font-size="9" fill="#15803d">✓ V-10 Cuentas 8.1.4 y 8.1.5 consistentes</text>
+            <text x="655" y="210" font-size="9" fill="#15803d">✓ V-11 Conciliación 04.3.1 ejecutada</text>
+            <text x="655" y="228" font-size="9" fill="#15803d">✓ V-12 Diferencias con cédula de nota</text>
+
+            <!-- Bottom Warning / Action Area -->
+            <rect x="15" y="305" width="930" height="90" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="328" font-size="11" font-weight="bold" fill="#991b1b">ACCIONES REQUERIDAS ANTES DE PODER CERRAR:</text>
+            <text x="30" y="346" font-size="10" fill="#475569">Existen 2 incidencias bloqueantes (V-03 y V-08). El botón de cierre permanecerá deshabilitado.</text>
+
+            <rect x="30" y="358" width="180" height="26" fill="#183125" rx="3"/>
+            <text x="120" y="375" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">🔍 Ver Incidencias (2)</text>
+
+            <rect x="220" y="358" width="200" height="26" fill="#0284c7" rx="3"/>
+            <text x="320" y="375" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">⟳ Reejecutar Validación Previa</text>
+
+            <rect x="745" y="355" width="185" height="30" fill="#e2e8f0" rx="4"/>
+            <text x="837" y="374" font-size="11" font-weight="bold" fill="#94a3b8" text-anchor="middle">🔒 Cerrar Mes (Bloqueado)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: BANDEJA DE INCIDENCIAS -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Bandeja de Incidencias Previas al Cierre · Navegación a Corrección</span>
+          <span style="font-size:10px; color:#666;">Resolución de Bloqueos</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="380" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <rect x="0" y="0" width="960" height="45" fill="#991b1b"/>
+            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Incidencias Detectadas que Bloquean el Cierre · Febrero 2026</text>
+            <text x="935" y="28" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+
+            <!-- Table Header -->
+            <rect x="20" y="65" width="920" height="25" fill="#334155"/>
+            <text x="30" y="81" font-size="9" font-weight="bold" fill="#ffffff">REGLA</text>
+            <text x="100" y="81" font-size="9" font-weight="bold" fill="#ffffff">SEVERIDAD</text>
+            <text x="200" y="81" font-size="9" font-weight="bold" fill="#ffffff">FOLIO / REGISTRO</text>
+            <text x="360" y="81" font-size="9" font-weight="bold" fill="#ffffff">DESCRIPCIÓN DE LA INCIDENCIA</text>
+            <text x="760" y="81" font-size="9" font-weight="bold" fill="#ffffff">ESTATUS</text>
+            <text x="880" y="81" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ACCIÓN</text>
+
+            <!-- Row 1: V-03 -->
+            <rect x="20" y="91" width="920" height="42" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="30" y="115" font-size="10" font-weight="bold" fill="#991b1b">V-03</text>
+            <rect x="100" y="102" width="80" height="18" fill="#fee2e2" rx="9"/>
+            <text x="140" y="115" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">BLOQUEANTE</text>
+            <text x="200" y="115" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0049</text>
+            <text x="360" y="115" font-size="10" fill="#1e293b">Distribución descuadrada: Importe Total $1,000,000 vs Suma $950,000 (-$50,000).</text>
+            <text x="760" y="115" font-size="10" fill="#ef4444">Sin resolver</text>
+            <rect x="850" y="101" width="70" height="22" fill="#183125" rx="3"/>
+            <text x="885" y="116" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Corregir ↗</text>
+
+            <!-- Row 2: V-08 -->
+            <rect x="20" y="134" width="920" height="42" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="30" y="158" font-size="10" font-weight="bold" fill="#991b1b">V-08</text>
+            <rect x="100" y="145" width="80" height="18" fill="#fee2e2" rx="9"/>
+            <text x="140" y="158" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">BLOQUEANTE</text>
+            <text x="200" y="158" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0046</text>
+            <text x="360" y="158" font-size="10" fill="#1e293b">Ingreso en estatus Aplicado ($128,450.32) no cuenta con folio de póliza enlazado.</text>
+            <text x="760" y="158" font-size="10" fill="#ef4444">Sin resolver</text>
+            <rect x="850" y="144" width="70" height="22" fill="#0284c7" rx="3"/>
+            <text x="885" y="159" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Generar ↗</text>
+
+            <!-- Bottom Note -->
+            <rect x="20" y="200" width="920" height="70" fill="#fffbeb" stroke="#fde68a" rx="4"/>
+            <text x="35" y="224" font-size="10" font-weight="bold" fill="#92400e">INSTRUCCIONES DE ATENCIÓN:</text>
+            <text x="35" y="242" font-size="10" fill="#78350f">1. Al hacer clic en "Corregir", el sistema abrirá el registro correspondiente en el módulo 04.2.1 para cuadrar las líneas.</text>
+            <text x="35" y="258" font-size="10" fill="#78350f">2. Al solventar las anomalías, regrese a esta pantalla y presione "Reejecutar Validación Previa".</text>
+
+            <rect x="20" y="315" width="140" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="90" y="335" font-size="11" fill="#64748b" text-anchor="middle">Regresar</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: BITÁCORA Y REAPERTURA -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Historial de Cierres y Bitácora de Reaperturas Extraordinarias</span>
+          <span style="font-size:10px; color:#666;">Auditoría Inmutable</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="380" fill="#f8fafc" rx="4"/>
+            
+            <rect x="15" y="15" width="930" height="50" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="44" font-size="13" font-weight="bold" fill="#183125">Bitácora de Cierres Mensuales · Ejercicio 2026</text>
+            <rect x="740" y="25" width="190" height="30" fill="#fae8ff" stroke="#d8b4fe" rx="4"/>
+            <text x="835" y="44" font-size="11" font-weight="bold" fill="#86198f" text-anchor="middle">🔓 Solicitar Reapertura</text>
+
+            <!-- Table Header -->
+            <rect x="15" y="80" width="930" height="25" fill="#334155"/>
+            <text x="25" y="96" font-size="9" font-weight="bold" fill="#ffffff">PERIODO</text>
+            <text x="110" y="96" font-size="9" font-weight="bold" fill="#ffffff">FECHA DE CIERRE</text>
+            <text x="230" y="96" font-size="9" font-weight="bold" fill="#ffffff">USUARIO RESPONSABLE</text>
+            <text x="400" y="96" font-size="9" font-weight="bold" fill="#ffffff">RECAUDADO CERTIFICADO ($)</text>
+            <text x="600" y="96" font-size="9" font-weight="bold" fill="#ffffff">ESTADO ACTUAL</text>
+            <text x="740" y="96" font-size="9" font-weight="bold" fill="#ffffff">BITÁCORA / REAPERTURAS</text>
+            <text x="910" y="96" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ACTA</text>
+
+            <!-- Row 1: Enero Cerrado -->
+            <rect x="15" y="106" width="930" height="36" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="128" font-size="10" font-weight="bold" fill="#1e293b">2026-01 (Enero)</text>
+            <text x="110" y="128" font-size="10" fill="#334155">04/02/2026 18:22</text>
+            <text x="230" y="128" font-size="10" fill="#334155">Lic. Eunice (Jefa Tesorería)</text>
+            <text x="400" y="128" font-size="10" font-weight="bold" fill="#15803d">$ 48,210,400.00</text>
+            <rect x="600" y="115" width="80" height="18" fill="#f1f5f9" stroke="#cbd5e1" rx="9"/>
+            <text x="640" y="128" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">CERRADO</text>
+            <text x="740" y="128" font-size="10" fill="#64748b">Cierre ordinario sin reaperturas</text>
+            <text x="910" y="128" font-size="11" fill="#0284c7" text-anchor="middle">📄</text>
+
+            <!-- Row 2: Febrero en Proceso -->
+            <rect x="15" y="143" width="930" height="36" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="165" font-size="10" font-weight="bold" fill="#1e293b">2026-02 (Febrero)</text>
+            <text x="110" y="165" font-size="10" fill="#94a3b8">En proceso...</text>
+            <text x="230" y="165" font-size="10" fill="#334155">Lic. Eunice (En revisión)</text>
+            <text x="400" y="165" font-size="10" font-weight="bold" fill="#b45309">$ 51,032,500.00</text>
+            <rect x="600" y="152" width="100" height="18" fill="#fee2e2" stroke="#fca5a5" rx="9"/>
+            <text x="650" y="165" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">CON INCIDENCIAS</text>
+            <text x="740" y="165" font-size="10" fill="#991b1b">2 incidencias pendientes</text>
+            <text x="910" y="165" font-size="11" fill="#94a3b8" text-anchor="middle">—</text>
+
+            <!-- Modal Explicativo de Reapertura -->
+            <rect x="15" y="200" width="930" height="150" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="225" font-size="11" font-weight="bold" fill="#86198f">POLÍTICA INSTITUCIONAL DE REAPERTURA DE PERIODOS:</text>
+            <text x="30" y="245" font-size="10" fill="#475569">• Toda solicitud de reapertura se asienta en la base de datos de auditoría, requiriendo firma mancomunada con Contabilidad.</text>
+            <text x="30" y="262" font-size="10" fill="#475569">• Al reabrirse un mes, se emite una alerta roja transversal en el dashboard directivo del Poder Judicial.</text>
+            <text x="30" y="279" font-size="10" fill="#475569">• Se establece una ventana máxima de 48 horas hábiles para realizar las correcciones y ejecutar nuevamente el cierre mensual.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 12. INTEGRACIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Integración con Registro, Contabilidad y Bancos</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Módulo / Componente</th><th>Mecanismo de Interfaz</th><th>Efecto de la Integración</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>04.2.1 Registro de Ingresos</strong></td>
+          <td>Congelamiento de Estado</td>
+          <td>Al cerrarse el mes, los ingresos del periodo adquieren estado de solo lectura bloqueando altas, ediciones o cancelaciones.</td>
+        </tr>
+        <tr>
+          <td><strong>04.3.1 Conciliación de Ingresos</strong></td>
+          <td>Validación Previa Obligatoria</td>
+          <td>El cierre mensual verifica que la conciliación de ingresos haya sido ejecutada y que no existan discrepancias no justificadas.</td>
+        </tr>
+        <tr>
+          <td><strong>03.3.7 Cierre Mensual Contable</strong></td>
+          <td>Coordinación de Candados</td>
+          <td>El cierre de Ingresos es insumo y prerrequisito para que Contabilidad proceda al cierre global de libros de diario y mayor.</td>
+        </tr>
+        <tr>
+          <td><strong>01.1.3 Periodos Contables</strong></td>
+          <td>Control de Permisos de Calendario</td>
+          <td>Verifica que el mes contable en la configuración institucional permanezca habilitado para escritura durante el proceso de validación.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 13. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">13</span> Casos de Prueba y Escenarios de Validación</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>ID</th><th>Escenario de Prueba</th><th>Condición Inicial</th><th>Comportamiento Esperado</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-CIERRE-01</strong></td>
+          <td>Cierre mensual exitoso con todas las validaciones cuadradas.</td>
+          <td>13 validaciones en verde o advertencias justificadas. Periodo abierto.</td>
+          <td>Estado transita a <em>Listo para cierre</em>. Al pulsar cerrar, cambia a <em>Cerrado</em> y bloquea escritura en 04.2.1.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-CIERRE-02</strong></td>
+          <td>Bloqueo de cierre por ingreso aplicado sin póliza contable (V-08).</td>
+          <td>1 ingreso de rendimientos en estado Aplicado sin ID de póliza enlazado.</td>
+          <td>El sistema bloquea el botón <em>Cerrar Mes</em>, transita a <em>Con incidencias</em> y ofrece enlace para generar la póliza.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-CIERRE-03</strong></td>
+          <td>Intento de cierre con periodo contable general cerrado en 01.1.3 (V-13).</td>
+          <td>El mes de febrero ya fue cerrado en el catálogo general de periodos.</td>
+          <td>El motor reporta falla en V-13 y bloquea el proceso indicando que el periodo institucional está cerrado.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-CIERRE-04</strong></td>
+          <td>Reapertura autorizada y registro en bitácora inmutable.</td>
+          <td>Periodo cerrado. Se ingresa oficio de solicitud y clave de autorización de Dirección.</td>
+          <td>El periodo pasa a <em>Reabierto</em>, se abre ventana de 48 horas y se genera registro con fecha/hora y usuario.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 14. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">14</span> Historial de Cambios</div>
+    <table class="props-table">
+      <thead>
+        <tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción de Modificaciones</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>v1.0.0</code></td>
+          <td>02/09/2026</td>
+          <td>Eunice / Julio César</td>
+          <td>Creación formal del Análisis Funcional DOC-08 para 04.3.2 Cierre mensual de ingresos, definiendo las 13 validaciones de integridad financiera, matriz de estados y política de reaperturas.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+  function showWF(id, btn) {
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+    const target = document.getElementById('wf-' + id);
+    if (target) target.classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

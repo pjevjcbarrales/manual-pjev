@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.2.1 Registro de Ingresos — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-doc  { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-prop { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .tag-status { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; }
+    .st-borrador { background:#fef3c7; color:#92400e; }
+    .st-esperado { background:#e0f2fe; color:#0369a1; }
+    .st-parcial  { background:#fed7aa; color:#9a3412; }
+    .st-recibido { background:#dcfce7; color:#15803d; }
+    .st-pend-id  { background:#f1f5f9; color:#475569; }
+    .st-aplicado { background:#ede9fe; color:#5b21b6; }
+    .st-contab   { background:#fae8ff; color:#86198f; }
+    .st-concil   { background:#d1fae5; color:#065f46; }
+    .st-cancel   { background:#fee2e2; color:#991b1b; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.put    { background: #fff3e0; color: #e65100; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>04 · Ingresos</span> ›
+    <span>04.2 · Registro</span> ›
+    <span>04.2.1 Registro de ingresos</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.2.1</div>
+      <h1 class="elem-title">Registro de ingresos</h1>
+      <p class="elem-desc">Módulo central para captar, controlar y distribuir presupuestariamente los recursos financieros del Poder Judicial del Estado de Veracruz mediante dos modalidades operativas: Ingreso Esperado e Ingreso Recibido.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Análisis funcional inicial (DOC-08)</span>
+        <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Eunice</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-box">
+    <div class="callout-title">📌 Criterio Arquitectónico y Alcance Simplificado</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Este módulo <strong>no administra oficios, archivos PDF/XML, firmas electrónicas, sellos digitales ni expedientes</strong> en la etapa actual. Para asociar documentación externa solo se dispone de un campo alfanumérico opcional de <em>Referencia externa</em>. Toda la lógica se concentra exclusivamente en el control transaccional de flujos financieros y su distribución presupuestaria.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>04.2.1 Registro de ingresos</strong> consolida en una única interfaz operativa la gestión integral de las entradas de recursos monetarios a la institución. Su diseño permite captar y dar seguimiento al ciclo financiero del ingreso desde dos puntos de partida mutuamente complementarios:</p>
+    <ul>
+      <li style="margin-bottom:8px;">
+        <strong>Modalidad A · Ingreso Esperado:</strong> Aplica cuando el PJEV recibe una notificación, programación o aviso formal de que un recurso llegará a las arcas institucionales (por ejemplo: la programación de una ministración mensual de SEFIPLAN, el pago programado de arrendamientos de espacios, el aviso de reintegro por concepto de viáticos no ejercidos de un servidor público, o fondos convenidos). Permite planificar la distribución del techo presupuestal y vigilar el cobro efectivo en bancos.
+      </li>
+      <li style="margin-bottom:8px;">
+        <strong>Modalidad B · Ingreso Recibido:</strong> Aplica cuando el depósito en firme ya fue identificado o reflejado en el estado de cuenta bancario de la institución, sin que necesariamente haya existido un registro esperado previo (por ejemplo: rendimientos bancarios devengados en cuentas productivas, devoluciones bancarias directas, depósitos en ventanilla o transferencias inmediatas).
+      </li>
+    </ul>
+    <p>Adicionalmente, el módulo introduce un principio clave de control financiero: la separación estricta entre el <strong>CRI (Clasificador por Rubros de Ingresos)</strong>, que define la <em>naturaleza económica del recurso recaudado</em>, y el <strong>Capítulo de Gasto</strong>, que determina el <em>destino presupuestario asignado</em> a dicho recurso al incorporarse al presupuesto de egresos de la entidad.</p>
+  </div>
+
+  <!-- 2. ALCANCE Y EXCLUSIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Alcance y Exclusiones de la Etapa Actual</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th style="width:50%;">Dentro del Alcance (Funcionalidad Aprobada)</th>
+          <th style="width:50%;">Fuera de Alcance (Exclusiones Estrictas)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5;">
+              <li>Registro de ingresos en sus dos modalidades: Esperado y Recibido.</li>
+              <li>Distribución presupuestaria multilínea (Capítulo, Fuente, Fondo y Órgano/UA).</li>
+              <li>Control aritmético del total versus líneas de distribución.</li>
+              <li>Recepción parcial de ingresos esperados con saldo pendiente acumulativo.</li>
+              <li>Registro transitorio de depósitos bancarios aún no identificados.</li>
+              <li>Vinculación flexible de uno a varios depósitos a un mismo ingreso esperado.</li>
+              <li>Consulta de seguimiento, filtros por estatus, concepto y periodos.</li>
+              <li>Referencia externa opcional como texto simple de trazabilidad.</li>
+            </ul>
+          </td>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5; color:#991b1b;">
+              <li><strong>Sin carga ni almacenamiento de archivos:</strong> no se suben PDFs, XMLs ni digitalizaciones de oficios.</li>
+              <li><strong>Sin expediente digital ni folios documentales:</strong> no se gestionan tomos, legajos ni expedientes anexos.</li>
+              <li><strong>Sin firmas electrónicas ni sellos digitales:</strong> no intervienen cadenas de firma criptográfica ni acuses sellados.</li>
+              <li><strong>Sin gestión documental de correspondencia:</strong> los oficios solo se referencian por su código alfanumérico.</li>
+              <li><strong>Sin conciliación bancaria contable exhaustiva:</strong> la conciliación de extractos bancarios se reserva para el proceso 04.3.1 / 06.3.1.</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. DISTINCIÓN DEL ORIGEN DE REQUERIMIENTOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Origen y Sustento de los Requerimientos</div>
+    <p>Conforme a las directrices de documentación del SIAF-PJEV, a continuación se delimita expresamente la fuente de cada directriz funcional:</p>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th style="width:25%;">Clasificación</th>
+          <th style="width:35%;">Requerimiento / Disposición</th>
+          <th style="width:40%;">Justificación y Evidencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Momentos contables del ingreso (Estimado, Modificado, Devengado y Recaudado).</td>
+          <td>Ley General de Contabilidad Gubernamental (LGCG Art. 38, 43, 44) y Marco Metodológico del CONAC: todo recurso público debe registrarse de forma concurrente reconociendo el derecho de cobro y la percepción efectiva.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Separación entre CRI (Naturaleza) y Capítulo de Gasto (Destino).</td>
+          <td>Clasificador por Rubros de Ingresos CONAC y Manual de Contabilidad Gubernamental: los rubros de ingreso no sustituyen a las partidas presupuestales de gasto; ambos coexisten.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-pjev">Evidencia Manual PJEV</span></td>
+          <td>Recepción de ministraciones estatales y reintegros institucionales.</td>
+          <td>Manual de Procedimientos de Tesorería del PJEV: describe la recepción de recursos de SEFIPLAN y la devolución de sobrantes por comisiones oficiales o gastos no devengados.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-doc">Evidencia Doc. Fuente</span></td>
+          <td>Manejo de depósitos no identificados y parcialidades bancarias.</td>
+          <td>Extractos bancarios y fichas de depósito de cuentas institucionales del PJEV donde los pagos ingresan en fechas diferidas respecto a la programación oficial.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-prop">Propuesta de Diseño</span></td>
+          <td>Unificación de dos modalidades (Esperado y Recibido) en el módulo 04.2.1.</td>
+          <td>Acuerdo arquitectónico de Tesorería (agosto 2026): reemplaza la duplicidad de formularios aislados por un módulo único parametrizado que elimina la carga documental en esta etapa.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. ACTORES Y ROLES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Actores que Intervienen</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Responsabilidad Principal</th>
+          <th>Acciones Clave en el Módulo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Analista de Ingresos (Tesorería)</strong></td>
+          <td>Captura de las expectativas de cobro y registro de ingresos directos.</td>
+          <td>Dar de alta ingresos esperados, capturar líneas de distribución por capítulo y fuente, y vincular referencias bancarias.</td>
+        </tr>
+        <tr>
+          <td><strong>Cajero / Operador Bancario</strong></td>
+          <td>Recepción e identificación de depósitos reflejados en bancos.</td>
+          <td>Registrar ingresos recibidos, clasificar depósitos pendientes de identificación y ligar depósitos a ingresos esperados.</td>
+        </tr>
+        <tr>
+          <td><strong>Jefe del Departamento de Ingresos</strong></td>
+          <td>Supervisión, validación de cuadre presupuestal y autorizaciones.</td>
+          <td>Revisar saldos pendientes por percibir, validar la consistencia de la distribución presupuestaria y aprobar ajustes o cancelaciones.</td>
+        </tr>
+        <tr>
+          <td><strong>Contabilidad Gubernamental</strong></td>
+          <td>Receptor contable-presupuestal de las operaciones en firme.</td>
+          <td>Consulta de ingresos aplicados para verificación del devengo/recaudo y posterior generación o cotejo de pólizas presupuestarias.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. FLUJOS OPERATIVOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Flujos Operativos del Registro</div>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:14px; margin-top:12px; margin-bottom:8px;">5.1 Flujo A · Ingreso Esperado (Con aviso o programación previa)</h3>
+    <ol style="font-size:13px; line-height:1.6; padding-left:20px; margin-bottom:16px;">
+      <li><strong>Aviso / Programación:</strong> La Tesorería recibe conocimiento formal de un recurso programado (ej. oficio de SEFIPLAN, contrato de arrendamiento o solicitud de reintegro).</li>
+      <li><strong>Captura Inicial (Modalidad Esperado):</strong> El analista selecciona la acción <em>Nuevo ingreso esperado</em>, ingresa el concepto, origen/depositante, importe total, fecha esperada y una referencia externa opcional (ej. número de oficio o contrato).</li>
+      <li><strong>Distribución Presupuestaria:</strong> Se desglosa el importe total en una o varias líneas asignando Capítulo de Gasto, Fuente de Financiamiento, Fondo y Unidad Administrativa receptora. El sistema valida que <code>Σ líneas = Importe Total</code>.</li>
+      <li><strong>Estatus Esperado:</strong> El registro queda guardado en estatus <span class="tag-status st-esperado">Esperado</span> con saldo pendiente igual al monto total.</li>
+      <li><strong>Llegada del Depósito Bancario:</strong> Cuando el recurso se abona en la cuenta bancaria:
+        <ul style="margin-top:4px;">
+          <li>Si el depósito cubre el total: se asocia el movimiento bancario y pasa a <span class="tag-status st-recibido">Recibido</span>.</li>
+          <li>Si el depósito cubre una fracción: se asocia la parcialidad, el estatus transita a <span class="tag-status st-parcial">Parcialmente recibido</span> y se actualiza el saldo pendiente restante.</li>
+        </ul>
+      </li>
+      <li><strong>Aplicación Financiera:</strong> Al confirmarse los depósitos totales, el ingreso transita a <span class="tag-status st-aplicado">Aplicado</span>, quedando disponible para su devengo contable y conciliación.</li>
+    </ol>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:14px; margin-top:16px; margin-bottom:8px;">5.2 Flujo B · Ingreso Recibido (Percepción directa o no programada)</h3>
+    <ol style="font-size:13px; line-height:1.6; padding-left:20px; margin-bottom:16px;">
+      <li><strong>Reflejo Bancario:</strong> Se detecta un abono en el estado de cuenta bancario de una cuenta recaudadora o concentradora del PJEV (ej. rendimientos bancarios mensuales o pago en ventanilla sin previo aviso).</li>
+      <li><strong>Captura Inicial (Modalidad Recibido):</strong> El cajero/analista selecciona <em>Registrar ingreso recibido</em>, capturando la cuenta bancaria receptora, fecha de operación bancaria, fecha valor, referencia bancaria e importe depositado.</li>
+      <li><strong>Identificación del Ingreso:</strong>
+        <ul style="margin-top:4px;">
+          <li><em>Si el origen y concepto se conocen de inmediato:</em> se asigna el concepto de ingreso, origen y se realiza la distribución presupuestaria por capítulo y fuente. Estatus: <span class="tag-status st-recibido">Recibido</span>.</li>
+          <li><em>Si el origen o concepto es incierto al momento:</em> el registro se guarda en estatus <span class="tag-status st-pend-id">Pendiente de identificación</span> para su posterior aclaración sin detener el control de caja.</li>
+        </ul>
+      </li>
+      <li><strong>Aclaración y Distribución:</strong> Una vez aclarado el depósito no identificado, el analista asigna el concepto y captura las líneas de distribución presupuestaria correspondientes, pasando a estatus <span class="tag-status st-aplicado">Aplicado</span>.</li>
+    </ol>
+  </div>
+
+  <!-- 6. CAMPOS Y MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Estructura de Datos y Campos</div>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:14px; margin-bottom:8px;">6.1 Encabezado General del Ingreso</h3>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Tipo / Formato</th>
+          <th>Modalidad Requerida</th>
+          <th>Descripción y Regla de Validación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>folio_interno</code></td>
+          <td><code>VARCHAR(25)</code></td>
+          <td>Ambas (Sistema)</td>
+          <td>Identificador correlativo único del sistema (ej. <code>ING-2026-0001</code>). Autogenerado.</td>
+        </tr>
+        <tr>
+          <td><code>modalidad</code></td>
+          <td><code>ENUM</code></td>
+          <td>Ambas (Obligatorio)</td>
+          <td>Valores permitidos: <code>ESPERADO</code> | <code>RECIBIDO</code>. Define el comportamiento de los campos de fecha.</td>
+        </tr>
+        <tr>
+          <td><code>concepto_ingreso_id</code></td>
+          <td><code>FK (INT)</code></td>
+          <td>Ambas (Obligatorio*)</td>
+          <td>Referencia al catálogo <code>04.1.1 Conceptos de ingreso</code>. *En modalidad recibido puede diferirse si está pendiente de identificar.</td>
+        </tr>
+        <tr>
+          <td><code>ejercicio_fiscal</code></td>
+          <td><code>INT</code></td>
+          <td>Ambas (Obligatorio)</td>
+          <td>Ejercicio presupuestario activo (ej. <code>2026</code>).</td>
+        </tr>
+        <tr>
+          <td><code>periodo</code></td>
+          <td><code>SMALLINT</code></td>
+          <td>Ambas (Obligatorio)</td>
+          <td>Mes presupuestal de afectación (1 a 12).</td>
+        </tr>
+        <tr>
+          <td><code>fecha_registro</code></td>
+          <td><code>DATE</code></td>
+          <td>Ambas (Sistema)</td>
+          <td>Fecha natural de captura del registro en la plataforma.</td>
+        </tr>
+        <tr>
+          <td><code>fecha_esperada</code></td>
+          <td><code>DATE</code></td>
+          <td>Ingreso Esperado</td>
+          <td>Fecha estimada en la que se prevé que el recurso ingrese al banco.</td>
+        </tr>
+        <tr>
+          <td><code>fecha_operacion_bancaria</code></td>
+          <td><code>DATE</code></td>
+          <td>Ingreso Recibido</td>
+          <td>Fecha asentada por la institución bancaria en el abono de la cuenta.</td>
+        </tr>
+        <tr>
+          <td><code>fecha_valor</code></td>
+          <td><code>DATE</code></td>
+          <td>Ingreso Recibido</td>
+          <td>Fecha efectiva de disponibilidad de fondos informada por la institución bancaria.</td>
+        </tr>
+        <tr>
+          <td><code>origen_depositante</code></td>
+          <td><code>VARCHAR(200)</code></td>
+          <td>Ambas (Obligatorio)</td>
+          <td>Ente, dependencia, institución bancaria o persona que efectúa el pago (ej. <em>SEFIPLAN</em>, <em>Banco Santander</em>, <em>Servidor Público</em>).</td>
+        </tr>
+        <tr>
+          <td><code>importe_total</code></td>
+          <td><code>DECIMAL(18,2)</code></td>
+          <td>Ambas (Obligatorio)</td>
+          <td>Monto monetario total del ingreso (debe ser mayor a $0.00).</td>
+        </tr>
+        <tr>
+          <td><code>cuenta_bancaria_id</code></td>
+          <td><code>FK (INT)</code></td>
+          <td>Condicionado</td>
+          <td>Cuenta receptora institucional (catálogo <code>01.4.2</code>). Obligatorio en Ingreso Recibido; opcional o sugerido en Ingreso Esperado.</td>
+        </tr>
+        <tr>
+          <td><code>referencia_externa</code></td>
+          <td><code>VARCHAR(100)</code></td>
+          <td>Opcional</td>
+          <td>Texto simple para anotar el oficio, folio externo o contrato (ej. <code>OFI-SEFIPLAN-2026-114</code>). Sin adjuntos ni archivos.</td>
+        </tr>
+        <tr>
+          <td><code>referencia_bancaria</code></td>
+          <td><code>VARCHAR(80)</code></td>
+          <td>Ingreso Recibido</td>
+          <td>Clave de rastreo SPEI, número de autorización o folio de transacción del banco.</td>
+        </tr>
+        <tr>
+          <td><code>observaciones</code></td>
+          <td><code>TEXT</code></td>
+          <td>Opcional</td>
+          <td>Notas explicativas o justificación administrativa de la operación.</td>
+        </tr>
+        <tr>
+          <td><code>estatus</code></td>
+          <td><code>ENUM</code></td>
+          <td>Ambas (Sistema)</td>
+          <td>Estado actual del registro dentro del ciclo de vida financiero.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:14px; margin-bottom:8px;">6.2 Distribución Presupuestaria (Líneas de Detalle)</h3>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Campo de Detalle</th>
+          <th>Tipo / Formato</th>
+          <th>Obligatoriedad</th>
+          <th>Descripción y Mapeo Normativo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>capitulo_gasto</code></td>
+          <td><code>INT</code></td>
+          <td>Obligatorio*</td>
+          <td>Capítulo del gasto al que se destinará el recurso (1000, 2000, 3000, 5000). *Condicionado en ciertos rendimientos según destino.</td>
+        </tr>
+        <tr>
+          <td><code>fuente_financiamiento_id</code></td>
+          <td><code>FK (INT)</code></td>
+          <td>Obligatorio</td>
+          <td>Fuente oficial de financiamiento (catálogo <code>01.2.4</code>, ej. <em>Recursos Fiscales</em>, <em>Ingresos Propios</em>, <em>FASP</em>).</td>
+        </tr>
+        <tr>
+          <td><code>fondo_especifico_id</code></td>
+          <td><code>FK (INT)</code></td>
+          <td>Opcional</td>
+          <td>Fondo o bolsa de recurso específico vinculado a la fuente cuando aplique.</td>
+        </tr>
+        <tr>
+          <td><code>unidad_administrativa_id</code></td>
+          <td><code>FK (INT)</code></td>
+          <td>Obligatorio*</td>
+          <td>Órgano o unidad ejecutora receptora del techo presupuestal (catálogo <code>01.2.1</code>). *Obligatorio en ministraciones.</td>
+        </tr>
+        <tr>
+          <td><code>importe_distribuido</code></td>
+          <td><code>DECIMAL(18,2)</code></td>
+          <td>Obligatorio</td>
+          <td>Fracción del importe asignada a esta línea. Debe ser mayor a $0.00.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. STORED PROCEDURES (LEER Y ABC) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      El esquema <code>ingresos</code> en PostgreSQL encapsula la lógica operativa del registro maestro-detalle bajo <code>SECURITY DEFINER</code> y estructura unificada de respuesta JSONB <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>.
+    </p>
+
+    <!-- 7.1 LEER -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">7.1. Procedimiento LEER (<code>ingresos.fn_leer_ingreso</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario activo en la sesión.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal activo.</td></tr>
+        <tr><td><code>p_periodo</code></td><td><code>SMALLINT</code></td><td>Mes contable (1 a 12, opcional).</td></tr>
+        <tr><td><code>p_modalidad</code></td><td><code>VARCHAR(20)</code></td><td><code>ESPERADO</code> | <code>RECIBIDO</code> (opcional).</td></tr>
+        <tr><td><code>p_estatus</code></td><td><code>VARCHAR(30)</code></td><td>Filtro por estatus de ciclo de vida (opcional).</td></tr>
+        <tr><td><code>p_buscar</code></td><td><code>VARCHAR(100)</code></td><td>Texto libre por folio, origen o referencia (opcional).</td></tr>
+        <tr><td><code>p_ingreso_id</code></td><td><code>BIGINT</code></td><td>ID específico para cargar detalle y distribución completa (NULL para listado).</td></tr>
+        <tr><td><code>p_limite</code></td><td><code>INTEGER</code></td><td>Tamaño de página (default 50).</td></tr>
+        <tr><td><code>p_offset</code></td><td><code>INTEGER</code></td><td>Paginación (default 0).</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_ingreso(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_periodo SMALLINT DEFAULT NULL,
+    p_modalidad VARCHAR DEFAULT NULL,
+    p_estatus VARCHAR DEFAULT NULL,
+    p_buscar VARCHAR DEFAULT NULL,
+    p_ingreso_id BIGINT DEFAULT NULL,
+    p_limite INTEGER DEFAULT 50,
+    p_offset INTEGER DEFAULT 0
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    -- Consulta de detalle único
+    IF p_ingreso_id IS NOT NULL THEN
+        SELECT jsonb_build_object(
+            'ingreso_id', i.ingreso_id,
+            'folio_interno', i.folio_interno,
+            'modalidad', i.modalidad,
+            'concepto_ingreso_id', i.concepto_ingreso_id,
+            'concepto_clave', c.clave,
+            'concepto_nombre', c.descripcion_corta,
+            'ejercicio_fiscal', i.ejercicio_fiscal,
+            'periodo', i.periodo,
+            'fecha_registro', i.fecha_registro,
+            'fecha_esperada', i.fecha_esperada,
+            'fecha_operacion_bancaria', i.fecha_operacion_bancaria,
+            'fecha_valor', i.fecha_valor,
+            'origen_depositante', i.origen_depositante,
+            'importe_total', i.importe_total,
+            'saldo_pendiente', i.saldo_pendiente,
+            'cuenta_bancaria_id', i.cuenta_bancaria_id,
+            'cuenta_bancaria_num', cb.numero_cuenta,
+            'banco_nombre', cb.banco_nombre,
+            'referencia_externa', i.referencia_externa,
+            'referencia_bancaria', i.referencia_bancaria,
+            'observaciones', i.observaciones,
+            'estatus', i.estatus,
+            'distribucion', (
+                SELECT COALESCE(jsonb_agg(
+                    jsonb_build_object(
+                        'distribucion_id', d.distribucion_id,
+                        'capitulo_gasto', d.capitulo_gasto,
+                        'fuente_financiamiento_id', d.fuente_financiamiento_id,
+                        'fuente_clave', f.clave,
+                        'fuente_nombre', f.descripcion,
+                        'fondo_especifico_id', d.fondo_especifico_id,
+                        'unidad_administrativa_id', d.unidad_administrativa_id,
+                        'unidad_nombre', u.nombre,
+                        'importe_distribuido', d.importe_distribuido
+                    )
+                ), '[]'::jsonb)
+                FROM ingresos.ingreso_distribucion d
+                LEFT JOIN cfg.fuente_financiamiento f ON d.fuente_financiamiento_id = f.fuente_id
+                LEFT JOIN cfg.unidad_administrativa u ON d.unidad_administrativa_id = u.unidad_id
+                WHERE d.ingreso_id = i.ingreso_id AND d.estatus_registro = 1
+            )
+        ) INTO v_data
+        FROM ingresos.ingreso i
+        LEFT JOIN ingresos.concepto_ingreso c ON i.concepto_ingreso_id = c.concepto_id
+        LEFT JOIN cfg.cuenta_bancaria cb ON i.cuenta_bancaria_id = cb.cuenta_id
+        WHERE i.ingreso_id = p_ingreso_id AND i.estatus_registro = 1;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', COALESCE(v_data, '{}'::jsonb));
+    ELSE
+        -- Listado para DataGrid
+        SELECT COALESCE(jsonb_agg(
+            jsonb_build_object(
+                'ingreso_id', i.ingreso_id,
+                'folio_interno', i.folio_interno,
+                'modalidad', i.modalidad,
+                'concepto_nombre', COALESCE(c.descripcion_corta, 'Pendiente de tipificar'),
+                'fecha', CASE WHEN i.modalidad = 'ESPERADO' THEN i.fecha_esperada ELSE i.fecha_operacion_bancaria END,
+                'origen_depositante', i.origen_depositante,
+                'importe_total', i.importe_total,
+                'saldo_pendiente', i.saldo_pendiente,
+                'cuenta_bancaria_num', cb.numero_cuenta,
+                'referencia_externa', i.referencia_externa,
+                'estatus', i.estatus
+            ) ORDER BY i.ingreso_id DESC
+        ), '[]'::jsonb) INTO v_data
+        FROM ingresos.ingreso i
+        LEFT JOIN ingresos.concepto_ingreso c ON i.concepto_ingreso_id = c.concepto_id
+        LEFT JOIN cfg.cuenta_bancaria cb ON i.cuenta_bancaria_id = cb.cuenta_id
+        WHERE i.ejercicio_fiscal = p_ejercicio
+          AND (p_periodo IS NULL OR i.periodo = p_periodo)
+          AND (p_modalidad IS NULL OR i.modalidad = p_modalidad)
+          AND (p_estatus IS NULL OR i.estatus = p_estatus)
+          AND (p_buscar IS NULL OR i.folio_interno ILIKE '%' || p_buscar || '%' OR i.origen_depositante ILIKE '%' || p_buscar || '%' OR i.referencia_externa ILIKE '%' || p_buscar || '%')
+          AND i.estatus_registro = 1
+        LIMIT p_limite OFFSET p_offset;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', COALESCE(v_data, '[]'::jsonb));
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', '[]'::jsonb);
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 7.2 ABC -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">7.2. Procedimiento ABC (<code>ingresos.fn_crud_ingreso</code>)</h4>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario ejecutor.</td></tr>
+        <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio presupuestario.</td></tr>
+        <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1</code> = Alta nuevo · <code>2</code> = Modificar borrador · <code>3</code> = Cancelar (exige motivo 04.1.3) · <code>4</code> = Vincular depósito parcial · <code>5</code> = Aplicar distribución.</td></tr>
+        <tr><td><code>p_ingreso_id</code></td><td><code>BIGINT</code></td><td>NULL en Alta; ID existente en Cambio/Cancelación.</td></tr>
+        <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con encabezado y array de distribución multilínea <code>[ { capitulo, fuente_id, unidad_id, importe } ]</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_crud_ingreso(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_accion SMALLINT,
+    p_ingreso_id BIGINT,
+    p_datos JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, public
+AS $$
+DECLARE
+    v_id BIGINT;
+    v_folio VARCHAR(25);
+    v_suma_dist NUMERIC(18,2);
+    v_importe_total NUMERIC(18,2);
+    v_linea RECORD;
+BEGIN
+    -- 1 = ALTA
+    IF p_accion = 1 THEN
+        v_importe_total := (p_datos->>'importe_total')::NUMERIC(18,2);
+        
+        -- Validar cuadre aritmético de distribución si viene informada
+        IF p_datos ? 'distribucion' AND jsonb_array_length(p_datos->'distribucion') > 0 THEN
+            SELECT COALESCE(SUM((elem->>'importe_distribuido')::NUMERIC(18,2)), 0)
+            INTO v_suma_dist
+            FROM jsonb_array_elements(p_datos->'distribucion') elem;
+
+            IF ABS(v_suma_dist - v_importe_total) > 0.001 THEN
+                RETURN jsonb_build_object('error', -1, 'mensaje', 'La sumatoria de la distribución presupuestaria ($' || v_suma_dist || ') no coincide con el importe total ($' || v_importe_total || ').');
+            END IF;
+        END IF;
+
+        -- Generar folio correlativo
+        SELECT 'ING-' || p_ejercicio || '-' || LPAD(COALESCE(MAX(SUBSTRING(folio_interno FROM '[0-9]+$')::INT), 0) + 1, 5, '0')
+        INTO v_folio
+        FROM ingresos.ingreso
+        WHERE ejercicio_fiscal = p_ejercicio;
+
+        INSERT INTO ingresos.ingreso (
+            folio_interno, modalidad, concepto_ingreso_id, ejercicio_fiscal, periodo,
+            fecha_registro, fecha_esperada, fecha_operacion_bancaria, fecha_valor,
+            origen_depositante, importe_total, saldo_pendiente, cuenta_bancaria_id,
+            referencia_externa, referencia_bancaria, observaciones, estatus,
+            estatus_registro, usuario_c, fecha_c
+        ) VALUES (
+            v_folio,
+            p_datos->>'modalidad',
+            (p_datos->>'concepto_ingreso_id')::BIGINT,
+            p_ejercicio,
+            COALESCE((p_datos->>'periodo')::SMALLINT, EXTRACT(MONTH FROM CURRENT_DATE)::SMALLINT),
+            CURRENT_DATE,
+            (p_datos->>'fecha_esperada')::DATE,
+            (p_datos->>'fecha_operacion_bancaria')::DATE,
+            (p_datos->>'fecha_valor')::DATE,
+            p_datos->>'origen_depositante',
+            v_importe_total,
+            CASE WHEN p_datos->>'modalidad' = 'ESPERADO' THEN v_importe_total ELSE 0.00 END,
+            (p_datos->>'cuenta_bancaria_id')::BIGINT,
+            p_datos->>'referencia_externa',
+            p_datos->>'referencia_bancaria',
+            p_datos->>'observaciones',
+            COALESCE(p_datos->>'estatus', CASE WHEN p_datos->>'modalidad' = 'ESPERADO' THEN 'ESPERADO' ELSE 'RECIBIDO' END),
+            1, p_usuario, CURRENT_TIMESTAMP
+        ) RETURNING ingreso_id INTO v_id;
+
+        -- Insertar líneas de distribución
+        IF p_datos ? 'distribucion' THEN
+            FOR v_linea IN SELECT * FROM jsonb_to_recordset(p_datos->'distribucion') AS x(
+                capitulo_gasto INT, fuente_financiamiento_id BIGINT, fondo_especifico_id BIGINT,
+                unidad_administrativa_id BIGINT, importe_distribuido NUMERIC(18,2)
+            ) LOOP
+                INSERT INTO ingresos.ingreso_distribucion (
+                    ingreso_id, capitulo_gasto, fuente_financiamiento_id,
+                    fondo_especifico_id, unidad_administrativa_id, importe_distribuido,
+                    estatus_registro, usuario_c, fecha_c
+                ) VALUES (
+                    v_id, v_linea.capitulo_gasto, v_linea.fuente_financiamiento_id,
+                    v_linea.fondo_especifico_id, v_linea.unidad_administrativa_id,
+                    v_linea.importe_distribuido, 1, p_usuario, CURRENT_TIMESTAMP
+                );
+            END LOOP;
+        END IF;
+
+        RETURN jsonb_build_object(
+            'error', 0, 'mensaje', 'Ingreso registrado correctamente.',
+            'data', jsonb_build_object('ingreso_id', v_id, 'folio_interno', v_folio)
+        );
+
+    -- 3 = CANCELACIÓN (CON MOTIVO DE 04.1.3)
+    ELSIF p_accion = 3 THEN
+        IF NOT (p_datos ? 'motivo_id') OR (p_datos->>'motivo_id')::BIGINT IS NULL THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La cancelación exige seleccionar un motivo tipificado del catálogo 04.1.3.');
+        END IF;
+
+        UPDATE ingresos.ingreso SET
+            estatus = 'CANCELADO',
+            motivo_cancelacion_id = (p_datos->>'motivo_id')::BIGINT,
+            justificacion_cancelacion = p_datos->>'justificacion',
+            usuario_m = p_usuario, fecha_m = CURRENT_TIMESTAMP
+        WHERE ingreso_id = p_ingreso_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Ingreso cancelado exitosamente.', 'data', jsonb_build_object('ingreso_id', p_ingreso_id));
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no soportada.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. SERVICIOS API REST (SWAGGER / OPENAPI) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/registro</code></td>
+          <td>Query: <code>{ ejercicio, periodo?, modalidad?, estatus?, buscar?, limite?, offset? }</code></td>
+          <td>Bandeja general de ingresos con paginación y filtros operativos.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/registro/:id</code></td>
+          <td>Param: <code>id (BigInt)</code></td>
+          <td>Detalle completo de encabezado y partidas de distribución presupuestaria.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/registro</code></td>
+          <td>Body: <code>CreateIngresoDto</code> (modalidad Esperado o Recibido)</td>
+          <td>Alta del ingreso validando cuadre y generando folio correlativo.</td>
+        </tr>
+        <tr>
+          <td><code class="method put">PUT</code></td>
+          <td><code>/api/v1/ingresos/registro/:id</code></td>
+          <td>Body: <code>UpdateIngresoDto</code></td>
+          <td>Edición de borrador o depósito en aclaración.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/registro/:id/vincular-deposito</code></td>
+          <td>Body: <code>{ depositoId, importeParcial, referenciaBancaria }</code></td>
+          <td>Asocia parcialidad de abono bancario recalculando el saldo pendiente.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/registro/:id/aplicar</code></td>
+          <td>Body: <code>{ distribucion: [...] }</code></td>
+          <td>Formaliza la distribución presupuestaria pasando a estado Aplicado.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/registro/:id/cancelar</code></td>
+          <td>Body: <code>{ motivoId: BigInt, justificacion: string }</code></td>
+          <td>Cancela el ingreso exigiendo un motivo válido del catálogo 04.1.3.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>// NestJS Controller: RegistroIngresosController
+@ApiTags('04.2.1 Registro de Ingresos')
+@Controller('api/v1/ingresos/registro')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class RegistroIngresosController {
+  constructor(private readonly registroService: RegistroIngresosService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Listar ingresos registrados con filtros y paginación' })
+  async listar(@CurrentUser() user: UserSession, @Query() query: FiltrosIngresoDto) {
+    return this.registroService.leer(user, query);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtener detalle de un ingreso y su desglose por capítulos' })
+  async obtenerDetalle(@Param('id') id: string, @CurrentUser() user: UserSession) {
+    return this.registroService.obtenerPorId(user, BigInt(id));
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Registrar nuevo ingreso (Esperado o Recibido)' })
+  @ApiResponse({ status: 201, description: 'Ingreso guardado exitosamente.' })
+  async crear(@CurrentUser() user: UserSession, @Body() dto: CreateIngresoDto) {
+    return this.registroService.crear(user, dto);
+  }
+
+  @Post(':id/cancelar')
+  @ApiOperation({ summary: 'Cancelar ingreso con motivo tipificado del catálogo 04.1.3' })
+  async cancelar(@Param('id') id: string, @CurrentUser() user: UserSession, @Body() dto: CancelarIngresoDto) {
+    return this.registroService.cancelar(user, BigInt(id), dto);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 9. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-01 · Cuadre Aritmético de Distribución</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          La sumatoria del <code>importe_distribuido</code> de todas las líneas de detalle asociadas al ingreso debe coincidir exactamente con el <code>importe_total</code> del encabezado (<code>| Σ importe_distribuido - importe_total | = 0.00</code>). El sistema impedirá cambiar el estatus a <span class="tag-status st-esperado">Esperado</span> o <span class="tag-status st-aplicado">Aplicado</span> mientras exista discrepancia.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-02 · Integridad de Ministraciones</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Para conceptos clasificados como <em>Ministración</em>, los campos de capítulo de gasto, fuente de financiamiento, unidad administrativa receptora e importe distribuido son estrictamente obligatorios en cada una de sus líneas antes de abandonar el estatus Borrador.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-03 · Trazabilidad de Reintegros al Gasto Original</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          En ingresos por concepto de <em>Reintegro de Trabajador / Viáticos</em>, el capítulo de gasto y la fuente de financiamiento pueden recuperarse automáticamente desde la afectación presupuestal del gasto original (CxP), reintegrando la suficiencia a la misma estructura programática.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-04 · Tratamiento de Rendimientos Bancarios</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Para ingresos por <em>Rendimientos Financieros</em>, la cuenta bancaria receptora y la fuente de financiamiento son obligatorias. El capítulo de gasto puede ser condicionado o canalizado a una bolsa global transitoria en tanto se determina su asignación presupuestaria.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-05 · Diferenciación Técnica entre CRI y Capítulo</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          El CRI clasifica el rubro de entrada de recursos (naturaleza contable del ingreso, ej. <em>Transferencias del Estado</em> o <em>Productos Financieros</em>), mientras que el Capítulo clasifica la partida de salida o reserva presupuestaria (ej. <em>1000 Servicios Personales</em>). Bajo ninguna circunstancia el sistema debe suponer una relación 1 a 1 rígida ni confundir ambos conceptos.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-06 · Admisión de Ingresos Parcialmente Recibidos</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Se permite recibir depósitos por montos menores al total de un ingreso esperado. El sistema mantendrá el registro en estado <span class="tag-status st-parcial">Parcialmente recibido</span>, mostrando en todo momento el <em>Saldo pendiente de cobro</em> (<code>Importe total - Σ depósitos recibidos</code>).
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-07 · Admisión de Depósitos No Identificados</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Cualquier depósito recibido en cuentas del PJEV cuya procedencia o concepto no esté esclarecida podrá registrarse con estatus <span class="tag-status st-pend-id">Pendiente de identificación</span>. No afectará techos presupuestales de egresos hasta que sea debidamente tipificado y distribuido.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-08 · Cardinalidad 1 a N (Ingreso Esperado vs Depósitos)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Un solo ingreso esperado puede asociarse a uno o varios depósitos bancarios recibidos, posibilitando la liquidación acumulativa de una ministración o pago a través de transferencias bancarias múltiples.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-09 · Política de Exclusión Documental</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          No se permite adjuntar archivos binarios (PDF, imágenes, ZIP) ni interactuar con servicios de firma o sellado digital. Cualquier vinculación física se efectúa exclusivamente registrando la referencia alfanumérica en el campo opcional <code>referencia_externa</code>.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 10. MATRIZ DE ESTADOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Matriz de Estados y Ciclo de Vida</div>
+    <p>El módulo implementa un ciclo de vida financiero estructurado con 9 estados posibles:</p>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Estatus</th>
+          <th>Significado Operativo</th>
+          <th>Transición Siguiente</th>
+          <th>Disparador / Evento</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag-status st-borrador">Borrador</span></td>
+          <td>Registro preliminar en captura. Permite modificaciones libres y no afecta saldos.</td>
+          <td>Esperado / Recibido</td>
+          <td>Acción <em>Guardar Borrador</em>.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-esperado">Esperado</span></td>
+          <td>Ingreso notificado con distribución presupuestaria completa, a la espera del depósito bancario.</td>
+          <td>Parcialmente recibido / Recibido / Cancelado</td>
+          <td>Acción <em>Confirmar Ingreso Esperado</em>.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-parcial">Parcialmente recibido</span></td>
+          <td>Se han recibido uno o varios depósitos que no completan el importe total esperado.</td>
+          <td>Recibido / Cancelado</td>
+          <td>Acción <em>Vincular depósito bancario</em> (monto acumulado &lt; total).</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-recibido">Recibido</span></td>
+          <td>El 100% del recurso ha ingresado efectivamente a las cuentas bancarias de la institución.</td>
+          <td>Aplicado</td>
+          <td>El saldo pendiente llega a $0.00.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-pend-id">Pendiente de identificación</span></td>
+          <td>Depósito en firme registrado sin asignación de concepto o depositante definitivo.</td>
+          <td>Recibido / Aplicado</td>
+          <td>Acción <em>Identificar y Distribuir</em>.</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-aplicado">Aplicado</span></td>
+          <td>Distribución presupuestaria cerrada y vinculada a la cuenta bancaria. Listo para devengo/recaudo contable.</td>
+          <td>Contabilizado / Cancelado</td>
+          <td>Distribución presupuestaria validada (cuadre al 100%).</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-contab">Contabilizado</span></td>
+          <td>Póliza contable-presupuestaria generada y aplicada en el sistema de Contabilidad (03).</td>
+          <td>Conciliado</td>
+          <td>Módulo de Pólizas Contables (03.2.1).</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-concil">Conciliado</span></td>
+          <td>Depósito bancario conciliado formalmente contra el extracto bancario del periodo.</td>
+          <td>Cerrado (Inmutable)</td>
+          <td>Módulo de Conciliación Bancaria (04.3.1 / 06.3.1).</td>
+        </tr>
+        <tr>
+          <td><span class="tag-status st-cancel">Cancelado</span></td>
+          <td>Registro anulado por error de captura o improcedencia. Conserva trazabilidad histórica.</td>
+          <td>Ninguna (Terminal)</td>
+          <td>Acción <em>Ajustar o Cancelar</em> con motivo tipificado (04.1.3).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 11. ACCIONES DE LA PANTALLA Y WIREFRAMES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Acciones de la Pantalla y Boceto de Interfaz (Wireframes)</div>
+    
+    <div style="margin-bottom:16px;">
+      <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:6px;">Acciones Principales Habilitadas:</h3>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <span style="font-size:11px; background:#fff; border:1px solid var(--pjev-verde-oscuro); color:var(--pjev-verde-oscuro); padding:4px 10px; border-radius:4px; font-weight:600;">➕ Nuevo ingreso esperado</span>
+        <span style="font-size:11px; background:#fff; border:1px solid #0369a1; color:#0369a1; padding:4px 10px; border-radius:4px; font-weight:600;">📥 Registrar ingreso recibido</span>
+        <span style="font-size:11px; background:#fff; border:1px solid #475569; color:#475569; padding:4px 10px; border-radius:4px; font-weight:600;">💾 Guardar borrador</span>
+        <span style="font-size:11px; background:#fff; border:1px solid #854d0e; color:#854d0e; padding:4px 10px; border-radius:4px; font-weight:600;">⚖️ Distribuir por capítulo y fuente</span>
+        <span style="font-size:11px; background:#fff; border:1px solid #166534; color:#166534; padding:4px 10px; border-radius:4px; font-weight:600;">🔗 Vincular depósito</span>
+        <span style="font-size:11px; background:#fff; border:1px solid #5b21b6; color:#5b21b6; padding:4px 10px; border-radius:4px; font-weight:600;">📊 Consultar saldo pendiente</span>
+        <span style="font-size:11px; background:#fff; border:1px solid #991b1b; color:#991b1b; padding:4px 10px; border-radius:4px; font-weight:600;">🚫 Ajustar o cancelar</span>
+        <span style="font-size:11px; background:#fff; border:1px solid #1f2937; color:#1f2937; padding:4px 10px; border-radius:4px; font-weight:600;">🔍 Consultar seguimiento</span>
+      </div>
+    </div>
+
+    <!-- WIREFRAME TABS -->
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">1. Bandeja Principal de Ingresos</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">2. Modal: Nuevo Ingreso Esperado</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Modal: Registro Ingreso Recibido</button>
+      <button class="wf-tab" onclick="showWF('wf4',this)">4. Consulta de Seguimiento y Vinculación</button>
+    </div>
+
+    <!-- WF1: BANDEJA PRINCIPAL -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Bandeja de Registro y Seguimiento de Ingresos (Grid Principal)</span>
+          <span style="font-size:10px; color:#666;">Vista Operativa · Ejercicio 2026</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 420" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="420" fill="#f8fafc" rx="4"/>
+            <!-- Top Action Toolbar -->
+            <rect x="15" y="15" width="930" height="50" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="44" font-size="13" font-weight="bold" fill="#183125">Registro de Ingresos</text>
+            <rect x="560" y="25" width="170" height="30" fill="#183125" rx="4"/>
+            <text x="645" y="44" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Ingreso Esperado</text>
+            <rect x="745" y="25" width="185" height="30" fill="#0284c7" rx="4"/>
+            <text x="837" y="44" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Ingreso Recibido</text>
+
+            <!-- Filters Area -->
+            <rect x="15" y="75" width="930" height="42" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="30" y="100" font-size="10" font-weight="bold" fill="#64748b">MODALIDAD:</text>
+            <rect x="100" y="85" width="100" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="110" y="100" font-size="10" fill="#334155">Todas ▼</text>
+            <text x="220" y="100" font-size="10" font-weight="bold" fill="#64748b">ESTATUS:</text>
+            <rect x="275" y="85" width="120" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="285" y="100" font-size="10" fill="#334155">Todos ▼</text>
+            <text x="415" y="100" font-size="10" font-weight="bold" fill="#64748b">CONCEPTO / ORIGEN:</text>
+            <rect x="535" y="85" width="220" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="545" y="100" font-size="10" fill="#94a3b8">Buscar por origen, folio o ref...</text>
+            <rect x="770" y="85" width="80" height="22" fill="#334155" rx="3"/>
+            <text x="810" y="100" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Filtrar</text>
+
+            <!-- Grid Header -->
+            <rect x="15" y="125" width="930" height="28" fill="#183125"/>
+            <text x="25" y="143" font-size="10" font-weight="bold" fill="#ffffff">FOLIO</text>
+            <text x="120" y="143" font-size="10" font-weight="bold" fill="#ffffff">MODALIDAD</text>
+            <text x="210" y="143" font-size="10" font-weight="bold" fill="#ffffff">CONCEPTO</text>
+            <text x="360" y="143" font-size="10" font-weight="bold" fill="#ffffff">ORIGEN / DEPOSITANTE</text>
+            <text x="540" y="143" font-size="10" font-weight="bold" fill="#ffffff">REF. EXTERNA</text>
+            <text x="660" y="143" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="end">TOTAL ($)</text>
+            <text x="770" y="143" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="end">PENDIENTE ($)</text>
+            <text x="830" y="143" font-size="10" font-weight="bold" fill="#ffffff">ESTATUS</text>
+            <text x="915" y="143" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+
+            <!-- Row 1: Esperado Ministracion -->
+            <rect x="15" y="153" width="930" height="36" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="175" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0045</text>
+            <rect x="120" y="163" width="75" height="18" fill="#e0f2fe" rx="9"/>
+            <text x="157" y="176" font-size="9" font-weight="bold" fill="#0369a1" text-anchor="middle">ESPERADO</text>
+            <text x="210" y="175" font-size="10" fill="#1e293b">Ministración Ordinaria</text>
+            <text x="360" y="175" font-size="10" fill="#475569">SEFIPLAN Gobierno del Estado</text>
+            <text x="540" y="175" font-size="10" fill="#64748b">OFI-SEF-2026-089</text>
+            <text x="660" y="175" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">45,000,000.00</text>
+            <text x="770" y="175" font-size="10" font-weight="bold" fill="#b45309" text-anchor="end">15,000,000.00</text>
+            <rect x="800" y="163" width="75" height="18" fill="#fed7aa" rx="9"/>
+            <text x="837" y="176" font-size="9" font-weight="bold" fill="#9a3412" text-anchor="middle">PARCIAL</text>
+            <rect x="895" y="162" width="40" height="20" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="915" y="176" font-size="10" fill="#334155" text-anchor="middle">Ver</text>
+
+            <!-- Row 2: Recibido Rendimientos -->
+            <rect x="15" y="189" width="930" height="36" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="211" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0046</text>
+            <rect x="120" y="199" width="75" height="18" fill="#dcfce7" rx="9"/>
+            <text x="157" y="212" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">RECIBIDO</text>
+            <text x="210" y="211" font-size="10" fill="#1e293b">Rendimientos Financieros</text>
+            <text x="360" y="211" font-size="10" fill="#475569">Banco Santander Cta *4012</text>
+            <text x="540" y="211" font-size="10" fill="#64748b">CORTE-FEB-2026</text>
+            <text x="660" y="211" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">128,450.32</text>
+            <text x="770" y="211" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">0.00</text>
+            <rect x="800" y="199" width="75" height="18" fill="#ede9fe" rx="9"/>
+            <text x="837" y="212" font-size="9" font-weight="bold" fill="#5b21b6" text-anchor="middle">APLICADO</text>
+            <rect x="895" y="198" width="40" height="20" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="915" y="212" font-size="10" fill="#334155" text-anchor="middle">Ver</text>
+
+            <!-- Row 3: Recibido Deposito No Identificado -->
+            <rect x="15" y="225" width="930" height="36" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="247" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0047</text>
+            <rect x="120" y="235" width="75" height="18" fill="#dcfce7" rx="9"/>
+            <text x="157" y="248" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">RECIBIDO</text>
+            <text x="210" y="247" font-size="10" fill="#94a3b8">Por Identificar...</text>
+            <text x="360" y="247" font-size="10" fill="#475569">Depósito Ventanilla Santander</text>
+            <text x="540" y="247" font-size="10" fill="#64748b">AUT-884129</text>
+            <text x="660" y="247" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">32,500.00</text>
+            <text x="770" y="247" font-size="10" font-weight="bold" fill="#64748b" text-anchor="end">0.00</text>
+            <rect x="790" y="235" width="95" height="18" fill="#f1f5f9" stroke="#cbd5e1" rx="9"/>
+            <text x="837" y="248" font-size="9" font-weight="bold" fill="#475569" text-anchor="middle">PEND. IDENTIF.</text>
+            <rect x="895" y="234" width="40" height="20" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="915" y="248" font-size="10" fill="#334155" text-anchor="middle">Ver</text>
+
+            <!-- Row 4: Reintegro Esperado -->
+            <rect x="15" y="261" width="930" height="36" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="283" font-size="10" font-weight="bold" fill="#0284c7">ING-2026-0048</text>
+            <rect x="120" y="271" width="75" height="18" fill="#e0f2fe" rx="9"/>
+            <text x="157" y="284" font-size="9" font-weight="bold" fill="#0369a1" text-anchor="middle">ESPERADO</text>
+            <text x="210" y="283" font-size="10" fill="#1e293b">Reintegro de Viáticos</text>
+            <text x="360" y="283" font-size="10" fill="#475569">Lic. Roberto Méndez (Juzgado 2do)</text>
+            <text x="540" y="283" font-size="10" fill="#64748b">CXP-VIA-2026-012</text>
+            <text x="660" y="283" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">4,820.00</text>
+            <text x="770" y="283" font-size="10" font-weight="bold" fill="#b45309" text-anchor="end">4,820.00</text>
+            <rect x="800" y="271" width="75" height="18" fill="#e0f2fe" rx="9"/>
+            <text x="837" y="284" font-size="9" font-weight="bold" fill="#0369a1" text-anchor="middle">ESPERADO</text>
+            <rect x="895" y="270" width="40" height="20" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="915" y="284" font-size="10" fill="#334155" text-anchor="middle">Ver</text>
+
+            <!-- Bottom Summary Bar -->
+            <rect x="15" y="320" width="930" height="85" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="342" font-size="11" font-weight="bold" fill="#183125">Resumen Financiero del Periodo Seleccionado:</text>
+            
+            <rect x="30" y="352" width="210" height="40" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="40" y="368" font-size="9" fill="#64748b">TOTAL ESPERADO:</text>
+            <text x="40" y="384" font-size="13" font-weight="bold" fill="#0369a1">$ 45,004,820.00</text>
+
+            <rect x="260" y="352" width="210" height="40" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="270" y="368" font-size="9" fill="#64748b">TOTAL RECAUDADO EN BANCOS:</text>
+            <text x="270" y="384" font-size="13" font-weight="bold" fill="#15803d">$ 30,160,950.32</text>
+
+            <rect x="490" y="352" width="210" height="40" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="500" y="368" font-size="9" fill="#64748b">SALDO PENDIENTE POR PERCIBIR:</text>
+            <text x="500" y="384" font-size="13" font-weight="bold" fill="#b45309">$ 15,004,820.00</text>
+
+            <rect x="720" y="352" width="210" height="40" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="730" y="368" font-size="9" fill="#64748b">DEPÓSITOS POR IDENTIFICAR:</text>
+            <text x="730" y="384" font-size="13" font-weight="bold" fill="#475569">1 Registro ($ 32,500.00)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: MODAL INGRESO ESPERADO -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Captura: Nuevo Ingreso Esperado y Distribución Presupuestaria</span>
+          <span style="font-size:10px; color:#666;">Formulario Compuesto · Maestro - Detalle</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 480" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="480" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <!-- Modal Header -->
+            <rect x="0" y="0" width="960" height="45" fill="#183125"/>
+            <text x="25" y="28" font-size="14" font-weight="bold" fill="#ffffff">Registrar Ingreso Esperado (Programado / Con Aviso)</text>
+            <text x="935" y="28" font-size="14" font-weight="bold" fill="#cbd5e1" text-anchor="end">✕</text>
+
+            <!-- Sección 1: Datos Generales -->
+            <text x="25" y="70" font-size="11" font-weight="bold" fill="#183125">1. DATOS GENERALES DEL INGRESO</text>
+            <line x1="25" y1="75" x2="935" y2="75" stroke="#e2e8f0" stroke-width="1"/>
+
+            <!-- Fila 1 -->
+            <text x="25" y="95" font-size="10" font-weight="bold" fill="#475569">CONCEPTO DE INGRESO (CRI) *</text>
+            <rect x="25" y="102" width="280" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="35" y="119" font-size="10" fill="#1e293b">1.1.1 Ministración Ordinaria Estatal ▼</text>
+
+            <text x="325" y="95" font-size="10" font-weight="bold" fill="#475569">ORIGEN O DEPOSITANTE *</text>
+            <rect x="325" y="102" width="310" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="335" y="119" font-size="10" fill="#1e293b">Secretaría de Finanzas y Planeación (SEFIPLAN)</text>
+
+            <text x="655" y="95" font-size="10" font-weight="bold" fill="#475569">IMPORTE TOTAL ESPERADO ($) *</text>
+            <rect x="655" y="102" width="280" height="26" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="3"/>
+            <text x="925" y="120" font-size="12" font-weight="bold" fill="#183125" text-anchor="end">$ 45,000,000.00</text>
+
+            <!-- Fila 2 -->
+            <text x="25" y="148" font-size="10" font-weight="bold" fill="#475569">FECHA ESPERADA DE DEPÓSITO *</text>
+            <rect x="25" y="155" width="200" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="35" y="172" font-size="10" fill="#1e293b">28/02/2026</text>
+
+            <text x="245" y="148" font-size="10" font-weight="bold" fill="#475569">CUENTA BANCARIA DESTINO (SUGERIDA)</text>
+            <rect x="245" y="155" width="280" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="255" y="172" font-size="10" fill="#1e293b">Santander *4012 - Concentradora PJEV ▼</text>
+
+            <text x="545" y="148" font-size="10" font-weight="bold" fill="#475569">REFERENCIA EXTERNA (OPCIONAL)</text>
+            <rect x="545" y="155" width="390" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="555" y="172" font-size="10" fill="#1e293b">OFICIO-SEFIPLAN-DGA-2026-089</text>
+
+            <!-- Sección 2: Distribución Presupuestaria -->
+            <text x="25" y="210" font-size="11" font-weight="bold" fill="#183125">2. DISTRIBUCIÓN PRESUPUESTARIA (POR CAPÍTULO, FUENTE Y ÓRGANO)</text>
+            <line x1="25" y1="215" x2="935" y2="215" stroke="#e2e8f0" stroke-width="1"/>
+
+            <!-- Grid Header Distribución -->
+            <rect x="25" y="225" width="910" height="24" fill="#334155"/>
+            <text x="35" y="241" font-size="9" font-weight="bold" fill="#ffffff">CAPÍTULO DE GASTO</text>
+            <text x="200" y="241" font-size="9" font-weight="bold" fill="#ffffff">FUENTE DE FINANCIAMIENTO</text>
+            <text x="440" y="241" font-size="9" font-weight="bold" fill="#ffffff">FONDO ESPECÍFICO</text>
+            <text x="620" y="241" font-size="9" font-weight="bold" fill="#ffffff">UNIDAD ADMINISTRATIVA</text>
+            <text x="820" y="241" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">IMPORTE DISTRIBUIDO ($)</text>
+            <text x="910" y="241" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">DEL</text>
+
+            <!-- Line 1 -->
+            <rect x="25" y="251" width="910" height="30" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="270" font-size="10" fill="#1e293b">1000 Servicios Personales</text>
+            <text x="200" y="270" font-size="10" fill="#1e293b">111 Recursos Fiscales</text>
+            <text x="440" y="270" font-size="10" fill="#64748b">Fondo General Ordinario</text>
+            <text x="620" y="270" font-size="10" fill="#1e293b">Dirección General de Administración</text>
+            <text x="820" y="270" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">35,000,000.00</text>
+            <text x="910" y="270" font-size="10" fill="#ef4444" text-anchor="middle">✕</text>
+
+            <!-- Line 2 -->
+            <rect x="25" y="283" width="910" height="30" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="35" y="302" font-size="10" fill="#1e293b">2000 Materiales y Suministros</text>
+            <text x="200" y="302" font-size="10" fill="#1e293b">111 Recursos Fiscales</text>
+            <text x="440" y="302" font-size="10" fill="#64748b">Fondo General Ordinario</text>
+            <text x="620" y="302" font-size="10" fill="#1e293b">Dirección de Recursos Materiales</text>
+            <text x="820" y="302" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">10,000,000.00</text>
+            <text x="910" y="302" font-size="10" fill="#ef4444" text-anchor="middle">✕</text>
+
+            <!-- Add Line Button -->
+            <rect x="25" y="320" width="160" height="24" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="105" y="336" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">+ Agregar línea de destino</text>
+
+            <!-- Cuadre Validation Bar -->
+            <rect x="25" y="355" width="910" height="40" fill="#ecfdf5" stroke="#a7f3d0" rx="4"/>
+            <text x="40" y="379" font-size="11" font-weight="bold" fill="#065f46">✓ BALANCE PRESUPUESTARIO CUADRADO:</text>
+            <text x="450" y="379" font-size="10" fill="#047857">Importe Total: $ 45,000,000.00 | Suma Distribuida: $ 45,000,000.00 | Diferencia: $ 0.00</text>
+
+            <!-- Modal Footer Actions -->
+            <line x1="25" y1="415" x2="935" y2="415" stroke="#e2e8f0" stroke-width="1"/>
+            <rect x="25" y="430" width="130" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="90" y="450" font-size="11" fill="#64748b" text-anchor="middle">Cancelar</text>
+
+            <rect x="580" y="430" width="150" height="32" fill="#f8fafc" stroke="#94a3b8" rx="4"/>
+            <text x="655" y="450" font-size="11" font-weight="bold" fill="#475569" text-anchor="middle">💾 Guardar Borrador</text>
+
+            <rect x="745" y="430" width="190" height="32" fill="#183125" rx="4"/>
+            <text x="840" y="450" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Confirmar Ingreso Esperado</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: MODAL INGRESO RECIBIDO -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Captura: Registro de Ingreso Recibido (Depósito en Firme)</span>
+          <span style="font-size:10px; color:#666;">Identificación Bancaria Inmediata</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 450" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="450" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            <!-- Modal Header -->
+            <rect x="0" y="0" width="960" height="45" fill="#0284c7"/>
+            <text x="25" y="28" font-size="14" font-weight="bold" fill="#ffffff">Registrar Ingreso Recibido (Depósito en Cuenta Bancaria)</text>
+            <text x="935" y="28" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+
+            <!-- Datos Bancarios -->
+            <text x="25" y="72" font-size="11" font-weight="bold" fill="#0369a1">1. DATOS DE LA OPERACIÓN BANCARIA (EXTRACTO BANCARIO)</text>
+            <line x1="25" y1="77" x2="935" y2="77" stroke="#e2e8f0" stroke-width="1"/>
+
+            <!-- Fila 1 Bancaria -->
+            <text x="25" y="98" font-size="10" font-weight="bold" fill="#475569">CUENTA BANCARIA RECEPTORA *</text>
+            <rect x="25" y="105" width="320" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="35" y="122" font-size="10" fill="#1e293b">Santander *4012 - Concentradora PJEV ▼</text>
+
+            <text x="365" y="98" font-size="10" font-weight="bold" fill="#475569">FECHA OPERACIÓN BANCARIA *</text>
+            <rect x="365" y="105" width="170" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="375" y="122" font-size="10" fill="#1e293b">26/02/2026</text>
+
+            <text x="555" y="98" font-size="10" font-weight="bold" fill="#475569">FECHA VALOR / DISPONIBILIDAD *</text>
+            <rect x="555" y="105" width="170" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="565" y="122" font-size="10" fill="#1e293b">26/02/2026</text>
+
+            <text x="745" y="98" font-size="10" font-weight="bold" fill="#475569">IMPORTE RECIBIDO ($) *</text>
+            <rect x="745" y="105" width="190" height="26" fill="#ffffff" stroke="#0284c7" stroke-width="1.5" rx="3"/>
+            <text x="925" y="123" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="end">$ 128,450.32</text>
+
+            <!-- Fila 2 Referencias -->
+            <text x="25" y="153" font-size="10" font-weight="bold" fill="#475569">REFERENCIA BANCARIA / SPEI / AUTORIZACIÓN *</text>
+            <rect x="25" y="160" width="320" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="35" y="177" font-size="10" fill="#1e293b">SPEI-BANC-SAN-99823104</text>
+
+            <text x="365" y="153" font-size="10" font-weight="bold" fill="#475569">ORIGEN O DEPOSITANTE *</text>
+            <rect x="365" y="160" width="360" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="375" y="177" font-size="10" fill="#1e293b">Banco Santander México S.A.</text>
+
+            <text x="745" y="153" font-size="10" font-weight="bold" fill="#475569">REF. EXTERNA (OPCIONAL)</text>
+            <rect x="745" y="160" width="190" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="755" y="177" font-size="10" fill="#64748b">ESTADO-CTA-02-26</text>
+
+            <!-- Tipificación -->
+            <text x="25" y="215" font-size="11" font-weight="bold" fill="#0369a1">2. CLASIFICACIÓN DEL INGRESO Y DESTINO</text>
+            <line x1="25" y1="220" x2="935" y2="220" stroke="#e2e8f0" stroke-width="1"/>
+
+            <rect x="25" y="230" width="910" height="35" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="40" y="252" font-size="10" font-weight="bold" fill="#475569">¿SE CUENTA CON EL CONCEPTO Y DESTINO DEFINITIVO?</text>
+            <circle cx="420" cy="247" r="6" fill="#0284c7"/>
+            <text x="435" y="251" font-size="10" font-weight="bold" fill="#1e293b">Sí, clasificar y distribuir ahora</text>
+            <circle cx="650" cy="247" r="6" fill="#cbd5e1"/>
+            <text x="665" y="251" font-size="10" fill="#64748b">No, guardar como Depósito No Identificado</text>
+
+            <!-- Detalle asignado -->
+            <text x="25" y="288" font-size="10" font-weight="bold" fill="#475569">CONCEPTO DE INGRESO (CRI) *</text>
+            <rect x="25" y="295" width="280" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="35" y="312" font-size="10" fill="#1e293b">1.4.1 Rendimientos Financieros ▼</text>
+
+            <text x="325" y="288" font-size="10" font-weight="bold" fill="#475569">FUENTE DE FINANCIAMIENTO *</text>
+            <rect x="325" y="295" width="250" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="335" y="312" font-size="10" fill="#1e293b">113 Ingresos Propios ▼</text>
+
+            <text x="595" y="288" font-size="10" font-weight="bold" fill="#475569">CAPÍTULO DESTINO (OPCIONAL/CONDICIONADO)</text>
+            <rect x="595" y="295" width="340" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="605" y="312" font-size="10" fill="#1e293b">Bolsa Global de Rendimientos Institucionales ▼</text>
+
+            <!-- Acciones -->
+            <line x1="25" y1="380" x2="935" y2="380" stroke="#e2e8f0" stroke-width="1"/>
+            <rect x="25" y="395" width="130" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="90" y="415" font-size="11" fill="#64748b" text-anchor="middle">Cancelar</text>
+
+            <rect x="550" y="395" width="200" height="32" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="650" y="415" font-size="11" font-weight="bold" fill="#475569" text-anchor="middle">Guardar como No Identificado</text>
+
+            <rect x="765" y="395" width="170" height="32" fill="#0284c7" rx="4"/>
+            <text x="850" y="415" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Aplicar Ingreso Recibido</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF4: CONSULTA DE SEGUIMIENTO Y VINCULACION -->
+    <div id="wf-wf4" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Seguimiento y Vinculación: Ingreso Esperado vs Depósitos Bancarios</span>
+          <span style="font-size:10px; color:#666;">Relación 1 a N · Desglose de Parcialidades</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 420" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="420" fill="#f8fafc" rx="4"/>
+            
+            <!-- Header Resumen Ingreso Esperado -->
+            <rect x="15" y="15" width="930" height="70" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="38" font-size="13" font-weight="bold" fill="#183125">ING-2026-0045 · Ministración Ordinaria Febrero 2026</text>
+            <text x="30" y="58" font-size="10" fill="#64748b">Origen: SEFIPLAN | Ref. Externa: OFI-SEF-2026-089 | Fecha Esperada: 28/02/2026</text>
+            <rect x="800" y="25" width="130" height="24" fill="#fed7aa" rx="12"/>
+            <text x="865" y="41" font-size="10" font-weight="bold" fill="#9a3412" text-anchor="middle">PARCIALMENTE RECIBIDO</text>
+
+            <!-- Cifras Control -->
+            <rect x="15" y="95" width="295" height="50" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="25" y="115" font-size="10" fill="#64748b">IMPORTE TOTAL ESPERADO:</text>
+            <text x="25" y="135" font-size="14" font-weight="bold" fill="#1e293b">$ 45,000,000.00</text>
+
+            <rect x="330" y="95" width="295" height="50" fill="#ecfdf5" stroke="#a7f3d0" rx="4"/>
+            <text x="340" y="115" font-size="10" fill="#065f46">DEPÓSITOS VINCULADOS EN BANCOS:</text>
+            <text x="340" y="135" font-size="14" font-weight="bold" fill="#15803d">$ 30,000,000.00</text>
+
+            <rect x="645" y="95" width="300" height="50" fill="#fffbeb" stroke="#fde68a" rx="4"/>
+            <text x="655" y="115" font-size="10" fill="#92400e">SALDO PENDIENTE POR PERCIBIR:</text>
+            <text x="655" y="135" font-size="14" font-weight="bold" fill="#b45309">$ 15,000,000.00</text>
+
+            <!-- Subtabla Depósitos Vinculados -->
+            <text x="15" y="172" font-size="11" font-weight="bold" fill="#183125">DEPÓSITOS BANCARIOS ASOCIADOS A ESTE INGRESO (2 DE 3 EXHIBICIONES)</text>
+            
+            <rect x="15" y="182" width="930" height="25" fill="#334155"/>
+            <text x="25" y="198" font-size="9" font-weight="bold" fill="#ffffff">ID DEPÓSITO</text>
+            <text x="140" y="198" font-size="9" font-weight="bold" fill="#ffffff">FECHA BANCO</text>
+            <text x="240" y="198" font-size="9" font-weight="bold" fill="#ffffff">CUENTA BANCARIA</text>
+            <text x="440" y="198" font-size="9" font-weight="bold" fill="#ffffff">REF. BANCARIA / SPEI</text>
+            <text x="660" y="198" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">MONTO RECIBIDO ($)</text>
+            <text x="800" y="198" font-size="9" font-weight="bold" fill="#ffffff">ESTATUS</text>
+            <text x="910" y="198" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ACCIÓN</text>
+
+            <!-- Fila Depósito 1 -->
+            <rect x="15" y="208" width="930" height="32" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="228" font-size="10" font-weight="bold" fill="#0284c7">DEP-2026-0112</text>
+            <text x="140" y="228" font-size="10" fill="#1e293b">15/02/2026</text>
+            <text x="240" y="228" font-size="10" fill="#1e293b">Santander *4012 (Concentradora)</text>
+            <text x="440" y="228" font-size="10" fill="#64748b">SPEI-SEFIPLAN-8819201</text>
+            <text x="660" y="228" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">20,000,000.00</text>
+            <text x="800" y="228" font-size="10" fill="#15803d">Aplicado</text>
+            <text x="910" y="228" font-size="10" fill="#64748b" text-anchor="middle">👁️</text>
+
+            <!-- Fila Depósito 2 -->
+            <rect x="15" y="241" width="930" height="32" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="261" font-size="10" font-weight="bold" fill="#0284c7">DEP-2026-0145</text>
+            <text x="140" y="261" font-size="10" fill="#1e293b">22/02/2026</text>
+            <text x="240" y="261" font-size="10" fill="#1e293b">Santander *4012 (Concentradora)</text>
+            <text x="440" y="261" font-size="10" fill="#64748b">SPEI-SEFIPLAN-8891024</text>
+            <text x="660" y="261" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">10,000,000.00</text>
+            <text x="800" y="261" font-size="10" fill="#15803d">Aplicado</text>
+            <text x="910" y="261" font-size="10" fill="#64748b" text-anchor="middle">👁️</text>
+
+            <!-- Bottom Actions -->
+            <rect x="15" y="285" width="200" height="30" fill="#183125" rx="4"/>
+            <text x="115" y="304" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">🔗 Vincular Otro Depósito</text>
+
+            <rect x="225" y="285" width="160" height="30" fill="#ffffff" stroke="#991b1b" rx="4"/>
+            <text x="305" y="304" font-size="10" font-weight="bold" fill="#991b1b" text-anchor="middle">Ajustar o Cancelar Saldo</text>
+
+            <!-- Footer Traza -->
+            <rect x="15" y="335" width="930" height="70" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="30" y="358" font-size="10" font-weight="bold" fill="#183125">HISTORIAL DE OPERACIONES Y SEGUIMIENTO:</text>
+            <text x="30" y="376" font-size="10" fill="#64748b">• 01/02/2026 10:14 — Registrado como Ingreso Esperado por $45,000,000.00 (Usuario: Eunice / Analista).</text>
+            <text x="30" y="392" font-size="10" fill="#64748b">• 15/02/2026 14:30 — Vinculado depósito DEP-2026-0112 ($20,000,000.00). Estatus cambió a Parcialmente Recibido.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 12. INTEGRACIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Integraciones con Otros Subsistemas</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>Subsistema / Módulo Destino</th>
+          <th>Naturaleza del Enlace</th>
+          <th>Información que Comparte o Consume</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>01 · Configuración Inicial (Bancos y Fuentes)</strong></td>
+          <td>Consumo de Catálogos Maestros</td>
+          <td>Consume las cuentas bancarias institucionales autorizadas (<code>01.4.2</code>), fuentes de financiamiento (<code>01.2.4</code>) y el catálogo orgánico de unidades administrativas (<code>01.2.1</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>04.1 · Catálogos de Ingresos</strong></td>
+          <td>Consumo de Clasificadores</td>
+          <td>Consume conceptos de ingreso (<code>04.1.1</code>), tipos de movimiento (<code>04.1.2</code>) y motivos tipificados de cancelación/ajuste (<code>04.1.3</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>02 · Presupuesto de Egresos</strong></td>
+          <td>Alimentación de Techo Financiero</td>
+          <td>La distribución presupuestaria del ingreso por capítulo y fuente habilita la disponibilidad presupuestal para comprometer en los programas de gasto institucional.</td>
+        </tr>
+        <tr>
+          <td><strong>03 · Contabilidad Gubernamental</strong></td>
+          <td>Afectación Contable / Pólizas</td>
+          <td>Generación de los momentos contables del devengado (Cuentas por Cobrar <code>1.1.2.4</code>) y recaudado (Bancos <code>1.1.1.2</code> contra Cuentas por Cobrar y Cuentas de Orden <code>8.1.x</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>04.3.1 / 06.3.1 · Conciliación Bancaria</strong></td>
+          <td>Cotejo de Extractos</td>
+          <td>Las referencias bancarias, importes y fechas de operación registradas en el ingreso se cotejan contra los movimientos reportados en los extractos de bancos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 13. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">13</span> Casos de Prueba y Escenarios de Validación</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Escenario de Prueba</th>
+          <th>Datos de Entrada</th>
+          <th>Resultado Esperado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-ING-01</strong></td>
+          <td>Registro de ministración esperada con distribución multilínea (Cap. 1000 y 2000).</td>
+          <td>Total: $45,000,000. Línea 1 (Cap. 1000, Fte. 111): $35,000,000. Línea 2 (Cap. 2000, Fte. 111): $10,000,000.</td>
+          <td>El sistema valida que la suma ($45,000,000) coincide con el total. El registro se guarda en estatus <em>Esperado</em> con saldo pendiente de $45,000,000.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-ING-02</strong></td>
+          <td>Recepción parcial de un ingreso esperado en dos exhibiciones bancarias.</td>
+          <td>Ingreso Esperado por $10,000,000. Se vincula primer depósito bancario por $6,000,000.</td>
+          <td>El estatus transita a <em>Parcialmente recibido</em> y el saldo pendiente se recalcula automáticamente en $4,000,000.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-ING-03</strong></td>
+          <td>Completitud del 100% de la recepción parcial.</td>
+          <td>Ingreso Parcial con saldo pendiente de $4,000,000. Se vincula segundo depósito por $4,000,000.</td>
+          <td>El saldo pendiente llega a $0.00 y el estatus transita automáticamente a <em>Recibido</em>.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-ING-04</strong></td>
+          <td>Depósito en cuenta bancaria sin identificación inmediata.</td>
+          <td>Abono bancario de $25,000 en Santander sin concepto aclarado. Modalidad: Recibido.</td>
+          <td>El registro se almacena en estatus <em>Pendiente de identificación</em> con datos bancarios completos; no afecta techos presupuestales de egresos.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-ING-05</strong></td>
+          <td>Intento de guardar distribución presupuestaria descuadrada.</td>
+          <td>Importe Total: $1,000,000. Líneas de detalle suman: $950,000 (Diferencia: $50,000).</td>
+          <td>El sistema bloquea la acción, muestra alerta en rojo de descuadre y prohíbe el paso al estatus <em>Esperado</em> o <em>Aplicado</em>.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-ING-06</strong></td>
+          <td>Reintegro de viáticos recuperando estructura programática.</td>
+          <td>Concepto Reintegro de Viáticos por $3,500. Se indica número de orden CxP original.</td>
+          <td>El sistema precarga el capítulo y fuente del gasto original en la línea de distribución de reintegro.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 14. DECISIONES PENDIENTES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">14</span> Decisiones Pendientes y Definiciones por Validar</div>
+    <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:16px; font-size:13px; color:var(--pjev-texto);">
+      <ul style="padding-left:20px; line-height:1.6; margin:0;">
+        <li style="margin-bottom:8px;">
+          <strong>Esquema relacional canónico:</strong> Validar con Eunice y el equipo de arquitectura si las tablas del esquema <code>cxc</code> (ej. <code>cxc.INGRESOS_RECURSO</code>) se refactorizarán hacia el esquema <code>ingresos</code> con soporte nativo de campos de modalidad y distribución maestro-detalle, o si se reutilizará la estructura existente adaptando vistas.
+        </li>
+        <li style="margin-bottom:8px;">
+          <strong>Regla de tolerancia bancaria para reintegros:</strong> Definir si se permitirá una tolerancia para diferencias en centavos originadas por cobros de comisiones bancarias en transferencias interbancarias de servidores públicos.
+        </li>
+        <li style="margin-bottom:8px;">
+          <strong>Automatización del Asiento Devengado-Recaudado Simultáneo:</strong> En ingresos que nacen como <em>Recibidos</em> en firme (ej. rendimientos bancarios), definir si el Stored Procedure generará simultáneamente la póliza de devengo y recaudo en un único paso transaccional.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+  function showWF(id, btn) {
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+    const target = document.getElementById('wf-' + id);
+    if (target) target.classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
