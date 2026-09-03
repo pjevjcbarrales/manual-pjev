@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05.2.1 Afectación del Gasto — Manual de Desarrollo SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  .badge-w { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:var(--font-mono); }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .method.patch  { background:#f3e8ff; color:#6b21a8; }
+
+  .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9fafb; padding:16px; overflow-x:auto; text-align:center; }
+
+  .status-pill { font-size:9px; font-weight:700; padding:2px 7px; border-radius:10px; text-transform:uppercase; }
+  .st-borrador { background:#e2e8f0; color:#334155; }
+  .st-enviada  { background:#fef3c7; color:#92400e; }
+  .st-aprobada { background:#dcfce7; color:#15803d; }
+  .st-regresada{ background:#fee2e2; color:#991b1b; }
+  .st-rechazada{ background:#fce7f3; color:#9d174d; }
+  .st-cancelada{ background:#f1f5f9; color:#64748b; }
+
+  .card-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; margin-top:10px; }
+  .proc-card { background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; }
+  .proc-card:hover { border-color:var(--pjev-verde-oscuro); box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<!-- BOTONES FLOTANTES ACCIÓN -->
+<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999;">
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.location.reload()">⟳ Refrescar</button>
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.print()">🖨 Imprimir</button>
+</div>
+
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Inicio</a> ›
+    <span>05 · Cuentas por Pagar</span> ›
+    <span>05.2 · Registro</span> ›
+    <span>05.2.1 Afectación del gasto</span>
+  </div>
+
+  <!-- ENCABEZADO Y TÍTULO -->
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">05.2.1</div>
+      <h1 class="elem-title">Afectación del Gasto (Registro de Trámites y Devengo Contable)</h1>
+      <p class="elem-desc">Módulo transaccional central de Cuentas por Pagar. Gobierna el registro de trámites de gasto en sus 4 Tipos de Pago y 15 Subtipos/Procedimientos canónicos, la extracción fiscal de CFDIs, la clasificación programática presupuestaria, la integración del expediente digital y la generación automatizada de pólizas contables de devengo (Momento A.1 CONAC / Matriz de Conversión).</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Maestro-Detalle 1:N)</span>
+        <span class="mod-badge badge-s">Fase 2: Ejecución del Gasto</span>
+        <span class="mod-badge badge-w">Póliza Automática de Devengo (CONAC A.1)</span>
+        <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/cxp/afectaciones</code></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>05.2.1 Afectación del Gasto</strong> es el corazón operativo y transaccional del Departamento de Tesorería del Poder Judicial del Estado de Veracruz. Sustituye integralmente al antiguo esquema analógico basado en el llenado en papel del formato "Anexo 9". Su misión es formalizar el reconocimiento legal de la obligación frente a terceros, proveedores, contratistas, empleados o entes gubernamentales.</p>
+    <p>La operación del módulo se articula en dos fases perfectamente sincronizadas:</p>
+    <ol style="font-size:13px; color:var(--pjev-texto); margin-left:20px; line-height:1.6;">
+      <li><strong>Fase 1: Asistente Visual de Clasificación del Trámite (Wizard Modal):</strong> El analista selecciona el <strong>Tipo de Pago Principal</strong> (entre 4 macro-familias) y el <strong>Subtipo / Procedimiento Operativo</strong> (entre 15 opciones). Cada opción despliega icono, título oficial y una <em>breve descripción funcional</em> que guía con certeza al usuario, condicionando automáticamente qué tipo de beneficiario exige el sistema (Proveedor, Empleado, Unidad Administrativa o Tercero Institucional) y si la operación afecta o no presupuesto.</li>
+      <li><strong>Fase 2: Formulario Compuesto (Maestro-Detalle):</strong> Una vez guardada la cabecera en <code>cxp.afectaciones_gasto</code>, el sistema habilita el grid de facturas electrónicas en <code>_cfdi</code> (con validación de timbrado SAT y retenciones), el grid de clasificación presupuestaria en <code>_detalles</code> (estructura programática y COG), el visor de expediente digital (Checklist normativo <code>05.1.1</code>) y la cadena de autorizaciones del workflow oficial de 6 estados. Al alcanzar el estado <code>APROBADA</code>, el motor genera de forma síncrona la póliza de devengo contable y presupuestal.</li>
+    </ol>
+  </div>
+
+  <!-- 2. MARCO NORMATIVO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+    <table class="props-table">
+      <thead><tr><th>Norma / Instrumento</th><th>Artículo / Sección</th><th>Obligación y Criterio Técnico</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
+          <td>Art. 4 Fracc. XVI, Art. 9 y Art. 67</td>
+          <td>El momento contable del <strong>Gasto Devengado</strong> se produce al recibir conforme los bienes o servicios o al formalizar una obligación de pago legalmente exigible, debiendo registrarse simultáneamente en cuentas patrimoniales (Clase 5 vs 2) y presupuestarias (Clase 8).</td>
+        </tr>
+        <tr>
+          <td><strong>Normativa CONAC (Guías Contabilizadoras)</strong></td>
+          <td>Modelo de Asiento Tipo A.1 y Matrices de Conversión</td>
+          <td>Instruye el devengo simultáneo: Cargo a Gastos de Funcionamiento (5.x.x.x) y Presupuesto Devengado (8.2.5), con Abono a Proveedores/Contratistas por Pagar (2.1.1.2) y Presupuesto Comprometido (8.2.4). Las operaciones extrapresupuestarias operan exclusivamente a nivel de balance.</td>
+        </tr>
+        <tr>
+          <td><strong>Manual Específico de Procedimientos de Recursos Financieros PJEV</strong></td>
+          <td>Procedimientos de Pago Directo, Contratos, Obra, Viáticos y Terceros (pág. 95 a 186)</td>
+          <td>Establece los flujos obligatorios de recepción, verificación documental de soportes, autorización por titular del área y emisión formal de la Solicitud-comprobación de recurso (Orden de Pago).</td>
+        </tr>
+        <tr>
+          <td><strong>Código Fiscal de la Federación (CFF)</strong></td>
+          <td>Art. 29 y 29-A (SAT Anexo 20 v4.0)</td>
+          <td>Exige la validación informática y extracción de metadatos (UUID, RFC, Subtotal, IVA, Retenciones) de comprobantes fiscales digitales por internet vigentes.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. ARQUITECTURA: LOS 4 TIPOS DE PAGO Y SUS 15 SUBTIPOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Estructura y Clasificación Institucional del Trámite (4 Tipos de Pago y 15 Subtipos)</div>
+    <p>Para erradicar la confusión histórica entre capítulos presupuestales y modalidades de pago, el sistema adopta una hegemonía de <strong>4 macro-familias de Tipo de Pago</strong> que gobiernan la afectación presupuestaria y derivan los 15 procedimientos operativos con sus descripciones breves:</p>
+
+    <!-- TABLA MAESTRA DE TIPOS Y SUBTIPOS -->
+    <table class="props-table" style="font-size:11px;">
+      <thead>
+        <tr>
+          <th style="width:18%;">Tipo de Pago Principal</th>
+          <th style="width:20%;">Subtipo / Procedimiento</th>
+          <th style="width:38%;">Breve Descripción en Pantalla (Card UI)</th>
+          <th style="width:12%;">Beneficiario</th>
+          <th style="width:12%;">Impacto Presupuestal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- GRUPO 1: GASTO DIRECTO -->
+        <tr style="background:#fdfbf7;">
+          <td rowspan="6"><strong>1. Gasto Directo</strong><br><code style="font-size:10px;">DIRECTO</code><br><small style="color:var(--pjev-texto-muted);">Sin pedido ni licitación previa</small></td>
+          <td><code>NOMINA</code><br><strong>Nómina Quincenal</strong></td>
+          <td>Afectación presupuestal de sueldos, compensaciones y prestaciones del personal jurisdiccional y administrativo.</td>
+          <td><span class="mod-badge badge-s">EMPLEADO / UA</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>ARRENDAMIENTO</code><br><strong>Arrendamiento Inmuebles</strong></td>
+          <td>Pago mensual de rentas de bienes inmuebles para juzgados foráneos y sedes judiciales del Estado.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>SERVICIOS_BASICOS</code><br><strong>Servicios Básicos</strong></td>
+          <td>Pago continuo de energía eléctrica (CFE), agua potable (CAEV/municipales), telefonía e internet institucional.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>HONORARIOS</code><br><strong>Servicios Profesionales</strong></td>
+          <td>Honorarios profesionales de personas físicas contratadas para asesorías, peritajes o dictámenes especializados.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>GASTO_DIRECTO_GENERAL</code><br><strong>Compras Menores</strong></td>
+          <td>Adquisiciones o servicios menores urgentes que no requieren proceso licitatorio ni entrega en almacén central.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>BENEFICIARIOS_EMPLEADOS</code><br><strong>Beneficiarios Empleados</strong></td>
+          <td>Pago de pensiones alimenticias o liquidaciones a favor de terceros vinculados legalmente a un trabajador.</td>
+          <td><span class="mod-badge badge-s">EMPLEADO</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+
+        <!-- GRUPO 2: PEDIDO / CONTRATO -->
+        <tr>
+          <td rowspan="3"><strong>2. Por Pedido / Contrato</strong><br><code style="font-size:10px;">PEDIDO</code><br><small style="color:var(--pjev-texto-muted);">Derivado de adquisiciones/obra</small></td>
+          <td><code>COMPRA_PEDIDO</code><br><strong>Pedido de Adquisiciones</strong></td>
+          <td>Compra de bienes y suministros de almacén formalizada mediante pedido y entrada sellada de recepción.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+        <tr>
+          <td><code>CONTRATO_SERVICIOS</code><br><strong>Contrato de Servicios</strong></td>
+          <td>Servicios generales continuos formalizados bajo contrato (vigilancia, limpieza, pólizas de seguros y sistemas).</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+        <tr>
+          <td><code>OBRA_PUBLICA</code><br><strong>Contrato de Obra Pública</strong></td>
+          <td>Anticipos, estimaciones autorizadas por supervisión de infraestructura y finiquitos de ciudades judiciales.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+
+        <!-- GRUPO 3: GASTOS A COMPROBAR -->
+        <tr style="background:#fdfbf7;">
+          <td rowspan="3"><strong>3. Gastos a Comprobar</strong><br><code style="font-size:10px;">COMPROBAR</code><br><small style="color:var(--pjev-texto-muted);">Anticipos y comisiones</small></td>
+          <td><code>COMPROBACION_VIATICOS</code><br><strong>Comprobación de Viáticos</strong></td>
+          <td>Comprobación oficial de viáticos y pasajes de servidores públicos conforme al tabulador y facturas (Anexo 6).</td>
+          <td><span class="mod-badge badge-s">EMPLEADO</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>SUJETOS_COMPROBAR</code><br><strong>Sujetos a Comprobar</strong></td>
+          <td>Comprobación de gastos de operación otorgados a titulares de juzgados foráneos y sedes regionales (Anexo 15).</td>
+          <td><span class="mod-badge badge-s">UNIDAD_ADMIN</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>FONDO_REVOLVENTE</code><br><strong>Reposición Fondo Rotatorio</strong></td>
+          <td>Reposición periódica de caja chica y fondos revolventes amparada con comprobantes fiscales de gastos menores.</td>
+          <td><span class="mod-badge badge-s">UNIDAD_ADMIN</span></td>
+          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+        </tr>
+
+        <!-- GRUPO 4: NO AFECTA PRESUPUESTO -->
+        <tr style="background:#f0fdf4;">
+          <td rowspan="3"><strong>4. No Afecta Presupuesto</strong><br><code style="font-size:10px;">NO_PRESUPUESTARIO</code><br><small style="color:var(--pjev-texto-muted);">Cuentas de balance y fondos ajenos</small></td>
+          <td><code>TERCEROS_INST</code><br><strong>Entero de Retenciones</strong></td>
+          <td>Pago concentrado de retenciones fiscales (SAT ISR quincenal), SEFIPLAN 3%, cuotas IPE, cuotas sindicales y seguros.</td>
+          <td><span class="mod-badge badge-w">TERCERO_INST</span></td>
+          <td><span class="mod-badge badge-s" style="background:#fee2e2; color:#991b1b;">Extrapresupuestal (Balance)</span></td>
+        </tr>
+        <tr style="background:#f0fdf4;">
+          <td><code>DEVOLUCION_GARANTIA</code><br><strong>Devolución de Garantías</strong></td>
+          <td>Reembolso de fondos y depósitos en garantía a licitantes no adjudicados o finiquitos de contratos sin impacto presupuestal.</td>
+          <td><span class="mod-badge badge-w">PROVEEDOR</span></td>
+          <td><span class="mod-badge badge-s" style="background:#fee2e2; color:#991b1b;">Extrapresupuestal (Balance)</span></td>
+        </tr>
+        <tr style="background:#f0fdf4;">
+          <td><code>FONDOS_CUSTODIA</code><br><strong>Fondos en Custodia Judicial</strong></td>
+          <td>Devolución de ingresos indebidos, consignaciones de juzgados o administración de fondos ajenos bajo mandato.</td>
+          <td><span class="mod-badge badge-w">TERCERO</span></td>
+          <td><span class="mod-badge badge-s" style="background:#fee2e2; color:#991b1b;">Extrapresupuestal (Balance)</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. CICLO DE ESTADOS Y WORKFLOW OFICIAL (6 ESTADOS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Ciclo de Vida Transaccional (Workflow Oficial de 6 Estados)</div>
+    <p>Conforme a las migraciones SQL 161 y 175 y al módulo de autorización <code>afectaciones-cxp.autorizacion.ts</code>, el ciclo de vida de una afectación transita rigurosamente por los siguientes 6 estados canónicos:</p>
+
+    <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:8px; padding:16px; margin:14px 0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; font-size:12px; font-weight:bold;">
+        <span class="status-pill st-borrador">1. BORRADOR</span> →
+        <span class="status-pill st-enviada">2. ENVIADA (REVISIÓN)</span> →
+        <span class="status-pill st-aprobada">3. APROBADA (DEVENGADA)</span>
+        <span style="color:#64748b;">|</span>
+        <span class="status-pill st-regresada">REGRESADA (OBSERVADA)</span>
+        <span class="status-pill st-rechazada">RECHAZADA</span>
+        <span class="status-pill st-cancelada">CANCELADA</span>
+      </div>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin:12px 0 0; line-height:1.5;">
+        <strong>Regla de Aprobación y Devengo:</strong> Al ejecutarse la acción <code>APROBAR</code> (exclusiva para usuarios Nivel 2: Director/Jefe de Tesorería), el sistema ejecuta de forma síncrona la función <code>cxp.fn_generar_poliza_afectacion</code>. Esta función consulta las matrices de conversión, crea los asientos en <code>contabilidad.poliza</code> y <code>cxp.poliza</code>, asigna el folio <code>PE</code> y graba el apuntador <code>p_poliza_id</code> en la cabecera. A partir de este momento, el trámite queda congelado para cualquier edición y queda disponible para emitir la <strong>Orden de Pago (05.2.2)</strong>.
+      </p>
+    </div>
+
+    <table class="props-table">
+      <thead><tr><th>Estado</th><th>Acciones Disponibles</th><th>Roles Facultados</th><th>Condición de Transición y Efectos</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="status-pill st-borrador">BORRADOR</span></td>
+          <td><code>GUARDAR</code>, <code>ENVIAR</code>, <code>CANCELAR</code></td>
+          <td>Analista Capturista (Nivel 3)</td>
+          <td>Edición total de CFDIs y partidas. Para <code>ENVIAR</code> se ejecuta <code>cxp.fn_validar_checklist_afectacion</code>; si falta algún requisito obligatorio, se bloquea el avance.</td>
+        </tr>
+        <tr>
+          <td><span class="status-pill st-enviada">ENVIADA</span></td>
+          <td><code>APROBAR</code>, <code>REGRESAR</code>, <code>RECHAZAR</code></td>
+          <td>Revisor / Aprobador (Nivel 2)</td>
+          <td>Trámite en poder de la autoridad facultada. No admite modificaciones de importes; solo dictamen de aprobación o retorno con observaciones.</td>
+        </tr>
+        <tr>
+          <td><span class="status-pill st-aprobada">APROBADA</span></td>
+          <td><code>EMITIR_ORDEN</code>, <code>CONSULTAR</code></td>
+          <td>Jefe Tesorería / CxP (Nivel 2)</td>
+          <td><strong>Devengo perfeccionado.</strong> La póliza contable ha sido asentada. Queda bloqueada contra cualquier edición. Se habilita en la bandeja de <code>05.2.2 Orden de pago</code>.</td>
+        </tr>
+        <tr>
+          <td><span class="status-pill st-regresada">REGRESADA</span></td>
+          <td><code>EDITAR</code>, <code>RE-ENVIAR</code></td>
+          <td>Analista Capturista (Nivel 3)</td>
+          <td>El revisor detectó una inconsistencia y la devolvió con justificación en la bitácora. Vuelve a ser editable para subsanar y volver a enviar.</td>
+        </tr>
+        <tr>
+          <td><span class="status-pill st-rechazada">RECHAZADA</span></td>
+          <td><code>CONSULTAR</code>, <code>CANCELAR</code></td>
+          <td>Revisor (Nivel 2) / Analista</td>
+          <td>Rechazo formal de procedencia del gasto por incumplimiento grave. No puede reactivarse; debe ser cancelada formalmente.</td>
+        </tr>
+        <tr>
+          <td><span class="status-pill st-cancelada">CANCELADA</span></td>
+          <td><code>CONSULTAR</code></td>
+          <td>Jefe de Tesorería (Nivel 2)</td>
+          <td>Baja lógica definitiva del trámite (<code>estatus_registro = 0</code>). Si contaba con compromiso presupuestal previo, se libera la disponibilidad.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. MODELO DE DATOS Y DICCIONARIO DE CAMPOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Modelo de Datos y Diccionario de Campos</div>
+    <p>La persistencia reside en el esquema <code>cxp</code> de PostgreSQL. La cabecera transaccional en <code>afectaciones_gasto</code> particiona por <code>ejercicio_fiscal</code>, vinculándose a las tablas hijas de facturas, partidas y auditoría:</p>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showDBTab('db1',this)">cxp.afectaciones_gasto</button>
+      <button class="sp-tab" onclick="showDBTab('db2',this)">cxp.afectaciones_gasto_cfdi</button>
+      <button class="sp-tab" onclick="showDBTab('db3',this)">cxp.afectaciones_gasto_detalles</button>
+      <button class="sp-tab" onclick="showDBTab('db4',this)">cxp.catalogo_grupos_tramite</button>
+      <button class="sp-tab" onclick="showDBTab('db5',this)">cxp.catalogo_procedimientos_afectacion</button>
+    </div>
+
+    <!-- TAB 1: CABECERA -->
+    <div id="db-db1" class="sp-panel active">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción y Regla de Validación</th></tr></thead>
+        <tbody>
+          <tr><td><code>ag_id</code></td><td><code>UUID PK</code></td><td>No</td><td>Identificador global único del trámite.</td></tr>
+          <tr><td><code>ejercicio_fiscal</code></td><td><code>INTEGER PK</code></td><td>No</td><td>Ejercicio anual (llave de partición obligatoria).</td></tr>
+          <tr><td><code>folio</code></td><td><code>VARCHAR(20) UNIQUE</code></td><td>No</td><td>Folio secuencial único generado por el sistema (ej. <code>AG-2026-00042</code>).</td></tr>
+          <tr><td><code>fecha_elaboracion</code></td><td><code>DATE</code></td><td>No</td><td>Fecha de captura del trámite.</td></tr>
+          <tr><td><code>f_grupo_codigo</code></td><td><code>VARCHAR(20) FK</code></td><td>No</td><td>Relación con <code>catalogo_grupos_tramite</code> (<code>DIRECTO</code>, <code>PEDIDO</code>, <code>COMPROBAR</code>, <code>NO_PRESUPUESTARIO</code>).</td></tr>
+          <tr><td><code>f_procedimiento_codigo</code></td><td><code>VARCHAR(40) FK</code></td><td>No</td><td>Procedimiento operativo en <code>catalogo_procedimientos_afectacion</code>.</td></tr>
+          <tr><td><code>tipo_pago</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Directo</code>, <code>2 = Pedido</code>, <code>3 = Comprobar</code>, <code>4 = No afecta presupuesto</code>.</td></tr>
+          <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>No</td><td><code>true</code> para tipos 1 a 3; <code>false</code> para tipo 4.</td></tr>
+          <tr><td><code>concepto</code></td><td><code>VARCHAR(500)</code></td><td>No</td><td>Justificación sustantiva del gasto.</td></tr>
+          <tr><td><code>importe_total_pago</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Importe bruto total acumulado de los comprobantes.</td></tr>
+          <tr><td><code>importe_retenciones</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Total acumulado de retenciones fiscales y laborales descontadas.</td></tr>
+          <tr><td><code>f_proveedor_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Beneficiario Proveedor en <code>config.catalogo_proveedores</code>.</td></tr>
+          <tr><td><code>f_empleado_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Beneficiario Servidor Público en <code>config.catalogo_empleados</code>.</td></tr>
+          <tr><td><code>f_ua_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Beneficiario Unidad Administrativa en <code>config.catalogo_ua</code>.</td></tr>
+          <tr><td><code>f_tercero_inst_id</code></td><td><code>BIGINT FK</code></td><td>Sí</td><td>Beneficiario Tercero Institucional en <code>config.catalogo_terceros_inst</code>.</td></tr>
+          <tr><td><code>f_centro_costo_id</code></td><td><code>INTEGER FK</code></td><td>No</td><td>Centro de costo solicitante en <code>config.catalogo_centros_costos</code>.</td></tr>
+          <tr><td><code>estatus_workflow</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td><code>BORRADOR</code>, <code>ENVIADA</code>, <code>APROBADA</code>, <code>REGRESADA</code>, <code>RECHAZADA</code>, <code>CANCELADA</code>.</td></tr>
+          <tr><td><code>p_poliza_id</code></td><td><code>BIGINT FK</code></td><td>Sí</td><td>Apuntador a la póliza contable de devengo en <code>contabilidad.poliza</code>.</td></tr>
+          <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Activo</code>, <code>0 = Inactivo</code> (Soft-delete).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TAB 2: CFDIs -->
+    <div id="db-db2" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>ag_cfdi_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único del registro de factura.</td></tr>
+          <tr><td><code>f_ag_id</code></td><td><code>UUID FK</code></td><td>No</td><td>Relación con la cabecera en <code>cxp.afectaciones_gasto</code>.</td></tr>
+          <tr><td><code>uuid_cfdi</code></td><td><code>VARCHAR(36) UNIQUE</code></td><td>No</td><td>Folio Fiscal Digital universal SAT.</td></tr>
+          <tr><td><code>rfc_emisor</code></td><td><code>VARCHAR(13)</code></td><td>No</td><td>RFC del emisor de la factura.</td></tr>
+          <tr><td><code>razon_social_emisor</code></td><td><code>VARCHAR(250)</code></td><td>No</td><td>Nombre o razón social del emisor.</td></tr>
+          <tr><td><code>serie_folio</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Serie y folio comercial del comprobante.</td></tr>
+          <tr><td><code>fecha_emision</code></td><td><code>TIMESTAMPTZ</code></td><td>No</td><td>Fecha de timbrado fiscal.</td></tr>
+          <tr><td><code>subtotal</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Subtotal de la factura antes de impuestos.</td></tr>
+          <tr><td><code>iva_trasladado</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>IVA trasladado causado.</td></tr>
+          <tr><td><code>retencion_isr</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Monto retenido de ISR.</td></tr>
+          <tr><td><code>retencion_iva</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Monto retenido de IVA.</td></tr>
+          <tr><td><code>total_factura</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Importe total del comprobante.</td></tr>
+          <tr><td><code>estatus_sat</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td><code>VIGENTE</code>, <code>CANCELADO</code>, <code>NO_ENCONTRADO</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TAB 3: DETALLES PRESUPUESTALES -->
+    <div id="db-db3" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>agd_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único de la partida presupuestal.</td></tr>
+          <tr><td><code>f_ag_id</code></td><td><code>UUID FK</code></td><td>No</td><td>Relación con la cabecera.</td></tr>
+          <tr><td><code>f_clave_presupuestal_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Clave presupuestaria completa (Función, Programa, Subprograma, Proyecto, Fuente). Nulo si Tipo 4.</td></tr>
+          <tr><td><code>f_cog_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Clasificador por Objeto del Gasto (COG a nivel partida). Nulo si Tipo 4.</td></tr>
+          <tr><td><code>cuenta_contable_balance</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Subcuenta de pasivo circulante (2.1.1.7) o deudores. Requerida si Tipo 4.</td></tr>
+          <tr><td><code>mes_servicio</code></td><td><code>SMALLINT</code></td><td>No</td><td>Mes calendario de devengo del gasto (1 a 12).</td></tr>
+          <tr><td><code>importe_solicitado</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Monto asignado a la partida presupuestal o cuenta.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TAB 4: GRUPOS TRÁMITE -->
+    <div id="db-db4" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>cgt_codigo</code></td><td><code>VARCHAR(20) PK</code></td><td>Código del grupo (<code>DIRECTO</code>, <code>PEDIDO</code>, <code>COMPROBAR</code>, <code>NO_PRESUPUESTARIO</code>).</td></tr>
+          <tr><td><code>cgt_numero</code></td><td><code>SMALLINT UNIQUE</code></td><td>Número correlativo (1, 2, 3, 4).</td></tr>
+          <tr><td><code>cgt_titulo</code></td><td><code>VARCHAR(100)</code></td><td>Título oficial de la tarjeta (ej. <code>1. Gasto Directo</code>).</td></tr>
+          <tr><td><code>cgt_subtitulo</code></td><td><code>VARCHAR(150)</code></td><td>Subtítulo guía (ej. <code>Sin pedido ni licitación</code>).</td></tr>
+          <tr><td><code>cgt_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>Breve descripción funcional renderizada en el modal.</td></tr>
+          <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>Indicador booleano de afectación presupuestaria.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TAB 5: PROCEDIMIENTOS -->
+    <div id="db-db5" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>cpa_codigo</code></td><td><code>VARCHAR(40) PK</code></td><td>Código nemotécnico (<code>NOMINA</code>, <code>ARRENDAMIENTO</code>, <code>COMPRA_PEDIDO</code>, etc.).</td></tr>
+          <tr><td><code>f_grupo_codigo</code></td><td><code>VARCHAR(20) FK</code></td><td>Relación con la macro-familia en <code>catalogo_grupos_tramite</code>.</td></tr>
+          <tr><td><code>cpa_nombre</code></td><td><code>VARCHAR(150)</code></td><td>Nombre completo legible del procedimiento.</td></tr>
+          <tr><td><code>cpa_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>Breve descripción renderizada en la tarjeta inferior de la UI.</td></tr>
+          <tr><td><code>cpa_tipo_beneficiario</code></td><td><code>VARCHAR(30)</code></td><td>Tipo de entidad obligatoria (<code>PROVEEDOR</code>, <code>EMPLEADO</code>, <code>UNIDAD_ADMINISTRATIVA</code>, <code>TERCERO_INST</code>).</td></tr>
+          <tr><td><code>cpa_seleccionable</code></td><td><code>BOOLEAN</code></td><td>Habilita o deshabilita la opción para captura general.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 6. STORED PROCEDURES (LEER, CRUD, WORKFLOW, POLIZA) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Funciones PostgreSQL en esquema <code>cxp</code> bajo estándar institucional, con <code>SECURITY DEFINER</code>, <code>SET search_path</code> y retorno JSONB unificado <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>:
+    </p>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showSP('spag1',this)">6.1 fn_leer_afectacion_encabezado</button>
+      <button class="sp-tab" onclick="showSP('spag2',this)">6.2 fn_abc_afectacion_encabezado</button>
+      <button class="sp-tab" onclick="showSP('spag3',this)">6.3 fn_abc_afectacion_detalles</button>
+      <button class="sp-tab" onclick="showSP('spag4',this)">6.4 sp_CxpAfectacionesGasto_Workflow_V2</button>
+      <button class="sp-tab" onclick="showSP('spag5',this)">6.5 fn_generar_poliza_afectacion</button>
+    </div>
+
+    <!-- SP 1: LEER ENCABEZADO -->
+    <div id="sp-spag1" class="sp-panel active">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función de Consulta: <code>cxp.fn_leer_afectacion_encabezado</code></h4>
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_leer_afectacion_encabezado(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_tipo_pago INTEGER DEFAULT NULL,
+    p_procedimiento VARCHAR DEFAULT NULL,
+    p_estatus_workflow VARCHAR DEFAULT NULL,
+    p_buscar VARCHAR DEFAULT NULL,
+    p_ag_id UUID DEFAULT NULL
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, contabilidad, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'ag_id', a.ag_id,
+            'ejercicio_fiscal', a.ejercicio_fiscal,
+            'folio', a.folio,
+            'fecha_elaboracion', a.fecha_elaboracion,
+            'grupo_codigo', a.f_grupo_codigo,
+            'grupo_titulo', g.cgt_titulo,
+            'procedimiento_codigo', a.f_procedimiento_codigo,
+            'procedimiento_nombre', p.cpa_nombre,
+            'tipo_pago', a.tipo_pago,
+            'afecta_presupuesto', a.afecta_presupuesto,
+            'concepto', a.concepto,
+            'importe_total_pago', a.importe_total_pago,
+            'importe_retenciones', a.importe_retenciones,
+            'importe_neto_pagar', (a.importe_total_pago - a.importe_retenciones),
+            'centro_costo_id', a.f_centro_costo_id,
+            'centro_costo_nombre', cc.cc_nombre,
+            'beneficiario_tipo', p.cpa_tipo_beneficiario,
+            'beneficiario_nombre', CASE p.cpa_tipo_beneficiario
+                WHEN 'PROVEEDOR' THEN prov.pr_razonsocial
+                WHEN 'EMPLEADO' THEN emp.emp_nombrecompleto
+                WHEN 'UNIDAD_ADMINISTRATIVA' THEN ua.ua_nombre
+                WHEN 'TERCERO_INST' THEN ti.nombre_institucion
+                ELSE 'No asignado' END,
+            'estatus_workflow', a.estatus_workflow,
+            'poliza_id', a.p_poliza_id,
+            'usuario_c', a.usuario_c,
+            'fecha_c', a.fecha_c
+        ) ORDER BY a.fecha_c DESC
+    ) INTO v_data
+    FROM cxp.afectaciones_gasto a
+    JOIN cxp.catalogo_grupos_tramite g ON g.cgt_codigo = a.f_grupo_codigo
+    JOIN cxp.catalogo_procedimientos_afectacion p ON p.cpa_codigo = a.f_procedimiento_codigo
+    LEFT JOIN config.catalogo_centros_costos cc ON cc.cc_id = a.f_centro_costo_id
+    LEFT JOIN config.catalogo_proveedores prov ON prov.pr_id = a.f_proveedor_id
+    LEFT JOIN config.catalogo_empleados emp ON emp.emp_id = a.f_empleado_id
+    LEFT JOIN config.catalogo_ua ua ON ua.ua_id = a.f_ua_id
+    LEFT JOIN config.catalogo_terceros_inst ti ON ti.tercero_inst_id = a.f_tercero_inst_id
+    WHERE a.ejercicio_fiscal = p_ejercicio
+      AND a.estatus_registro = 1
+      AND (p_ag_id IS NULL OR a.ag_id = p_ag_id)
+      AND (p_tipo_pago IS NULL OR a.tipo_pago = p_tipo_pago)
+      AND (p_procedimiento IS NULL OR a.f_procedimiento_codigo = p_procedimiento)
+      AND (p_estatus_workflow IS NULL OR a.estatus_workflow = p_estatus_workflow)
+      AND (p_buscar IS NULL OR (
+          a.folio ILIKE '%' || p_buscar || '%' OR
+          a.concepto ILIKE '%' || p_buscar || '%'
+      ));
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', COALESCE(v_data, '[]'::jsonb));
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 2: ABC ENCABEZADO -->
+    <div id="sp-spag2" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función Transaccional: <code>cxp.fn_abc_afectacion_encabezado</code></h4>
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_abc_afectacion_encabezado(
+    p_accion SMALLINT,
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_ag_id UUID,
+    p_datos JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, contabilidad, public
+AS $$
+DECLARE
+    v_id UUID;
+    v_folio VARCHAR(20);
+    v_proc VARCHAR(40);
+    v_grupo VARCHAR(20);
+    v_tipo_pago SMALLINT;
+    v_afecta_ppto BOOLEAN;
+    v_tipo_bene VARCHAR(30);
+BEGIN
+    -- 1 = ALTA
+    IF p_accion = 1 THEN
+        v_proc := p_datos->>'procedimiento_codigo';
+        
+        -- Obtener configuración del procedimiento
+        SELECT f_grupo_codigo, cpa_tipo_beneficiario INTO v_grupo, v_tipo_bene
+          FROM cxp.catalogo_procedimientos_afectacion
+         WHERE cpa_codigo = v_proc AND estatus_registro = 1;
+
+        IF NOT FOUND THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'El procedimiento seleccionado no existe o está inactivo.');
+        END IF;
+
+        -- Obtener grupo y afectación presupuestaria
+        SELECT cgt_numero, afecta_presupuesto INTO v_tipo_pago, v_afecta_ppto
+          FROM cxp.catalogo_grupos_tramite WHERE cgt_codigo = v_grupo;
+
+        v_id := gen_random_uuid();
+        
+        -- Generar folio anual AG-YYYY-XXXXX
+        SELECT 'AG-' || p_ejercicio || '-' || LPAD((COALESCE(MAX(SUBSTRING(folio FROM 9)::INTEGER), 0) + 1)::TEXT, 5, '0')
+          INTO v_folio
+          FROM cxp.afectaciones_gasto WHERE ejercicio_fiscal = p_ejercicio;
+
+        INSERT INTO cxp.afectaciones_gasto (
+            ag_id, ejercicio_fiscal, folio, fecha_elaboracion,
+            f_grupo_codigo, f_procedimiento_codigo, tipo_pago, afecta_presupuesto,
+            concepto, f_centro_costo_id, f_proveedor_id, f_empleado_id,
+            f_ua_id, f_tercero_inst_id, estatus_workflow, estatus_registro,
+            usuario_c, fecha_c
+        ) VALUES (
+            v_id, p_ejercicio, v_folio, CURRENT_DATE,
+            v_grupo, v_proc, v_tipo_pago, v_afecta_ppto,
+            TRIM(p_datos->>'concepto'),
+            (p_datos->>'centro_costo_id')::INTEGER,
+            (p_datos->>'proveedor_id')::INTEGER,
+            (p_datos->>'empleado_id')::INTEGER,
+            (p_datos->>'ua_id')::INTEGER,
+            (p_datos->>'tercero_inst_id')::BIGINT,
+            'BORRADOR', 1, p_usuario, clock_timestamp()
+        );
+
+        -- Registrar en bitácora de auditoría
+        INSERT INTO cxp.afectaciones_historial (
+            f_ag_id, estado_anterior, estado_nuevo, accion_realizada,
+            observaciones, usuario_accion, fecha_accion
+        ) VALUES (
+            v_id, NULL, 'BORRADOR', 'CREACION', 'Alta inicial de cabecera de afectación', p_usuario, clock_timestamp()
+        );
+
+        RETURN jsonb_build_object(
+            'error', 0,
+            'mensaje', 'Afectación guardada exitosamente en borrador.',
+            'data', jsonb_build_object('ag_id', v_id, 'folio', v_folio)
+        );
+
+    -- 2 = EDICIÓN (Solo en BORRADOR o REGRESADA)
+    ELSIF p_accion = 2 THEN
+        UPDATE cxp.afectaciones_gasto SET
+            concepto = COALESCE(TRIM(p_datos->>'concepto'), concepto),
+            f_centro_costo_id = COALESCE((p_datos->>'centro_costo_id')::INTEGER, f_centro_costo_id),
+            f_proveedor_id = (p_datos->>'proveedor_id')::INTEGER,
+            f_empleado_id = (p_datos->>'empleado_id')::INTEGER,
+            f_ua_id = (p_datos->>'ua_id')::INTEGER,
+            f_tercero_inst_id = (p_datos->>'tercero_inst_id')::BIGINT,
+            usuario_m = p_usuario, fecha_m = clock_timestamp()
+        WHERE ag_id = p_ag_id AND estatus_workflow IN ('BORRADOR', 'REGRESADA');
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Encabezado de afectación actualizado.');
+
+    -- 3 = CANCELACIÓN FORMAL
+    ELSIF p_accion = 3 THEN
+        UPDATE cxp.afectaciones_gasto 
+           SET estatus_workflow = 'CANCELADA', estatus_registro = 0,
+               usuario_m = p_usuario, fecha_m = clock_timestamp()
+         WHERE ag_id = p_ag_id AND estatus_workflow <> 'APROBADA';
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Trámite cancelado formalmente.');
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no permitida.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 3: ABC DETALLES -->
+    <div id="sp-spag3" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función de Partidas: <code>cxp.fn_abc_afectacion_detalles</code></h4>
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_abc_afectacion_detalles(
+    p_accion SMALLINT,
+    p_usuario VARCHAR,
+    p_ag_id UUID,
+    p_detalles JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, contabilidad, public
+AS $$
+DECLARE
+    v_item JSONB;
+    v_total NUMERIC(15,2) := 0.00;
+BEGIN
+    -- 1 = REEMPLAZAR PARTIDAS COMPLETAS (En Borrador o Regresada)
+    IF p_accion = 1 THEN
+        DELETE FROM cxp.afectaciones_gasto_detalles WHERE f_ag_id = p_ag_id;
+
+        FOR v_item IN SELECT * FROM jsonb_array_elements(p_detalles) LOOP
+            INSERT INTO cxp.afectaciones_gasto_detalles (
+                f_ag_id, f_clave_presupuestal_id, f_cog_id, cuenta_contable_balance,
+                mes_servicio, importe_solicitado, estatus_registro, usuario_c
+            ) VALUES (
+                p_ag_id,
+                (v_item->>'clave_presupuestal_id')::INTEGER,
+                (v_item->>'cog_id')::INTEGER,
+                v_item->>'cuenta_contable_balance',
+                COALESCE((v_item->>'mes_servicio')::SMALLINT, EXTRACT(MONTH FROM CURRENT_DATE)::SMALLINT),
+                (v_item->>'importe_solicitado')::NUMERIC,
+                1, p_usuario
+            );
+            v_total := v_total + (v_item->>'importe_solicitado')::NUMERIC;
+        END LOOP;
+
+        -- Actualizar importe acumulado en la cabecera
+        UPDATE cxp.afectaciones_gasto 
+           SET importe_total_pago = v_total, usuario_m = p_usuario, fecha_m = clock_timestamp()
+         WHERE ag_id = p_ag_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Partidas presupuestarias sincronizadas con éxito.', 'total', v_total);
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no soportada.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 4: WORKFLOW V2 -->
+    <div id="sp-spag4" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Motor de Transición de Workflow: <code>cxp.sp_CxpAfectacionesGasto_Workflow_V2</code></h4>
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.sp_CxpAfectacionesGasto_Workflow_V2(
+    p_ag_id UUID,
+    p_accion VARCHAR, -- 'ENVIAR', 'APROBAR', 'REGRESAR', 'RECHAZAR', 'CANCELAR'
+    p_usuario VARCHAR,
+    p_observaciones VARCHAR DEFAULT NULL
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, contabilidad, public
+AS $$
+DECLARE
+    v_ag RECORD;
+    v_chk JSONB;
+    v_poliza JSONB;
+    v_estado_ant VARCHAR(20);
+    v_estado_nue VARCHAR(20);
+BEGIN
+    SELECT * INTO v_ag FROM cxp.afectaciones_gasto WHERE ag_id = p_ag_id AND estatus_registro = 1;
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Afectación no localizada o inactiva.');
+    END IF;
+
+    v_estado_ant := v_ag.estatus_workflow;
+
+    -- CASO 1: ENVIAR A REVISIÓN
+    IF p_accion = 'ENVIAR' THEN
+        IF v_estado_ant NOT IN ('BORRADOR', 'REGRESADA') THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en Borrador o Regresada pueden ser enviados.');
+        END IF;
+
+        -- Validar Checklist de Expediente Digital Obligatorio (05.1.1)
+        v_chk := cxp.fn_validar_checklist_afectacion(p_ag_id, v_ag.ejercicio_fiscal);
+        IF (v_chk->>'valido')::BOOLEAN = false THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', v_chk->>'mensaje', 'faltantes', v_chk->'faltantes');
+        END IF;
+
+        v_estado_nue := 'ENVIADA';
+
+    -- CASO 2: APROBAR Y DETONAR DEVENGO CONTABLE
+    ELSIF p_accion = 'APROBAR' THEN
+        IF v_estado_ant <> 'ENVIADA' THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en estado ENVIADA pueden ser aprobados.');
+        END IF;
+
+        -- Detonar Generación de Póliza de Devengo (Matriz de Conversión)
+        v_poliza := cxp.fn_generar_poliza_afectacion(p_ag_id, p_usuario);
+        IF (v_poliza->>'error')::INTEGER <> 0 THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Error al generar la póliza de devengo: ' || (v_poliza->>'mensaje'));
+        END IF;
+
+        v_estado_nue := 'APROBADA';
+
+    -- CASO 3: REGRESAR CON OBSERVACIONES
+    ELSIF p_accion = 'REGRESAR' THEN
+        IF v_estado_ant <> 'ENVIADA' THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en estado ENVIADA pueden ser regresados.');
+        END IF;
+        v_estado_nue := 'REGRESADA';
+
+    -- CASO 4: RECHAZAR FORMALMENTE
+    ELSIF p_accion = 'RECHAZAR' THEN
+        v_estado_nue := 'RECHAZADA';
+
+    -- CASO 5: CANCELAR
+    ELSIF p_accion = 'CANCELAR' THEN
+        IF v_estado_ant = 'APROBADA' THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Un trámite APROBADO con póliza contable requiere reversa formal en Contabilidad.');
+        END IF;
+        v_estado_nue := 'CANCELADA';
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción de workflow no reconocida.');
+    END IF;
+
+    -- Actualizar estado de la afectación
+    UPDATE cxp.afectaciones_gasto 
+       SET estatus_workflow = v_estado_nue,
+           p_poliza_id = COALESCE((v_poliza->'data'->>'poliza_id')::BIGINT, p_poliza_id),
+           usuario_m = p_usuario, fecha_m = clock_timestamp()
+     WHERE ag_id = p_ag_id;
+
+    -- Registrar auditoría en historial
+    INSERT INTO cxp.afectaciones_historial (
+        f_ag_id, estado_anterior, estado_nuevo, accion_realizada,
+        observaciones, usuario_accion, fecha_accion
+    ) VALUES (
+        p_ag_id, v_estado_ant, v_estado_nue, p_accion,
+        p_observaciones, p_usuario, clock_timestamp()
+    );
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'Transición completada exitosamente a ' || v_estado_nue,
+        'estado_nuevo', v_estado_nue,
+        'poliza_id', (v_poliza->'data'->>'poliza_id')::BIGINT
+    );
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 5: GENERADOR POLIZA -->
+    <div id="sp-spag5" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Generador de Pólizas: <code>cxp.fn_generar_poliza_afectacion</code></h4>
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_generar_poliza_afectacion(
+    p_ag_id UUID,
+    p_usuario VARCHAR DEFAULT 'SISTEMA'
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, contabilidad, config, public
+AS $$
+DECLARE
+    v_ag RECORD;
+    v_poliza_id BIGINT;
+    v_folio_poliza VARCHAR(10);
+    v_det RECORD;
+    v_regla RECORD;
+    v_mov RECORD;
+    v_cta RECORD;
+    v_orden INTEGER := 0;
+BEGIN
+    SELECT * INTO v_ag FROM cxp.afectaciones_gasto WHERE ag_id = p_ag_id;
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Afectación no localizada.');
+    END IF;
+
+    -- Generar folio secuencial PE-YYYY-XXXXX
+    SELECT 'PE-' || v_ag.ejercicio_fiscal || '-' || LPAD((COALESCE(MAX(SUBSTRING(p_numero FROM 9)::INTEGER), 0) + 1)::TEXT, 5, '0')
+      INTO v_folio_poliza
+      FROM contabilidad.poliza WHERE p_ejercicio = v_ag.ejercicio_fiscal AND p_tipo = 'PE';
+
+    -- Insertar Cabecera de Póliza en contabilidad.poliza
+    INSERT INTO contabilidad.poliza (
+        p_tipo, p_subtipo, p_numero, p_ejercicio, p_fecha, p_descripcion,
+        p_afecta, estatus_registro, usuario_c, fecha_c, p_centro_costo_id
+    ) VALUES (
+        'PE', 'AG', v_folio_poliza, v_ag.ejercicio_fiscal, v_ag.fecha_elaboracion,
+        'Devengo de gasto por afectación ' || v_ag.folio || ': ' || v_ag.concepto,
+        1, 1, p_usuario, clock_timestamp(), v_ag.f_centro_costo_id
+    ) RETURNING p_id INTO v_poliza_id;
+
+    -- BIFURCACIÓN DE CONTABILIZACIÓN
+    -- CASO A: Trámites Presupuestarios (Tipos 1, 2 y 3) -> Disparan Matriz A.1 (Gasto + Presupuesto)
+    IF v_ag.afecta_presupuesto = true THEN
+        FOR v_det IN SELECT * FROM cxp.afectaciones_gasto_detalles WHERE f_ag_id = p_ag_id AND estatus_registro = 1 LOOP
+            -- Asiento Patrimonial Gasto 5.x vs Pasivo Proveedores 2.1.1.2
+            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
+            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 1, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_cri_cog = (SELECT cog_cuentacompleta FROM config.catalogo_cog WHERE cog_id = v_det.f_cog_id) AND cc_nivel1 = '5' LIMIT 1), v_det.importe_solicitado, 0.00, p_usuario);
+
+            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
+            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 2, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_cuenta = '211210101' LIMIT 1), 0.00, v_det.importe_solicitado, p_usuario);
+
+            -- Asiento Presupuestario Devengado 8.2.5 vs Comprometido 8.2.4
+            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
+            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 3, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_nivel1 = '8' AND cc_nivel2 = '2' AND cc_nivel3 = '5' LIMIT 1), v_det.importe_solicitado, 0.00, p_usuario);
+
+            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
+            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 4, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_nivel1 = '8' AND cc_nivel2 = '2' AND cc_nivel3 = '4' LIMIT 1), 0.00, v_det.importe_solicitado, p_usuario);
+        END LOOP;
+
+    -- CASO B: Trámites No Presupuestarios (Tipo 4) -> Operación de Balance Pura (Sin cuentas 8.2.x)
+    ELSE
+        FOR v_det IN SELECT * FROM cxp.afectaciones_gasto_detalles WHERE f_ag_id = p_ag_id AND estatus_registro = 1 LOOP
+            -- Cargo: Pasivo Circulante a disminuir (Retención 2.1.1.7 o Garantía 2.1.6.1)
+            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
+            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 1, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_cuenta = v_det.cuenta_contable_balance LIMIT 1), v_det.importe_solicitado, 0.00, p_usuario);
+
+            -- Abono: Pasivo exigible / Orden de Pago
+            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
+            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 2, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_cuenta = '211910101' LIMIT 1), 0.00, v_det.importe_solicitado, p_usuario);
+        END LOOP;
+    END IF;
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'Póliza generada.', 'data', jsonb_build_object('poliza_id', v_poliza_id, 'folio_poliza', v_folio_poliza));
+END;
+$$;</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. SERVICIOS API REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Servicios API REST (Controlador NestJS y Swagger)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      El backend expone los endpoints en <code>AfectacionesCxpController</code> consumiendo Prisma <code>$queryRaw</code>:
+    </p>
+
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>DTO / Parámetros</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code class="method get">GET</code></td><td><code>/api/v1/cxp/afectaciones</code></td><td>Query: <code>{ ejercicio, tipoPago?, procedimiento?, estatus?, buscar? }</code></td><td>Lista las afectaciones de gasto con filtros combinados y paginación.</td></tr>
+        <tr><td><code class="method get">GET</code></td><td><code>/api/v1/cxp/afectaciones/:id</code></td><td>Param: <code>id: UUID</code></td><td>Obtiene el detalle completo: cabecera, CFDIs, partidas presupuestales y firmas.</td></tr>
+        <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cxp/afectaciones</code></td><td>Body: <code>GuardarAfectacionEncabezadoDto</code></td><td>Registra la cabecera en estado BORRADOR asignando folio único.</td></tr>
+        <tr><td><code class="method put">PUT</code></td><td><code>/api/v1/cxp/afectaciones/:id</code></td><td>Param: <code>id</code>, Body: <code>ActualizarAfectacionDto</code></td><td>Actualiza datos generales de la cabecera (en Borrador o Regresada).</td></tr>
+        <tr><td><code class="method put">PUT</code></td><td><code>/api/v1/cxp/afectaciones/:id/detalles</code></td><td>Param: <code>id</code>, Body: <code>GuardarAfectacionDetallesDto</code></td><td>Guarda o reemplaza las partidas presupuestales o cuentas de balance.</td></tr>
+        <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cxp/afectaciones/:id/workflow</code></td><td>Param: <code>id</code>, Body: <code>WorkflowAfectacionDto</code></td><td>Ejecuta transiciones (<code>ENVIAR</code>, <code>APROBAR</code>, <code>REGRESAR</code>, <code>RECHAZAR</code>, <code>CANCELAR</code>).</td></tr>
+        <tr><td><code class="method get">GET</code></td><td><code>/api/v1/cxp/afectaciones/:id/previsualizar-poliza</code></td><td>Param: <code>id: UUID</code></td><td>Simula los asientos contables y presupuestales que detonará la matriz.</td></tr>
+      </tbody>
+    </table>
+
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">Controlador NestJS: <code>afectaciones-cxp.controller.ts</code></h4>
+    <div class="code-wrap">
+<pre><code>import { Controller, Get, Post, Put, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../configuracion/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../configuracion/auth/guards/roles.guard';
+import { MinRol } from '../configuracion/auth/decorators/min-rol.decorator';
+import { AfectacionesCxpService } from './afectaciones-cxp.service';
+
+@ApiTags('CxP / Afectaciones de Gasto')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('cxp/afectaciones')
+export class AfectacionesCxpController {
+  constructor(private readonly service: AfectacionesCxpService) {}
+
+  @Get()
+  @MinRol(4)
+  @ApiOperation({ summary: 'Listar afectaciones de gasto' })
+  findAll(@Query() query: FiltrosAfectacionDto, @Req() req) {
+    return this.service.findAll(query, req.user);
+  }
+
+  @Get(':id')
+  @MinRol(4)
+  @ApiOperation({ summary: 'Consultar detalle integral de una afectación' })
+  findOne(@Param('id') id: string, @Req() req) {
+    return this.service.findOne(id, req.user);
+  }
+
+  @Post()
+  @MinRol(3)
+  @ApiOperation({ summary: 'Crear cabecera de afectación de gasto' })
+  create(@Body() dto: GuardarAfectacionEncabezadoDto, @Req() req) {
+    return this.service.create(dto, req.user);
+  }
+
+  @Put(':id/detalles')
+  @MinRol(3)
+  @ApiOperation({ summary: 'Sincronizar partidas presupuestales' })
+  saveDetalles(@Param('id') id: string, @Body() dto: GuardarAfectacionDetalleDto, @Req() req) {
+    return this.service.saveDetalles(id, dto, req.user);
+  }
+
+  @Post(':id/workflow')
+  @MinRol(2)
+  @ApiOperation({ summary: 'Ejecutar transición de workflow (ENVIAR, APROBAR, etc.)' })
+  transitarWorkflow(@Param('id') id: string, @Body() dto: WorkflowAfectacionDto, @Req() req) {
+    return this.service.transitarWorkflow(id, dto, req.user);
+  }
+
+  @Get(':id/previsualizar-poliza')
+  @MinRol(4)
+  @ApiOperation({ summary: 'Previsualizar póliza contable simulada por la matriz' })
+  previsualizarPoliza(@Param('id') id: string, @Req() req) {
+    return this.service.previsualizarPoliza(id, req.user);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. REGLAS DE NEGOCIO Y VALIDACIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Reglas de Negocio y Validaciones</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-AG-01 · Selección Guiada Obligatoria (Tipo y Subtipo)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          No se puede capturar directamente la cabecera sin pasar por el asistente modal de selección. El procedimiento elegido fija de forma inmutable el tipo de beneficiario legal y el comportamiento presupuestario del trámite.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-AG-02 · Cuadratura Matemática entre Comprobantes y Partidas</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          La suma de las partidas presupuestales capturadas en <code>cxp.afectaciones_gasto_detalles</code> debe ser exactamente igual al importe total bruto registrado en los comprobantes fiscales de la tabla <code>_cfdi</code>. Cualquier diferencia de centavos impide el envío a revisión.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-AG-03 · Validación Bloqueante de Expediente Digital</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Antes de permitir la transición a <code>ENVIADA</code>, el sistema ejecuta <code>cxp.fn_validar_checklist_afectacion</code>. Si falta alguno de los documentos marcados como <code>OBLIGATORIO</code> en el catálogo <code>05.1.1</code> para ese procedimiento, la acción es rechazada.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-AG-04 · Tratamiento Exclusivo para Tipo 4 (No Afecta Presupuesto)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          En trámites con <code>tipo_pago = 4</code> (Entero de retenciones o garantías), el formulario suprime la captura de estructura programática (Función, Programa, Proyecto, Fuente y COG) y solicita únicamente la subcuenta contable de balance a disminuir (<code>2.1.1.7</code> / <code>2.1.6.1</code>), garantizando cero impacto en cuentas `8.2.x`.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-AG-05 · Congelamiento Inmutable tras Aprobación</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Una vez que el trámite pasa a <code>APROBADA</code> y se genera la póliza de devengo, queda estrictamente prohibida la modificación o eliminación física de cualquier dato de la cabecera, CFDI o partidas. Cualquier ajuste debe procesarse mediante póliza de rectificación contable.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 9. PROPUESTA VISUAL (WIREFRAMES) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Propuesta Visual de Interfaz (Wireframes Nativos)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wfag1',this)">1. Modal de Clasificación del Trámite (Wizard)</button>
+      <button class="wf-tab" onclick="showWF('wfag2',this)">2. Formulario Maestro-Detalle y Grid CFDIs</button>
+      <button class="wf-tab" onclick="showWF('wfag3',this)">3. Previsualizador de Póliza Contable</button>
+    </div>
+
+    <!-- WF1: MODAL ASISTENTE (IDÉNTICO A LA CAPTURA DEL CLIENTE) -->
+    <div id="wf-wfag1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.2.1 Modal de Selección del Trámite · Asistente Guiado PJEV-UI</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">4 Tipos Principales y Subtipos con Descripción</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 920 540" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <!-- Modal Background Window -->
+            <rect width="920" height="540" fill="#ffffff" rx="8" stroke="#cbd5e1"/>
+            
+            <!-- Modal Header -->
+            <rect width="920" height="50" fill="#183125" rx="8"/>
+            <text x="25" y="32" font-size="14" font-weight="bold" fill="#ffffff">Clasificación del Trámite</text>
+            <text x="220" y="32" font-size="11" fill="#cbd5e1">— Selecciona el tipo de trámite y su procedimiento para acceder a la captura del encabezado.</text>
+            <rect x="875" y="14" width="24" height="24" fill="#2d4a3b" rx="4"/>
+            <text x="887" y="30" font-size="12" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
+
+            <!-- SECCIÓN 1: TIPO DE TRÁMITE PRINCIPAL -->
+            <text x="25" y="75" font-size="11" font-weight="bold" fill="#334155">1. SELECCIONA EL TIPO DE TRÁMITE PRINCIPAL *</text>
+            <text x="895" y="75" font-size="10" fill="#64748b" text-anchor="end">4 Modalidades Oficiales</text>
+
+            <!-- Card 1: Gasto Directo (Selected) -->
+            <rect x="25" y="85" width="205" height="75" fill="#fdfbf7" stroke="#183125" stroke-width="2" rx="6"/>
+            <text x="40" y="112" font-size="12" font-weight="bold" fill="#183125">💵 1. Gasto Directo</text>
+            <text x="40" y="130" font-size="9" fill="#64748b">Nómina, servicios básicos, rentas y</text>
+            <text x="40" y="143" font-size="9" fill="#64748b">compras menores directas.</text>
+
+            <!-- Card 2: Por Pedido / Contrato -->
+            <rect x="245" y="85" width="205" height="75" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <text x="260" y="112" font-size="12" font-weight="bold" fill="#1e293b">📦 2. Pedido / Contrato</text>
+            <text x="260" y="130" font-size="9" fill="#64748b">Licitaciones, compras de almacén y</text>
+            <text x="260" y="143" font-size="9" fill="#64748b">contratos de obra pública.</text>
+
+            <!-- Card 3: Gastos a Comprobar -->
+            <rect x="465" y="85" width="205" height="75" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <text x="480" y="112" font-size="12" font-weight="bold" fill="#1e293b">✈ 3. Gastos a Comprobar</text>
+            <text x="480" y="130" font-size="9" fill="#64748b">Viáticos (Anexo 6), sujetos a</text>
+            <text x="480" y="143" font-size="9" fill="#64748b">comprobar y caja chica.</text>
+
+            <!-- Card 4: No Afecta Presupuesto (NUEVO) -->
+            <rect x="685" y="85" width="210" height="75" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" rx="6"/>
+            <text x="700" y="112" font-size="12" font-weight="bold" fill="#166534">🏛 4. No Afecta Ppto.</text>
+            <text x="700" y="130" font-size="9" fill="#15803d">Entero retenciones SAT/IPE, garantías</text>
+            <text x="700" y="143" font-size="9" fill="#15803d">y fondos ajenos en balance.</text>
+
+            <!-- SECCIÓN 2: SUBTIPOS / PROCEDIMIENTOS -->
+            <text x="25" y="185" font-size="11" font-weight="bold" fill="#334155">2. SELECCIONA EL SUBTIPO / PROCEDIMIENTO *</text>
+            <text x="895" y="185" font-size="10" font-weight="bold" fill="#183125" text-anchor="end">Subtipos de 1. Gasto Directo</text>
+
+            <!-- Subtipo 1: Nómina -->
+            <rect x="25" y="195" width="425" height="70" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="35" y="207" width="34" height="34" fill="#f1f5f9" rx="4"/>
+            <text x="52" y="228" font-size="14" text-anchor="middle">👥</text>
+            <text x="80" y="218" font-size="11" font-weight="bold" fill="#1e293b">Nómina Quincenal / Prestaciones</text>
+            <text x="80" y="233" font-size="9" fill="#64748b">Afectación presupuestal de sueldos, compensaciones y prestaciones.</text>
+            <rect x="80" y="242" width="105" height="15" fill="#f1f5f9" rx="3"/>
+            <text x="132" y="253" font-size="8" fill="#475569" text-anchor="middle">Servicios Personales</text>
+
+            <!-- Subtipo 2: Arrendamiento -->
+            <rect x="465" y="195" width="430" height="70" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="475" y="207" width="34" height="34" fill="#f1f5f9" rx="4"/>
+            <text x="492" y="228" font-size="14" text-anchor="middle">🏢</text>
+            <text x="520" y="218" font-size="11" font-weight="bold" fill="#1e293b">Arrendamiento de Inmuebles</text>
+            <text x="520" y="233" font-size="9" fill="#64748b">Pago mensual de rentas de bienes inmuebles para juzgados y sedes.</text>
+            <rect x="520" y="242" width="100" height="15" fill="#f1f5f9" rx="3"/>
+            <text x="570" y="253" font-size="8" fill="#475569" text-anchor="middle">Recursos Materiales</text>
+
+            <!-- Subtipo 3: Servicios Básicos -->
+            <rect x="25" y="275" width="425" height="70" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="35" y="287" width="34" height="34" fill="#f1f5f9" rx="4"/>
+            <text x="52" y="308" font-size="14" text-anchor="middle">⚡</text>
+            <text x="80" y="298" font-size="11" font-weight="bold" fill="#1e293b">Servicios Básicos (CFE, CAEV, Telecom)</text>
+            <text x="80" y="313" font-size="9" fill="#64748b">Pago continuo de energía eléctrica, agua potable, telefonía e internet.</text>
+            <rect x="80" y="322" width="100" height="15" fill="#f1f5f9" rx="3"/>
+            <text x="130" y="333" font-size="8" fill="#475569" text-anchor="middle">Recursos Materiales</text>
+
+            <!-- Subtipo 4: Honorarios -->
+            <rect x="465" y="275" width="430" height="70" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="475" y="287" width="34" height="34" fill="#f1f5f9" rx="4"/>
+            <text x="492" y="308" font-size="14" text-anchor="middle">📜</text>
+            <text x="520" y="298" font-size="11" font-weight="bold" fill="#1e293b">Honorarios / Servicios Profesionales</text>
+            <text x="520" y="313" font-size="9" fill="#64748b">Servicios profesionales independientes de personas físicas con retención.</text>
+            <rect x="520" y="322" width="100" height="15" fill="#f1f5f9" rx="3"/>
+            <text x="570" y="333" font-size="8" fill="#475569" text-anchor="middle">Recursos Materiales</text>
+
+            <!-- Subtipo 5: Compra Directa Menor -->
+            <rect x="25" y="355" width="425" height="70" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="35" y="367" width="34" height="34" fill="#f1f5f9" rx="4"/>
+            <text x="52" y="388" font-size="14" text-anchor="middle">🏷</text>
+            <text x="80" y="378" font-size="11" font-weight="bold" fill="#1e293b">Compra Directa / Gastos Menores</text>
+            <text x="80" y="393" font-size="9" fill="#64748b">Adquisiciones menores urgentes que no requieren proceso de almacén.</text>
+            <rect x="80" y="402" width="100" height="15" fill="#f1f5f9" rx="3"/>
+            <text x="130" y="413" font-size="8" fill="#475569" text-anchor="middle">Recursos Materiales</text>
+
+            <!-- Subtipo 6: Beneficiarios Empleados -->
+            <rect x="465" y="355" width="430" height="70" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="475" y="367" width="34" height="34" fill="#f1f5f9" rx="4"/>
+            <text x="492" y="388" font-size="14" text-anchor="middle">⚖</text>
+            <text x="520" y="378" font-size="11" font-weight="bold" fill="#1e293b">Pago a Beneficiarios de Empleados</text>
+            <text x="520" y="393" font-size="9" fill="#64748b">Pago a acreedores de pensiones alimenticias o terceros del personal.</text>
+            <rect x="520" y="402" width="105" height="15" fill="#f1f5f9" rx="3"/>
+            <text x="572" y="413" font-size="8" fill="#475569" text-anchor="middle">Servicios Personales</text>
+
+            <!-- Footer Bar -->
+            <line x1="0" y1="480" x2="920" y2="480" stroke="#e2e8f0"/>
+            <text x="25" y="508" font-size="11" fill="#b45309">ⓘ Selecciona un procedimiento para habilitar la captura del encabezado.</text>
+            
+            <rect x="620" y="492" width="120" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="680" y="512" font-size="11" font-weight="bold" fill="#475569" text-anchor="middle">Volver al Listado</text>
+
+            <rect x="755" y="492" width="140" height="32" fill="#183125" rx="4"/>
+            <text x="825" y="512" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Continuar ➔</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: FORMULARIO MAESTRO-DETALLE -->
+    <div id="wf-wfag2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.2.1 Formulario de Captura Maestro-Detalle · Afectación del Gasto</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Cabecera + Grid de CFDIs + Partidas Presupuestarias</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 920 460" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="920" height="460" fill="#f8fafc" rx="6" stroke="#cbd5e1"/>
+            
+            <!-- Cabecera Form -->
+            <rect x="15" y="15" width="890" height="110" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="30" y="38" font-size="12" font-weight="bold" fill="#183125">Trámite: AG-2026-00124</text>
+            <rect x="180" y="24" width="75" height="18" fill="#e2e8f0" rx="9"/>
+            <text x="217" y="37" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">BORRADOR</text>
+
+            <text x="30" y="65" font-size="10" font-weight="bold" fill="#64748b">Procedimiento:</text>
+            <text x="120" y="65" font-size="10" font-weight="bold" fill="#1e293b">ARRENDAMIENTO (1. Gasto Directo)</text>
+
+            <text x="360" y="65" font-size="10" font-weight="bold" fill="#64748b">Beneficiario (Proveedor):</text>
+            <text x="490" y="65" font-size="10" font-weight="bold" fill="#0284c7">INMOBILIARIA VERACRUZANA S.A. DE C.V.</text>
+
+            <text x="30" y="95" font-size="10" font-weight="bold" fill="#64748b">Concepto:</text>
+            <text x="90" y="95" font-size="10" fill="#1e293b">Pago de renta del inmueble que ocupa el Juzgado Cuarto de Primera Instancia de Poza Rica, Ver.</text>
+
+            <text x="730" y="45" font-size="10" fill="#64748b">Importe Bruto Total:</text>
+            <text x="730" y="68" font-size="16" font-family="monospace" font-weight="bold" fill="#183125">$23,200.00 MXN</text>
+
+            <!-- Sección Facturas CFDIs -->
+            <rect x="15" y="135" width="890" height="140" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="30" y="155" font-size="11" font-weight="bold" fill="#183125">Comprobantes Fiscales Vinculados (CFDI 4.0)</text>
+            <rect x="760" y="142" width="130" height="22" fill="#183125" rx="3"/>
+            <text x="825" y="156" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Cargar XML Timbrado</text>
+
+            <!-- Table Header CFDIs -->
+            <rect x="25" y="170" width="870" height="22" fill="#f1f5f9"/>
+            <text x="35" y="185" font-size="9" font-weight="bold" fill="#475569">UUID SAT</text>
+            <text x="240" y="185" font-size="9" font-weight="bold" fill="#475569">RFC EMISOR</text>
+            <text x="380" y="185" font-size="9" font-weight="bold" fill="#475569">SUBTOTAL</text>
+            <text x="480" y="185" font-size="9" font-weight="bold" fill="#475569">IVA</text>
+            <text x="580" y="185" font-size="9" font-weight="bold" fill="#475569">RETENCIONES</text>
+            <text x="700" y="185" font-size="9" font-weight="bold" fill="#475569">TOTAL FACTURA</text>
+            <text x="830" y="185" font-size="9" font-weight="bold" fill="#475569">ESTATUS SAT</text>
+
+            <!-- Row 1 CFDI -->
+            <text x="35" y="210" font-size="9" font-family="monospace" fill="#0284c7">4A2E8B1C-90DF-4E33-A12B-9876543210AB</text>
+            <text x="240" y="210" font-size="9" font-family="monospace" fill="#1e293b">IVE990101XYZ</text>
+            <text x="380" y="210" font-size="9" font-family="monospace" fill="#334155">$20,000.00</text>
+            <text x="480" y="210" font-size="9" font-family="monospace" fill="#334155">$3,200.00</text>
+            <text x="580" y="210" font-size="9" font-family="monospace" fill="#991b1b">-$4,266.67</text>
+            <text x="700" y="210" font-size="9" font-family="monospace" font-weight="bold" fill="#183125">$23,200.00</text>
+            <rect x="825" y="200" width="55" height="15" fill="#dcfce7" rx="3"/>
+            <text x="852" y="211" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">VIGENTE</text>
+
+            <!-- Sección Clasificación Presupuestaria -->
+            <rect x="15" y="285" width="890" height="120" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="30" y="305" font-size="11" font-weight="bold" fill="#183125">Clasificación Presupuestaria del Gasto (Detalle Programático)</text>
+
+            <!-- Table Header Partidas -->
+            <rect x="25" y="318" width="870" height="22" fill="#f1f5f9"/>
+            <text x="35" y="333" font-size="9" font-weight="bold" fill="#475569">CENTRO DE COSTO</text>
+            <text x="180" y="333" font-size="9" font-weight="bold" fill="#475569">ESTRUCTURA PROGRAMÁTICA (FN-PR-SP-PY)</text>
+            <text x="460" y="333" font-size="9" font-weight="bold" fill="#475569">FUENTE</text>
+            <text x="560" y="333" font-size="9" font-weight="bold" fill="#475569">PARTIDA (COG)</text>
+            <text x="700" y="333" font-size="9" font-weight="bold" fill="#475569">MES</text>
+            <text x="790" y="333" font-size="9" font-weight="bold" fill="#475569">IMPORTE ($)</text>
+
+            <!-- Row 1 Partida -->
+            <text x="35" y="358" font-size="9" fill="#1e293b">11304 · Juzgado 4to Poza Rica</text>
+            <text x="180" y="358" font-size="9" font-family="monospace" fill="#334155">1.2.1 - 01 - 04 - 002 (Impartición Justicia)</text>
+            <text x="460" y="358" font-size="9" fill="#334155">111 Rec. Fiscales</text>
+            <text x="560" y="358" font-size="9" font-family="monospace" font-weight="bold" fill="#0284c7">32201 Arrendamiento</text>
+            <text x="700" y="358" font-size="9" fill="#334155">Septiembre</text>
+            <text x="790" y="358" font-size="9" font-family="monospace" font-weight="bold" fill="#15803d">$23,200.00</text>
+
+            <!-- Action Bar -->
+            <rect x="15" y="415" width="890" height="35" fill="#f1f5f9" rx="4"/>
+            <text x="30" y="437" font-size="10" font-weight="bold" fill="#15803d">✓ Cuadratura Perfecta: Comprobantes ($23,200.00) = Presupuesto ($23,200.00)</text>
+
+            <rect x="580" y="420" width="140" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="650" y="437" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">Previsualizar Póliza</text>
+
+            <rect x="735" y="420" width="160" height="26" fill="#183125" rx="3"/>
+            <text x="815" y="437" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Enviar a Revisión ➔</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: PREVISUALIZADOR DE PÓLIZA -->
+    <div id="wf-wfag3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.2.1 Simulación Contable y Presupuestal · Matriz CONAC A.1</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Póliza Automática Tipo PE (Devengado)</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 850 320" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="850" height="320" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect width="850" height="38" fill="#183125" rx="6"/>
+            <text x="25" y="24" font-size="12" font-weight="bold" fill="#ffffff">Previsualización de Póliza de Devengo (Momento Contable CONAC A.1)</text>
+
+            <!-- Table Header -->
+            <rect x="20" y="48" width="810" height="24" fill="#f1f5f9"/>
+            <text x="30" y="64" font-size="9" font-weight="bold" fill="#475569">CUENTA CONTABLE</text>
+            <text x="160" y="64" font-size="9" font-weight="bold" fill="#475569">NOMBRE DE LA CUENTA</text>
+            <text x="500" y="64" font-size="9" font-weight="bold" fill="#475569">NATURALEZA</text>
+            <text x="640" y="64" font-size="9" font-weight="bold" fill="#475569" text-anchor="end">DEBE ($)</text>
+            <text x="790" y="64" font-size="9" font-weight="bold" fill="#475569" text-anchor="end">HABER ($)</text>
+
+            <!-- Line 1: Gasto -->
+            <text x="30" y="92" font-size="10" font-family="monospace" fill="#0284c7">5.1.3.2.3221</text>
+            <text x="160" y="92" font-size="10" fill="#1e293b">Arrendamiento de Edificios y Locales</text>
+            <text x="500" y="92" font-size="9" fill="#64748b">Gasto Contable (Patrimonial)</text>
+            <text x="640" y="92" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$20,000.00</text>
+            <text x="790" y="92" font-size="10" text-anchor="end">-</text>
+
+            <!-- Line 2: IVA -->
+            <text x="30" y="118" font-size="10" font-family="monospace" fill="#0284c7">1.1.9.1.0101</text>
+            <text x="160" y="118" font-size="10" fill="#1e293b">IVA Pendiente de Acreditar</text>
+            <text x="500" y="118" font-size="9" fill="#64748b">Activo Circulante</text>
+            <text x="640" y="118" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$3,200.00</text>
+            <text x="790" y="118" font-size="10" text-anchor="end">-</text>
+
+            <!-- Line 3: Pasivo Neto -->
+            <text x="30" y="144" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.2.0101</text>
+            <text x="160" y="144" font-size="10" fill="#1e293b">Proveedores por Pagar a Corto Plazo</text>
+            <text x="500" y="144" font-size="9" fill="#15803d">Neto por Pagar (Orden de Pago)</text>
+            <text x="640" y="144" font-size="10" text-anchor="end">-</text>
+            <text x="790" y="144" font-size="10" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$18,933.33</text>
+
+            <!-- Line 4: Retenciones -->
+            <text x="30" y="170" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.7.0103</text>
+            <text x="160" y="170" font-size="10" fill="#1e293b">Retención ISR Arrendamiento (10%)</text>
+            <text x="500" y="170" font-size="9" fill="#991b1b">Pasivo por Retención Fiscal</text>
+            <text x="640" y="170" font-size="10" text-anchor="end">-</text>
+            <text x="790" y="170" font-size="10" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">$2,000.00</text>
+
+            <!-- Line 5: Retención IVA -->
+            <text x="30" y="196" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.7.0202</text>
+            <text x="160" y="196" font-size="10" fill="#1e293b">Retención IVA Arrendamiento (100%)</text>
+            <text x="500" y="196" font-size="9" fill="#991b1b">Pasivo por Retención Fiscal</text>
+            <text x="640" y="196" font-size="10" text-anchor="end">-</text>
+            <text x="790" y="196" font-size="10" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">$2,266.67</text>
+
+            <!-- Presupuestario -->
+            <line x1="20" y1="212" x2="830" y2="212" stroke="#cbd5e1" stroke-dasharray="3"/>
+            <text x="30" y="232" font-size="10" font-family="monospace" fill="#15803d">8.2.5.0.0000</text>
+            <text x="160" y="232" font-size="10" fill="#1e293b">Presupuesto de Egresos Devengado</text>
+            <text x="500" y="232" font-size="9" fill="#166534">Momento Presupuestario</text>
+            <text x="640" y="232" font-size="10" font-family="monospace" font-weight="bold" fill="#166534" text-anchor="end">$23,200.00</text>
+            <text x="790" y="232" font-size="10" text-anchor="end">-</text>
+
+            <text x="30" y="258" font-size="10" font-family="monospace" fill="#15803d">8.2.4.0.0000</text>
+            <text x="160" y="258" font-size="10" fill="#1e293b">Presupuesto de Egresos Comprometido</text>
+            <text x="500" y="258" font-size="9" fill="#166534">Amortización de Compromiso</text>
+            <text x="640" y="258" font-size="10" text-anchor="end">-</text>
+            <text x="790" y="258" font-size="10" font-family="monospace" font-weight="bold" fill="#166534" text-anchor="end">$23,200.00</text>
+
+            <!-- Sumas Iguales -->
+            <rect x="20" y="278" width="810" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="30" y="297" font-size="11" font-weight="bold" fill="#183125">SUMAS IGUALES (PÓLIZA CUADRADA):</text>
+            <text x="640" y="297" font-size="11" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$46,400.00</text>
+            <text x="790" y="297" font-size="11" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$46,400.00</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. INTEGRACIONES Y DEPENDENCIAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Integraciones y Dependencias Inter-módulos</div>
+    <table class="props-table">
+      <thead><tr><th>Módulo / Subsistema</th><th>Relación Técnica</th><th>Efecto de Integración</th></tr></thead>
+      <tbody>
+        <tr><td><strong>05.1.1 Requisitos Documentales</strong></td><td>Motor de validación previa</td><td>Inspecciona que el expediente digital cuente con todos los soportes obligatorios antes de autorizar el pase a <code>ENVIADA</code>.</td></tr>
+        <tr><td><strong>05.2.2 Orden de Pago</strong></td><td>Destino operativo de la obligación</td><td>Toma las afectaciones en estado <code>APROBADA</code> y formaliza la instrucción líquida de pago hacia Tesorería.</td></tr>
+        <tr><td><strong>03.1.2 Matriz de Conversión</strong></td><td>Motor contable automatizado</td><td>Traduce los datos del trámite y el COG en asientos de póliza de devengo tipo <code>PE</code> sin captura manual.</td></tr>
+        <tr><td><strong>07.1.1 Bóveda CFDI</strong></td><td>Repositorio y validación SAT</td><td>Verifica vigencia del XML, RFC del emisor y extrae automáticamente impuestos trasladados y retenidos.</td></tr>
+        <tr><td><strong>02.1 Presupuesto de Egresos</strong></td><td>Control de disponibilidad</td><td>Valida en tiempo real que exista saldo suficiente en la clave presupuestaria antes de permitir el registro.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 11. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Casos de Prueba (Validación QA)</div>
+    <table class="props-table">
+      <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Acción / Entrada</th><th>Resultado Esperado</th></tr></thead>
+      <tbody>
+        <tr><td><strong>CP-AG-01</strong></td><td>Intento de envío con faltantes en expediente digital</td><td>Trámite en <code>COMPRA_PEDIDO</code> sin adjuntar entrada de almacén sellada.</td><td>La función <code>fn_validar_checklist_afectacion</code> bloquea el envío y retorna listado de faltantes.</td></tr>
+        <tr><td><strong>CP-AG-02</strong></td><td>Discrepancia entre comprobantes y partidas</td><td>CFDIs suman $10,000.00 y las partidas presupuestales suman $9,500.00.</td><td>El sistema bloquea el avance indicando diferencia matemática de $500.00 MXN.</td></tr>
+        <tr><td><strong>CP-AG-03</strong></td><td>Aprobación y generación síncrona de póliza</td><td>Usuario Nivel 2 ejecuta <code>APROBAR</code> sobre trámite en estado <code>ENVIADA</code>.</td><td>Transita a <code>APROBADA</code>, genera póliza <code>PE</code> en <code>contabilidad.poliza</code> y asigna <code>p_poliza_id</code>.</td></tr>
+        <tr><td><strong>CP-AG-04</strong></td><td>Trámite No Presupuestario (Tipo 4: Entero de Retenciones)</td><td>Afectación en <code>TERCEROS_INST</code> para pago de ISR retenido.</td><td>No solicita COG; genera póliza de balance puro (cargo a <code>2.1.1.7</code>) con cero afectación en cuentas `8.2.x`.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 12. HISTORIAL DE VERSIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Historial de Versiones</div>
+    <table class="props-table">
+      <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Cambios Realizados</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>2.0.0</code></td>
+          <td>2026-09-02</td>
+          <td>Equipo SIAF-PJEV / Dix Consultoría</td>
+          <td>Reestructuración canónica bajo estándar DOC-08. Se erradica el hardcodeo de 1 y 2, incorporando los 4 Tipos de Pago y 15 Subtipos/Procedimientos con sus descripciones breves de UI, integración de la modalidad No Afecta Presupuesto, workflow oficial de 6 estados, SPs de devengo y wireframes SVG nativos del wizard de selección.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  function showWF(wfId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('wf-' + wfId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showSP(spId, btn) {
+    document.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('sp-' + spId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showDBTab(tabId, btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const container = parent.parentElement;
+    container.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('db-' + tabId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
