@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.2.2 Bandeja de Entrada y Grapado Documental — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.2 · Operación y Registro</span> ›
+    <span>09.2.2 Bandeja de Entrada y Grapado Documental</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.2.2</div>
+      <h1 class="elem-title">Bandeja de Entrada y Grapado Documental (Document Tray)</h1>
+      <p class="elem-desc">Espacio de trabajo interactivo inspirado en el Document Tray de DocuWare para la recepción, pre-visualización, unión indisoluble (grapado de XML + PDF) y preparación de archivos antes de su archivado formal en expedientes del SIAF-PJEV.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Operación Frontend (DOC-08)</span>
+        <span class="mod-badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc;">Benchmark: DocuWare Tray</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">📎 El Concepto de "Grapado" (Document Stapling)</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      En materia fiscal y contable gubernamental (CONAC / SAT), una factura no es solo un PDF ni solo un XML: <strong>ambos forman una unidad jurídica indivisible</strong>. 
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      La <strong>Bandeja de Entrada</strong> detecta automáticamente cuando un usuario arrastra un archivo <code>.xml</code> y su correspondiente <code>.pdf</code> con el mismo UUID fiscal o nombre base, y los "grapa" virtualmente en un único paquete documental que viaja junto a la póliza o trámite de pago.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>09.2.2 Bandeja de Entrada y Grapado Documental</strong> actúa como la antesala de custodia. Permite a los usuarios operativos de Cuentas por Pagar, Adquisiciones o Tesorería:</p>
+    <ul style="font-size:12px; line-height:1.7; color:var(--pjev-texto);">
+      <li><strong>Carga Rápida Drag & Drop:</strong> Arrastrar múltiples comprobantes, contratos u oficios desde el explorador de archivos.</li>
+      <li><strong>Validación de Integridad Local:</strong> Cálculo previo del hash SHA-256 en el navegador para alertar sobre archivos corruptos o duplicados antes de consumir ancho de banda.</li>
+      <li><strong>Grapado y Desglose (*Staple / Unstaple*):</strong> Agrupar un CFDI XML con su representación impresa PDF, o anexar bitácoras de viaje al formato de comprobación de viáticos.</li>
+      <li><strong>Pase al Expediente SIAF:</strong> Asociar los documentos grapados directamente a un número de trámite en curso con un solo clic.</li>
+    </ul>
+  </div>
+
+  <!-- 2. SERVICIOS Y STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Servicios Backend y Procedimientos</div>
+    <p>Este módulo interactúa con <code>/api/v1/archivos/subir</code> generando documentos transitorios con <code>es_temporal = TRUE</code>, y utiliza el SP <code>archivos.fn_crud_documento_relacion</code> para consolidar las grapas lógicas.</p>
+
+    <div class="code-wrap">
+<pre><code>-- Operación de grapado entre dos documentos en base de datos
+-- El documento hijo queda referenciado como anexo estructurado del documento padre
+INSERT INTO archivos.documento_relacion (
+    documento_id, modulo_siaf, entidad_origen, registro_id, tipo_documento, descripcion
+) VALUES (
+    'e5b9f712-4521-419a-bcde-0123456789ab'::uuid, -- UUID del XML
+    'archivo',
+    'documento',
+    '3a12b489-1122-3344-5566-778899aabbcc',      -- UUID del PDF (Padre grapado)
+    'GRAPADO_CFDI_XML',
+    'Archivo XML complementario grapado a la representación impresa'
+);</code></pre>
+    </div>
+  </div>
+
+  <!-- 3. WIREFRAMES SVG NATIVOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Interfaz de Usuario (Bandeja Interactiva)</div>
+
+    <div class="wf-box">
+      <div class="wf-bar">
+        <span>Bandeja de Entrada Personal (DocuWare Tray Metaphor)</span>
+        <span style="color:var(--pjev-verde-oscuro);">Área de Trabajo y Grapado</span>
+      </div>
+      <div class="wf-svg-area">
+        <svg viewBox="0 0 960 480" width="100%" height="480" xmlns="http://www.w3.org/2000/svg">
+          <rect width="960" height="480" fill="#f8fafc" rx="6"/>
+          <!-- Barra superior -->
+          <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Bandeja de Entrada de Documentos (Document Tray)</text>
+          
+          <rect x="710" y="28" width="110" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+          <text x="765" y="46" font-size="11" fill="#334155" text-anchor="middle">📎 Grapar Sel.</text>
+
+          <rect x="830" y="28" width="100" height="28" fill="#065f46" rx="4"/>
+          <text x="880" y="46" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">📁 Archivar en SIAF</text>
+
+          <!-- Zona Drag & Drop -->
+          <rect x="20" y="75" width="920" height="75" fill="#ffffff" stroke="#065f46" stroke-dasharray="6 4" rx="6"/>
+          <text x="480" y="108" font-size="12" font-weight="bold" fill="#065f46" text-anchor="middle">Arrastre aquí facturas (XML + PDF), contratos u oficios para indexar</text>
+          <text x="480" y="128" font-size="10" fill="#64748b" text-anchor="middle">Soporta PDF/A, XML CFDI 4.0, PNG, JPG hasta 25 MB por archivo</text>
+
+          <!-- Tarjeta de Paquete Grapado 1 -->
+          <rect x="20" y="165" width="445" height="135" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <rect x="20" y="165" width="445" height="28" fill="#ecfdf5" stroke="#a7f3d0" rx="6 6 0 0"/>
+          <text x="35" y="183" font-size="10.5" font-weight="bold" fill="#065f46">📎 PAQUETE FISCAL GRAPADO (2 Archivos)</text>
+          <text x="440" y="183" font-size="9" fill="#047857" text-anchor="end">UUID: 4A12B890-C12D...</text>
+
+          <!-- Sub-documento 1 (PDF) -->
+          <rect x="35" y="202" width="415" height="40" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+          <text x="45" y="222" font-size="11" font-weight="bold" fill="#1e293b">📄 Factura_Papeleria_A491.pdf</text>
+          <text x="45" y="236" font-size="9.5" fill="#64748b">2.4 MB · Representación impresa</text>
+          <text x="435" y="226" font-size="10" fill="#2563eb" text-anchor="end">👁️ Ver</text>
+
+          <!-- Sub-documento 2 (XML) -->
+          <rect x="35" y="248" width="415" height="40" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+          <text x="45" y="268" font-size="11" font-weight="bold" fill="#1e293b">📜 Factura_Papeleria_A491.xml</text>
+          <text x="45" y="282" font-size="9.5" fill="#64748b">48 KB · CFDI 4.0 Timbrado SAT (Válido)</text>
+          <text x="435" y="272" font-size="10" fill="#2563eb" text-anchor="end">👁️ XML</text>
+
+          <!-- Tarjeta de Archivo Simple 2 -->
+          <rect x="495" y="165" width="445" height="135" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <rect x="495" y="165" width="445" height="28" fill="#f8fafc" stroke="#e2e8f0" rx="6 6 0 0"/>
+          <text x="510" y="183" font-size="10.5" font-weight="bold" fill="#334155">📄 DOCUMENTO INDIVIDUAL</text>
+          
+          <rect x="510" y="202" width="415" height="85" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+          <text x="525" y="226" font-size="11" font-weight="bold" fill="#1e293b">Oficio_Solicitud_Suficiencia_2026.pdf</text>
+          <text x="525" y="244" font-size="9.5" fill="#64748b">1.2 MB · Pendiente de asociar a Presupuesto</text>
+          <rect x="525" y="256" width="130" height="22" fill="#e0f2fe" rx="3"/>
+          <text x="590" y="271" font-size="9.5" font-weight="bold" fill="#0369a1" text-anchor="middle">1S.01 Presupuesto</text>
+          <text x="910" y="244" font-size="10" fill="#2563eb" text-anchor="end">👁️ Ver · 🗑️</text>
+
+          <!-- Pie informativo -->
+          <rect x="20" y="320" width="920" height="140" fill="#ffffff" stroke="#e2e8f0" rx="6"/>
+          <text x="35" y="345" font-size="11" font-weight="bold" fill="#065f46">Acciones Rápidas de la Bandeja:</text>
+          <text x="35" y="370" font-size="10.5" fill="#334155">• Seleccione un XML y un PDF y presione 'Grapar Sel.' para consolidarlos como paquete fiscal indivisible.</text>
+          <text x="35" y="392" font-size="10.5" fill="#334155">• Los archivos en la bandeja temporal cuentan con una vigencia máxima de 24 horas antes de depuración automática.</text>
+          <text x="35" y="414" font-size="10.5" fill="#334155">• Al presionar 'Archivar en SIAF', elija el módulo (CxP, Presupuesto, Ingresos) y el ID de trámite para mover los documentos en firme.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

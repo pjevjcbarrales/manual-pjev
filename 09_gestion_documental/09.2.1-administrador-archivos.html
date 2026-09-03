@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.2.1 Administrador General de Archivos — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.2 · Operación y Registro</span> ›
+    <span>09.2.1 Administrador General de Archivos</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.2.1</div>
+      <h1 class="elem-title">Administrador General de Archivos y Buscador Transversal</h1>
+      <p class="elem-desc">Consola central de consulta, supervisión y búsqueda transversal de expedientes digitales del Poder Judicial del Estado de Veracruz (modelo DocuWare File Cabinet). Permite rastrear documentos por hash criptográfico SHA-256, módulo, serie del CGCA, y monitorear el ciclo vital conforme a la LGA.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Consola Transversal (DOC-08)</span>
+        <span class="mod-badge badge-norm">LGA Arts. 43–46 / NOM-151</span>
+        <span class="mod-badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc;">Benchmark: DocuWare</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">🔍 El "File Cabinet" Institucional del PJEV</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      Inspirado en el <strong>File Cabinet de DocuWare</strong>, este módulo rompe los silos entre áreas. Permite a la Unidad Central de Archivo, al Órgano Interno de Control y a los Auditores localizar cualquier documento registrado en el sistema (una factura de CxP, un oficio de ministración de Ingresos, un contrato de Adquisiciones o una póliza contable) a través de un único panel unificado.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Cada resultado cuenta con una <strong>Ficha Integral de Control Documental</strong> con visor embebido, árbol genealógico de versiones, relaciones polimórficas y cadena de custodia inmutable (LGA Art. 45).
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El <strong>09.2.1 Administrador General de Archivos</strong> proporciona la visión omnicanal de todo el patrimonio documental del Poder Judicial. Resuelve la dispersión de información integrando en una sola vista:</p>
+    <ul style="font-size:12px; line-height:1.7; color:var(--pjev-texto);">
+      <li><strong>Filtros Multidimensionales:</strong> Búsqueda por Nombre, Hash SHA-256, UUID, Serie del CGCA, Módulo emisor, Rango de fechas, Usuario de carga y Nivel de confidencialidad (Público, Reservado, Confidencial).</li>
+      <li><strong>Semáforos de Vigencia (CADIDO):</strong> Alertas visuales para documentos activos en <em>Archivo de Trámite</em>, documentos en custodia precautoria en <em>Archivo de Concentración</em>, y expedientes próximos a cumplir su plazo legal para dictamen de baja o transferencia histórica.</li>
+      <li><strong>Ficha de Control Documental:</strong> Vista de 360 grados de cada archivo con previsualización sin descarga previa, detalle de firmas electrónicas y constancias NOM-151.</li>
+    </ul>
+  </div>
+
+  <!-- 2. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Modelo de Datos y Relaciones</div>
+    <p>Este módulo consulta la tabla maestra <code>archivos.documento</code> vinculada con <code>archivos.documento_relacion</code>, <code>archivos.documento_version</code> y <code>archivos.documento_bitacora</code>:</p>
+
+    <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:16px; margin:14px 0; font-family:var(--font-mono); font-size:12px; line-height:1.7;">
+      <strong>archivos.documento</strong> (Binario, Metadatos, Hash SHA-256, CGCA, CADIDO)<br>
+      &nbsp;&nbsp;├── 1:N <strong>archivos.documento_relacion</strong> (Módulo, Entidad, Registro Padre, Tipo Documento)<br>
+      &nbsp;&nbsp;├── 1:N <strong>archivos.documento_version</strong> (Versión incremental, Hash previo, Motivo de cambio)<br>
+      &nbsp;&nbsp;└── 1:N <strong>archivos.documento_bitacora</strong> (Cadena de custodia: Eventos de carga, consulta, descarga)
+    </div>
+  </div>
+
+  <!-- 3. STORED PROCEDURES (UBICACIÓN MANDATORIA) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Stored Procedures Canónicos</div>
+    <p>Utiliza directamente el motor <code>archivos.fn_leer_documento</code> y <code>archivos.fn_crud_documento</code> con agregación JSONB completa:</p>
+
+    <div class="code-wrap">
+<pre><code>-- Consulta avanzada consumida por la consola
+SELECT archivos.fn_leer_documento(
+    jsonb_build_object(
+        'modulo_siaf', 'cxp',
+        'estado_archivistico', 'TRAMITE',
+        'cgca_codigo', 'PJEV-DGA-RF-1S.01',
+        'estatus_registro', 1
+    )
+);</code></pre>
+    </div>
+  </div>
+
+  <!-- 4. SERVICIOS REST (NESTJS / SWAGGER) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Servicios API REST (NestJS / Swagger)</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Endpoint</th>
+          <th>Guards</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/v1/archivos</code></td>
+          <td><code>JwtAuthGuard, Roles('ADMIN_ARCHIVOS', 'AUDITORIA')</code></td>
+          <td>Búsqueda global con paginación, ordenamiento y filtros compuestos.</td>
+        </tr>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/v1/archivos/:id/ficha-completa</code></td>
+          <td><code>JwtAuthGuard</code></td>
+          <td>Retorna ficha de 360 grados: metadatos, versiones, relaciones y bitácora.</td>
+        </tr>
+        <tr>
+          <td><span class="method patch">PATCH</span></td>
+          <td><code>/api/v1/archivos/:id/clasificacion-seguridad</code></td>
+          <td><code>Roles('UNIDAD_TRANSPARENCIA')</code></td>
+          <td>Actualiza nivel de clasificación (Pública, Reservada, Confidencial).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. WIREFRAMES SVG NATIVOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Interfaz de Usuario (Wireframes DocuWare Style)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="switchWfTab('wf-admin-grid', this)">Consola Central (File Cabinet)</button>
+      <button class="wf-tab" onclick="switchWfTab('wf-admin-ficha', this)">Ficha Integral Documental</button>
+    </div>
+
+    <div id="wf-admin-grid" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span>Pantalla: 09.2.1 Administrador General de Archivos</span>
+          <span style="color:var(--pjev-verde-oscuro);">File Cabinet Transversal · PJEV</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 500" width="100%" height="500" xmlns="http://www.w3.org/2000/svg">
+            <rect width="960" height="500" fill="#f8fafc" rx="6"/>
+            <!-- Barra superior -->
+            <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Buscador Transversal de Archivos y Expedientes (DocuWare File Cabinet)</text>
+            <rect x="800" y="28" width="125" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="862" y="46" font-size="11" fill="#334155" text-anchor="middle">Exportar Lista</text>
+
+            <!-- Métricas superiores -->
+            <rect x="20" y="75" width="220" height="50" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="35" y="95" font-size="10" fill="#64748b">ARCHIVO DE TRÁMITE</text>
+            <text x="35" y="116" font-size="16" font-weight="bold" fill="#065f46">14,892 docs</text>
+
+            <rect x="250" y="75" width="220" height="50" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="265" y="95" font-size="10" fill="#64748b">ARCHIVO CONCENTRACIÓN</text>
+            <text x="265" y="116" font-size="16" font-weight="bold" fill="#0369a1">48,210 docs</text>
+
+            <rect x="480" y="75" width="220" height="50" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="495" y="95" font-size="10" fill="#64748b">PRÓXIMOS A VENCER (CADIDO)</text>
+            <text x="495" y="116" font-size="16" font-weight="bold" fill="#b45309">138 expedientes</text>
+
+            <rect x="710" y="75" width="230" height="50" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="725" y="95" font-size="10" fill="#64748b">ALMACENAMIENTO UTILIZADO</text>
+            <text x="725" y="116" font-size="16" font-weight="bold" fill="#334155">142.6 GB (MinIO/NAS)</text>
+
+            <!-- Filtros de búsqueda rápida -->
+            <rect x="20" y="135" width="920" height="42" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="35" y="160" font-size="11" fill="#94a3b8">Buscar por nombre, UUID, Hash SHA-256 o RFC proveedor...</text>
+            <rect x="620" y="142" width="130" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="630" y="160" font-size="10" fill="#475569">Módulo: Todos ▼</text>
+            <rect x="760" y="142" width="130" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+            <text x="770" y="160" font-size="10" fill="#475569">Estado: Trámite ▼</text>
+            <rect x="900" y="142" width="30" height="28" fill="#065f46" rx="3"/>
+            <text x="915" y="160" font-size="11" fill="#ffffff" text-anchor="middle">🔍</text>
+
+            <!-- Encabezado Grid -->
+            <rect x="20" y="188" width="920" height="30" fill="#065f46" rx="2"/>
+            <text x="35" y="207" font-size="10" font-weight="bold" fill="#ffffff">DOCUMENTO</text>
+            <text x="240" y="207" font-size="10" font-weight="bold" fill="#ffffff">MÓDULO / TRÁMITE</text>
+            <text x="440" y="207" font-size="10" font-weight="bold" fill="#ffffff">SERIE CGCA</text>
+            <text x="600" y="207" font-size="10" font-weight="bold" fill="#ffffff">TIPO DOC</text>
+            <text x="730" y="207" font-size="10" font-weight="bold" fill="#ffffff">HASH SHA-256</text>
+            <text x="860" y="207" font-size="10" font-weight="bold" fill="#ffffff">ACCIONES</text>
+
+            <!-- Fila 1 -->
+            <rect x="20" y="222" width="920" height="44" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="242" font-size="11" font-weight="bold" fill="#1e293b">Factura_CFDI_A491.pdf</text>
+            <text x="35" y="258" font-size="9.5" fill="#64748b">2.4 MB · 03/09/2026 11:24</text>
+            <text x="240" y="242" font-size="11" font-weight="bold" fill="#0369a1">CXP · Afectación 852</text>
+            <text x="240" y="258" font-size="9.5" fill="#64748b">Papelería y Útiles de Oficina</text>
+            <text x="440" y="247" font-size="10" fill="#334155">1S.02 Cuentas por Pagar</text>
+            <rect x="600" y="234" width="90" height="18" fill="#e0f2fe" rx="9"/>
+            <text x="645" y="247" font-size="9.5" font-weight="bold" fill="#0369a1" text-anchor="middle">CFDI_PDF</text>
+            <text x="730" y="247" font-size="10" font-family="monospace" fill="#64748b">a8f29c...31e4</text>
+            <text x="865" y="247" font-size="11" fill="#2563eb">👁️ Ver · ⬇️</text>
+
+            <!-- Fila 2 -->
+            <rect x="20" y="270" width="920" height="44" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="35" y="290" font-size="11" font-weight="bold" fill="#1e293b">Oficio_SEFIPLAN_Min_09.pdf</text>
+            <text x="35" y="306" font-size="9.5" fill="#64748b">1.1 MB · 01/09/2026 09:10</text>
+            <text x="240" y="290" font-size="11" font-weight="bold" fill="#0369a1">INGRESOS · Registro 412</text>
+            <text x="240" y="306" font-size="9.5" fill="#64748b">Ministración Gasto Corriente</text>
+            <text x="440" y="295" font-size="10" fill="#334155">1S.01 Pólizas y Ministraciones</text>
+            <rect x="600" y="282" width="90" height="18" fill="#fef3c7" rx="9"/>
+            <text x="645" y="295" font-size="9.5" font-weight="bold" fill="#92400e" text-anchor="middle">OFICIO_SOL</text>
+            <text x="730" y="295" font-size="10" font-family="monospace" fill="#64748b">77b310...88a1</text>
+            <text x="865" y="295" font-size="11" fill="#2563eb">👁️ Ver · ⬇️</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div id="wf-admin-ficha" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span>Detalle: Ficha de 360 Grados del Expediente Digital</span>
+          <span style="color:var(--pjev-dorado);">Trazabilidad y Visor</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 480" width="100%" height="480" xmlns="http://www.w3.org/2000/svg">
+            <rect width="960" height="480" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <!-- Panel Izquierdo: Visor -->
+            <rect x="15" y="15" width="480" height="450" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <rect x="25" y="25" width="460" height="35" fill="#ffffff" stroke="#e2e8f0" rx="3"/>
+            <text x="35" y="47" font-size="11" font-weight="bold" fill="#334155">📄 Factura_CFDI_A491.pdf (Página 1 de 2)</text>
+            <text x="440" y="47" font-size="11" fill="#64748b">🔍 100%</text>
+
+            <!-- Hoja simulada de factura -->
+            <rect x="45" y="75" width="420" height="370" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+            <text x="65" y="105" font-size="12" font-weight="bold" fill="#065f46">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+            <text x="65" y="125" font-size="10" fill="#64748b">RFC: PJE970529AAA · Uso CFDI: G03 Gastos en General</text>
+            <line x1="65" y1="140" x2="445" y2="140" stroke="#cbd5e1"/>
+            <text x="65" y="165" font-size="10" fill="#334155">Proveedor: DISTRIBUIDORA DE PAPELERÍA XALAPA S.A. DE C.V.</text>
+            <text x="65" y="185" font-size="10" fill="#334155">Folio Fiscal SAT: 4A12B890-C12D-4E5F-8899-0123456789AB</text>
+
+            <!-- Sello digital de DocuWare sobre documento -->
+            <rect x="250" y="280" width="180" height="60" fill="#dcfce7" stroke="#16a34a" stroke-width="2" rx="4" opacity="0.9"/>
+            <text x="340" y="303" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">✓ REVISIÓN CONFORME</text>
+            <text x="340" y="318" font-size="9" fill="#166534" text-anchor="middle">CXP-PJEV · Eunice G.</text>
+            <text x="340" y="331" font-size="8" fill="#166534" text-anchor="middle">03/09/2026 12:44 · Hash OK</text>
+
+            <!-- Panel Derecho: Metadatos y Pestañas -->
+            <rect x="510" y="15" width="435" height="450" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="525" y="42" font-size="12" font-weight="bold" fill="#065f46">Ficha Técnica Archivística y Trazabilidad</text>
+
+            <rect x="525" y="60" width="405" height="110" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="540" y="80" font-size="10" font-weight="bold" fill="#334155">Serie CGCA:</text>
+            <text x="620" y="80" font-size="10" fill="#065f46">1S.02 Cuentas por Pagar y Facturación</text>
+            <text x="540" y="100" font-size="10" font-weight="bold" fill="#334155">Vigencia CADIDO:</text>
+            <text x="640" y="100" font-size="10" fill="#1e293b">1 año trámite / 5 años concentración</text>
+            <text x="540" y="120" font-size="10" font-weight="bold" fill="#334155">Hash Criptográfico:</text>
+            <text x="650" y="120" font-size="9" font-family="monospace" fill="#0369a1">a8f29cb901...31e4599a</text>
+            <text x="540" y="140" font-size="10" font-weight="bold" fill="#334155">Clasificación Acceso:</text>
+            <rect x="660" y="128" width="85" height="18" fill="#fee2e2" rx="9"/>
+            <text x="702" y="141" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">Confidencial</text>
+
+            <text x="525" y="195" font-size="11" font-weight="bold" fill="#334155">Cadena de Custodia (Bitácora LGA Art. 45)</text>
+            <rect x="525" y="205" width="405" height="200" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="540" y="225" font-size="9.5" fill="#334155">03/09/2026 11:24 — CARGA por Cristian G. (IP: 192.168.10.42)</text>
+            <text x="540" y="245" font-size="9.5" fill="#334155">03/09/2026 11:25 — VINCULAR a Afectación Gasto 852</text>
+            <text x="540" y="265" font-size="9.5" fill="#166534">03/09/2026 12:44 — SELLO 'REVISIÓN CONFORME' por Eunice G.</text>
+            <text x="540" y="285" font-size="9.5" fill="#0369a1">03/09/2026 13:10 — PREVISUALIZACIÓN por Julio César (DGA)</text>
+
+            <rect x="525" y="420" width="195" height="32" fill="#065f46" rx="4"/>
+            <text x="622" y="440" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">⬇️ Descargar Original</text>
+
+            <rect x="735" y="420" width="195" height="32" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="832" y="440" font-size="11" fill="#334155" text-anchor="middle">📄 Generar Versión Pública</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+  function switchWfTab(panelId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById(panelId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+</body>
+</html>

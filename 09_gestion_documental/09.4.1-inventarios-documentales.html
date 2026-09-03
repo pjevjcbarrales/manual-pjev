@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.4.1 Inventarios Documentales AGN — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.4 · Informes y Auditoría</span> ›
+    <span>09.4.1 Inventarios Documentales AGN</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.4.1</div>
+      <h1 class="elem-title">Inventarios Documentales (Formatos AGN / Consejo Estatal)</h1>
+      <p class="elem-desc">Generador y concentrador institucional de los cuatro inventarios archivísticos oficiales exigidos por la Ley General de Archivos: Inventario General, Inventario de Transferencia Primaria, Inventario de Transferencia Secundaria e Inventario de Baja Documental.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Reportes Normativos (DOC-08)</span>
+        <span class="mod-badge badge-norm">LGA Art. 14 / AGN Estándar</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">📋 Los Cuatro Inventarios de Ley</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      El <strong>Artículo 14 de la Ley General de Archivos</strong> mandata que los sujetos obligados deben contar y mantener actualizados sus inventarios documentales conforme a la estructura técnica dictada por el Archivo General de la Nación (AGN).
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Este módulo automatiza la emisión de dichos formatos foliados en PDF y Excel, evitando el llenado manual de cédulas al construirlos directamente desde la base de datos de <code>archivos.documento</code> y <code>archivos.documento_relacion</code>.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>09.4.1 Inventarios Documentales AGN</strong> permite emitir los reportes normativos oficiales:</p>
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th>Tipo de Inventario</th>
+          <th>Periodicidad / Detonante</th>
+          <th>Destinatario Oficial</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Inventario General</strong></td>
+          <td>Anual (cierre de ejercicio fiscal)</td>
+          <td>Unidad Central de Archivos PJEV y publicación en portal de Transparencia.</td>
+        </tr>
+        <tr>
+          <td><strong>Inventario de Transferencia Primaria</strong></td>
+          <td>Al concluir vigencia en Archivo de Trámite</td>
+          <td>Entrega de la Unidad Productora al Archivo de Concentración.</td>
+        </tr>
+        <tr>
+          <td><strong>Inventario de Transferencia Secundaria</strong></td>
+          <td>Al concluir vigencia en Concentración (si tiene valor histórico)</td>
+          <td>Entrega formal al Archivo Histórico del PJEV.</td>
+        </tr>
+        <tr>
+          <td><strong>Inventario de Baja Documental</strong></td>
+          <td>Al vencer plazo precautorio sin valores secundarios</td>
+          <td>Dictamen remitido al Consejo Estatal de Archivos y al AGN para autorización de baja.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. SERVICIOS BACKEND -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Servicios y Consulta SQL</div>
+
+    <div class="code-wrap">
+<pre><code>-- Consulta generadora del Inventario General AGN
+SELECT 
+    ROW_NUMBER() OVER(ORDER BY c.seccion, c.serie) AS consecutivo,
+    d.cgca_codigo,
+    c.seccion,
+    c.serie,
+    c.subserie,
+    COUNT(d.id) AS total_expedientes,
+    MIN(d.fecha_c) AS fecha_extrema_inicial,
+    MAX(d.fecha_c) AS fecha_extrema_final,
+    cad.valor_administrativo,
+    cad.valor_legal,
+    cad.valor_fiscal_contable,
+    cad.vigencia_tramite_anios,
+    cad.vigencia_concentracion_anios,
+    cad.destino_final
+FROM archivos.documento d
+JOIN archivos.cgca_catalogo c ON d.cgca_codigo = c.cgca_codigo
+LEFT JOIN archivos.cadido_catalogo cad ON d.cgca_codigo = cad.cgca_codigo
+WHERE d.estatus_registro = 1
+GROUP BY d.cgca_codigo, c.seccion, c.serie, c.subserie, cad.valor_administrativo, 
+         cad.valor_legal, cad.valor_fiscal_contable, cad.vigencia_tramite_anios, 
+         cad.vigencia_concentracion_anios, cad.destino_final
+ORDER BY c.seccion, c.serie;</code></pre>
+    </div>
+  </div>
+
+  <!-- 3. WIREFRAMES SVG -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Interfaz del Generador de Inventarios</div>
+
+    <div class="wf-box">
+      <div class="wf-bar">
+        <span>Consola de Emisión de Inventarios Documentales AGN</span>
+        <span style="color:var(--pjev-verde-oscuro);">Reportes Oficiales PJEV</span>
+      </div>
+      <div class="wf-svg-area">
+        <svg viewBox="0 0 960 460" width="100%" height="460" xmlns="http://www.w3.org/2000/svg">
+          <rect width="960" height="460" fill="#f8fafc" rx="6"/>
+          <!-- Barra superior -->
+          <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Inventarios Documentales Institucionales (LGA Art. 14 / AGN)</text>
+          
+          <rect x="680" y="28" width="115" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+          <text x="737" y="46" font-size="11" fill="#334155" text-anchor="middle">📊 Excel (XLSX)</text>
+
+          <rect x="805" y="28" width="125" height="28" fill="#065f46" rx="4"/>
+          <text x="867" y="46" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">📄 PDF Foliado AGN</text>
+
+          <!-- Filtros de Emisión -->
+          <rect x="20" y="75" width="920" height="45" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+          <text x="35" y="102" font-size="11" font-weight="bold" fill="#334155">Tipo de Inventario:</text>
+          <rect x="155" y="84" width="220" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+          <text x="165" y="102" font-size="10.5" fill="#1e293b">Inventario General de Archivo ▼</text>
+
+          <text x="400" y="102" font-size="11" font-weight="bold" fill="#334155">Ejercicio Fiscal:</text>
+          <rect x="500" y="84" width="90" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+          <text x="545" y="102" font-size="10.5" fill="#1e293b" text-anchor="middle">2026 ▼</text>
+
+          <text x="615" y="102" font-size="11" font-weight="bold" fill="#334155">Área Productora:</text>
+          <rect x="720" y="84" width="205" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+          <text x="730" y="102" font-size="10.5" fill="#1e293b">DGA · Recursos Financieros ▼</text>
+
+          <!-- Vista Previa Cédula Oficial -->
+          <rect x="20" y="130" width="920" height="300" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <rect x="20" y="130" width="920" height="45" fill="#ecfdf5" stroke="#a7f3d0" rx="4 4 0 0"/>
+          <text x="480" y="150" font-size="11" font-weight="bold" fill="#065f46" text-anchor="middle">PODER JUDICIAL DEL ESTADO DE VERACRUZ — SISTEMA INSTITUCIONAL DE ARCHIVOS</text>
+          <text x="480" y="165" font-size="9.5" fill="#047857" text-anchor="middle">CÉDULA DE INVENTARIO GENERAL DE ARCHIVO DE TRÁMITE (FORMATO AGN)</text>
+
+          <!-- Tabla interna -->
+          <rect x="35" y="185" width="890" height="26" fill="#065f46"/>
+          <text x="45" y="202" font-size="9.5" font-weight="bold" fill="#ffffff">NO.</text>
+          <text x="80" y="202" font-size="9.5" font-weight="bold" fill="#ffffff">CÓDIGO CLASIF.</text>
+          <text x="210" y="202" font-size="9.5" font-weight="bold" fill="#ffffff">SERIE / SUBSERIE DOCUMENTAL</text>
+          <text x="480" y="202" font-size="9.5" font-weight="bold" fill="#ffffff">EXPEDIENTES</text>
+          <text x="580" y="202" font-size="9.5" font-weight="bold" fill="#ffffff">FECHAS EXTREMAS</text>
+          <text x="720" y="202" font-size="9.5" font-weight="bold" fill="#ffffff">VALORES</text>
+          <text x="830" y="202" font-size="9.5" font-weight="bold" fill="#ffffff">VIGENCIA</text>
+
+          <!-- Fila 1 -->
+          <rect x="35" y="213" width="890" height="32" fill="#ffffff" stroke="#f1f5f9"/>
+          <text x="45" y="233" font-size="10" fill="#334155">1</text>
+          <text x="80" y="233" font-size="10" font-family="monospace" fill="#065f46">1S.01</text>
+          <text x="210" y="233" font-size="10" font-weight="bold" fill="#1e293b">Pólizas Contables y Presupuestales</text>
+          <text x="495" y="233" font-size="10" fill="#334155" text-anchor="middle">1,420</text>
+          <text x="580" y="233" font-size="10" fill="#64748b">01/01/2026 - 31/08/2026</text>
+          <text x="720" y="233" font-size="9.5" fill="#0369a1">[F] [L]</text>
+          <text x="840" y="233" font-size="10" fill="#166534">1T + 5C</text>
+
+          <!-- Fila 2 -->
+          <rect x="35" y="247" width="890" height="32" fill="#f8fafc" stroke="#f1f5f9"/>
+          <text x="45" y="267" font-size="10" fill="#334155">2</text>
+          <text x="80" y="267" font-size="10" font-family="monospace" fill="#065f46">1S.02</text>
+          <text x="210" y="267" font-size="10" font-weight="bold" fill="#1e293b">Cuentas por Pagar y Facturación</text>
+          <text x="495" y="267" font-size="10" fill="#334155" text-anchor="middle">3,892</text>
+          <text x="580" y="267" font-size="10" fill="#64748b">02/01/2026 - 31/08/2026</text>
+          <text x="720" y="267" font-size="9.5" fill="#0369a1">[F]</text>
+          <text x="840" y="267" font-size="10" fill="#166534">1T + 5C</text>
+
+          <!-- Firmas Oficiales de Cédula -->
+          <line x1="120" y1="380" x2="340" y2="380" stroke="#94a3b8"/>
+          <text x="230" y="398" font-size="9.5" fill="#475569" text-anchor="middle">Elaboró: Responsable de Archivo de Trámite</text>
+
+          <line x1="620" y1="380" x2="840" y2="380" stroke="#94a3b8"/>
+          <text x="730" y="398" font-size="9.5" fill="#475569" text-anchor="middle">Autorizó: Titular de la Unidad Administrativa</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

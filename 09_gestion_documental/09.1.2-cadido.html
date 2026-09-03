@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.1.2 Catálogo de Disposición Documental (CADIDO) — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.1 · Catálogos Archivísticos</span> ›
+    <span>09.1.2 Catálogo de Disposición Documental (CADIDO)</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.1.2</div>
+      <h1 class="elem-title">Catálogo de Disposición Documental (CADIDO)</h1>
+      <p class="elem-desc">Instrumento que establece los valores documentales (administrativo, legal, fiscal/contable), las vigencias de custodia en Archivo de Trámite y Archivo de Concentración, y el destino final (Baja o Transferencia Histórica) para cada serie del CGCA conforme a la LGA y normatividad CONAC.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Análisis funcional canónico (DOC-08)</span>
+        <span class="mod-badge badge-norm">LGA Art. 14 / CFF Art. 30</span>
+        <span class="mod-badge badge-pjev">SIAF-PJEV Transversal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">⚖️ Automatización del Ciclo Vital del Documento</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      El <strong>CADIDO</strong> es el motor que dota de inteligencia temporal al SIAF-PJEV. Al asociar una serie archivística a este catálogo, el sistema calcula de forma automática la <strong>fecha de cierre en trámite</strong> y programa la <strong>vigencia precautoria en concentración</strong> (mínimo 5 años para comprobantes fiscales y contables).
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Ningún usuario puede borrar documentos a discreción; cualquier baja física o lógica exige cumplir el plazo del CADIDO y emitir el Acta Formal de Baja aprobada por el AGN y el Consejo Estatal de Archivos.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El catálogo <strong>09.1.2 Catálogo de Disposición Documental (CADIDO)</strong> complementa al CGCA fijando las reglas de conservación y destino de los documentos del Poder Judicial. Responde a tres preguntas jurídicas indispensables:</p>
+    <ol style="font-size:12px; line-height:1.7; color:var(--pjev-texto);">
+      <li><strong>¿Qué valor testimonial tiene la serie?</strong> (Administrativo, Legal, Fiscal/Contable o Técnico).</li>
+      <li><strong>¿Cuánto tiempo debe conservarse activamente y precautoriamente?</strong> (Años en Archivo de Trámite y años en Archivo de Concentración).</li>
+      <li><strong>¿Cuál es su destino final una vez extinguidos sus plazos?</strong> (Baja Documental autorizada o Transferencia Histórica permanente).</li>
+    </ol>
+  </div>
+
+  <!-- 2. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Modelo de Datos y Diccionario de Campos</div>
+    <p>Tabla nativa: <code>archivos.cadido_catalogo</code> en PostgreSQL:</p>
+
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Tipo</th>
+          <th>Nulo</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>cadido_id</code></td>
+          <td><code>SERIAL (PK)</code></td>
+          <td>No</td>
+          <td>Identificador único del registro de disposición.</td>
+        </tr>
+        <tr>
+          <td><code>cgca_codigo</code></td>
+          <td><code>VARCHAR(50) (FK)</code></td>
+          <td>No</td>
+          <td>Clave foránea hacia <code>archivos.cgca_catalogo.cgca_codigo</code>.</td>
+        </tr>
+        <tr>
+          <td><code>valor_administrativo</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Indica si el documento ampara gestiones de trámite institucional.</td>
+        </tr>
+        <tr>
+          <td><code>valor_legal</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Indica si ampara derechos u obligaciones procesales / contractuales.</td>
+        </tr>
+        <tr>
+          <td><code>valor_fiscal_contable</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Indica si ampara ingresos, egresos, pasivos o contabilidad pública (Default TRUE).</td>
+        </tr>
+        <tr>
+          <td><code>valor_tecnico</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Indica si ampara planos, especificaciones de obra o tecnología.</td>
+        </tr>
+        <tr>
+          <td><code>vigencia_tramite_anios</code></td>
+          <td><code>INT</code></td>
+          <td>No</td>
+          <td>Años de permanencia activa en la unidad productora (Default: 1 año).</td>
+        </tr>
+        <tr>
+          <td><code>vigencia_concentracion_anios</code></td>
+          <td><code>INT</code></td>
+          <td>No</td>
+          <td>Años de custodia precautoria en Archivo de Concentración (Default: 5 años).</td>
+        </tr>
+        <tr>
+          <td><code>destino_final</code></td>
+          <td><code>VARCHAR(25)</code></td>
+          <td>No</td>
+          <td><code>'BAJA_DOCUMENTAL'</code> o <code>'TRANSFERENCIA_HISTORICA'</code>.</td>
+        </tr>
+        <tr>
+          <td><code>fundamento_legal</code></td>
+          <td><code>TEXT</code></td>
+          <td>No</td>
+          <td>Cita jurídica de retención (ej. <em>CFF Art. 30, LGCG Art. 44, LGA Art. 14</em>).</td>
+        </tr>
+        <tr>
+          <td><code>estatus_registro</code></td>
+          <td><code>SMALLINT</code></td>
+          <td>No</td>
+          <td><code>1</code> = Activo, <code>0</code> = Inactivo.</td>
+        </tr>
+        <tr>
+          <td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td>
+          <td>Auditoría</td>
+          <td>-</td>
+          <td>Estándar PJEV de trazabilidad.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. STORED PROCEDURES (UBICACIÓN MANDATORIA) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Stored Procedures Canónicos (PostgreSQL)</div>
+
+    <div class="code-wrap">
+<pre><code>-- SP 1: archivos.fn_leer_cadido
+CREATE OR REPLACE FUNCTION archivos.fn_leer_cadido(
+    p_filtros JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_id INT;
+    v_cgca VARCHAR(50);
+    v_destino VARCHAR(25);
+    v_resultado JSONB;
+BEGIN
+    v_id := (p_filtros->>'cadido_id')::int;
+    v_cgca := p_filtros->>'cgca_codigo';
+    v_destino := p_filtros->>'destino_final';
+
+    SELECT COALESCE(jsonb_agg(row_to_json(r)), '[]'::jsonb)
+    INTO v_resultado
+    FROM (
+        SELECT 
+            d.cadido_id,
+            d.cgca_codigo,
+            c.seccion,
+            c.serie,
+            c.subserie,
+            d.valor_administrativo,
+            d.valor_legal,
+            d.valor_fiscal_contable,
+            d.valor_tecnico,
+            d.vigencia_tramite_anios,
+            d.vigencia_concentracion_anios,
+            (d.vigencia_tramite_anios + d.vigencia_concentracion_anios) AS vigencia_total_anios,
+            d.destino_final,
+            d.fundamento_legal,
+            d.estatus_registro,
+            d.usuario_c,
+            d.fecha_c,
+            d.usuario_m,
+            d.fecha_m
+        FROM archivos.cadido_catalogo d
+        JOIN archivos.cgca_catalogo c ON d.cgca_codigo = c.cgca_codigo
+        WHERE d.estatus_registro = COALESCE((p_filtros->>'estatus_registro')::smallint, 1)
+          AND (v_id IS NULL OR d.cadido_id = v_id)
+          AND (v_cgca IS NULL OR d.cgca_codigo = v_cgca)
+          AND (v_destino IS NULL OR d.destino_final = v_destino)
+        ORDER BY c.seccion ASC, c.serie ASC
+    ) r;
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', v_resultado);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error en fn_leer_cadido: ' || SQLERRM, 'data', '[]'::jsonb);
+END;
+$$;</code></pre>
+    </div>
+
+    <div class="code-wrap">
+<pre><code>-- SP 2: archivos.fn_crud_cadido
+CREATE OR REPLACE FUNCTION archivos.fn_crud_cadido(
+    p_operacion VARCHAR(20),
+    p_datos JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_id INT;
+    v_cgca VARCHAR(50);
+    v_usuario VARCHAR(50);
+BEGIN
+    v_usuario := COALESCE(p_datos->>'usuario', 'SISTEMA');
+
+    IF p_operacion = 'INSERT' THEN
+        v_cgca := UPPER(TRIM(p_datos->>'cgca_codigo'));
+
+        -- Validar que la serie exista en el CGCA
+        IF NOT EXISTS (SELECT 1 FROM archivos.cgca_catalogo WHERE cgca_codigo = v_cgca AND estatus_registro = 1) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La serie archivística indicada no existe en el CGCA o está inactiva.', 'data', null);
+        END IF;
+
+        -- Validar unicidad en CADIDO
+        IF EXISTS (SELECT 1 FROM archivos.cadido_catalogo WHERE cgca_codigo = v_cgca AND estatus_registro = 1) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La serie archivística ya cuenta con disposición documental registrada.', 'data', null);
+        END IF;
+
+        INSERT INTO archivos.cadido_catalogo (
+            cgca_codigo, valor_administrativo, valor_legal, valor_fiscal_contable,
+            valor_tecnico, vigencia_tramite_anios, vigencia_concentracion_anios,
+            destino_final, fundamento_legal, estatus_registro, usuario_c, fecha_c
+        ) VALUES (
+            v_cgca,
+            COALESCE((p_datos->>'valor_administrativo')::boolean, FALSE),
+            COALESCE((p_datos->>'valor_legal')::boolean, FALSE),
+            COALESCE((p_datos->>'valor_fiscal_contable')::boolean, TRUE),
+            COALESCE((p_datos->>'valor_tecnico')::boolean, FALSE),
+            COALESCE((p_datos->>'vigencia_tramite_anios')::int, 1),
+            COALESCE((p_datos->>'vigencia_concentracion_anios')::int, 5),
+            COALESCE(p_datos->>'destino_final', 'BAJA_DOCUMENTAL'),
+            p_datos->>'fundamento_legal',
+            1, v_usuario, clock_timestamp()
+        ) RETURNING cadido_id INTO v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Disposición documental asignada con éxito.', 'data', jsonb_build_object('cadido_id', v_id));
+
+    ELSIF p_operacion = 'UPDATE' THEN
+        v_id := (p_datos->>'cadido_id')::int;
+
+        UPDATE archivos.cadido_catalogo
+        SET valor_administrativo = (p_datos->>'valor_administrativo')::boolean,
+            valor_legal = (p_datos->>'valor_legal')::boolean,
+            valor_fiscal_contable = (p_datos->>'valor_fiscal_contable')::boolean,
+            valor_tecnico = (p_datos->>'valor_tecnico')::boolean,
+            vigencia_tramite_anios = (p_datos->>'vigencia_tramite_anios')::int,
+            vigencia_concentracion_anios = (p_datos->>'vigencia_concentracion_anios')::int,
+            destino_final = p_datos->>'destino_final',
+            fundamento_legal = p_datos->>'fundamento_legal',
+            usuario_m = v_usuario,
+            fecha_m = clock_timestamp()
+        WHERE cadido_id = v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Disposición documental actualizada exitosamente.', 'data', jsonb_build_object('cadido_id', v_id));
+
+    ELSIF p_operacion = 'DESACTIVAR' THEN
+        v_id := (p_datos->>'cadido_id')::int;
+
+        UPDATE archivos.cadido_catalogo
+        SET estatus_registro = 0,
+            usuario_m = v_usuario,
+            fecha_m = clock_timestamp()
+        WHERE cadido_id = v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Registro CADIDO desactivado.', 'data', jsonb_build_object('cadido_id', v_id));
+
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Operación no válida: ' || p_operacion, 'data', null);
+    END IF;
+
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error en fn_crud_cadido: ' || SQLERRM, 'data', null);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 4. SWAGGER / NESTJS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Servicios API REST (NestJS / Swagger)</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Endpoint</th>
+          <th>Permiso / Guard</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/v1/archivos/cadido</code></td>
+          <td><code>JwtAuthGuard</code></td>
+          <td>Consulta de fichas de disposición documental por serie o destino.</td>
+        </tr>
+        <tr>
+          <td><span class="method post">POST</span></td>
+          <td><code>/api/v1/archivos/cadido</code></td>
+          <td><code>Roles('ADMIN_ARCHIVOS')</code></td>
+          <td>Asigna valores y vigencias documentales a una serie del CGCA.</td>
+        </tr>
+        <tr>
+          <td><span class="method patch">PATCH</span></td>
+          <td><code>/api/v1/archivos/cadido/:id</code></td>
+          <td><code>Roles('ADMIN_ARCHIVOS')</code></td>
+          <td>Actualiza plazos de retención o fundamento legal.</td>
+        </tr>
+        <tr>
+          <td><span class="method delete">DELETE</span></td>
+          <td><code>/api/v1/archivos/cadido/:id</code></td>
+          <td><code>Roles('ADMIN_ARCHIVOS')</code></td>
+          <td>Baja lógica del registro CADIDO.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Reglas de Negocio</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Nivel</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>RN-CAD-01</strong></td>
+          <td>Retención Mínima Fiscal (5 Años)</td>
+          <td>Toda serie que tenga <code>valor_fiscal_contable = TRUE</code> debe tener una vigencia en concentración mínima de 5 años (CFF Art. 30 y LGCG).</td>
+          <td>SP / Validación</td>
+        </tr>
+        <tr>
+          <td><strong>RN-CAD-02</strong></td>
+          <td>Asignación de Destino Final Excluyente</td>
+          <td>El destino final únicamente puede ser <code>BAJA_DOCUMENTAL</code> o <code>TRANSFERENCIA_HISTORICA</code>.</td>
+          <td>Base de Datos</td>
+        </tr>
+        <tr>
+          <td><strong>RN-CAD-03</strong></td>
+          <td>Fundamentación Jurídica Obligatoria</td>
+          <td>No se permite guardar una ficha de disposición documental sin citar expresamente los artículos legales que sustentan el plazo.</td>
+          <td>Frontend y SP</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. WIREFRAMES SVG -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Interfaz de Usuario (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="switchWfTab('wf-grid-cad', this)">Catálogo de Disposición (Grid)</button>
+      <button class="wf-tab" onclick="switchWfTab('wf-modal-cad', this)">Ficha de Vigencias (Modal)</button>
+    </div>
+
+    <div id="wf-grid-cad" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span>Pantalla: 09.1.2 Catálogo de Disposición Documental (CADIDO)</span>
+          <span style="color:var(--pjev-verde-oscuro);">Vigencias y Plazos Legales</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 460" width="100%" height="460" xmlns="http://www.w3.org/2000/svg">
+            <rect width="960" height="460" fill="#f8fafc" rx="6"/>
+            <!-- Barra superior -->
+            <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Catálogo de Disposición Documental (CADIDO)</text>
+            <rect x="770" y="28" width="155" height="28" fill="#065f46" rx="4"/>
+            <text x="847" y="46" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Asignar Disposición</text>
+
+            <!-- Encabezado Grid -->
+            <rect x="20" y="80" width="920" height="32" fill="#065f46" rx="2"/>
+            <text x="35" y="100" font-size="10" font-weight="bold" fill="#ffffff">CLAVE SERIE</text>
+            <text x="180" y="100" font-size="10" font-weight="bold" fill="#ffffff">DENOMINACIÓN</text>
+            <text x="430" y="100" font-size="10" font-weight="bold" fill="#ffffff">VALORES</text>
+            <text x="560" y="100" font-size="10" font-weight="bold" fill="#ffffff">TRÁMITE</text>
+            <text x="640" y="100" font-size="10" font-weight="bold" fill="#ffffff">CONCENTRACIÓN</text>
+            <text x="760" y="100" font-size="10" font-weight="bold" fill="#ffffff">DESTINO FINAL</text>
+            <text x="890" y="100" font-size="10" font-weight="bold" fill="#ffffff">ACCIONES</text>
+
+            <!-- Fila 1 -->
+            <rect x="20" y="115" width="920" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="138" font-size="11" font-family="monospace" font-weight="bold" fill="#065f46">1S.01</text>
+            <text x="180" y="138" font-size="11" font-weight="bold" fill="#1e293b">Pólizas Contables y Presupuestales</text>
+            <text x="430" y="138" font-size="10" fill="#0369a1">[Fiscal/Contable] [Legal]</text>
+            <text x="575" y="138" font-size="11" fill="#334155" text-anchor="middle">1 año</text>
+            <text x="680" y="138" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">5 años</text>
+            <rect x="755" y="125" width="105" height="18" fill="#fee2e2" rx="9"/>
+            <text x="807" y="138" font-size="9.5" font-weight="bold" fill="#991b1b" text-anchor="middle">Baja Documental</text>
+            <text x="895" y="138" font-size="11" fill="#2563eb">Editar</text>
+
+            <!-- Fila 2 -->
+            <rect x="20" y="155" width="920" height="38" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="35" y="178" font-size="11" font-family="monospace" font-weight="bold" fill="#065f46">1S.02</text>
+            <text x="180" y="178" font-size="11" font-weight="bold" fill="#1e293b">Cuentas por Pagar y Facturación</text>
+            <text x="430" y="178" font-size="10" fill="#0369a1">[Fiscal/Contable]</text>
+            <text x="575" y="178" font-size="11" fill="#334155" text-anchor="middle">1 año</text>
+            <text x="680" y="178" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">5 años</text>
+            <rect x="755" y="165" width="105" height="18" fill="#fee2e2" rx="9"/>
+            <text x="807" y="178" font-size="9.5" font-weight="bold" fill="#991b1b" text-anchor="middle">Baja Documental</text>
+            <text x="895" y="178" font-size="11" fill="#2563eb">Editar</text>
+
+            <!-- Fila 3 -->
+            <rect x="20" y="195" width="920" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="218" font-size="11" font-family="monospace" font-weight="bold" fill="#065f46">2S.01</text>
+            <text x="180" y="218" font-size="11" font-weight="bold" fill="#1e293b">Contratos de Obra y Servicios</text>
+            <text x="430" y="218" font-size="10" fill="#0369a1">[Legal] [Técnico] [Fiscal]</text>
+            <text x="575" y="218" font-size="11" fill="#334155" text-anchor="middle">3 años</text>
+            <text x="680" y="218" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">10 años</text>
+            <rect x="755" y="205" width="105" height="18" fill="#fef3c7" rx="9"/>
+            <text x="807" y="218" font-size="9.5" font-weight="bold" fill="#92400e" text-anchor="middle">Histórico PJEV</text>
+            <text x="895" y="218" font-size="11" fill="#2563eb">Editar</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div id="wf-modal-cad" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span>Modal: Asignación de Valores y Vigencias</span>
+          <span style="color:var(--pjev-dorado);">Ficha CADIDO</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 740 440" width="100%" height="440" xmlns="http://www.w3.org/2000/svg">
+            <rect width="740" height="440" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <!-- Modal header -->
+            <rect width="740" height="45" fill="#065f46" rx="6 6 0 0"/>
+            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Disposición Documental para Serie Archivística</text>
+
+            <!-- Serie CGCA -->
+            <text x="35" y="75" font-size="11" font-weight="bold" fill="#334155">Serie del CGCA *</text>
+            <rect x="35" y="85" width="670" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="45" y="105" font-size="11" fill="#065f46">PJEV-DGA-RF-1S.01 — Pólizas Contables y Presupuestales</text>
+
+            <!-- Valores Documentales -->
+            <text x="35" y="140" font-size="11" font-weight="bold" fill="#334155">Valores Documentales *</text>
+            <rect x="35" y="150" width="140" height="26" fill="#e0f2fe" stroke="#0284c7" rx="4"/>
+            <text x="45" y="167" font-size="10" font-weight="bold" fill="#0369a1">☑ Fiscal / Contable</text>
+
+            <rect x="185" y="150" width="110" height="26" fill="#e0f2fe" stroke="#0284c7" rx="4"/>
+            <text x="195" y="167" font-size="10" font-weight="bold" fill="#0369a1">☑ Legal</text>
+
+            <rect x="305" y="150" width="130" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="315" y="167" font-size="10" fill="#64748b">☐ Administrativo</text>
+
+            <!-- Vigencias -->
+            <text x="35" y="205" font-size="11" font-weight="bold" fill="#334155">Años en Trámite *</text>
+            <rect x="35" y="215" width="200" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="45" y="235" font-size="11" fill="#1e293b">1 año</text>
+
+            <text x="260" y="205" font-size="11" font-weight="bold" fill="#334155">Años en Concentración *</text>
+            <rect x="260" y="215" width="200" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="270" y="235" font-size="11" font-weight="bold" fill="#166534">5 años (LGCG Art. 44)</text>
+
+            <text x="485" y="205" font-size="11" font-weight="bold" fill="#334155">Destino Final *</text>
+            <rect x="485" y="215" width="220" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="495" y="235" font-size="11" fill="#991b1b">BAJA DOCUMENTAL ▼</text>
+
+            <!-- Fundamento Legal -->
+            <text x="35" y="275" font-size="11" font-weight="bold" fill="#334155">Fundamento Legal de Retención *</text>
+            <rect x="35" y="285" width="670" height="50" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="45" y="305" font-size="11" fill="#334155">Código Fiscal de la Federación Art. 30; Ley General de Contabilidad Gubernamental Art. 44 y 46.</text>
+
+            <!-- Botones -->
+            <rect x="490" y="385" width="100" height="32" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="540" y="405" font-size="11" fill="#475569" text-anchor="middle">Cancelar</text>
+
+            <rect x="605" y="385" width="100" height="32" fill="#065f46" rx="4"/>
+            <text x="655" y="405" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar Ficha</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+
+<script src="../shared.js"></script>
+<script>
+  function switchWfTab(panelId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById(panelId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+</body>
+</html>
