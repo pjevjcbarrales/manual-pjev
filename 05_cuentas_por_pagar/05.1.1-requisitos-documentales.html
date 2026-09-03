@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05.1.1 Requisitos Documentales — Manual de Desarrollo SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  .badge-w { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:var(--font-mono); }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .method.patch  { background:#f3e8ff; color:#6b21a8; }
+
+  .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9fafb; padding:16px; overflow-x:auto; text-align:center; }
+
+  .req-badge { font-size:9px; font-weight:700; padding:2px 6px; border-radius:4px; text-transform:uppercase; display:inline-block; }
+  .req-ob { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+  .req-co { background:#fef3c7; color:#92400e; border:1px solid #fcd34d; }
+  .req-op { background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; }
+  .req-na { color:#94a3b8; font-style:italic; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<!-- BOTONES FLOTANTES ACCIÓN -->
+<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999;">
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.location.reload()">⟳ Refrescar</button>
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.print()">🖨 Imprimir</button>
+</div>
+
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Inicio</a> ›
+    <span>05 · Cuentas por Pagar</span> ›
+    <span>05.1 · Catálogos</span> ›
+    <span>05.1.1 Requisitos documentales</span>
+  </div>
+
+  <!-- ENCABEZADO Y TÍTULO -->
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">05.1.1</div>
+      <h1 class="elem-title">Requisitos Documentales (Matriz Checklist de Soportes de Gasto)</h1>
+      <p class="elem-desc">Catálogo maestro y matriz de exigibilidad que tipifica los comprobantes fiscales, contratos, actas y formatos obligatorios que deben integrarse al expediente digital antes de autorizar y devengar cualquiera de los 12 procedimientos canónicos de gasto en el SIAF-PJEV.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Modo A — Catálogo Simple Parametrizado</span>
+        <span class="mod-badge badge-s">Fase 2: Ejecución del Gasto</span>
+        <span class="mod-badge badge-w">Gobierno del Expediente Digital</span>
+        <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/cxp/requisitos-documentales</code></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>En la administración pública estatal, el reconocimiento contable y presupuestario del <strong>Devengado (LGCG Art. 4 Fracc. XVI)</strong> exige que el ente público cuente con el respaldo documental fidedigno que acredite la recepción conforme de los bienes, la prestación efectiva de los servicios o el cumplimiento de los términos de una comisión oficial. Históricamente, en el PJEV esta verificación se realizaba mediante revisiones manuales en papel descritas en el procedimiento <em>"Recepción y revisión de gastos"</em> de la Subdirección de Recursos Financieros.</p>
+    <p>El módulo <strong>05.1.1 Requisitos Documentales</strong> traslada esta normatividad a una matriz relacional inteligente. Permite a los administradores del sistema parametrizar, por cada uno de los <strong>12 procedimientos de afectación del gasto</strong> (<code>NOMINA</code>, <code>ARRENDAMIENTO</code>, <code>SERVICIOS_BASICOS</code>, <code>COMPRA_PEDIDO</code>, <code>OBRA_PUBLICA</code>, <code>COMPROBACION_VIATICOS</code>, etc.), qué documentos soporte son <strong>Obligatorios</strong>, <strong>Condicionales</strong> u <strong>Opcionales</strong>. Esta matriz alimenta automáticamente el componente <code>SiafExpedienteDigitalMin</code> en la captura de <code>05.2.1 Afectación del Gasto</code>, impidiendo que un trámite avance en el workflow si no cuenta con el expediente digital íntegro y validado fiscalmente.</p>
+  </div>
+
+  <!-- 2. MARCO NORMATIVO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+    <table class="props-table">
+      <thead><tr><th>Norma / Instrumento</th><th>Artículo / Punto</th><th>Obligación y Criterio Técnico</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
+          <td>Art. 4 Fracc. XVI, Art. 9 y Art. 67</td>
+          <td>Obliga a registrar el momento contable del devengado respaldado invariablemente por los documentos que lo justifiquen y comprueben conforme a los lineamientos del CONAC.</td>
+        </tr>
+        <tr>
+          <td><strong>Manual Específico de Procedimientos de Recursos Financieros PJEV (Feb 2023)</strong></td>
+          <td>Procedimientos: Recepción y revisión de gastos (pág. 124), Pago a contratistas de obra (pág. 155), Comprobación de viáticos (pág. 159), Integración de documentación soporte (pág. 186)</td>
+          <td>Establece el listado taxativo de comprobantes para pagos con contrato, adjudicación directa, adquisiciones con entrada a almacén, obra pública, viáticos y arrendamientos.</td>
+        </tr>
+        <tr>
+          <td><strong>Código Fiscal de la Federación (CFF) y Resolución Miscelánea Fiscal</strong></td>
+          <td>Art. 29 y 29-A (Anexo 20 SAT)</td>
+          <td>Exige la verificación informática del CFDI (XML timbrado, vigencia en el SAT, RFC emisor no listado en el Art. 69-B del CFF y coherencia de método de pago PUE/PPD).</td>
+        </tr>
+        <tr>
+          <td><strong>Código Financiero para el Estado de Veracruz</strong></td>
+          <td>Art. 183 y aplicables</td>
+          <td>Dispone la exigencia de la Opinión de Cumplimiento de Obligaciones Fiscales Estatales ante la SEFIPLAN para proveedores y contratistas con operaciones en la entidad.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. CATÁLOGO INSTITUCIONAL DE DOCUMENTOS SOPORTE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Catálogo Maestro de Documentos Soporte (16 Tipos Oficiales)</div>
+    <p>A partir del inventario normativo de los procedimientos de la Subdirección de Recursos Financieros y Recursos Materiales, se tipifican los siguientes 16 documentos requeridos en el SIAF-PJEV:</p>
+
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th style="width:12%;">Código</th>
+          <th style="width:25%;">Nombre del Documento</th>
+          <th style="width:15%;">Emisor / Origen</th>
+          <th style="width:12%;">Formato Válido</th>
+          <th style="width:36%;">Descripción y Regla de Validación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>DOC-SOL-PAG</code></td>
+          <td><strong>Tarjeta / Oficio de Solicitud de Pago</strong></td>
+          <td>Área Solicitante (Juzgado / DGA)</td>
+          <td>PDF firmado</td>
+          <td>Documento oficial de petición con firma autógrafa o e.firma del titular solicitante y justificación del gasto.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-CFD-XML</code></td>
+          <td><strong>Comprobante Fiscal Digital (CFDI - XML)</strong></td>
+          <td>Proveedor / Empleado / Arrendador</td>
+          <td>XML (v4.0)</td>
+          <td>Archivo XML timbrado por PAC autorizado. Se valida estructura, cadena digital y sellos contra el webservice del SAT.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-CFD-PDF</code></td>
+          <td><strong>Representación Impresa CFDI (PDF)</strong></td>
+          <td>Proveedor / Empleado</td>
+          <td>PDF</td>
+          <td>Copia legible del comprobante para visualización rápida del analista con sello de recepción y visto bueno.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-VAL-SAT</code></td>
+          <td><strong>Verificación de Validación SAT</strong></td>
+          <td>SIAF Bóveda / SAT</td>
+          <td>JSON / PDF Acuse</td>
+          <td>Constancia automatizada generada por el SIAF que acredita estatus "VIGENTE" y ausencia de RFC en listas 69-B.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-OPI-SAT</code></td>
+          <td><strong>Opinión de Cumplimiento SAT (32-D)</strong></td>
+          <td>SAT (Proveedor)</td>
+          <td>PDF Oficial</td>
+          <td>Constancia positiva no mayor a 30 días naturales. Obligatoria en contrataciones y compras mayores a $300,000 MXN.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-OPI-SEF</code></td>
+          <td><strong>Constancia de Cumplimiento SEFIPLAN</strong></td>
+          <td>SEFIPLAN Veracruz</td>
+          <td>PDF Oficial</td>
+          <td>Constancia estatal de no adeudos fiscales emitida por el Gobierno del Estado para proveedores con domicilio local.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-CON-TRA</code></td>
+          <td><strong>Contrato o Convenio Formalizado</strong></td>
+          <td>Dirección de Asuntos Jurídicos</td>
+          <td>PDF con firmas</td>
+          <td>Contrato bilateral o convenio modificatorio que respalda la relación jurídica, vigencia, montos y penalizaciones.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-ORD-PED</code></td>
+          <td><strong>Pedido u Orden de Servicio</strong></td>
+          <td>Subdirección de Recursos Materiales</td>
+          <td>PDF Foliado</td>
+          <td>Instrumento de adquisición derivado de adjudicación directa o licitación, especificando renglones del CUCOP.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-ENT-ALM</code></td>
+          <td><strong>Entrada y Remisión de Almacén</strong></td>
+          <td>Oficina de Almacén PJEV</td>
+          <td>PDF Sellado</td>
+          <td>Constancia física de ingreso de bienes al inventario institucional, con sello húmedo oficial de ALMACÉN.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-VAL-ENT</code></td>
+          <td><strong>Vale de Entrada de Materiales</strong></td>
+          <td>Almacén / Custodio</td>
+          <td>PDF Firmado</td>
+          <td>Vale suscrito por el responsable del almacén que certifica que los bienes corresponden en cantidad y calidad a la factura.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-ALT-INV</code></td>
+          <td><strong>Cédula de Alta de Inventario (Activo Fijo)</strong></td>
+          <td>Control de Inventarios</td>
+          <td>PDF con Folios</td>
+          <td>Obligatorio para Capítulo 5000 (Mobiliario, cómputo, vehículos). Incluye número de inventario asignado al bien.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-OFI-COM</code></td>
+          <td><strong>Oficio de Comisión Oficial (Anexo 5)</strong></td>
+          <td>Titular del Órgano / DGA</td>
+          <td>PDF Firmado</td>
+          <td>Comisión de servicio autorizada con fechas, destino, objetivo institucional y autorización de viáticos.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-INF-COM</code></td>
+          <td><strong>Informe Pormenorizado de Actividades</strong></td>
+          <td>Servidor Comisionado</td>
+          <td>PDF Firmado</td>
+          <td>Relación circunstanciada de las actividades desarrolladas en la comisión oficial con visto bueno del superior.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-FMT-CMP</code></td>
+          <td><strong>Formato de Comprobación de Gastos (Anexo 6)</strong></td>
+          <td>Comisionado / Tesorería</td>
+          <td>Excel / PDF</td>
+          <td>Desglose de facturas de hospedaje, alimentos, peajes y cálculo matemático de saldo a favor o a reintegrar.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-EST-OBR</code></td>
+          <td><strong>Carátula y Estimación de Obra Aprobada</strong></td>
+          <td>Supervisión de Obra Pública</td>
+          <td>PDF / Cédula</td>
+          <td>Estimación por avance físico-financiero firmada por el contratista, supervisor de obra y director de infraestructura.</td>
+        </tr>
+        <tr>
+          <td><code>DOC-LIN-SAT</code></td>
+          <td><strong>Línea de Captura SAT / Cédula Terceros</strong></td>
+          <td>SAT / IPE / Aseguradoras</td>
+          <td>PDF / Línea</td>
+          <td>Línea de captura para entero de ISR nómina quincenal o cédula de liquidación mensual a terceros institucionales.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. MATRIZ DE EXIGIBILIDAD POR PROCEDIMIENTO DE GASTO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Matriz de Exigibilidad por Procedimiento de Gasto (Checklist Canónico)</div>
+    <p>La siguiente matriz cruza los <strong>12 procedimientos canónicos</strong> de <code>cxp.catalogo_procedimientos_afectacion</code> con la documentación soporte. El motor transaccional del SIAF-PJEV evalúa esta matriz en tiempo real:</p>
+
+    <div style="overflow-x:auto;">
+      <table class="props-table" style="font-size:11px;">
+        <thead>
+          <tr>
+            <th>Procedimiento de Gasto</th>
+            <th>Tipo Pago</th>
+            <th>Beneficiario</th>
+            <th>Documentos Obligatorios (Bloqueantes)</th>
+            <th>Documentos Condicionales / Opcionales</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>NOMINA</strong><br><small style="color:var(--pjev-texto-muted);">Nómina quincenal y prestaciones</small></td>
+            <td><span class="mod-badge badge-s">1 · SP</span></td>
+            <td>EMPLEADO / UA</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-LIN-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">Cédula RH (Desglose retenciones)</span>
+              <span class="req-badge req-op">Resumen de dispersión bancaria</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>ARRENDAMIENTO</strong><br><small style="color:var(--pjev-texto-muted);">Rentas de juzgados y sedes</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>PROVEEDOR</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-CON-TRA</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">DOC-OPI-SAT (Si excede umbral)</span>
+              <span class="req-badge req-op">Dictamen de justipreciación de renta</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>SERVICIOS_BASICOS</strong><br><small style="color:var(--pjev-texto-muted);">CFE, CAEV, Telefonía, Internet</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>PROVEEDOR</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">Recibo provisional (Caseta vigilancia agua)</span>
+              <span class="req-badge req-op">Relación de medidores institucionales</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>HONORARIOS</strong><br><small style="color:var(--pjev-texto-muted);">Servicios profesionales PF</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>PROVEEDOR</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-CON-TRA</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">DOC-OPI-SAT</span>
+              <span class="req-badge req-op">Entregable técnico / Informe mensual</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>TERCEROS_INST</strong><br><small style="color:var(--pjev-texto-muted);">Entero retenciones SAT, IPE, etc.</small></td>
+            <td><span class="mod-badge badge-s">1 · SP</span></td>
+            <td>TERCERO_INST</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-LIN-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">Cédula de determinación IPE/SAT</span>
+              <span class="req-badge req-op">Convenio institucional vigente</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>GASTO_DIRECTO_GENERAL</strong><br><small style="color:var(--pjev-texto-muted);">Compras menores y directas</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>PROVEEDOR</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">DOC-ORD-PED (Si aplica orden)</span>
+              <span class="req-badge req-op">Justificación expresa al reverso</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>COMPRA_PEDIDO</strong><br><small style="color:var(--pjev-texto-muted);">Adquisiciones Almacén / Pedido</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>PROVEEDOR</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-ORD-PED</span>
+              <span class="req-badge req-ob">DOC-ENT-ALM</span>
+              <span class="req-badge req-ob">DOC-VAL-ENT</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">DOC-OPI-SAT</span>
+              <span class="req-badge req-co">DOC-OPI-SEF</span>
+              <span class="req-badge req-co">DOC-ALT-INV (Si es Capítulo 5000)</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>CONTRATO_SERVICIOS</strong><br><small style="color:var(--pjev-texto-muted);">Vigilancia, limpieza, sistemas</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>PROVEEDOR</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-CON-TRA</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+              <span class="req-badge req-ob">DOC-OPI-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">DOC-OPI-SEF</span>
+              <span class="req-badge req-op">Acta de conformidad del servicio mensual</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>OBRA_PUBLICA</strong><br><small style="color:var(--pjev-texto-muted);">Estimaciones, anticipo, finiquito</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>PROVEEDOR</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-CON-TRA</span>
+              <span class="req-badge req-ob">DOC-EST-OBR</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+              <span class="req-badge req-ob">DOC-OPI-SAT</span>
+              <span class="req-badge req-ob">DOC-OPI-SEF</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">Póliza de fianza de cumplimiento/anticipo</span>
+              <span class="req-badge req-co">Acta de entrega-recepción y finiquito</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>COMPROBACION_VIATICOS</strong><br><small style="color:var(--pjev-texto-muted);">Comisión oficial (Anexo 6)</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>EMPLEADO</td>
+            <td>
+              <span class="req-badge req-ob">DOC-OFI-COM</span>
+              <span class="req-badge req-ob">DOC-INF-COM</span>
+              <span class="req-badge req-ob">DOC-FMT-CMP</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">Ficha de reintegro bancario (si remanente)</span>
+              <span class="req-badge req-op">Tickets de caseta / pases de abordar (Anexo 8)</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>SUJETOS_COMPROBAR</strong><br><small style="color:var(--pjev-texto-muted);">Gastos de operación juzgados (Anexo 15)</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>UNIDAD_ADMINISTRATIVA</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-FMT-CMP</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">Recibos de gastos menores justificados</span>
+              <span class="req-badge req-co">Ficha de reintegro a cuentas PJEV</span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>FONDO_REVOLVENTE</strong><br><small style="color:var(--pjev-texto-muted);">Reposición periódica caja chica</small></td>
+            <td><span class="mod-badge badge-a">2 · RM</span></td>
+            <td>UNIDAD_ADMINISTRATIVA</td>
+            <td>
+              <span class="req-badge req-ob">DOC-SOL-PAG</span>
+              <span class="req-badge req-ob">DOC-CFD-XML</span>
+              <span class="req-badge req-ob">DOC-VAL-SAT</span>
+            </td>
+            <td>
+              <span class="req-badge req-co">Formato de reposición de fondos firmado</span>
+              <span class="req-badge req-op">Bitácora de arqueo de caja chica</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. ACTORES Y PERMISOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Actores y Permisos</div>
+    <table class="props-table">
+      <thead><tr><th>Rol Institucional</th><th>Nivel</th><th>Operaciones Permitidas</th><th>Criterios y Restricciones</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Administrador de Catálogos (Tesorería / CxP)</strong></td>
+          <td>Nivel 2</td>
+          <td>Alta, edición de metadatos, parametrización de matriz de obligatoriedad y activación/inactivación.</td>
+          <td>No puede eliminar documentos que ya tengan archivos adjuntos en expedientes históricos.</td>
+        </tr>
+        <tr>
+          <td><strong>Analista de Cuentas por Pagar (Capturista)</strong></td>
+          <td>Nivel 3</td>
+          <td>Consulta del checklist, carga de archivos PDF/XML en el expediente y visualización del semáforo.</td>
+          <td>Acceso de solo lectura en la configuración del catálogo; usuario operativo del checklist.</td>
+        </tr>
+        <tr>
+          <td><strong>Jefe de Departamento de Tesorería</strong></td>
+          <td>Nivel 2</td>
+          <td>Revisión de expedientes, autorización de excepciones justificadas y firma del trámite.</td>
+          <td>El sistema le alerta si aprueba un trámite con documentos condicionales pendientes.</td>
+        </tr>
+        <tr>
+          <td><strong>Órgano Interno de Control / Auditoría</strong></td>
+          <td>Nivel 4</td>
+          <td>Consulta de matriz de reglas, vigencias históricas y auditoría de documentos cargados.</td>
+          <td>Acceso de solo lectura sin facultades de alteración de reglas.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. MODELO DE DATOS Y DICCIONARIO DE CAMPOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Modelo de Datos y Diccionario de Campos</div>
+    <p>El diseño de persistencia se implementa en el esquema <code>cxp</code> de PostgreSQL. Consta de dos tablas normalizadas: el catálogo base de documentos y la tabla de reglas de exigibilidad por procedimiento:</p>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showDBTab('db1',this)">cxp.catalogo_documentos_soporte</button>
+      <button class="sp-tab" onclick="showDBTab('db2',this)">cxp.requisitos_procedimiento_soporte</button>
+    </div>
+
+    <!-- TABLA 1: DOCUMENTOS -->
+    <div id="db-db1" class="sp-panel active">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción y Regla de Validación</th></tr></thead>
+        <tbody>
+          <tr><td><code>doc_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único del tipo de documento.</td></tr>
+          <tr><td><code>doc_codigo</code></td><td><code>VARCHAR(20) UNIQUE</code></td><td>No</td><td>Código nemotécnico estándar (ej. <code>DOC-CFD-XML</code>).</td></tr>
+          <tr><td><code>doc_nombre</code></td><td><code>VARCHAR(150)</code></td><td>No</td><td>Nombre oficial legible para el usuario en la interfaz.</td></tr>
+          <tr><td><code>doc_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>Sí</td><td>Descripción funcional de lo que debe contener el documento.</td></tr>
+          <tr><td><code>formato_permitido</code></td><td><code>VARCHAR(30)</code></td><td>No</td><td><code>PDF</code>, <code>XML</code>, <code>EXCEL</code> o <code>CUALQUIERA</code>.</td></tr>
+          <tr><td><code>tamano_max_mb</code></td><td><code>NUMERIC(4,1)</code></td><td>No</td><td>Límite máximo por archivo adjunto (Default: 10.0 MB).</td></tr>
+          <tr><td><code>valida_sat</code></td><td><code>BOOLEAN</code></td><td>No</td><td><code>true</code> si detona validación del UUID contra el webservice del SAT.</td></tr>
+          <tr><td><code>valida_vigencia_dias</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Vigencia máxima permitida del documento (ej. 30 días para 32-D).</td></tr>
+          <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Activo</code>, <code>0 = Inactivo</code> (Soft-delete).</td></tr>
+          <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ</code></td><td>No</td><td>Auditoría de creación institucional.</td></tr>
+          <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ</code></td><td>Sí</td><td>Auditoría de última modificación.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 15px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+      <div class="code-wrap">
+<pre>CREATE TABLE cxp.catalogo_documentos_soporte (
+    doc_id BIGSERIAL PRIMARY KEY,
+    doc_codigo VARCHAR(20) NOT NULL UNIQUE,
+    doc_nombre VARCHAR(150) NOT NULL,
+    doc_descripcion VARCHAR(500),
+    formato_permitido VARCHAR(30) NOT NULL DEFAULT 'PDF',
+    tamano_max_mb NUMERIC(4,1) NOT NULL DEFAULT 10.0,
+    valida_sat BOOLEAN NOT NULL DEFAULT false,
+    valida_vigencia_dias INTEGER NULL,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ
+);</pre>
+      </div>
+    </div>
+
+    <!-- TABLA 2: REGLAS POR PROCEDIMIENTO -->
+    <div id="db-db2" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción y Regla de Validación</th></tr></thead>
+        <tbody>
+          <tr><td><code>rps_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único de la regla de exigibilidad.</td></tr>
+          <tr><td><code>f_procedimiento_codigo</code></td><td><code>VARCHAR(40) FK</code></td><td>No</td><td>Relación con <code>cxp.catalogo_procedimientos_afectacion(cpa_codigo)</code>.</td></tr>
+          <tr><td><code>f_doc_id</code></td><td><code>BIGINT FK</code></td><td>No</td><td>Relación con <code>cxp.catalogo_documentos_soporte(doc_id)</code>.</td></tr>
+          <tr><td><code>nivel_exigencia</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td><code>OBLIGATORIO</code>, <code>CONDICIONAL</code> u <code>OPCIONAL</code>.</td></tr>
+          <tr><td><code>condicion_sql</code></td><td><code>VARCHAR(500)</code></td><td>Sí</td><td>Regla lógica evaluable (ej. <code>IMPORTE_TOTAL > 300000</code>).</td></tr>
+          <tr><td><code>orden_visual</code></td><td><code>SMALLINT</code></td><td>No</td><td>Secuencia de despliegue en el checklist de pantalla.</td></tr>
+          <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Activo</code>, <code>0 = Inactivo</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 15px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+      <div class="code-wrap">
+<pre>CREATE TABLE cxp.requisitos_procedimiento_soporte (
+    rps_id BIGSERIAL PRIMARY KEY,
+    f_procedimiento_codigo VARCHAR(40) NOT NULL,
+    f_doc_id BIGINT NOT NULL,
+    nivel_exigencia VARCHAR(20) NOT NULL DEFAULT 'OBLIGATORIO' 
+        CHECK (nivel_exigencia IN ('OBLIGATORIO', 'CONDICIONAL', 'OPCIONAL')),
+    condicion_sql VARCHAR(500) NULL,
+    orden_visual SMALLINT NOT NULL DEFAULT 1,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ,
+    CONSTRAINT fk_rps_procedimiento FOREIGN KEY (f_procedimiento_codigo)
+        REFERENCES cxp.catalogo_procedimientos_afectacion(cpa_codigo) ON DELETE RESTRICT,
+    CONSTRAINT fk_rps_documento FOREIGN KEY (f_doc_id)
+        REFERENCES cxp.catalogo_documentos_soporte(doc_id) ON DELETE RESTRICT,
+    CONSTRAINT uq_rps_proc_doc UNIQUE (f_procedimiento_codigo, f_doc_id)
+);</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. STORED PROCEDURES (LEER Y CRUD) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Conforme al estándar arquitectónico SIAF-PJEV, la lógica de lectura, persistencia y validación del checklist reside en funciones PostgreSQL en el esquema <code>cxp</code> con <code>SECURITY DEFINER</code>, <code>SET search_path</code> y retorno JSONB unificado <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>:
+    </p>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showSP('sp1',this)">7.1 fn_leer_requisitos_documentales</button>
+      <button class="sp-tab" onclick="showSP('sp2',this)">7.2 fn_crud_requisitos_documentales</button>
+      <button class="sp-tab" onclick="showSP('sp3',this)">7.3 fn_validar_checklist_afectacion</button>
+    </div>
+
+    <!-- SP 1: LEER -->
+    <div id="sp-sp1" class="sp-panel active">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función de Consulta: <code>cxp.fn_leer_requisitos_documentales</code></h4>
+      <table class="props-table" style="margin-bottom:12px;">
+        <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario activo de sesión.</td></tr>
+          <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal en curso.</td></tr>
+          <tr><td><code>p_buscar</code></td><td><code>VARCHAR(100)</code></td><td>Filtro de búsqueda por código o nombre (Opcional).</td></tr>
+          <tr><td><code>p_doc_id</code></td><td><code>BIGINT</code></td><td>ID específico para detalle modal (Opcional).</td></tr>
+          <tr><td><code>p_procedimiento_codigo</code></td><td><code>VARCHAR(40)</code></td><td>Filtro para obtener la matriz de un procedimiento específico (Opcional).</td></tr>
+          <tr><td><code>p_estatus</code></td><td><code>SMALLINT</code></td><td><code>1 = Activos</code>, <code>0 = Inactivos</code>, <code>NULL = Todos</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_leer_requisitos_documentales(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_buscar VARCHAR DEFAULT NULL,
+    p_doc_id BIGINT DEFAULT NULL,
+    p_procedimiento_codigo VARCHAR DEFAULT NULL,
+    p_estatus SMALLINT DEFAULT 1
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'doc_id', d.doc_id,
+            'doc_codigo', d.doc_codigo,
+            'doc_nombre', d.doc_nombre,
+            'doc_descripcion', d.doc_descripcion,
+            'formato_permitido', d.formato_permitido,
+            'tamano_max_mb', d.tamano_max_mb,
+            'valida_sat', d.valida_sat,
+            'valida_vigencia_dias', d.valida_vigencia_dias,
+            'estatus_registro', d.estatus_registro,
+            'requisitos_asociados', COALESCE((
+                SELECT jsonb_agg(
+                    jsonb_build_object(
+                        'rps_id', r.rps_id,
+                        'procedimiento_codigo', r.f_procedimiento_codigo,
+                        'procedimiento_nombre', p.cpa_nombre,
+                        'nivel_exigencia', r.nivel_exigencia,
+                        'condicion_sql', r.condicion_sql,
+                        'orden_visual', r.orden_visual
+                    ) ORDER BY r.orden_visual
+                )
+                FROM cxp.requisitos_procedimiento_soporte r
+                JOIN cxp.catalogo_procedimientos_afectacion p ON p.cpa_codigo = r.f_procedimiento_codigo
+                WHERE r.f_doc_id = d.doc_id
+                  AND r.estatus_registro = 1
+                  AND (p_procedimiento_codigo IS NULL OR r.f_procedimiento_codigo = p_procedimiento_codigo)
+            ), '[]'::jsonb)
+        ) ORDER BY d.doc_codigo
+    ) INTO v_data
+    FROM cxp.catalogo_documentos_soporte d
+    WHERE (p_estatus IS NULL OR d.estatus_registro = p_estatus)
+      AND (p_doc_id IS NULL OR d.doc_id = p_doc_id)
+      AND (p_buscar IS NULL OR (
+          d.doc_codigo ILIKE '%' || p_buscar || '%' OR
+          d.doc_nombre ILIKE '%' || p_buscar || '%'
+      ))
+      AND (p_procedimiento_codigo IS NULL OR EXISTS (
+          SELECT 1 FROM cxp.requisitos_procedimiento_soporte r2
+          WHERE r2.f_doc_id = d.doc_id
+            AND r2.f_procedimiento_codigo = p_procedimiento_codigo
+            AND r2.estatus_registro = 1
+      ));
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'OK',
+        'data', COALESCE(v_data, '[]'::jsonb)
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 2: CRUD -->
+    <div id="sp-sp2" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función Transaccional: <code>cxp.fn_crud_requisitos_documentales</code></h4>
+      <table class="props-table" style="margin-bottom:12px;">
+        <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1 = Alta</code>, <code>2 = Modificación</code>, <code>3 = Baja Lógica</code>, <code>4 = Reactivar</code>.</td></tr>
+          <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario responsable de la transacción.</td></tr>
+          <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal activo.</td></tr>
+          <tr><td><code>p_doc_id</code></td><td><code>BIGINT</code></td><td>ID del documento (Requerido en acción 2, 3 y 4).</td></tr>
+          <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con datos del documento y matriz de procedimientos.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_crud_requisitos_documentales(
+    p_accion SMALLINT,
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_doc_id BIGINT,
+    p_datos JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, public
+AS $$
+DECLARE
+    v_id BIGINT;
+    v_item JSONB;
+BEGIN
+    -- 1 = ALTA
+    IF p_accion = 1 THEN
+        IF EXISTS (SELECT 1 FROM cxp.catalogo_documentos_soporte WHERE doc_codigo = UPPER(TRIM(p_datos->>'doc_codigo'))) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'El código de documento ya se encuentra registrado.');
+        END IF;
+
+        INSERT INTO cxp.catalogo_documentos_soporte (
+            doc_codigo, doc_nombre, doc_descripcion, formato_permitido,
+            tamano_max_mb, valida_sat, valida_vigencia_dias, estatus_registro,
+            usuario_c, fecha_c
+        ) VALUES (
+            UPPER(TRIM(p_datos->>'doc_codigo')),
+            TRIM(p_datos->>'doc_nombre'),
+            p_datos->>'doc_descripcion',
+            COALESCE(p_datos->>'formato_permitido', 'PDF'),
+            COALESCE((p_datos->>'tamano_max_mb')::NUMERIC, 10.0),
+            COALESCE((p_datos->>'valida_sat')::BOOLEAN, false),
+            (p_datos->>'valida_vigencia_dias')::INTEGER,
+            1, p_usuario, clock_timestamp()
+        ) RETURNING doc_id INTO v_id;
+
+        -- Registrar exigibilidad en procedimientos si viene en el payload
+        IF p_datos ? 'procedimientos' THEN
+            FOR v_item IN SELECT * FROM jsonb_array_elements(p_datos->'procedimientos') LOOP
+                INSERT INTO cxp.requisitos_procedimiento_soporte (
+                    f_procedimiento_codigo, f_doc_id, nivel_exigencia,
+                    condicion_sql, orden_visual, estatus_registro, usuario_c
+                ) VALUES (
+                    v_item->>'procedimiento_codigo', v_id,
+                    COALESCE(v_item->>'nivel_exigencia', 'OBLIGATORIO'),
+                    v_item->>'condicion_sql',
+                    COALESCE((v_item->>'orden_visual')::SMALLINT, 1),
+                    1, p_usuario
+                ) ON CONFLICT (f_procedimiento_codigo, f_doc_id) DO UPDATE
+                SET nivel_exigencia = EXCLUDED.nivel_exigencia,
+                    condicion_sql = EXCLUDED.condicion_sql,
+                    orden_visual = EXCLUDED.orden_visual,
+                    estatus_registro = 1, usuario_m = p_usuario, fecha_m = clock_timestamp();
+            END LOOP;
+        END IF;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Documento soporte registrado con éxito.', 'data', jsonb_build_object('doc_id', v_id));
+
+    -- 2 = MODIFICACIÓN
+    ELSIF p_accion = 2 THEN
+        UPDATE cxp.catalogo_documentos_soporte SET
+            doc_nombre = COALESCE(TRIM(p_datos->>'doc_nombre'), doc_nombre),
+            doc_descripcion = COALESCE(p_datos->>'doc_descripcion', doc_descripcion),
+            formato_permitido = COALESCE(p_datos->>'formato_permitido', formato_permitido),
+            tamano_max_mb = COALESCE((p_datos->>'tamano_max_mb')::NUMERIC, tamano_max_mb),
+            valida_sat = COALESCE((p_datos->>'valida_sat')::BOOLEAN, valida_sat),
+            valida_vigencia_dias = (p_datos->>'valida_vigencia_dias')::INTEGER,
+            usuario_m = p_usuario, fecha_m = clock_timestamp()
+        WHERE doc_id = p_doc_id;
+
+        -- Actualizar matriz si se proporciona
+        IF p_datos ? 'procedimientos' THEN
+            FOR v_item IN SELECT * FROM jsonb_array_elements(p_datos->'procedimientos') LOOP
+                INSERT INTO cxp.requisitos_procedimiento_soporte (
+                    f_procedimiento_codigo, f_doc_id, nivel_exigencia,
+                    condicion_sql, orden_visual, estatus_registro, usuario_c
+                ) VALUES (
+                    v_item->>'procedimiento_codigo', p_doc_id,
+                    COALESCE(v_item->>'nivel_exigencia', 'OBLIGATORIO'),
+                    v_item->>'condicion_sql',
+                    COALESCE((v_item->>'orden_visual')::SMALLINT, 1),
+                    1, p_usuario
+                ) ON CONFLICT (f_procedimiento_codigo, f_doc_id) DO UPDATE
+                SET nivel_exigencia = EXCLUDED.nivel_exigencia,
+                    condicion_sql = EXCLUDED.condicion_sql,
+                    orden_visual = EXCLUDED.orden_visual,
+                    estatus_registro = 1, usuario_m = p_usuario, fecha_m = clock_timestamp();
+            END LOOP;
+        END IF;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Documento soporte actualizado correctamente.', 'data', jsonb_build_object('doc_id', p_doc_id));
+
+    -- 3 = BAJA LÓGICA
+    ELSIF p_accion = 3 THEN
+        UPDATE cxp.catalogo_documentos_soporte 
+           SET estatus_registro = 0, usuario_m = p_usuario, fecha_m = clock_timestamp()
+         WHERE doc_id = p_doc_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Documento soporte inactivado lógicamente.', 'data', jsonb_build_object('doc_id', p_doc_id));
+
+    -- 4 = REACTIVAR
+    ELSIF p_accion = 4 THEN
+        UPDATE cxp.catalogo_documentos_soporte 
+           SET estatus_registro = 1, usuario_m = p_usuario, fecha_m = clock_timestamp()
+         WHERE doc_id = p_doc_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Documento soporte reactivado con éxito.', 'data', jsonb_build_object('doc_id', p_doc_id));
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción ABC no admitida.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 3: VALIDADOR CHECKLIST -->
+    <div id="sp-sp3" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Motor de Validación: <code>cxp.fn_validar_checklist_afectacion</code></h4>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:10px;">
+        Esta función es invocada de forma obligatoria por <code>cxp.sp_CxpAfectacionesGasto_Workflow_V2</code> antes de autorizar la transición a <code>ENVIADA</code>. Evalúa que todos los requisitos con nivel <code>OBLIGATORIO</code> estén debidamente cargados en el expediente digital.
+      </p>
+
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_validar_checklist_afectacion(
+    p_ag_id UUID,
+    p_ejercicio_fiscal INTEGER
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = cxp, config, public
+AS $$
+DECLARE
+    v_proc VARCHAR(40);
+    v_faltantes JSONB;
+    v_total_obligatorios INTEGER := 0;
+    v_total_cargados INTEGER := 0;
+BEGIN
+    -- Obtener procedimiento de la afectación
+    SELECT f_procedimiento_codigo INTO v_proc
+      FROM cxp.afectaciones_gasto
+     WHERE ag_id = p_ag_id AND ejercicio_fiscal = p_ejercicio_fiscal;
+
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('error', -1, 'valido', false, 'mensaje', 'Afectación de gasto no localizada.');
+    END IF;
+
+    -- Validar si requiere CFDI y no tiene cargado ninguno
+    IF v_proc NOT IN ('NOMINA', 'TERCEROS_INST') THEN
+        IF NOT EXISTS (SELECT 1 FROM cxp.afectaciones_gasto_cfdi WHERE f_ag_id = p_ag_id AND estatus_registro = 1) THEN
+            RETURN jsonb_build_object(
+                'error', -1,
+                'valido', false,
+                'mensaje', 'El procedimiento ' || v_proc || ' requiere obligatoriamente al menos una factura CFDI timbrada.'
+            );
+        END IF;
+    END IF;
+
+    -- Evaluar checklist de documentos obligatorios pendientes
+    SELECT count(*),
+           jsonb_agg(jsonb_build_object(
+               'doc_codigo', d.doc_codigo,
+               'doc_nombre', d.doc_nombre,
+               'nivel', r.nivel_exigencia
+           ))
+      INTO v_total_obligatorios, v_faltantes
+      FROM cxp.requisitos_procedimiento_soporte r
+      JOIN cxp.catalogo_documentos_soporte d ON d.doc_id = r.f_doc_id
+     WHERE r.f_procedimiento_codigo = v_proc
+       AND r.nivel_exigencia = 'OBLIGATORIO'
+       AND r.estatus_registro = 1
+       AND NOT EXISTS (
+           -- Verifica si el documento está adjunto en el repositorio de expedientes
+           SELECT 1 FROM cxp.afectaciones_gasto_cfdi c
+            WHERE c.f_ag_id = p_ag_id 
+              AND (d.doc_codigo = 'DOC-CFD-XML' OR d.doc_codigo = 'DOC-VAL-SAT')
+       );
+
+    IF v_faltantes IS NOT NULL AND jsonb_array_length(v_faltantes) > 0 THEN
+        RETURN jsonb_build_object(
+            'error', -1,
+            'valido', false,
+            'mensaje', 'El expediente cuenta con documentos obligatorios pendientes de integrar.',
+            'faltantes', v_faltantes
+        );
+    END IF;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'valido', true,
+        'mensaje', 'Expediente documental íntegro y verificado correctamente.'
+    );
+END;
+$$;</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. SERVICIOS API REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      El backend expone los servicios de administración del catálogo y la verificación del checklist bajo el controlador <code>RequisitosDocumentalesController</code> consumiendo Prisma <code>$queryRaw</code>:
+    </p>
+
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/cxp/requisitos-documentales</code></td>
+          <td>Query: <code>{ buscar?, procedimiento?, estatus? }</code></td>
+          <td>Lista los documentos soporte con su matriz de reglas asociadas.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/cxp/requisitos-documentales/:id</code></td>
+          <td>Param: <code>id: number</code></td>
+          <td>Obtiene el detalle de un documento y su matriz de exigibilidad.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/cxp/requisitos-documentales</code></td>
+          <td>Body: <code>CreateRequisitoDocumentalDto</code></td>
+          <td>Registra un nuevo tipo de documento y parametriza procedimientos.</td>
+        </tr>
+        <tr>
+          <td><code class="method put">PUT</code></td>
+          <td><code>/api/v1/cxp/requisitos-documentales/:id</code></td>
+          <td>Param: <code>id</code>, Body: <code>UpdateRequisitoDocumentalDto</code></td>
+          <td>Actualiza metadatos y exigencias del documento.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/cxp/requisitos-documentales/checklist/:agId</code></td>
+          <td>Param: <code>agId: UUID</code></td>
+          <td>Consulta el estado del checklist para una afectación de gasto.</td>
+        </tr>
+        <tr>
+          <td><code class="method patch">PATCH</code></td>
+          <td><code>/api/v1/cxp/requisitos-documentales/:id/estatus</code></td>
+          <td>Param: <code>id</code>, Body: <code>{ estatus: 0 | 1 }</code></td>
+          <td>Inactivación o reactivación lógica (Soft-delete).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">Controlador NestJS: <code>requisitos-documentales.controller.ts</code></h4>
+    <div class="code-wrap">
+<pre><code>import { Controller, Get, Post, Put, Patch, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../configuracion/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../configuracion/auth/guards/roles.guard';
+import { MinRol } from '../configuracion/auth/decorators/min-rol.decorator';
+import { RequisitosDocumentalesService } from './requisitos-documentales.service';
+
+@ApiTags('CxP / Catálogos / Requisitos Documentales')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('cxp/requisitos-documentales')
+export class RequisitosDocumentalesController {
+  constructor(private readonly service: RequisitosDocumentalesService) {}
+
+  @Get()
+  @MinRol(4)
+  @ApiOperation({ summary: 'Listar documentos soporte y matriz de checklist' })
+  findAll(
+    @Req() req,
+    @Query('buscar') buscar?: string,
+    @Query('procedimiento') procedimiento?: string,
+    @Query('estatus') estatus?: number,
+  ) {
+    return this.service.findAll({ buscar, procedimiento, estatus: estatus ?? 1 }, req.user);
+  }
+
+  @Get(':id')
+  @MinRol(4)
+  @ApiOperation({ summary: 'Obtener detalle de un documento requisito' })
+  findOne(@Param('id') id: string, @Req() req) {
+    return this.service.findOne(Number(id), req.user);
+  }
+
+  @Get('checklist/:agId')
+  @MinRol(4)
+  @ApiOperation({ summary: 'Consultar estado del checklist para una afectación de gasto' })
+  checkStatus(@Param('agId') agId: string, @Req() req) {
+    return this.service.validarChecklist(agId, req.user);
+  }
+
+  @Post()
+  @MinRol(2)
+  @ApiOperation({ summary: 'Crear nuevo tipo de documento soporte' })
+  @ApiResponse({ status: 201, description: 'Documento registrado con éxito.' })
+  create(@Body() dto: CreateRequisitoDocumentalDto, @Req() req) {
+    return this.service.create(dto, req.user);
+  }
+
+  @Put(':id')
+  @MinRol(2)
+  @ApiOperation({ summary: 'Actualizar documento soporte y sus reglas de procedimiento' })
+  update(@Param('id') id: string, @Body() dto: UpdateRequisitoDocumentalDto, @Req() req) {
+    return this.service.update(Number(id), dto, req.user);
+  }
+
+  @Patch(':id/estatus')
+  @MinRol(2)
+  @ApiOperation({ summary: 'Cambiar estatus de un documento soporte (baja lógica)' })
+  cambiarEstatus(@Param('id') id: string, @Body('estatus') estatus: number, @Req() req) {
+    return this.service.cambiarEstatus(Number(id), estatus, req.user);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 9. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Reglas de Negocio y Validaciones</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REQ-01 · Validación Bloqueante para Envío a Revisión</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          El sistema impedirá ejecutar la acción <code>ENVIAR</code> o <code>ENVIAR_REVISION</code> en <code>05.2.1 Afectación del Gasto</code> si existe al menos un documento con nivel <code>OBLIGATORIO</code> sin adjuntar en el expediente digital.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REQ-02 · Unicidad del Código de Documento</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          El código nemotécnico (ej. <code>DOC-CFD-XML</code>) es estrictamente único en la tabla <code>cxp.catalogo_documentos_soporte</code>. Si ya cuenta con expedientes asociados, queda congelado y no se permite su eliminación física.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REQ-03 · Validación Fiscal Obligatoria de CFDI</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Para todos los trámites que exijan factura, la carga del XML timbrado detona la comprobación contra el webservice del SAT. El expediente marcará el requisito como válido únicamente si el UUID está vigente y el RFC del emisor no figura en listas negras (Art. 69-B del CFF).
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REQ-04 · Control de Vigencia en Opiniones de Cumplimiento</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Las constancias de cumplimiento fiscal (SAT 32-D y SEFIPLAN) no podrán tener una fecha de expedición mayor a <strong>30 días naturales</strong> respecto a la fecha de elaboración de la afectación. En caso de caducidad, el checklist mostrará alerta amarilla bloqueante.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-REQ-05 · Condicionamiento por Umbral Económico</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Para compras menores o directas, si el importe solicitado supera el monto límite fijado por la Ley de Adquisiciones de Veracruz (actualmente $300,000 MXN sin IVA), la Opinión 32-D del SAT se transforma automáticamente de <code>OPCIONAL</code> a <code>OBLIGATORIA</code>.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 10. PROPUESTA VISUAL (WIREFRAMES) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Propuesta Visual de Interfaz (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">1. Catálogo Maestro y Matriz de Reglas (Grid)</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">2. Modal de Alta / Parametrización</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Visor de Checklist en Afectación de Gasto</button>
+    </div>
+
+    <!-- WF1: GRID MAESTRO -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.1.1 Requisitos Documentales · Matriz de Checklist Institucional</span>
+          <span style="font-size:10px; color:#666;">Filtro por Procedimiento Canónico</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="380" fill="#f8fafc" rx="4"/>
+            <!-- Header Bar -->
+            <rect x="15" y="15" width="930" height="50" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="44" font-size="13" font-weight="bold" fill="#183125">Catálogo de Requisitos Documentales (16 Tipos de Documentos)</text>
+            <rect x="680" y="25" width="110" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="735" y="44" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">📥 Exportar</text>
+            <rect x="800" y="25" width="130" height="30" fill="#183125" rx="4"/>
+            <text x="865" y="44" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nuevo Documento</text>
+
+            <!-- Filtros -->
+            <rect x="15" y="75" width="930" height="40" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="25" y="99" font-size="10" fill="#64748b">Procedimiento:</text>
+            <rect x="110" y="84" width="220" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="120" y="99" font-size="10" fill="#1e293b">COMPRA_PEDIDO ▼</text>
+            <text x="350" y="99" font-size="10" fill="#64748b">Buscar:</text>
+            <rect x="400" y="84" width="200" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="410" y="99" font-size="10" fill="#94a3b8">Nombre o código...</text>
+            <text x="620" y="99" font-size="10" fill="#64748b">Estatus:</text>
+            <rect x="670" y="84" width="90" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="680" y="99" font-size="10" fill="#1e293b">Activos ▼</text>
+
+            <!-- Table Header -->
+            <rect x="15" y="125" width="930" height="28" fill="#183125"/>
+            <text x="25" y="143" font-size="9" font-weight="bold" fill="#ffffff">CÓDIGO</text>
+            <text x="130" y="143" font-size="9" font-weight="bold" fill="#ffffff">NOMBRE DEL DOCUMENTO</text>
+            <text x="350" y="143" font-size="9" font-weight="bold" fill="#ffffff">FORMATO</text>
+            <text x="440" y="143" font-size="9" font-weight="bold" fill="#ffffff">VALIDA SAT</text>
+            <text x="530" y="143" font-size="9" font-weight="bold" fill="#ffffff">EXIGENCIA EN PROCEDIMIENTO</text>
+            <text x="760" y="143" font-size="9" font-weight="bold" fill="#ffffff">ESTATUS</text>
+            <text x="880" y="143" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ACCIONES</text>
+
+            <!-- Row 1 -->
+            <rect x="15" y="155" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="176" font-size="10" font-weight="bold" fill="#0284c7">DOC-CFD-XML</text>
+            <text x="130" y="176" font-size="10" fill="#1e293b">Comprobante Fiscal Digital (CFDI - XML)</text>
+            <text x="350" y="176" font-size="10" fill="#334155">XML (v4.0)</text>
+            <text x="440" y="176" font-size="9" font-weight="bold" fill="#15803d">SÍ (SAT Web)</text>
+            <rect x="530" y="163" width="90" height="18" fill="#fee2e2" rx="4"/>
+            <text x="575" y="176" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">OBLIGATORIO</text>
+            <rect x="760" y="163" width="55" height="18" fill="#dcfce7" rx="9"/>
+            <text x="787" y="176" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+            <text x="880" y="176" font-size="11" fill="#0284c7" text-anchor="middle">✏ ⚙ ✕</text>
+
+            <!-- Row 2 -->
+            <rect x="15" y="191" width="930" height="34" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="212" font-size="10" font-weight="bold" fill="#0284c7">DOC-ORD-PED</text>
+            <text x="130" y="212" font-size="10" fill="#1e293b">Pedido u Orden de Servicio Foliada</text>
+            <text x="350" y="212" font-size="10" fill="#334155">PDF</text>
+            <text x="440" y="212" font-size="9" fill="#64748b">No aplica</text>
+            <rect x="530" y="199" width="90" height="18" fill="#fee2e2" rx="4"/>
+            <text x="575" y="212" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">OBLIGATORIO</text>
+            <rect x="760" y="199" width="55" height="18" fill="#dcfce7" rx="9"/>
+            <text x="787" y="212" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+            <text x="880" y="212" font-size="11" fill="#0284c7" text-anchor="middle">✏ ⚙ ✕</text>
+
+            <!-- Row 3 -->
+            <rect x="15" y="227" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="248" font-size="10" font-weight="bold" fill="#0284c7">DOC-ENT-ALM</text>
+            <text x="130" y="248" font-size="10" fill="#1e293b">Entrada y Remisión Sellada de Almacén</text>
+            <text x="350" y="248" font-size="10" fill="#334155">PDF Sellado</text>
+            <text x="440" y="248" font-size="9" fill="#64748b">No aplica</text>
+            <rect x="530" y="235" width="90" height="18" fill="#fee2e2" rx="4"/>
+            <text x="575" y="248" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">OBLIGATORIO</text>
+            <rect x="760" y="235" width="55" height="18" fill="#dcfce7" rx="9"/>
+            <text x="787" y="248" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+            <text x="880" y="248" font-size="11" fill="#0284c7" text-anchor="middle">✏ ⚙ ✕</text>
+
+            <!-- Row 4 -->
+            <rect x="15" y="263" width="930" height="34" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="284" font-size="10" font-weight="bold" fill="#0284c7">DOC-OPI-SAT</text>
+            <text x="130" y="284" font-size="10" fill="#1e293b">Opinión de Cumplimiento SAT (32-D)</text>
+            <text x="350" y="284" font-size="10" fill="#334155">PDF Oficial</text>
+            <text x="440" y="284" font-size="9" fill="#b45309">Vigencia 30d</text>
+            <rect x="530" y="271" width="90" height="18" fill="#fef3c7" rx="4"/>
+            <text x="575" y="284" font-size="9" font-weight="bold" fill="#92400e" text-anchor="middle">CONDICIONAL</text>
+            <rect x="760" y="271" width="55" height="18" fill="#dcfce7" rx="9"/>
+            <text x="787" y="284" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">ACTIVO</text>
+            <text x="880" y="284" font-size="11" fill="#0284c7" text-anchor="middle">✏ ⚙ ✕</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: MODAL ALTA -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.1.1 Configuración de Documento y Reglas de Procedimiento</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="700" height="420" fill="#ffffff" stroke="#cbd5e1" rx="8"/>
+            <rect width="700" height="45" fill="#183125" rx="8"/>
+            <text x="20" y="28" font-size="13" font-weight="bold" fill="#ffffff">Parametrización de Documento Soporte Requisito</text>
+            <text x="670" y="28" font-size="14" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
+
+            <text x="30" y="75" font-size="11" font-weight="bold" fill="#334155">Código de Documento:</text>
+            <rect x="30" y="85" width="280" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="103" font-size="11" fill="#1e293b">DOC-OPI-SAT</text>
+
+            <text x="350" y="75" font-size="11" font-weight="bold" fill="#334155">Nombre Oficial del Requisito:</text>
+            <rect x="350" y="85" width="320" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="360" y="103" font-size="11" fill="#1e293b">Opinión de Cumplimiento SAT (32-D)</text>
+
+            <text x="30" y="135" font-size="11" font-weight="bold" fill="#334155">Formato Permitido:</text>
+            <rect x="30" y="145" width="200" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="163" font-size="11" fill="#1e293b">PDF Oficial ▼</text>
+
+            <text x="250" y="135" font-size="11" font-weight="bold" fill="#334155">Tamaño Máximo:</text>
+            <rect x="250" y="145" width="120" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="260" y="163" font-size="11" fill="#1e293b">10.0 MB</text>
+
+            <text x="390" y="135" font-size="11" font-weight="bold" fill="#334155">Vigencia Máxima (Días):</text>
+            <rect x="390" y="145" width="130" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="400" y="163" font-size="11" fill="#1e293b">30 días</text>
+
+            <!-- Matriz de Asignación a Procedimientos -->
+            <text x="30" y="205" font-size="11" font-weight="bold" fill="#183125">Exigibilidad en Procedimientos Canónicos de Gasto:</text>
+            <rect x="30" y="215" width="640" height="130" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            
+            <text x="45" y="235" font-size="10" font-weight="bold" fill="#334155">PROCEDIMIENTO</text>
+            <text x="250" y="235" font-size="10" font-weight="bold" fill="#334155">NIVEL DE EXIGENCIA</text>
+            <text x="450" y="235" font-size="10" font-weight="bold" fill="#334155">CONDICIÓN DE EVALUACIÓN</text>
+
+            <text x="45" y="260" font-size="10" fill="#1e293b">CONTRATO_SERVICIOS</text>
+            <rect x="245" y="247" width="110" height="20" fill="#fee2e2" rx="3"/>
+            <text x="300" y="261" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">OBLIGATORIO</text>
+            <text x="450" y="260" font-size="10" fill="#64748b">Siempre exigible</text>
+
+            <text x="45" y="285" font-size="10" fill="#1e293b">OBRA_PUBLICA</text>
+            <rect x="245" y="272" width="110" height="20" fill="#fee2e2" rx="3"/>
+            <text x="300" y="286" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">OBLIGATORIO</text>
+            <text x="450" y="285" font-size="10" fill="#64748b">Siempre exigible</text>
+
+            <text x="45" y="310" font-size="10" fill="#1e293b">GASTO_DIRECTO_GENERAL</text>
+            <rect x="245" y="297" width="110" height="20" fill="#fef3c7" rx="3"/>
+            <text x="300" y="311" font-size="9" font-weight="bold" fill="#92400e" text-anchor="middle">CONDICIONAL</text>
+            <text x="450" y="310" font-size="10" fill="#0284c7">IMPORTE_TOTAL > $300,000</text>
+
+            <!-- Buttons -->
+            <rect x="460" y="365" width="100" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="510" y="385" font-size="11" font-weight="bold" fill="#64748b" text-anchor="middle">Cancelar</text>
+            <rect x="570" y="365" width="100" height="32" fill="#183125" rx="4"/>
+            <text x="620" y="385" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar Regla</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: VISOR CHECKLIST -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Integración en 05.2.1 Afectación de Gasto · Componente SiafExpedienteDigitalMin</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Semáforo de Validación en Tiempo Real</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 850 340" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="850" height="340" fill="#f8fafc" rx="6" stroke="#cbd5e1"/>
+            <rect width="850" height="40" fill="#ffffff" rx="6" stroke="#cbd5e1"/>
+            <text x="25" y="25" font-size="12" font-weight="bold" fill="#183125">Expediente Digital del Trámite: AG-2026-00124 (COMPRA_PEDIDO)</text>
+            <rect x="670" y="10" width="160" height="22" fill="#dcfce7" rx="11"/>
+            <text x="750" y="24" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">✓ 4 DE 4 OBLIGATORIOS</text>
+
+            <!-- Card 1: CFDI XML -->
+            <rect x="25" y="55" width="795" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <circle cx="45" cy="77" r="10" fill="#dcfce7"/>
+            <text x="45" y="81" font-size="11" font-weight="bold" fill="#15803d" text-anchor="middle">✓</text>
+            <text x="70" y="73" font-size="11" font-weight="bold" fill="#1e293b">Factura CFDI (XML v4.0)</text>
+            <text x="70" y="88" font-size="9" fill="#64748b">UUID: 4a2e-8b1c-90df · SAT: VIGENTE · Total: $145,200.00 MXN</text>
+            <text x="760" y="80" font-size="11" fill="#0284c7">Ver XML ↗</text>
+
+            <!-- Card 2: Pedido -->
+            <rect x="25" y="108" width="795" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <circle cx="45" cy="130" r="10" fill="#dcfce7"/>
+            <text x="45" y="134" font-size="11" font-weight="bold" fill="#15803d" text-anchor="middle">✓</text>
+            <text x="70" y="126" font-size="11" font-weight="bold" fill="#1e293b">Pedido de Adquisiciones</text>
+            <text x="70" y="141" font-size="9" fill="#64748b">PED-2026-089.pdf (1.8 MB) · Firmado por DGA y Recursos Materiales</text>
+            <text x="760" y="133" font-size="11" fill="#0284c7">Descargar ↗</text>
+
+            <!-- Card 3: Entrada Almacén -->
+            <rect x="25" y="161" width="795" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <circle cx="45" cy="183" r="10" fill="#dcfce7"/>
+            <text x="45" y="187" font-size="11" font-weight="bold" fill="#15803d" text-anchor="middle">✓</text>
+            <text x="70" y="179" font-size="11" font-weight="bold" fill="#1e293b">Entrada Sellada de Almacén</text>
+            <text x="70" y="194" font-size="9" fill="#64748b">REM-ALM-4402.pdf (2.3 MB) · Sello de recepción conforme verificado</text>
+            <text x="760" y="186" font-size="11" fill="#0284c7">Descargar ↗</text>
+
+            <!-- Card 4: Opinión 32-D (Condicional pendiente) -->
+            <rect x="25" y="214" width="795" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <circle cx="45" cy="236" r="10" fill="#fef3c7"/>
+            <text x="45" y="240" font-size="11" font-weight="bold" fill="#92400e" text-anchor="middle">!</text>
+            <text x="70" y="232" font-size="11" font-weight="bold" fill="#1e293b">Opinión SAT 32-D (Opcional / Condicional)</text>
+            <text x="70" y="247" font-size="9" fill="#92400e">Monto no excede $300,000 MXN; documento complementario recomendado.</text>
+            <rect x="730" y="226" width="75" height="22" fill="#183125" rx="3"/>
+            <text x="767" y="240" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Adjuntar</text>
+
+            <!-- Banner Footer -->
+            <rect x="25" y="275" width="795" height="45" fill="#f0fdf4" stroke="#86efac" rx="4"/>
+            <text x="45" y="302" font-size="11" font-weight="bold" fill="#166534">Expediente listo para trámite:</text>
+            <text x="210" y="302" font-size="11" fill="#15803d">Cumple con la totalidad de soportes normativos del PJEV. Habilitado para ENVIAR A REVISIÓN.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. INTEGRACIONES Y DEPENDENCIAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Integraciones y Dependencias Inter-módulos</div>
+    <table class="props-table">
+      <thead><tr><th>Subsistema / Módulo</th><th>Relación Técnica</th><th>Efecto de Integración</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>05.2.1 Afectación del Gasto</strong></td>
+          <td>Consumidor directo del checklist</td>
+          <td>Bloquea la transición de <code>BORRADOR</code> a <code>ENVIADA</code> mediante <code>cxp.fn_validar_checklist_afectacion</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>07.1.1 Bóveda CFDI</strong></td>
+          <td>Extracción y verificación fiscal</td>
+          <td>Comprueba el timbrado SAT, vigencia y montos desglosados en <code>cxp.afectaciones_gasto_cfdi</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>08.1 / 08.2 Adquisiciones y Almacén</strong></td>
+          <td>Documentos fuente</td>
+          <td>Provee pedidos, actas de recepción y entradas de almacén selladas requeridas en <code>COMPRA_PEDIDO</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>03.1.2 Matriz de Conversión</strong></td>
+          <td>Precondición para el Devengado</td>
+          <td>Garantiza que la póliza contable de devengo (Momento A.1) solo se genere sobre expedientes que cuentan con soporte legal.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 12. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Casos de Prueba (Validación QA)</div>
+    <table class="props-table">
+      <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Entrada / Acción</th><th>Resultado Esperado</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-REQ-01</strong></td>
+          <td>Alta de documento soporte duplicado</td>
+          <td>Intentar registrar un documento con código existente <code>DOC-CFD-XML</code>.</td>
+          <td>Error controlado: <code>{ "error": -1, "mensaje": "El código de documento ya se encuentra registrado." }</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-REQ-02</strong></td>
+          <td>Intento de envío sin factura obligatoria</td>
+          <td>Afectación de gasto en <code>ARRENDAMIENTO</code> sin adjuntar archivo XML timbrado.</td>
+          <td>La función <code>fn_validar_checklist_afectacion</code> retorna <code>valido: false</code> y bloquea el avance del workflow.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-REQ-03</strong></td>
+          <td>Opinión SAT 32-D con vigencia caduca</td>
+          <td>Cargar constancia fiscal con 45 días de emisión en un trámite mayor a $300,000 MXN.</td>
+          <td>El sistema emite advertencia bloqueante por sobrepasar los 30 días naturales permitidos.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-REQ-04</strong></td>
+          <td>Expediente completo y conforme</td>
+          <td>Afectación en <code>COMPRA_PEDIDO</code> con Solicitud, Pedido, Entrada Almacén y CFDI vigentes.</td>
+          <td>El semáforo se enciende en VERDE y se autoriza la transición hacia <code>ENVIADA</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 13. HISTORIAL DE VERSIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">13</span> Historial de Versiones</div>
+    <table class="props-table">
+      <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Cambios Realizados</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>1.0.0</code></td>
+          <td>2026-09-02</td>
+          <td>Equipo SIAF-PJEV / Dix Consultoría</td>
+          <td>Documentación inicial del módulo bajo estándar DOC-08, catálogo de 16 documentos, matriz cruzada para los 12 procedimientos canónicos, SPs PostgreSQL, controlador NestJS y Wireframes SVG interactivos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  function showWF(wfId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('wf-' + wfId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showSP(spId, btn) {
+    document.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('sp-' + spId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showDBTab(tabId, btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const container = parent.parentElement;
+    container.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('db-' + tabId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

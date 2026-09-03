@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05.1.3 Conceptos de Retención y Deducción — Manual de Desarrollo SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  .badge-w { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:var(--font-mono); }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .method.patch  { background:#f3e8ff; color:#6b21a8; }
+
+  .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9fafb; padding:16px; overflow-x:auto; text-align:center; }
+
+  .tasa-badge { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; font-family:var(--font-mono); }
+  .tasa-fisc { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+  .tasa-nom  { background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<!-- BOTONES FLOTANTES ACCIÓN -->
+<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999;">
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.location.reload()">⟳ Refrescar</button>
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.print()">🖨 Imprimir</button>
+</div>
+
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Inicio</a> ›
+    <span>05 · Cuentas por Pagar</span> ›
+    <span>05.1 · Catálogos</span> ›
+    <span>05.1.3 Conceptos de retención y deducción</span>
+  </div>
+
+  <!-- ENCABEZADO Y TÍTULO -->
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">05.1.3</div>
+      <h1 class="elem-title">Conceptos de Retención y Deducción</h1>
+      <p class="elem-desc">Catálogo institucional de retenciones impositivas fiscales y deducciones administrativas/laborales aplicables a facturas de proveedores, prestadores de servicios, contratistas y nómina de personal. Parametriza porcentajes, bases imponibles, subcuentas contables de pasivo circulante (2.1.1.7) y vinculación con terceros institucionales acreedores.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Modo A — Catálogo Simple Parametrizado</span>
+        <span class="mod-badge badge-s">Fase 2: Ejecución del Gasto</span>
+        <span class="mod-badge badge-w">Integración Contable a 6to Nivel (2.1.1.7)</span>
+        <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/cxp/conceptos-retencion</code></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>En las operaciones financieras y presupuestarias del Poder Judicial del Estado de Veracruz, no todos los recursos autorizados en una afectación del gasto se entregan de forma líquida al beneficiario final. Por mandato de las leyes tributarias federales y estatales, así como por convenios laborales y mandatos judiciales, el PJEV actúa como <strong>retenedor legal</strong> obligado a descontar porcentajes específicos del monto bruto a pagar.</p>
+    <p>El módulo <strong>05.1.3 Conceptos de Retención y Deducción</strong> gestiona la parametrización de todas las retenciones impositivas (ISR Honorarios, ISR Arrendamiento, ISR RESICO, Retenciones de IVA, 5 al millar de obra pública) y deducciones a trabajadores (cuotas sindicales, pensiones alimenticias, cuotas al IPE, seguros). Su función es dual:</p>
+    <ol style="font-size:13px; color:var(--pjev-texto); margin-left:20px; line-height:1.6;">
+      <li><strong>En el Devengado (<code>05.2.1 Afectación del Gasto</code>):</strong> Determina con exactitud el <em>Neto a Pagar</em> al proveedor o empleado y genera automáticamente el abono contable al pasivo circulante <code>2.1.1.7 Retenciones y Contribuciones por Pagar</code>.</li>
+      <li><strong>En el Entero (<code>05.3.3 Control y entero de retenciones</code>):</strong> Agrupa los saldos retenidos por periodo quincenal/mensual para emitir la orden de pago y liquidar la obligación frente a las instituciones acreedoras (SAT, SEFIPLAN, IPE, Juzgados de Familia).</li>
+    </ol>
+  </div>
+
+  <!-- 2. MARCO NORMATIVO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+    <table class="props-table">
+      <thead><tr><th>Ordenamiento Jurídico</th><th>Artículos Clave</th><th>Obligación como Retenedor y Criterio Técnico</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Ley del Impuesto sobre la Renta (LISR)</strong></td>
+          <td>Art. 106, 113-J, 116 y 96</td>
+          <td>Obliga a personas morales y entes públicos a retener el 10% de ISR sobre honorarios a PF, 1.25% a contribuyentes RESICO, 10% por arrendamiento de inmuebles e ISR por salarios.</td>
+        </tr>
+        <tr>
+          <td><strong>Ley del Impuesto al Valor Agregado (LIVA)</strong></td>
+          <td>Art. 1-A Fracc. II incisos a) y c)</td>
+          <td>Dispone la retención de las dos terceras partes del IVA causado (10.667%) en honorarios y fletes, y del 100% del IVA causado (16%) en arrendamiento de inmuebles.</td>
+        </tr>
+        <tr>
+          <td><strong>Código Financiero para el Estado de Veracruz</strong></td>
+          <td>Art. 182 y aplicables</td>
+          <td>Establece el derecho del 5 al millar (0.50%) sobre el importe de las estimaciones de obra pública y servicios relacionados con ellas para vigilancia y fiscalización de SEFIPLAN y ORFIS.</td>
+        </tr>
+        <tr>
+          <td><strong>Ley de Pensiones del Estado de Veracruz (Ley 287)</strong></td>
+          <td>Art. 16, 19 y aplicables</td>
+          <td>Dispone el descuento obligatorio de cuotas de aportación patronal y laboral, así como préstamos personales e hipotecarios a favor del Instituto de Pensiones del Estado (IPE).</td>
+        </tr>
+        <tr>
+          <td><strong>Código Civil y Código de Procedimientos Civiles del Estado de Veracruz</strong></td>
+          <td>Capítulo de Alimentos</td>
+          <td>Mandato judicial de cumplimiento obligatorio para realizar retenciones salariales directas a favor de acreedores alimentarios según orden de los Juzgados de Primera Instancia.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. CATÁLOGO TIPIFICADO DE CONCEPTOS INSTITUCIONALES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Catálogo Maestro de Conceptos Tipificados (10 Conceptos Oficiales)</div>
+    <p>A partir del análisis de las nóminas, pagos directos, contratos y obras del PJEV, se tipifican los 10 conceptos canónicos de retención y deducción:</p>
+
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th style="width:12%;">Código</th>
+          <th style="width:24%;">Nombre del Concepto</th>
+          <th style="width:10%;">Tipo</th>
+          <th style="width:10%;">Tasa / Factor</th>
+          <th style="width:14%;">Base Imponible</th>
+          <th style="width:14%;">Subcuenta Contable</th>
+          <th style="width:16%;">Tercero Acreedor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>RET-ISR-HON</code></td>
+          <td><strong>Retención ISR Honorarios PF</strong></td>
+          <td><span class="tasa-badge tasa-fisc">FISCAL</span></td>
+          <td style="font-family:monospace; font-weight:bold;">10.00%</td>
+          <td>Subtotal (Sin IVA)</td>
+          <td><code>2.1.1.7.01.01</code></td>
+          <td>SAT (Línea Captura)</td>
+        </tr>
+        <tr>
+          <td><code>RET-ISR-RES</code></td>
+          <td><strong>Retención ISR RESICO PF</strong></td>
+          <td><span class="tasa-badge tasa-fisc">FISCAL</span></td>
+          <td style="font-family:monospace; font-weight:bold;">1.25%</td>
+          <td>Subtotal (Sin IVA)</td>
+          <td><code>2.1.1.7.01.02</code></td>
+          <td>SAT (Línea Captura)</td>
+        </tr>
+        <tr>
+          <td><code>RET-ISR-ARR</code></td>
+          <td><strong>Retención ISR Arrendamiento PF</strong></td>
+          <td><span class="tasa-badge tasa-fisc">FISCAL</span></td>
+          <td style="font-family:monospace; font-weight:bold;">10.00%</td>
+          <td>Subtotal (Sin IVA)</td>
+          <td><code>2.1.1.7.01.03</code></td>
+          <td>SAT (Línea Captura)</td>
+        </tr>
+        <tr>
+          <td><code>RET-IVA-HON</code></td>
+          <td><strong>Retención IVA Honorarios / Fletes</strong></td>
+          <td><span class="tasa-badge tasa-fisc">FISCAL</span></td>
+          <td style="font-family:monospace; font-weight:bold;">10.667%</td>
+          <td>Subtotal (2/3 IVA)</td>
+          <td><code>2.1.1.7.02.01</code></td>
+          <td>SAT (Línea Captura)</td>
+        </tr>
+        <tr>
+          <td><code>RET-IVA-ARR</code></td>
+          <td><strong>Retención IVA Arrendamiento</strong></td>
+          <td><span class="tasa-badge tasa-fisc">FISCAL</span></td>
+          <td style="font-family:monospace; font-weight:bold;">16.00%</td>
+          <td>Subtotal (100% IVA)</td>
+          <td><code>2.1.1.7.02.02</code></td>
+          <td>SAT (Línea Captura)</td>
+        </tr>
+        <tr>
+          <td><code>RET-OBR-MIL</code></td>
+          <td><strong>5 al Millar de Obra Pública</strong></td>
+          <td><span class="tasa-badge tasa-fisc">ESTATAL</span></td>
+          <td style="font-family:monospace; font-weight:bold;">0.50%</td>
+          <td>Estimación (Sin IVA)</td>
+          <td><code>2.1.1.7.03.01</code></td>
+          <td>SEFIPLAN / ORFIS</td>
+        </tr>
+        <tr>
+          <td><code>DED-NOM-SIN</code></td>
+          <td><strong>Cuotas Sindicales de Empleados</strong></td>
+          <td><span class="tasa-badge tasa-nom">NÓMINA</span></td>
+          <td style="font-family:monospace; font-weight:bold;">1.00% - Fijo</td>
+          <td>Sueldo Base Quincenal</td>
+          <td><code>2.1.1.7.04.01</code></td>
+          <td>Sindicatos PJEV</td>
+        </tr>
+        <tr>
+          <td><code>DED-NOM-PEN</code></td>
+          <td><strong>Retención Pensión Alimenticia</strong></td>
+          <td><span class="tasa-badge tasa-nom">JUDICIAL</span></td>
+          <td style="font-family:monospace; font-weight:bold;">Variable</td>
+          <td>Percepciones Netas</td>
+          <td><code>2.1.1.7.05.01</code></td>
+          <td>Beneficiario Judicial</td>
+        </tr>
+        <tr>
+          <td><code>DED-NOM-SEG</code></td>
+          <td><strong>Seguros Institucionales de Vida</strong></td>
+          <td><span class="tasa-badge tasa-nom">NÓMINA</span></td>
+          <td style="font-family:monospace; font-weight:bold;">Cuota Fija</td>
+          <td>Póliza contratada</td>
+          <td><code>2.1.1.7.06.01</code></td>
+          <td>Aseguradora (MetLife)</td>
+        </tr>
+        <tr>
+          <td><code>DED-NOM-IPE</code></td>
+          <td><strong>Aportaciones y Préstamos IPE</strong></td>
+          <td><span class="tasa-badge tasa-nom">SEG. SOC.</span></td>
+          <td style="font-family:monospace; font-weight:bold;">12.00% + Céd.</td>
+          <td>Sueldo Cotizable</td>
+          <td><code>2.1.1.7.07.01</code></td>
+          <td>Inst. Pensiones Edo.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. MODELO DE ASIENTO CONTABLE Y MATRIZ DE CONVERSIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Modelo de Asiento Contable en la Matriz de Conversión (CONAC A.1)</div>
+    <p>Cuando se aprueba una afectación de gasto con retenciones en <code>05.2.1 Afectación del Gasto</code>, el sistema detona la <strong>Matriz de Conversión de Egresos (Momento A.1 Devengado)</strong> generando de forma automatizada el desglose entre el pasivo exigible del proveedor y las retenciones acumuladas por enterar:</p>
+
+    <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:8px; padding:16px; margin:14px 0;">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 10px; font-size:13px;">Ejemplo Canónico: Honorarios Profesionales (\$100,000.00 Subtotal + \$16,000.00 IVA)</h4>
+      <table class="props-table" style="font-size:11px; margin:0;">
+        <thead><tr><th>Cuenta Contable</th><th>Nombre de la Cuenta</th><th>Debe (Cargo)</th><th>Haber (Abono)</th><th>Naturaleza del Asiento</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>5.1.3.3.3311</code></td>
+            <td>Servicios Legales, de Contabilidad y Auditoría</td>
+            <td style="font-family:monospace; font-weight:bold; text-align:right;">$100,000.00</td>
+            <td style="text-align:right;">-</td>
+            <td>Gasto Contable (Devengado)</td>
+          </tr>
+          <tr>
+            <td><code>2.1.1.2.01.01</code></td>
+            <td>Proveedores por Pagar a Corto Plazo</td>
+            <td style="text-align:right;">-</td>
+            <td style="font-family:monospace; font-weight:bold; text-align:right; color:#15803d;">$95,333.33</td>
+            <td><strong>Neto a Transferir (Orden de Pago)</strong></td>
+          </tr>
+          <tr>
+            <td><code>2.1.1.7.01.01</code></td>
+            <td>Retención ISR por Servicios Profesionales (10%)</td>
+            <td style="text-align:right;">-</td>
+            <td style="font-family:monospace; font-weight:bold; text-align:right; color:#991b1b;">$10,000.00</td>
+            <td>Pasivo Circulante por Retención ISR</td>
+          </tr>
+          <tr>
+            <td><code>2.1.1.7.02.01</code></td>
+            <td>Retención IVA por Servicios Profesionales (2/3)</td>
+            <td style="text-align:right;">-</td>
+            <td style="font-family:monospace; font-weight:bold; text-align:right; color:#991b1b;">$10,666.67</td>
+            <td>Pasivo Circulante por Retención IVA</td>
+          </tr>
+          <tr style="background:#f8fafc; font-weight:bold;">
+            <td colspan="2" style="text-align:right;">SUMAS IGUALES:</td>
+            <td style="font-family:monospace; text-align:right;">$116,000.00</td>
+            <td style="font-family:monospace; text-align:right;">$116,000.00</td>
+            <td>Póliza Cuadrada Automática</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. ACTORES Y PERMISOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Actores y Permisos</div>
+    <table class="props-table">
+      <thead><tr><th>Rol Institucional</th><th>Nivel</th><th>Operaciones Permitidas</th><th>Criterios y Restricciones</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Subdirector de Recursos Financieros</strong></td>
+          <td>Nivel 2</td>
+          <td>Alta y configuración de conceptos de retención, fijación de tasas y asignación de cuentas contables.</td>
+          <td>Requiere validación conjunta con el Departamento de Contabilidad.</td>
+        </tr>
+        <tr>
+          <td><strong>Jefe de Departamento de Contabilidad</strong></td>
+          <td>Nivel 2</td>
+          <td>Asignación y validación de las subcuentas de pasivo <code>2.1.1.7</code> a 6to nivel conforme al Plan de Cuentas CONAC.</td>
+          <td>Garantiza que no existan cuentas huérfanas en la balanza.</td>
+        </tr>
+        <tr>
+          <td><strong>Analista de Cuentas por Pagar (Capturista)</strong></td>
+          <td>Nivel 3</td>
+          <td>Selección de conceptos en la afectación de gasto, cálculo automático de retenciones y verificación del neto.</td>
+          <td>Acceso operativo de cálculo; no puede alterar porcentajes maestros.</td>
+        </tr>
+        <tr>
+          <td><strong>Órgano Interno de Control / Auditoría</strong></td>
+          <td>Nivel 4</td>
+          <td>Fiscalización de enteros quincenales/mensuales ante SAT y SEFIPLAN y cotejo con declaraciones DIOT.</td>
+          <td>Acceso de auditoría de solo lectura.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. MODELO DE DATOS Y DICCIONARIO DE CAMPOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Modelo de Datos y Diccionario de Campos</div>
+    <p>El diseño de persistencia se aloja en el esquema <code>cxp</code> de PostgreSQL. Se implementa en la tabla normalizada <code>cxp.catalogo_conceptos_retencion</code>:</p>
+
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción y Regla de Validación</th></tr></thead>
+      <tbody>
+        <tr><td><code>retencion_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único del concepto de retención.</td></tr>
+        <tr><td><code>ret_codigo</code></td><td><code>VARCHAR(20) UNIQUE</code></td><td>No</td><td>Código nemotécnico institucional (ej. <code>RET-ISR-HON</code>).</td></tr>
+        <tr><td><code>ret_nombre</code></td><td><code>VARCHAR(150)</code></td><td>No</td><td>Nombre legible del concepto de retención o deducción.</td></tr>
+        <tr><td><code>tipo_retencion</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td><code>FISCAL</code>, <code>ESTATAL</code>, <code>NOMINA</code>, <code>JUDICIAL</code> o <code>TERCERO</code>.</td></tr>
+        <tr><td><code>porcentaje_tasa</code></td><td><code>NUMERIC(6,4)</code></td><td>No</td><td>Tasa porcentual aplicable (ej. 10.0000 para 10%, 1.2500 para RESICO).</td></tr>
+        <tr><td><code>base_calculo</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td><code>SUBTOTAL</code>, <code>IVA</code> o <code>IMPORTE_NETO</code>.</td></tr>
+        <tr><td><code>f_cuenta_pasivo_codigo</code></td><td><code>VARCHAR(30) FK</code></td><td>No</td><td>Subcuenta de pasivo <code>2.1.1.7.x.x</code> en <code>contabilidad.catalogo_cuentas</code>.</td></tr>
+        <tr><td><code>f_tercero_inst_id</code></td><td><code>BIGINT FK</code></td><td>Sí</td><td>Acreedor legal en <code>config.catalogo_terceros_inst</code> (ej. SAT, IPE, SEFIPLAN).</td></tr>
+        <tr><td><code>aplica_a_procedimiento</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Procedimiento sugerido (<code>HONORARIOS</code>, <code>ARRENDAMIENTO</code>, <code>OBRA_PUBLICA</code>).</td></tr>
+        <tr><td><code>es_deduccion_fija</code></td><td><code>BOOLEAN</code></td><td>No</td><td><code>false</code> si es porcentaje de factura, <code>true</code> si es importe fijo de nómina.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Activo</code>, <code>0 = Inactivo</code> (Soft-delete).</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ</code></td><td>No</td><td>Auditoría de creación institucional.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ</code></td><td>Sí</td><td>Auditoría de última modificación.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 15px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+    <div class="code-wrap">
+<pre>CREATE TABLE cxp.catalogo_conceptos_retencion (
+    retencion_id BIGSERIAL PRIMARY KEY,
+    ret_codigo VARCHAR(20) NOT NULL UNIQUE,
+    ret_nombre VARCHAR(150) NOT NULL,
+    tipo_retencion VARCHAR(20) NOT NULL DEFAULT 'FISCAL' 
+        CHECK (tipo_retencion IN ('FISCAL', 'ESTATAL', 'NOMINA', 'JUDICIAL', 'TERCERO')),
+    porcentaje_tasa NUMERIC(6,4) NOT NULL DEFAULT 0.0000,
+    base_calculo VARCHAR(20) NOT NULL DEFAULT 'SUBTOTAL'
+        CHECK (base_calculo IN ('SUBTOTAL', 'IVA', 'IMPORTE_NETO')),
+    f_cuenta_pasivo_codigo VARCHAR(30) NOT NULL,
+    f_tercero_inst_id BIGINT NULL,
+    aplica_a_procedimiento VARCHAR(40) NULL,
+    es_deduccion_fija BOOLEAN NOT NULL DEFAULT false,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ,
+    CONSTRAINT fk_retencion_tercero FOREIGN KEY (f_tercero_inst_id)
+        REFERENCES config.catalogo_terceros_inst(tercero_inst_id) ON DELETE RESTRICT
+);</pre>
+    </div>
+  </div>
+
+  <!-- 7. STORED PROCEDURES (LEER Y CRUD) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Funciones PostgreSQL en esquema <code>cxp</code> bajo estándar estricto con <code>SECURITY DEFINER</code>, <code>SET search_path</code> y retorno JSONB unificado <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>:
+    </p>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showSP('spret1',this)">7.1 fn_leer_conceptos_retencion</button>
+      <button class="sp-tab" onclick="showSP('spret2',this)">7.2 fn_crud_conceptos_retencion</button>
+      <button class="sp-tab" onclick="showSP('spret3',this)">7.3 fn_calcular_retenciones_cfdi</button>
+    </div>
+
+    <!-- SP 1: LEER -->
+    <div id="sp-spret1" class="sp-panel active">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función de Consulta: <code>cxp.fn_leer_conceptos_retencion</code></h4>
+      <table class="props-table" style="margin-bottom:12px;">
+        <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario activo de sesión.</td></tr>
+          <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal en curso.</td></tr>
+          <tr><td><code>p_tipo_retencion</code></td><td><code>VARCHAR(20)</code></td><td>Filtro por tipo (<code>FISCAL</code>, <code>NOMINA</code>, etc.). Opcional.</td></tr>
+          <tr><td><code>p_buscar</code></td><td><code>VARCHAR(100)</code></td><td>Filtro de búsqueda por texto o código. Opcional.</td></tr>
+          <tr><td><code>p_estatus</code></td><td><code>SMALLINT</code></td><td><code>1 = Activos</code>, <code>0 = Inactivos</code>, <code>NULL = Todos</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_leer_conceptos_retencion(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_tipo_retencion VARCHAR DEFAULT NULL,
+    p_buscar VARCHAR DEFAULT NULL,
+    p_estatus SMALLINT DEFAULT 1
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, contabilidad, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'retencion_id', r.retencion_id,
+            'ret_codigo', r.ret_codigo,
+            'ret_nombre', r.ret_nombre,
+            'tipo_retencion', r.tipo_retencion,
+            'porcentaje_tasa', r.porcentaje_tasa,
+            'base_calculo', r.base_calculo,
+            'cuenta_pasivo_codigo', r.f_cuenta_pasivo_codigo,
+            'tercero_inst_id', r.f_tercero_inst_id,
+            'tercero_inst_nombre', t.nombre_institucion,
+            'aplica_a_procedimiento', r.aplica_a_procedimiento,
+            'es_deduccion_fija', r.es_deduccion_fija,
+            'estatus_registro', r.estatus_registro,
+            'usuario_c', r.usuario_c,
+            'fecha_c', r.fecha_c,
+            'usuario_m', r.usuario_m,
+            'fecha_m', r.fecha_m
+        ) ORDER BY r.tipo_retencion, r.ret_codigo
+    ) INTO v_data
+    FROM cxp.catalogo_conceptos_retencion r
+    LEFT JOIN config.catalogo_terceros_inst t ON t.tercero_inst_id = r.f_tercero_inst_id
+    WHERE (p_estatus IS NULL OR r.estatus_registro = p_estatus)
+      AND (p_tipo_retencion IS NULL OR r.tipo_retencion = p_tipo_retencion)
+      AND (p_buscar IS NULL OR (
+          r.ret_codigo ILIKE '%' || p_buscar || '%' OR
+          r.ret_nombre ILIKE '%' || p_buscar || '%'
+      ));
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'OK',
+        'data', COALESCE(v_data, '[]'::jsonb)
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 2: CRUD -->
+    <div id="sp-spret2" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función Transaccional: <code>cxp.fn_crud_conceptos_retencion</code></h4>
+      <table class="props-table" style="margin-bottom:12px;">
+        <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1 = Alta</code>, <code>2 = Modificación</code>, <code>3 = Baja Lógica</code>, <code>4 = Reactivar</code>.</td></tr>
+          <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario responsable.</td></tr>
+          <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal en curso.</td></tr>
+          <tr><td><code>p_retencion_id</code></td><td><code>BIGINT</code></td><td>ID del registro (Requerido en acción 2, 3 y 4).</td></tr>
+          <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con tasas, bases y subcuentas contables.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_crud_conceptos_retencion(
+    p_accion SMALLINT,
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_retencion_id BIGINT,
+    p_datos JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, contabilidad, public
+AS $$
+DECLARE
+    v_id BIGINT;
+    v_cod VARCHAR(20);
+BEGIN
+    v_cod := UPPER(TRIM(p_datos->>'ret_codigo'));
+
+    -- 1 = ALTA
+    IF p_accion = 1 THEN
+        IF EXISTS (SELECT 1 FROM cxp.catalogo_conceptos_retencion WHERE ret_codigo = v_cod) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'El código de retención ya existe.');
+        END IF;
+
+        INSERT INTO cxp.catalogo_conceptos_retencion (
+            ret_codigo, ret_nombre, tipo_retencion, porcentaje_tasa,
+            base_calculo, f_cuenta_pasivo_codigo, f_tercero_inst_id,
+            aplica_a_procedimiento, es_deduccion_fija, estatus_registro,
+            usuario_c, fecha_c
+        ) VALUES (
+            v_cod,
+            TRIM(p_datos->>'ret_nombre'),
+            COALESCE(p_datos->>'tipo_retencion', 'FISCAL'),
+            COALESCE((p_datos->>'porcentaje_tasa')::NUMERIC, 0.0000),
+            COALESCE(p_datos->>'base_calculo', 'SUBTOTAL'),
+            TRIM(p_datos->>'cuenta_pasivo_codigo'),
+            (p_datos->>'tercero_inst_id')::BIGINT,
+            p_datos->>'aplica_a_procedimiento',
+            COALESCE((p_datos->>'es_deduccion_fija')::BOOLEAN, false),
+            1, p_usuario, clock_timestamp()
+        ) RETURNING retencion_id INTO v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Concepto de retención registrado.', 'data', jsonb_build_object('retencion_id', v_id));
+
+    -- 2 = MODIFICACIÓN
+    ELSIF p_accion = 2 THEN
+        UPDATE cxp.catalogo_conceptos_retencion SET
+            ret_nombre = COALESCE(TRIM(p_datos->>'ret_nombre'), ret_nombre),
+            tipo_retencion = COALESCE(p_datos->>'tipo_retencion', tipo_retencion),
+            porcentaje_tasa = COALESCE((p_datos->>'porcentaje_tasa')::NUMERIC, porcentaje_tasa),
+            base_calculo = COALESCE(p_datos->>'base_calculo', base_calculo),
+            f_cuenta_pasivo_codigo = COALESCE(TRIM(p_datos->>'cuenta_pasivo_codigo'), f_cuenta_pasivo_codigo),
+            f_tercero_inst_id = (p_datos->>'tercero_inst_id')::BIGINT,
+            aplica_a_procedimiento = p_datos->>'aplica_a_procedimiento',
+            es_deduccion_fija = COALESCE((p_datos->>'es_deduccion_fija')::BOOLEAN, es_deduccion_fija),
+            usuario_m = p_usuario, fecha_m = clock_timestamp()
+        WHERE retencion_id = p_retencion_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Concepto de retención actualizado.', 'data', jsonb_build_object('retencion_id', p_retencion_id));
+
+    -- 3 = BAJA LÓGICA
+    ELSIF p_accion = 3 THEN
+        UPDATE cxp.catalogo_conceptos_retencion
+           SET estatus_registro = 0, usuario_m = p_usuario, fecha_m = clock_timestamp()
+         WHERE retencion_id = p_retencion_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Concepto inactivado lógicamente.', 'data', jsonb_build_object('retencion_id', p_retencion_id));
+
+    -- 4 = REACTIVAR
+    ELSIF p_accion = 4 THEN
+        UPDATE cxp.catalogo_conceptos_retencion
+           SET estatus_registro = 1, usuario_m = p_usuario, fecha_m = clock_timestamp()
+         WHERE retencion_id = p_retencion_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Concepto reactivado con éxito.', 'data', jsonb_build_object('retencion_id', p_retencion_id));
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no permitida.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 3: CALCULADORA RETENCIONES CFDI -->
+    <div id="sp-spret3" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Motor de Cálculo de Retenciones: <code>cxp.fn_calcular_retenciones_cfdi</code></h4>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:10px;">
+        Esta función calcula en tiempo real los importes retenidos de ISR e IVA sobre una factura o estimación y determina el neto exacto a instruir en la orden de pago.
+      </p>
+
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_calcular_retenciones_cfdi(
+    p_subtotal NUMERIC,
+    p_iva NUMERIC,
+    p_tipo_operacion VARCHAR,
+    p_es_resico BOOLEAN DEFAULT false
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = cxp, config, contabilidad, public
+AS $$
+DECLARE
+    v_ret_isr NUMERIC(15,2) := 0.00;
+    v_ret_iva NUMERIC(15,2) := 0.00;
+    v_ret_5millar NUMERIC(15,2) := 0.00;
+    v_total_bruto NUMERIC(15,2) := 0.00;
+    v_total_retenciones NUMERIC(15,2) := 0.00;
+    v_neto_pagar NUMERIC(15,2) := 0.00;
+BEGIN
+    v_total_bruto := p_subtotal + p_iva;
+
+    -- Caso 1: HONORARIOS PROFESIONALES
+    IF p_tipo_operacion = 'HONORARIOS' THEN
+        IF p_es_resico THEN
+            v_ret_isr := ROUND(p_subtotal * 0.0125, 2); -- 1.25% RESICO
+        ELSE
+            v_ret_isr := ROUND(p_subtotal * 0.1000, 2); -- 10.00% Tradicional
+        END IF;
+        v_ret_iva := ROUND(p_iva * (2.0 / 3.0), 2);    -- Dos terceras partes del IVA
+
+    -- Caso 2: ARRENDAMIENTO DE INMUEBLES
+    ELSIF p_tipo_operacion = 'ARRENDAMIENTO' THEN
+        IF p_es_resico THEN
+            v_ret_isr := ROUND(p_subtotal * 0.0125, 2);
+        ELSE
+            v_ret_isr := ROUND(p_subtotal * 0.1000, 2);
+        END IF;
+        v_ret_iva := p_iva;                             -- 100% del IVA en arrendamiento
+
+    -- Caso 3: OBRA PÚBLICA (5 al millar)
+    ELSIF p_tipo_operacion = 'OBRA_PUBLICA' THEN
+        v_ret_5millar := ROUND(p_subtotal * 0.0050, 2); -- 0.50% Inspección SEFIPLAN
+    END IF;
+
+    v_total_retenciones := v_ret_isr + v_ret_iva + v_ret_5millar;
+    v_neto_pagar := v_total_bruto - v_total_retenciones;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'OK',
+        'data', jsonb_build_object(
+            'subtotal', p_subtotal,
+            'iva', p_iva,
+            'total_bruto', v_total_bruto,
+            'retencion_isr', v_ret_isr,
+            'retencion_iva', v_ret_iva,
+            'retencion_5_al_millar', v_ret_5millar,
+            'total_retenciones', v_total_retenciones,
+            'neto_pagar', v_neto_pagar
+        )
+    );
+END;
+$$;</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. SERVICIOS API REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Controlador NestJS <code>ConceptosRetencionController</code> para la administración y simulación de retenciones:
+    </p>
+
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/cxp/conceptos-retencion</code></td>
+          <td>Query: <code>{ tipo?, buscar?, estatus? }</code></td>
+          <td>Lista los conceptos vigentes de retención y deducción.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/cxp/conceptos-retencion</code></td>
+          <td>Body: <code>CreateConceptoRetencionDto</code></td>
+          <td>Registra un nuevo concepto de retención institucional.</td>
+        </tr>
+        <tr>
+          <td><code class="method put">PUT</code></td>
+          <td><code>/api/v1/cxp/conceptos-retencion/:id</code></td>
+          <td>Param: <code>id</code>, Body: <code>UpdateConceptoRetencionDto</code></td>
+          <td>Modifica tasas, base o cuenta de pasivo del concepto.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/cxp/conceptos-retencion/calcular</code></td>
+          <td>Body: <code>CalcularRetencionesCfdiDto</code></td>
+          <td>Calcula en tiempo real los importes retenidos para una factura.</td>
+        </tr>
+        <tr>
+          <td><code class="method patch">PATCH</code></td>
+          <td><code>/api/v1/cxp/conceptos-retencion/:id/estatus</code></td>
+          <td>Param: <code>id</code>, Body: <code>{ estatus: 0 | 1 }</code></td>
+          <td>Baja lógica o reactivación del concepto.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">Controlador NestJS: <code>conceptos-retencion.controller.ts</code></h4>
+    <div class="code-wrap">
+<pre><code>import { Controller, Get, Post, Put, Patch, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../configuracion/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../configuracion/auth/guards/roles.guard';
+import { MinRol } from '../configuracion/auth/decorators/min-rol.decorator';
+import { ConceptosRetencionService } from './conceptos-retencion.service';
+
+@ApiTags('CxP / Catálogos / Conceptos de Retención')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('cxp/conceptos-retencion')
+export class ConceptosRetencionController {
+  constructor(private readonly service: ConceptosRetencionService) {}
+
+  @Get()
+  @MinRol(4)
+  @ApiOperation({ summary: 'Consultar catálogo de retenciones y deducciones' })
+  findAll(
+    @Req() req,
+    @Query('tipo') tipo?: string,
+    @Query('buscar') buscar?: string,
+    @Query('estatus') estatus?: number,
+  ) {
+    return this.service.findAll({ tipo, buscar, estatus: estatus ?? 1 }, req.user);
+  }
+
+  @Post('calcular')
+  @MinRol(4)
+  @ApiOperation({ summary: 'Calcular retenciones de ISR e IVA para un CFDI' })
+  calcular(@Body() dto: CalcularRetencionesCfdiDto) {
+    return this.service.calcular(dto);
+  }
+
+  @Post()
+  @MinRol(2)
+  @ApiOperation({ summary: 'Crear nuevo concepto de retención' })
+  @ApiResponse({ status: 201, description: 'Concepto registrado exitosamente.' })
+  create(@Body() dto: CreateConceptoRetencionDto, @Req() req) {
+    return this.service.create(dto, req.user);
+  }
+
+  @Put(':id')
+  @MinRol(2)
+  @ApiOperation({ summary: 'Actualizar concepto de retención' })
+  update(@Param('id') id: string, @Body() dto: UpdateConceptoRetencionDto, @Req() req) {
+    return this.service.update(Number(id), dto, req.user);
+  }
+
+  @Patch(':id/estatus')
+  @MinRol(2)
+  @ApiOperation({ summary: 'Inactivar o reactivar concepto' })
+  cambiarEstatus(@Param('id') id: string, @Body('estatus') estatus: number, @Req() req) {
+    return this.service.cambiarEstatus(Number(id), estatus, req.user);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 9. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Reglas de Negocio y Validaciones</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-RET-01 · Inalterabilidad de Fórmulas Tributarias</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Las tasas y factores de retención impositiva (ej. 10% ISR, 2/3 IVA, 5 al millar) están normadas por leyes federales y estatales. El analista capturista en <code>05.2.1</code> no puede modificar manualmente las tasas; únicamente se permite la parametrización centralizada por usuarios de Nivel 2.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-RET-02 · Mapeo Obligatorio a Subcuenta 2.1.1.7 de Sexto Nivel</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Todo concepto de retención debe estar obligatoriamente vinculado a una subcuenta activa del grupo <code>2.1.1.7 Retenciones y Contribuciones por Pagar</code> a sexto nivel (ej. <code>2.1.1.7.01.01</code>). Queda estrictamente prohibido registrar pasivos en cuentas genéricas de mayor.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-RET-03 · Vinculación Mandatoria con Tercero Acreedor</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Cada retención debe registrar el identificador del tercero institucional que fungirá como beneficiario al momento del entero (SAT para ISR/IVA, SEFIPLAN para 5 al millar, IPE para seguridad social, o beneficiario judicial para pensiones).
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-RET-04 · Extracción Automática desde el Timbrado CFDI</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Cuando el trámite ampare una factura electrónica, los nodos <code>cfdi:Retenciones</code> del XML timbrado se extraen automáticamente para validar que coincidan exactamente con el cálculo normativo del sistema, alertando cualquier discrepancia de centavos.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-RET-05 · Congelamiento por Trámites Históricos</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Si un concepto de retención ya cuenta con movimientos contables o afectaciones de gasto asociadas en ejercicios anteriores o en curso, se prohíbe la eliminación física del registro, permitiéndose únicamente la baja lógica (<code>estatus_registro = 0</code>).
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 10. PROPUESTA VISUAL (WIREFRAMES) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Propuesta Visual de Interfaz (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wfret1',this)">1. Catálogo Maestro de Retenciones (Grid)</button>
+      <button class="wf-tab" onclick="showWF('wfret2',this)">2. Modal de Configuración de Concepto</button>
+      <button class="wf-tab" onclick="showWF('wfret3',this)">3. Desglose de Retenciones en Factura CFDI</button>
+    </div>
+
+    <!-- WF1: GRID MAESTRO -->
+    <div id="wf-wfret1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.1.3 Catálogo de Conceptos de Retención y Deducción · Grid de Gestión</span>
+          <span style="font-size:10px; color:#666;">Filtros por Tipo y Base de Cálculo</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="380" fill="#f8fafc" rx="4"/>
+            <!-- Header Bar -->
+            <rect x="15" y="15" width="930" height="50" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="44" font-size="13" font-weight="bold" fill="#183125">Conceptos de Retención y Deducción (10 Tipos Registrados)</text>
+            <rect x="680" y="25" width="110" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="735" y="44" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">📥 Exportar</text>
+            <rect x="800" y="25" width="130" height="30" fill="#183125" rx="4"/>
+            <text x="865" y="44" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nuevo Concepto</text>
+
+            <!-- Filtros -->
+            <rect x="15" y="75" width="930" height="40" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="25" y="99" font-size="10" fill="#64748b">Tipo de Retención:</text>
+            <rect x="130" y="84" width="180" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="140" y="99" font-size="10" fill="#1e293b">Todos los tipos ▼</text>
+            <text x="330" y="99" font-size="10" fill="#64748b">Buscar:</text>
+            <rect x="380" y="84" width="220" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="390" y="99" font-size="10" fill="#94a3b8">Código o descripción...</text>
+            <text x="620" y="99" font-size="10" fill="#64748b">Estatus:</text>
+            <rect x="670" y="84" width="90" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="680" y="99" font-size="10" fill="#1e293b">Activos ▼</text>
+
+            <!-- Table Header -->
+            <rect x="15" y="125" width="930" height="28" fill="#183125"/>
+            <text x="25" y="143" font-size="9" font-weight="bold" fill="#ffffff">CÓDIGO</text>
+            <text x="140" y="143" font-size="9" font-weight="bold" fill="#ffffff">NOMBRE DEL CONCEPTO</text>
+            <text x="380" y="143" font-size="9" font-weight="bold" fill="#ffffff">TIPO</text>
+            <text x="470" y="143" font-size="9" font-weight="bold" fill="#ffffff">TASA</text>
+            <text x="540" y="143" font-size="9" font-weight="bold" fill="#ffffff">CUENTA PASIVO (2.1.1.7)</text>
+            <text x="730" y="143" font-size="9" font-weight="bold" fill="#ffffff">ACREEDOR INSTITUCIONAL</text>
+            <text x="900" y="143" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ACCIONES</text>
+
+            <!-- Row 1: ISR HON -->
+            <rect x="15" y="155" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="176" font-size="10" font-weight="bold" fill="#0284c7">RET-ISR-HON</text>
+            <text x="140" y="176" font-size="10" fill="#1e293b">Retención ISR Honorarios PF</text>
+            <rect x="380" y="163" width="60" height="18" fill="#fee2e2" rx="3"/>
+            <text x="410" y="176" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">FISCAL</text>
+            <text x="470" y="176" font-size="10" font-family="monospace" font-weight="bold" fill="#334155">10.00%</text>
+            <text x="540" y="176" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.7.01.01</text>
+            <text x="730" y="176" font-size="10" fill="#334155">SAT (Línea de Captura)</text>
+            <text x="900" y="176" font-size="11" fill="#0284c7" text-anchor="middle">✏ ⚙ ✕</text>
+
+            <!-- Row 2: IVA HON -->
+            <rect x="15" y="191" width="930" height="34" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="212" font-size="10" font-weight="bold" fill="#0284c7">RET-IVA-HON</text>
+            <text x="140" y="212" font-size="10" fill="#1e293b">Retención IVA Honorarios (2/3)</text>
+            <rect x="380" y="199" width="60" height="18" fill="#fee2e2" rx="3"/>
+            <text x="410" y="212" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">FISCAL</text>
+            <text x="470" y="212" font-size="10" font-family="monospace" font-weight="bold" fill="#334155">10.667%</text>
+            <text x="540" y="212" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.7.02.01</text>
+            <text x="730" y="212" font-size="10" fill="#334155">SAT (Línea de Captura)</text>
+            <text x="900" y="212" font-size="11" fill="#0284c7" text-anchor="middle">✏ ⚙ ✕</text>
+
+            <!-- Row 3: 5 al millar -->
+            <rect x="15" y="227" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="248" font-size="10" font-weight="bold" fill="#0284c7">RET-OBR-MIL</text>
+            <text x="140" y="248" font-size="10" fill="#1e293b">5 al Millar de Obra Pública</text>
+            <rect x="380" y="235" width="60" height="18" fill="#fef3c7" rx="3"/>
+            <text x="410" y="248" font-size="9" font-weight="bold" fill="#92400e" text-anchor="middle">ESTATAL</text>
+            <text x="470" y="248" font-size="10" font-family="monospace" font-weight="bold" fill="#334155">0.50%</text>
+            <text x="540" y="248" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.7.03.01</text>
+            <text x="730" y="248" font-size="10" fill="#334155">SEFIPLAN / ORFIS</text>
+            <text x="900" y="248" font-size="11" fill="#0284c7" text-anchor="middle">✏ ⚙ ✕</text>
+
+            <!-- Row 4: Cuota Sindical -->
+            <rect x="15" y="263" width="930" height="34" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="284" font-size="10" font-weight="bold" fill="#0284c7">DED-NOM-SIN</text>
+            <text x="140" y="284" font-size="10" fill="#1e293b">Cuotas Sindicales de Empleados</text>
+            <rect x="380" y="271" width="60" height="18" fill="#e0f2fe" rx="3"/>
+            <text x="410" y="284" font-size="9" font-weight="bold" fill="#0369a1" text-anchor="middle">NÓMINA</text>
+            <text x="470" y="284" font-size="10" font-family="monospace" font-weight="bold" fill="#334155">1.00%</text>
+            <text x="540" y="284" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.7.04.01</text>
+            <text x="730" y="284" font-size="10" fill="#334155">Sindicatos del PJEV</text>
+            <text x="900" y="284" font-size="11" fill="#0284c7" text-anchor="middle">✏ ⚙ ✕</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: MODAL ALTA / CONFIG -->
+    <div id="wf-wfret2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.1.3 Configuración de Concepto de Retención y Mapeo Contable</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="680" height="400" fill="#ffffff" stroke="#cbd5e1" rx="8"/>
+            <rect width="680" height="45" fill="#183125" rx="8"/>
+            <text x="20" y="28" font-size="13" font-weight="bold" fill="#ffffff">Parametrización de Concepto de Retención</text>
+            <text x="650" y="28" font-size="14" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
+
+            <text x="30" y="75" font-size="11" font-weight="bold" fill="#334155">Código Único:</text>
+            <rect x="30" y="85" width="280" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="103" font-size="11" fill="#1e293b">RET-ISR-HON</text>
+
+            <text x="340" y="75" font-size="11" font-weight="bold" fill="#334155">Tipo de Retención:</text>
+            <rect x="340" y="85" width="310" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="350" y="103" font-size="11" fill="#1e293b">FISCAL (SAT Federal) ▼</text>
+
+            <text x="30" y="135" font-size="11" font-weight="bold" fill="#334155">Nombre Oficial del Concepto:</text>
+            <rect x="30" y="145" width="620" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="163" font-size="11" fill="#1e293b">Retención ISR por Servicios Profesionales (Honorarios PF)</text>
+
+            <text x="30" y="195" font-size="11" font-weight="bold" fill="#334155">Tasa Porcentual (%):</text>
+            <rect x="30" y="205" width="180" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="223" font-size="11" font-family="monospace" fill="#1e293b">10.0000 %</text>
+
+            <text x="230" y="195" font-size="11" font-weight="bold" fill="#334155">Base de Cálculo:</text>
+            <rect x="230" y="205" width="200" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="240" y="223" font-size="11" fill="#1e293b">SUBTOTAL (Sin IVA) ▼</text>
+
+            <text x="450" y="195" font-size="11" font-weight="bold" fill="#334155">Tercero Institucional:</text>
+            <rect x="450" y="205" width="200" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="460" y="223" font-size="11" fill="#1e293b">INST-SAT (Federal) ▼</text>
+
+            <!-- Mapeo Contable -->
+            <text x="30" y="260" font-size="11" font-weight="bold" fill="#183125">Subcuenta de Pasivo Circulante (Plan de Cuentas CONAC):</text>
+            <rect x="30" y="270" width="620" height="45" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="45" y="295" font-size="11" font-family="monospace" font-weight="bold" fill="#0284c7">2.1.1.7.01.01</text>
+            <text x="180" y="295" font-size="11" fill="#334155">Retención de ISR por Servicios Profesionales a Personas Físicas</text>
+
+            <!-- Buttons -->
+            <rect x="440" y="345" width="100" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="490" y="365" font-size="11" font-weight="bold" fill="#64748b" text-anchor="middle">Cancelar</text>
+            <rect x="550" y="345" width="100" height="32" fill="#183125" rx="4"/>
+            <text x="600" y="365" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar Concepto</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: DESGLOSE CFDI -->
+    <div id="wf-wfret3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Simulador de Desglose en Captura de Factura · 05.2.1 Afectación del Gasto</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Cálculo Automático de Retenciones y Neto a Pagar</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 850 320" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="850" height="320" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect width="850" height="40" fill="#f8fafc" stroke="#cbd5e1" rx="6"/>
+            <text x="25" y="25" font-size="12" font-weight="bold" fill="#183125">Desglose de Retenciones para CFDI (Procedimiento: HONORARIOS)</text>
+
+            <!-- Resumen Bruto -->
+            <rect x="25" y="55" width="795" height="55" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="45" y="78" font-size="11" fill="#64748b">Subtotal Factura:</text>
+            <text x="45" y="96" font-size="13" font-family="monospace" font-weight="bold" fill="#1e293b">$100,000.00 MXN</text>
+
+            <text x="240" y="78" font-size="11" fill="#64748b">IVA Causado (16%):</text>
+            <text x="240" y="96" font-size="13" font-family="monospace" font-weight="bold" fill="#1e293b">$16,000.00 MXN</text>
+
+            <text x="440" y="78" font-size="11" fill="#64748b">Importe Bruto Total:</text>
+            <text x="440" y="96" font-size="13" font-family="monospace" font-weight="bold" fill="#0284c7">$116,000.00 MXN</text>
+
+            <text x="640" y="78" font-size="11" fill="#64748b">Régimen Emisor:</text>
+            <text x="640" y="96" font-size="11" font-weight="bold" fill="#1e293b">612 · Personas Físicas</text>
+
+            <!-- Tabla de Retenciones Desglosadas -->
+            <rect x="25" y="125" width="795" height="110" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="45" y="150" font-size="11" fill="#334155">(-) Retención ISR Honorarios (10.00% sobre subtotal):</text>
+            <text x="790" y="150" font-size="11" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">-$10,000.00 MXN</text>
+
+            <text x="45" y="180" font-size="11" fill="#334155">(-) Retención IVA Servicios Profesionales (10.667% / dos terceras partes):</text>
+            <text x="790" y="180" font-size="11" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">-$10,666.67 MXN</text>
+
+            <line x1="45" y1="200" x2="790" y2="200" stroke="#cbd5e1" stroke-dasharray="3"/>
+
+            <text x="45" y="222" font-size="11" font-weight="bold" fill="#334155">Total de Retenciones Aplicables:</text>
+            <text x="790" y="222" font-size="12" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">-$20,666.67 MXN</text>
+
+            <!-- Banner Neto a Pagar -->
+            <rect x="25" y="245" width="795" height="50" fill="#f0fdf4" stroke="#86efac" rx="4"/>
+            <text x="45" y="275" font-size="13" font-weight="bold" fill="#166534">IMPORTE NETO A TRANSFERIR AL BENEFICIARIO (ORDEN DE PAGO):</text>
+            <text x="790" y="275" font-size="16" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$95,333.33 MXN</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. INTEGRACIONES Y DEPENDENCIAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Integraciones y Dependencias Inter-módulos</div>
+    <table class="props-table">
+      <thead><tr><th>Módulo / Subsistema</th><th>Relación Técnica</th><th>Efecto de Integración</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>05.2.1 Afectación del Gasto</strong></td>
+          <td>Cálculo del Neto</td>
+          <td>Descuenta las retenciones del importe bruto de los CFDI y graba <code>importe_retenciones</code> en <code>cxp.afectaciones_gasto</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>05.3.3 Control y entero de retenciones</strong></td>
+          <td>Consolidación para pago</td>
+          <td>Agrupa los pasivos acumulados en <code>2.1.1.7</code> para generar las órdenes de pago hacia el SAT, SEFIPLAN e IPE.</td>
+        </tr>
+        <tr>
+          <td><strong>03.1.2 Matriz de Conversión</strong></td>
+          <td>Regla Contable CONAC A.1</td>
+          <td>Acredita la cuenta de retenciones correspondiente al tipo de trámite de forma automática sin captura manual.</td>
+        </tr>
+        <tr>
+          <td><strong>01.3.4 Terceros Institucionales</strong></td>
+          <td>Entidad acreedora</td>
+          <td>Provee los datos fiscales (RFC, cuenta CLABE o línea de captura) para realizar el pago del entero institucional.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 12. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Casos de Prueba (Validación QA)</div>
+    <table class="props-table">
+      <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Entrada / Acción</th><th>Resultado Esperado</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-RET-01</strong></td>
+          <td>Cálculo de honorarios tradicional</td>
+          <td>Subtotal = $10,000.00, IVA = $1,600.00, Procedimiento = HONORARIOS.</td>
+          <td>Ret. ISR = $1,000.00 (10%), Ret. IVA = $1,066.67 (2/3). Neto a pagar = $9,533.33 MXN.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-RET-02</strong></td>
+          <td>Cálculo de honorarios bajo régimen RESICO</td>
+          <td>Subtotal = $10,000.00, IVA = $1,600.00, es_resico = true.</td>
+          <td>Ret. ISR = $125.00 (1.25%), Ret. IVA = $1,066.67. Neto a pagar = $10,408.33 MXN.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-RET-03</strong></td>
+          <td>Arrendamiento de inmueble PF</td>
+          <td>Subtotal = $20,000.00, IVA = $3,200.00, Procedimiento = ARRENDAMIENTO.</td>
+          <td>Ret. ISR = $2,000.00 (10%), Ret. IVA = $3,200.00 (100%). Neto a pagar = $18,000.00 MXN.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-RET-04</strong></td>
+          <td>Estimación de obra pública (5 al millar)</td>
+          <td>Subtotal = $500,000.00, IVA = $80,000.00, Procedimiento = OBRA_PUBLICA.</td>
+          <td>Ret. 5 al millar = $2,500.00 (0.50%). Neto a pagar = $577,500.00 MXN.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 13. HISTORIAL DE VERSIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">13</span> Historial de Versiones</div>
+    <table class="props-table">
+      <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Cambios Realizados</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>1.0.0</code></td>
+          <td>2026-09-02</td>
+          <td>Equipo SIAF-PJEV / Dix Consultoría</td>
+          <td>Documentación inicial de Conceptos de Retención y Deducción bajo estándar DOC-08, 10 conceptos tipificados, modelo de asiento contable CONAC A.1, DDL PostgreSQL, SPs de cálculo, controlador NestJS y Wireframes SVG interactivos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  function showWF(wfId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('wf-' + wfId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showSP(spId, btn) {
+    document.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('sp-' + spId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

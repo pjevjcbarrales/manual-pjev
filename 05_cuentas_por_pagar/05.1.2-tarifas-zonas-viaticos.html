@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05.1.2 Tarifas y Zonas de Viáticos — Manual de Desarrollo SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
+    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  .badge-w { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:var(--font-mono); }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .method.patch  { background:#f3e8ff; color:#6b21a8; }
+
+  .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
+  .wf-svg-area { background:#f9fafb; padding:16px; overflow-x:auto; text-align:center; }
+
+  .money-col { text-align: right; font-family: var(--font-mono); font-weight: 600; }
+  .tbl-highlight { background: #fdfbf7; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<!-- BOTONES FLOTANTES ACCIÓN -->
+<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999;">
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.location.reload()">⟳ Refrescar</button>
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.print()">🖨 Imprimir</button>
+</div>
+
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Inicio</a> ›
+    <span>05 · Cuentas por Pagar</span> ›
+    <span>05.1 · Catálogos</span> ›
+    <span>05.1.2 Tarifas y zonas de viáticos</span>
+  </div>
+
+  <!-- ENCABEZADO Y TÍTULO -->
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">05.1.2</div>
+      <h1 class="elem-title">Tarifas y Zonas de Viáticos (Tabulador Oficial PJEV)</h1>
+      <p class="elem-desc">Parametrización del tabulador oficial de viáticos y pasajes del Poder Judicial del Estado de Veracruz. Regula los techos financieros diarios de hospedaje, alimentación y traslados locales por zona geográfica y nivel jerárquico, así como los criterios para comisiones oficiales y gastos por comprobar.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Modo A — Catálogo Simple Parametrizado</span>
+        <span class="mod-badge badge-s">Fase 2: Ejecución del Gasto</span>
+        <span class="mod-badge badge-w">Control de Techos Financieros DGA</span>
+        <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/cxp/tarifas-viaticos</code></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>Las comisiones oficiales de servicio desempeñadas por servidores públicos del Poder Judicial del Estado de Veracruz (Magistrados, Jueces, Secretarios, Actuarios, Notificadores y personal operativo) implican el otorgamiento de recursos económicos para sufragar gastos indispensables de hospedaje, alimentación y transporte local. Para garantizar la racionalidad, austeridad y transparencia en el ejercicio del gasto público, el Consejo de la Judicatura emite a través de la Dirección General de Administración el <strong>Tabulador Oficial de Viáticos y Pasajes</strong>.</p>
+    <p>El módulo <strong>05.1.2 Tarifas y Zonas de Viáticos</strong> digitaliza y centraliza este tabulador. Permite calcular con exactitud matemática el importe máximo autorizado al emitir una comisión (Anexo 5) en <code>05.2.3 Gastos a comprobar</code>, y sirve como motor de auditoría automática al revisar los CFDI presentados por el servidor público en la comprobación de viáticos (Anexo 6 en <code>05.2.1 Afectación del Gasto</code> / procedimiento <code>COMPROBACION_VIATICOS</code>), determinando si existen importes excedentes no deducibles o reintegros a favor del ente público.</p>
+  </div>
+
+  <!-- 2. MARCO NORMATIVO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+    <table class="props-table">
+      <thead><tr><th>Norma / Instrumento</th><th>Artículo / Sección</th><th>Disposición y Regla Aplicable</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Manual de Viáticos y Recursos Públicos de la DGA del PJEV</strong></td>
+          <td>Lineamientos Generales y Tabulador Oficial</td>
+          <td>Fija las asignaciones máximas por día para hospedaje, alimentación y traslados locales según el destino geográfico y la jerarquía institucional del comisionado.</td>
+        </tr>
+        <tr>
+          <td><strong>Ley de Impuesto sobre la Renta (LISR)</strong></td>
+          <td>Art. 28 Fracc. V y Art. 93 Fracc. XVII</td>
+          <td>Establece los requisitos fiscales de deducibilidad para viáticos y pasajes, exigiendo que se ejerzan fuera de una faja de 50 kilómetros del centro de trabajo y amparados con CFDI.</td>
+        </tr>
+        <tr>
+          <td><strong>Ley Orgánica del Poder Judicial del Estado de Veracruz</strong></td>
+          <td>Art. 119 y 122</td>
+          <td>Faculta al Consejo de la Judicatura y a la Dirección General de Administración para normar y fiscalizar el gasto operativo en juzgados foráneos y sedes regionales.</td>
+        </tr>
+        <tr>
+          <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
+          <td>Art. 67 y 70</td>
+          <td>Exige que las erogaciones por servicios personales, comisiones y gastos sujetos a comprobar mantengan registro individualizado por beneficiario y clave programática.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. ESTRUCTURA DEL TABULADOR (3 DIMENSIONES) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Estructura y Dimensiones Paramétricas del Tabulador</div>
+    <p>El cálculo del tope de viáticos se rige por tres dimensiones institucionales normalizadas en base de datos:</p>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-top:14px;">
+      <!-- DIMENSIÓN 1: ZONAS -->
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:14px;">
+        <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">1. Zonas Geográficas (3 Zonas)</h4>
+        <ul style="font-size:12px; color:var(--pjev-texto); margin:0; padding-left:18px; line-height:1.6;">
+          <li><strong>Zona 1 · Estado de Veracruz (<code>ZON-VER</code>):</strong> Sedes y juzgados de los 21 distritos judiciales (Xalapa, Veracruz, Coatzacoalcos, Córdoba, Poza Rica, etc.).</li>
+          <li><strong>Zona 2 · Nacional / CDMX (<code>ZON-NAC</code>):</strong> Resto de las entidades federativas del país, incluyendo comparecencias ante SCJN, TEPJF y comisiones en la capital.</li>
+          <li><strong>Zona 3 · Extranjero (<code>ZON-EXT</code>):</strong> Comisiones oficiales internacionales autorizadas de manera expresa por el Pleno del Consejo (cuotas en USD).</li>
+        </ul>
+      </div>
+
+      <!-- DIMENSIÓN 2: JERARQUÍAS -->
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:14px;">
+        <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">2. Niveles Jerárquicos (4 Niveles)</h4>
+        <ul style="font-size:12px; color:var(--pjev-texto); margin:0; padding-left:18px; line-height:1.6;">
+          <li><strong>Nivel 1 (<code>JER-N1</code>):</strong> Magistrados(as) del TSJ y Consejeros(as) de la Judicatura.</li>
+          <li><strong>Nivel 2 (<code>JER-N2</code>):</strong> Directores(as) Generales y Jueces(zas) de Primera Instancia y Menores.</li>
+          <li><strong>Nivel 3 (<code>JER-N3</code>):</strong> Secretarios(as) de Acuerdos, Jefes(as) de Departamento y Actuarios(as).</li>
+          <li><strong>Nivel 4 (<code>JER-N4</code>):</strong> Oficiales Judiciales, Notificadores(as), Choferes y Personal Operativo.</li>
+        </ul>
+      </div>
+
+      <!-- DIMENSIÓN 3: RUBROS -->
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:14px;">
+        <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">3. Rubros de Asignación Diaria</h4>
+        <ul style="font-size:12px; color:var(--pjev-texto); margin:0; padding-left:18px; line-height:1.6;">
+          <li><strong>Hospedaje (COG 37501):</strong> Cuota máxima comprobable por noche. Condicionada a la pernocta en la localidad.</li>
+          <li><strong>Alimentación (COG 37501):</strong> Asignación fija/máxima por día natural de comisión.</li>
+          <li><strong>Pasajes Locales (COG 37201):</strong> Asignación diaria para traslados urbanos en taxi o transporte público.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. TABLA DEL TABULADOR OFICIAL VIGENTE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Tabulador Institucional Vigente (Valores Oficiales PJEV)</div>
+    <p>A continuación se presentan las cuotas diarias vigentes expresadas en moneda nacional (MXN) para territorio nacional y dólares (USD) para comisiones en el extranjero:</p>
+
+    <div style="overflow-x:auto;">
+      <table class="props-table" style="font-size:11px;">
+        <thead>
+          <tr>
+            <th rowspan="2" style="vertical-align:middle;">Zona Geográfica</th>
+            <th rowspan="2" style="vertical-align:middle;">Nivel Jerárquico</th>
+            <th colspan="3" style="text-align:center; border-bottom:1px solid rgba(255,255,255,0.2);">Cuotas Diarias Autorizadas (MXN)</th>
+            <th rowspan="2" style="vertical-align:middle; text-align:center;">Tope Diario Total</th>
+            <th rowspan="2" style="vertical-align:middle; text-align:center;">Tope Sin CFDI (20%)</th>
+          </tr>
+          <tr>
+            <th style="text-align:right;">Hospedaje (Noche)</th>
+            <th style="text-align:right;">Alimentación (Día)</th>
+            <th style="text-align:right;">Pasajes Locales</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- ZONA 1: VERACRUZ -->
+          <tr class="tbl-highlight">
+            <td rowspan="4"><strong>Zona 1: Estado de Veracruz</strong><br><small style="color:var(--pjev-texto-muted);">Distritos Judiciales</small></td>
+            <td><strong>Nivel 1:</strong> Magistrados(as) y Consejeros(as)</td>
+            <td class="money-col">$1,850.00</td>
+            <td class="money-col">$1,050.00</td>
+            <td class="money-col">$350.00</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$3,250.00</td>
+            <td class="money-col" style="color:#b45309;">$280.00</td>
+          </tr>
+          <tr class="tbl-highlight">
+            <td><strong>Nivel 2:</strong> Jueces(zas) y Directores(as)</td>
+            <td class="money-col">$1,450.00</td>
+            <td class="money-col">$850.00</td>
+            <td class="money-col">$250.00</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$2,550.00</td>
+            <td class="money-col" style="color:#b45309;">$220.00</td>
+          </tr>
+          <tr class="tbl-highlight">
+            <td><strong>Nivel 3:</strong> Secretarios(as), Jefes y Actuarios</td>
+            <td class="money-col">$1,150.00</td>
+            <td class="money-col">$650.00</td>
+            <td class="money-col">$200.00</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$2,000.00</td>
+            <td class="money-col" style="color:#b45309;">$170.00</td>
+          </tr>
+          <tr class="tbl-highlight">
+            <td><strong>Nivel 4:</strong> Notificadores(as), Choferes, Operativos</td>
+            <td class="money-col">$850.00</td>
+            <td class="money-col">$500.00</td>
+            <td class="money-col">$150.00</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$1,500.00</td>
+            <td class="money-col" style="color:#b45309;">$130.00</td>
+          </tr>
+
+          <!-- ZONA 2: NACIONAL -->
+          <tr>
+            <td rowspan="4"><strong>Zona 2: Nacional / CDMX</strong><br><small style="color:var(--pjev-texto-muted);">Otras Entidades Federativas</small></td>
+            <td><strong>Nivel 1:</strong> Magistrados(as) y Consejeros(as)</td>
+            <td class="money-col">$2,950.00</td>
+            <td class="money-col">$1,450.00</td>
+            <td class="money-col">$550.00</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$4,950.00</td>
+            <td class="money-col" style="color:#b45309;">$400.00</td>
+          </tr>
+          <tr>
+            <td><strong>Nivel 2:</strong> Jueces(zas) y Directores(as)</td>
+            <td class="money-col">$2,300.00</td>
+            <td class="money-col">$1,150.00</td>
+            <td class="money-col">$400.00</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$3,850.00</td>
+            <td class="money-col" style="color:#b45309;">$310.00</td>
+          </tr>
+          <tr>
+            <td><strong>Nivel 3:</strong> Secretarios(as), Jefes y Actuarios</td>
+            <td class="money-col">$1,750.00</td>
+            <td class="money-col">$900.00</td>
+            <td class="money-col">$300.00</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$2,950.00</td>
+            <td class="money-col" style="color:#b45309;">$240.00</td>
+          </tr>
+          <tr>
+            <td><strong>Nivel 4:</strong> Notificadores(as), Choferes, Operativos</td>
+            <td class="money-col">$1,350.00</td>
+            <td class="money-col">$700.00</td>
+            <td class="money-col">$250.00</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$2,300.00</td>
+            <td class="money-col" style="color:#b45309;">$190.00</td>
+          </tr>
+
+          <!-- ZONA 3: EXTRANJERO -->
+          <tr class="tbl-highlight">
+            <td rowspan="2"><strong>Zona 3: Extranjero (USD)</strong><br><small style="color:var(--pjev-texto-muted);">Comisiones Internacionales</small></td>
+            <td><strong>Nivel 1:</strong> Magistrados(as) y Consejeros(as)</td>
+            <td class="money-col">$250.00 USD</td>
+            <td class="money-col">$120.00 USD</td>
+            <td class="money-col">$50.00 USD</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$420.00 USD</td>
+            <td class="money-col" style="color:#b45309;">$34.00 USD</td>
+          </tr>
+          <tr class="tbl-highlight">
+            <td><strong>Nivel 2 y 3:</strong> Directores y Secretarios</td>
+            <td class="money-col">$190.00 USD</td>
+            <td class="money-col">$90.00 USD</td>
+            <td class="money-col">$40.00 USD</td>
+            <td class="money-col" style="color:var(--pjev-verde-oscuro); font-weight:bold;">$320.00 USD</td>
+            <td class="money-col" style="color:#b45309;">$26.00 USD</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. ACTORES Y PERMISOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Actores y Permisos</div>
+    <table class="props-table">
+      <thead><tr><th>Rol Institucional</th><th>Nivel</th><th>Operaciones Permitidas</th><th>Criterios y Restricciones</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Dirección General de Administración (DGA)</strong></td>
+          <td>Nivel 1</td>
+          <td>Actualización anual del tabulador oficial, aprobación de vigencias y modificación de cuotas por inflación.</td>
+          <td>Requiere autorización expresa del Consejo de la Judicatura para modificar techos.</td>
+        </tr>
+        <tr>
+          <td><strong>Subdirección de Recursos Financieros (SRF)</strong></td>
+          <td>Nivel 2</td>
+          <td>Mantenimiento del catálogo en el sistema, consulta y validación de reglas de auditoría.</td>
+          <td>No puede modificar tarifas de ejercicios fiscales concluidos.</td>
+        </tr>
+        <tr>
+          <td><strong>Analista de Viáticos / Cuentas por Pagar</strong></td>
+          <td>Nivel 3</td>
+          <td>Consulta de tarifas, cálculo de techos en órdenes de pago y validación de comprobaciones presentadas.</td>
+          <td>Acceso de solo lectura en la parametrización de cuotas.</td>
+        </tr>
+        <tr>
+          <td><strong>Servidor Público Comisionado</strong></td>
+          <td>Nivel 4</td>
+          <td>Consulta del simulador de techos para planificar comisiones y conocer los límites diarios autorizados.</td>
+          <td>Acceso informativo a través del portal de autoservicio judicial.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. MODELO DE DATOS Y DICCIONARIO DE CAMPOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Modelo de Datos y Diccionario de Campos</div>
+    <p>El modelo relacional del tabulador reside en el esquema <code>cxp</code> de PostgreSQL. Se implementa en tres tablas normalizadas:</p>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showDBTab('dbt1',this)">cxp.tabulador_tarifas_viaticos</button>
+      <button class="sp-tab" onclick="showDBTab('dbt2',this)">cxp.catalogo_zonas_viaticos</button>
+      <button class="sp-tab" onclick="showDBTab('dbt3',this)">cxp.catalogo_jerarquias_viaticos</button>
+    </div>
+
+    <!-- TABLA 1: TABULADOR -->
+    <div id="dbt-dbt1" class="sp-panel active">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción y Regla de Validación</th></tr></thead>
+        <tbody>
+          <tr><td><code>tarifa_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único del registro de tarifa.</td></tr>
+          <tr><td><code>f_zona_codigo</code></td><td><code>VARCHAR(10) FK</code></td><td>No</td><td>Relación con <code>cxp.catalogo_zonas_viaticos(zona_codigo)</code>.</td></tr>
+          <tr><td><code>f_jerarquia_codigo</code></td><td><code>VARCHAR(10) FK</code></td><td>No</td><td>Relación con <code>cxp.catalogo_jerarquias_viaticos(jerarquia_codigo)</code>.</td></tr>
+          <tr><td><code>ejercicio_fiscal</code></td><td><code>INTEGER</code></td><td>No</td><td>Ejercicio anual de aplicación (ej. 2026).</td></tr>
+          <tr><td><code>cuota_hospedaje_diaria</code></td><td><code>NUMERIC(12,2)</code></td><td>No</td><td>Cuota máxima por noche de hospedaje con comprobante.</td></tr>
+          <tr><td><code>cuota_alimentacion_diaria</code></td><td><code>NUMERIC(12,2)</code></td><td>No</td><td>Cuota diaria máxima para alimentos.</td></tr>
+          <tr><td><code>cuota_pasajes_diaria</code></td><td><code>NUMERIC(12,2)</code></td><td>No</td><td>Cuota diaria máxima para traslados locales urbanos.</td></tr>
+          <tr><td><code>moneda</code></td><td><code>VARCHAR(3)</code></td><td>No</td><td><code>MXN</code> o <code>USD</code>.</td></tr>
+          <tr><td><code>pct_max_sin_cfdi</code></td><td><code>NUMERIC(5,2)</code></td><td>No</td><td>Porcentaje máximo comprobable sin factura fiscal (Default: 20.00%).</td></tr>
+          <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Activo</code>, <code>0 = Inactivo</code> (Soft-delete).</td></tr>
+          <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ</code></td><td>No</td><td>Auditoría de creación institucional.</td></tr>
+          <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ</code></td><td>Sí</td><td>Auditoría de última modificación.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 15px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+      <div class="code-wrap">
+<pre>CREATE TABLE cxp.tabulador_tarifas_viaticos (
+    tarifa_id BIGSERIAL PRIMARY KEY,
+    f_zona_codigo VARCHAR(10) NOT NULL,
+    f_jerarquia_codigo VARCHAR(10) NOT NULL,
+    ejercicio_fiscal INTEGER NOT NULL,
+    cuota_hospedaje_diaria NUMERIC(12,2) NOT NULL DEFAULT 0.00,
+    cuota_alimentacion_diaria NUMERIC(12,2) NOT NULL DEFAULT 0.00,
+    cuota_pasajes_diaria NUMERIC(12,2) NOT NULL DEFAULT 0.00,
+    moneda VARCHAR(3) NOT NULL DEFAULT 'MXN',
+    pct_max_sin_cfdi NUMERIC(5,2) NOT NULL DEFAULT 20.00,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ,
+    CONSTRAINT uq_tabulador_zona_jer_ejercicio UNIQUE (f_zona_codigo, f_jerarquia_codigo, ejercicio_fiscal)
+);</pre>
+      </div>
+    </div>
+
+    <!-- TABLA 2: ZONAS -->
+    <div id="dbt-dbt2" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>zona_codigo</code></td><td><code>VARCHAR(10) PK</code></td><td>No</td><td>Código nemotécnico (<code>ZON-VER</code>, <code>ZON-NAC</code>, <code>ZON-EXT</code>).</td></tr>
+          <tr><td><code>zona_nombre</code></td><td><code>VARCHAR(100)</code></td><td>No</td><td>Nombre descriptivo de la zona geográfica.</td></tr>
+          <tr><td><code>orden_visual</code></td><td><code>SMALLINT</code></td><td>No</td><td>Secuencia de orden en combos y reportes.</td></tr>
+          <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Activo</code>, <code>0 = Inactivo</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 15px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+      <div class="code-wrap">
+<pre>CREATE TABLE cxp.catalogo_zonas_viaticos (
+    zona_codigo VARCHAR(10) PRIMARY KEY,
+    zona_nombre VARCHAR(100) NOT NULL,
+    orden_visual SMALLINT NOT NULL DEFAULT 1,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
+);</pre>
+      </div>
+    </div>
+
+    <!-- TABLA 3: JERARQUÍAS -->
+    <div id="dbt-dbt3" class="sp-panel">
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>jerarquia_codigo</code></td><td><code>VARCHAR(10) PK</code></td><td>No</td><td>Código del nivel jerárquico (<code>JER-N1</code> a <code>JER-N4</code>).</td></tr>
+          <tr><td><code>jerarquia_nombre</code></td><td><code>VARCHAR(150)</code></td><td>No</td><td>Puestos y cargos comprendidos en el nivel.</td></tr>
+          <tr><td><code>orden_visual</code></td><td><code>SMALLINT</code></td><td>No</td><td>Secuencia jerárquica de mayor a menor.</td></tr>
+          <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Activo</code>, <code>0 = Inactivo</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size: 13px; color: var(--pjev-verde-oscuro); margin-top: 15px; margin-bottom: 8px;">DDL (PostgreSQL)</h3>
+      <div class="code-wrap">
+<pre>CREATE TABLE cxp.catalogo_jerarquias_viaticos (
+    jerarquia_codigo VARCHAR(10) PRIMARY KEY,
+    jerarquia_nombre VARCHAR(150) NOT NULL,
+    orden_visual SMALLINT NOT NULL DEFAULT 1,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
+);</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. STORED PROCEDURES (LEER Y CRUD) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Funciones almacenadas en el esquema <code>cxp</code> bajo el estándar PJEV con <code>SECURITY DEFINER</code>, <code>SET search_path</code> y retorno JSONB unificado <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>:
+    </p>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showSP('spt1',this)">7.1 fn_leer_tarifas_viaticos</button>
+      <button class="sp-tab" onclick="showSP('spt2',this)">7.2 fn_crud_tarifas_viaticos</button>
+      <button class="sp-tab" onclick="showSP('spt3',this)">7.3 fn_calcular_tope_viaticos</button>
+    </div>
+
+    <!-- SP 1: LEER -->
+    <div id="sp-spt1" class="sp-panel active">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función de Consulta: <code>cxp.fn_leer_tarifas_viaticos</code></h4>
+      <table class="props-table" style="margin-bottom:12px;">
+        <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario activo de sesión.</td></tr>
+          <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal en curso.</td></tr>
+          <tr><td><code>p_zona_codigo</code></td><td><code>VARCHAR(10)</code></td><td>Filtro por zona geográfica (Opcional).</td></tr>
+          <tr><td><code>p_jerarquia_codigo</code></td><td><code>VARCHAR(10)</code></td><td>Filtro por jerarquía (Opcional).</td></tr>
+          <tr><td><code>p_estatus</code></td><td><code>SMALLINT</code></td><td><code>1 = Activos</code>, <code>0 = Inactivos</code>, <code>NULL = Todos</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_leer_tarifas_viaticos(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_zona_codigo VARCHAR DEFAULT NULL,
+    p_jerarquia_codigo VARCHAR DEFAULT NULL,
+    p_estatus SMALLINT DEFAULT 1
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'tarifa_id', t.tarifa_id,
+            'zona_codigo', t.f_zona_codigo,
+            'zona_nombre', z.zona_nombre,
+            'jerarquia_codigo', t.f_jerarquia_codigo,
+            'jerarquia_nombre', j.jerarquia_nombre,
+            'ejercicio_fiscal', t.ejercicio_fiscal,
+            'cuota_hospedaje_diaria', t.cuota_hospedaje_diaria,
+            'cuota_alimentacion_diaria', t.cuota_alimentacion_diaria,
+            'cuota_pasajes_diaria', t.cuota_pasajes_diaria,
+            'tope_diario_total', (t.cuota_hospedaje_diaria + t.cuota_alimentacion_diaria + t.cuota_pasajes_diaria),
+            'moneda', t.moneda,
+            'pct_max_sin_cfdi', t.pct_max_sin_cfdi,
+            'estatus_registro', t.estatus_registro,
+            'usuario_c', t.usuario_c,
+            'fecha_c', t.fecha_c,
+            'usuario_m', t.usuario_m,
+            'fecha_m', t.fecha_m
+        ) ORDER BY z.orden_visual, j.orden_visual
+    ) INTO v_data
+    FROM cxp.tabulador_tarifas_viaticos t
+    JOIN cxp.catalogo_zonas_viaticos z ON z.zona_codigo = t.f_zona_codigo
+    JOIN cxp.catalogo_jerarquias_viaticos j ON j.jerarquia_codigo = t.f_jerarquia_codigo
+    WHERE t.ejercicio_fiscal = p_ejercicio
+      AND (p_estatus IS NULL OR t.estatus_registro = p_estatus)
+      AND (p_zona_codigo IS NULL OR t.f_zona_codigo = p_zona_codigo)
+      AND (p_jerarquia_codigo IS NULL OR t.f_jerarquia_codigo = p_jerarquia_codigo);
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'OK',
+        'data', COALESCE(v_data, '[]'::jsonb)
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 2: CRUD -->
+    <div id="sp-spt2" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función Transaccional: <code>cxp.fn_crud_tarifas_viaticos</code></h4>
+      <table class="props-table" style="margin-bottom:12px;">
+        <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1 = Alta / Actualización de Cuota</code>, <code>2 = Modificación</code>, <code>3 = Baja Lógica</code>, <code>4 = Reactivar</code>.</td></tr>
+          <tr><td><code>p_usuario</code></td><td><code>VARCHAR(50)</code></td><td>Usuario responsable.</td></tr>
+          <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal en curso.</td></tr>
+          <tr><td><code>p_tarifa_id</code></td><td><code>BIGINT</code></td><td>ID de la tarifa (Opcional en acción 1 si viene zona y jerarquía).</td></tr>
+          <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con importes de hospedaje, alimentación, pasajes y porcentajes.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_crud_tarifas_viaticos(
+    p_accion SMALLINT,
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER,
+    p_tarifa_id BIGINT,
+    p_datos JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cxp, config, public
+AS $$
+DECLARE
+    v_id BIGINT;
+    v_zona VARCHAR(10);
+    v_jerarquia VARCHAR(10);
+BEGIN
+    v_zona := p_datos->>'zona_codigo';
+    v_jerarquia := p_datos->>'jerarquia_codigo';
+
+    -- 1 = ALTA O UPSERT DE TARIFA ANUAL
+    IF p_accion = 1 THEN
+        INSERT INTO cxp.tabulador_tarifas_viaticos (
+            f_zona_codigo, f_jerarquia_codigo, ejercicio_fiscal,
+            cuota_hospedaje_diaria, cuota_alimentacion_diaria, cuota_pasajes_diaria,
+            moneda, pct_max_sin_cfdi, estatus_registro, usuario_c, fecha_c
+        ) VALUES (
+            v_zona, v_jerarquia, p_ejercicio,
+            COALESCE((p_datos->>'cuota_hospedaje_diaria')::NUMERIC, 0.00),
+            COALESCE((p_datos->>'cuota_alimentacion_diaria')::NUMERIC, 0.00),
+            COALESCE((p_datos->>'cuota_pasajes_diaria')::NUMERIC, 0.00),
+            COALESCE(p_datos->>'moneda', 'MXN'),
+            COALESCE((p_datos->>'pct_max_sin_cfdi')::NUMERIC, 20.00),
+            1, p_usuario, clock_timestamp()
+        )
+        ON CONFLICT (f_zona_codigo, f_jerarquia_codigo, ejercicio_fiscal) DO UPDATE
+        SET cuota_hospedaje_diaria = EXCLUDED.cuota_hospedaje_diaria,
+            cuota_alimentacion_diaria = EXCLUDED.cuota_alimentacion_diaria,
+            cuota_pasajes_diaria = EXCLUDED.cuota_pasajes_diaria,
+            moneda = EXCLUDED.moneda,
+            pct_max_sin_cfdi = EXCLUDED.pct_max_sin_cfdi,
+            estatus_registro = 1,
+            usuario_m = p_usuario,
+            fecha_m = clock_timestamp()
+        RETURNING tarifa_id INTO v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tarifa de viáticos guardada con éxito.', 'data', jsonb_build_object('tarifa_id', v_id));
+
+    -- 2 = MODIFICACIÓN DIRECTA POR ID
+    ELSIF p_accion = 2 THEN
+        UPDATE cxp.tabulador_tarifas_viaticos SET
+            cuota_hospedaje_diaria = COALESCE((p_datos->>'cuota_hospedaje_diaria')::NUMERIC, cuota_hospedaje_diaria),
+            cuota_alimentacion_diaria = COALESCE((p_datos->>'cuota_alimentacion_diaria')::NUMERIC, cuota_alimentacion_diaria),
+            cuota_pasajes_diaria = COALESCE((p_datos->>'cuota_pasajes_diaria')::NUMERIC, cuota_pasajes_diaria),
+            moneda = COALESCE(p_datos->>'moneda', moneda),
+            pct_max_sin_cfdi = COALESCE((p_datos->>'pct_max_sin_cfdi')::NUMERIC, pct_max_sin_cfdi),
+            usuario_m = p_usuario, fecha_m = clock_timestamp()
+        WHERE tarifa_id = p_tarifa_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tarifa de viáticos actualizada.', 'data', jsonb_build_object('tarifa_id', p_tarifa_id));
+
+    -- 3 = BAJA LÓGICA
+    ELSIF p_accion = 3 THEN
+        UPDATE cxp.tabulador_tarifas_viaticos
+           SET estatus_registro = 0, usuario_m = p_usuario, fecha_m = clock_timestamp()
+         WHERE tarifa_id = p_tarifa_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tarifa inactivada lógicamente.', 'data', jsonb_build_object('tarifa_id', p_tarifa_id));
+
+    -- 4 = REACTIVAR
+    ELSIF p_accion = 4 THEN
+        UPDATE cxp.tabulador_tarifas_viaticos
+           SET estatus_registro = 1, usuario_m = p_usuario, fecha_m = clock_timestamp()
+         WHERE tarifa_id = p_tarifa_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tarifa reactivada correctamente.', 'data', jsonb_build_object('tarifa_id', p_tarifa_id));
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no soportada.');
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 3: CALCULADORA TOPE -->
+    <div id="sp-spt3" class="sp-panel">
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Motor de Cálculo de Techos: <code>cxp.fn_calcular_tope_viaticos</code></h4>
+      <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:10px;">
+        Esta función es consumida por el frontend en tiempo real al registrar una comisión en <code>05.2.3 Gastos a comprobar</code> y al auditar la comprobación (Anexo 6). Devuelve el desglose presupuestal por rubro y los techos máximos permitidos con y sin factura.
+      </p>
+
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_calcular_tope_viaticos(
+    p_zona_codigo VARCHAR,
+    p_jerarquia_codigo VARCHAR,
+    p_dias_comision INTEGER,
+    p_pernocta BOOLEAN DEFAULT true,
+    p_ejercicio INTEGER DEFAULT EXTRACT(YEAR FROM CURRENT_DATE)::INTEGER
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = cxp, config, public
+AS $$
+DECLARE
+    v_tarifa RECORD;
+    v_noches INTEGER := 0;
+    v_tope_hospedaje NUMERIC(12,2) := 0.00;
+    v_tope_alimentos NUMERIC(12,2) := 0.00;
+    v_tope_pasajes NUMERIC(12,2) := 0.00;
+    v_tope_total NUMERIC(12,2) := 0.00;
+    v_max_sin_cfdi NUMERIC(12,2) := 0.00;
+BEGIN
+    IF p_dias_comision <= 0 THEN
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'La comisión debe ser de al menos 1 día natural.');
+    END IF;
+
+    -- Obtener tarifa vigente
+    SELECT * INTO v_tarifa
+      FROM cxp.tabulador_tarifas_viaticos
+     WHERE f_zona_codigo = p_zona_codigo
+       AND f_jerarquia_codigo = p_jerarquia_codigo
+       AND ejercicio_fiscal = p_ejercicio
+       AND estatus_registro = 1;
+
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object(
+            'error', -1,
+            'mensaje', 'No existe tarifa de viáticos activa para la combinación de zona y jerarquía en el ejercicio ' || p_ejercicio
+        );
+    END IF;
+
+    -- Si hay pernocta, las noches son días - 1 (o días completos según fecha)
+    IF p_pernocta THEN
+        v_noches := GREATEST(1, p_dias_comision - 1);
+        v_tope_hospedaje := v_tarifa.cuota_hospedaje_diaria * v_noches;
+    ELSE
+        v_tope_hospedaje := 0.00;
+    END IF;
+
+    v_tope_alimentos := v_tarifa.cuota_alimentacion_diaria * p_dias_comision;
+    v_tope_pasajes := v_tarifa.cuota_pasajes_diaria * p_dias_comision;
+    v_tope_total := v_tope_hospedaje + v_tope_alimentos + v_tope_pasajes;
+
+    -- El 20% sin CFDI aplica sobre alimentos y pasajes (no sobre hospedaje)
+    v_max_sin_cfdi := ROUND((v_tope_alimentos + v_tope_pasajes) * (v_tarifa.pct_max_sin_cfdi / 100.0), 2);
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'OK',
+        'data', jsonb_build_object(
+            'zona_codigo', p_zona_codigo,
+            'jerarquia_codigo', p_jerarquia_codigo,
+            'dias_comision', p_dias_comision,
+            'noches_hospedaje', v_noches,
+            'pernocta', p_pernocta,
+            'moneda', v_tarifa.moneda,
+            'cuotas_unitarias', jsonb_build_object(
+                'hospedaje_noche', v_tarifa.cuota_hospedaje_diaria,
+                'alimentos_dia', v_tarifa.cuota_alimentacion_diaria,
+                'pasajes_dia', v_tarifa.cuota_pasajes_diaria
+            ),
+            'techos_totales', jsonb_build_object(
+                'tope_hospedaje', v_tope_hospedaje,
+                'tope_alimentos', v_tope_alimentos,
+                'tope_pasajes', v_tope_pasajes,
+                'tope_gran_total', v_tope_total,
+                'tope_max_sin_cfdi', v_max_sin_cfdi
+            )
+        )
+    );
+END;
+$$;</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. SERVICIOS API REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      El backend expone los endpoints de administración y la calculadora bajo el controlador <code>TarifasViaticosController</code>:
+    </p>
+
+    <table class="props-table" style="margin-bottom:16px;">
+      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/cxp/tarifas-viaticos</code></td>
+          <td>Query: <code>{ ejercicio, zona?, jerarquia?, estatus? }</code></td>
+          <td>Consulta el tabulador completo con filtros opcionales.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/cxp/tarifas-viaticos</code></td>
+          <td>Body: <code>GuardarTarifaViaticoDto</code></td>
+          <td>Crea o actualiza una cuota del tabulador (Upsert).</td>
+        </tr>
+        <tr>
+          <td><code class="method put">PUT</code></td>
+          <td><code>/api/v1/cxp/tarifas-viaticos/:id</code></td>
+          <td>Param: <code>id</code>, Body: <code>UpdateTarifaViaticoDto</code></td>
+          <td>Modifica cuotas de un registro existente.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/cxp/tarifas-viaticos/calcular-tope</code></td>
+          <td>Query: <code>{ zona, jerarquia, dias, pernocta }</code></td>
+          <td>Calcula el techo financiero autorizado y el límite sin CFDI.</td>
+        </tr>
+        <tr>
+          <td><code class="method patch">PATCH</code></td>
+          <td><code>/api/v1/cxp/tarifas-viaticos/:id/estatus</code></td>
+          <td>Param: <code>id</code>, Body: <code>{ estatus: 0 | 1 }</code></td>
+          <td>Baja lógica o reactivación de una tarifa.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">Controlador NestJS: <code>tarifas-viaticos.controller.ts</code></h4>
+    <div class="code-wrap">
+<pre><code>import { Controller, Get, Post, Put, Patch, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../configuracion/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../configuracion/auth/guards/roles.guard';
+import { MinRol } from '../configuracion/auth/decorators/min-rol.decorator';
+import { TarifasViaticosService } from './tarifas-viaticos.service';
+
+@ApiTags('CxP / Catálogos / Tarifas de Viáticos')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('cxp/tarifas-viaticos')
+export class TarifasViaticosController {
+  constructor(private readonly service: TarifasViaticosService) {}
+
+  @Get()
+  @MinRol(4)
+  @ApiOperation({ summary: 'Obtener tabulador de tarifas de viáticos' })
+  findAll(
+    @Req() req,
+    @Query('ejercicio') ejercicio?: number,
+    @Query('zona') zona?: string,
+    @Query('jerarquia') jerarquia?: string,
+    @Query('estatus') estatus?: number,
+  ) {
+    return this.service.findAll({
+      ejercicio: ejercicio ?? new Date().getFullYear(),
+      zona,
+      jerarquia,
+      estatus: estatus ?? 1,
+    }, req.user);
+  }
+
+  @Get('calcular-tope')
+  @MinRol(4)
+  @ApiOperation({ summary: 'Simular y calcular techo de viáticos para una comisión' })
+  calcularTope(
+    @Query('zona') zona: string,
+    @Query('jerarquia') jerarquia: string,
+    @Query('dias') dias: number,
+    @Query('pernocta') pernocta: boolean = true,
+  ) {
+    return this.service.calcularTope(zona, jerarquia, Number(dias), pernocta);
+  }
+
+  @Post()
+  @MinRol(1)
+  @ApiOperation({ summary: 'Registrar o actualizar cuota en el tabulador oficial' })
+  @ApiResponse({ status: 201, description: 'Tarifa guardada con éxito.' })
+  save(@Body() dto: GuardarTarifaViaticoDto, @Req() req) {
+    return this.service.save(dto, req.user);
+  }
+
+  @Put(':id')
+  @MinRol(1)
+  @ApiOperation({ summary: 'Modificar importes de tarifa por ID' })
+  update(@Param('id') id: string, @Body() dto: UpdateTarifaViaticoDto, @Req() req) {
+    return this.service.update(Number(id), dto, req.user);
+  }
+
+  @Patch(':id/estatus')
+  @MinRol(1)
+  @ApiOperation({ summary: 'Inactivar o reactivar tarifa' })
+  cambiarEstatus(@Param('id') id: string, @Body('estatus') estatus: number, @Req() req) {
+    return this.service.cambiarEstatus(Number(id), estatus, req.user);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 9. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Reglas de Negocio y Validaciones</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-VIA-01 · Límite Máximo Infranqueable por Factura</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Si el servidor público presenta una factura de hospedaje o alimentación que exceda la cuota diaria establecida en el tabulador para su jerarquía y zona, el sistema solo reconocerá como gasto devengable el importe máximo del tabulador. El excedente no será cubierto por el PJEV.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-VIA-02 · Condición de Pernocta Obligatoria para Hospedaje</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Para comisiones de ida y vuelta en el mismo día natural (sin pernocta), la cuota de hospedaje se congela automáticamente en $0.00 MXN. El sistema no admitirá facturas de hotel para comisiones de 1 solo día a menos que exista justificación extraordinaria autorizada por la DGA.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-VIA-03 · Regla de Gastos No Comprobables Fiscalmente (Tope 20%)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          La suma de los recibos simples y gastos menores justificados sin CFDI no podrá superar bajo ninguna circunstancia el <strong>20% del total de alimentos y pasajes asignados</strong>. Cualquier importe que sobrepase este 20% deberá ser reintegrado a cuentas del PJEV.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-VIA-04 · Plazo Perentorio de Comprobación (5 Días Hábiles)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Conforme al Manual de Viáticos del PJEV, el comisionado dispone de un plazo máximo de <strong>5 días hábiles</strong> posteriores al término de la comisión para presentar su comprobación (Anexo 6). Vencido el plazo sin comprobación, el sistema genera alerta para retención vía nómina.
+        </p>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-VIA-05 · Generación Automática de Reintegro hacia Ingresos</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Si el recurso otorgado fue mayor a los gastos reales válidamente comprobados, el saldo resultante debe devolverse a la cuenta bancaria pagadora. El sistema enlaza la ficha de depósito con el módulo <code>04.2.1 Registro de Ingresos</code> bajo el concepto <code>ING-REI-VIA</code>.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 10. PROPUESTA VISUAL (WIREFRAMES) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Propuesta Visual de Interfaz (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wfvia1',this)">1. Matriz del Tabulador Oficial (Grid)</button>
+      <button class="wf-tab" onclick="showWF('wfvia2',this)">2. Modal de Actualización de Cuotas</button>
+      <button class="wf-tab" onclick="showWF('wfvia3',this)">3. Calculadora / Simulador de Comisiones</button>
+    </div>
+
+    <!-- WF1: GRID TABULADOR -->
+    <div id="wf-wfvia1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.1.2 Tabulador Oficial de Viáticos PJEV · Ejercicio 2026</span>
+          <span style="font-size:10px; color:#666;">Filtros por Zona y Nivel Jerárquico</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="380" fill="#f8fafc" rx="4"/>
+            <!-- Header Bar -->
+            <rect x="15" y="15" width="930" height="50" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <text x="30" y="44" font-size="13" font-weight="bold" fill="#183125">Tabulador de Viáticos Oficial (Ejercicio Fiscal 2026)</text>
+            <rect x="680" y="25" width="110" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="735" y="44" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">📥 Exportar PDF</text>
+            <rect x="800" y="25" width="130" height="30" fill="#183125" rx="4"/>
+            <text x="865" y="44" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">⚙ Ajustar Cuotas</text>
+
+            <!-- Filtros -->
+            <rect x="15" y="75" width="930" height="40" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="25" y="99" font-size="10" fill="#64748b">Ejercicio:</text>
+            <rect x="75" y="84" width="80" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="85" y="99" font-size="10" fill="#1e293b">2026 ▼</text>
+            <text x="175" y="99" font-size="10" fill="#64748b">Zona:</text>
+            <rect x="215" y="84" width="180" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="225" y="99" font-size="10" fill="#1e293b">Todas las zonas ▼</text>
+            <text x="415" y="99" font-size="10" fill="#64748b">Moneda:</text>
+            <rect x="470" y="84" width="90" height="22" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="480" y="99" font-size="10" fill="#1e293b">MXN ▼</text>
+
+            <!-- Table Header -->
+            <rect x="15" y="125" width="930" height="28" fill="#183125"/>
+            <text x="25" y="143" font-size="9" font-weight="bold" fill="#ffffff">ZONA GEOGRÁFICA</text>
+            <text x="210" y="143" font-size="9" font-weight="bold" fill="#ffffff">NIVEL JERÁRQUICO</text>
+            <text x="430" y="143" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">HOSPEDAJE (NOCHE)</text>
+            <text x="560" y="143" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">ALIMENTACIÓN (DÍA)</text>
+            <text x="680" y="143" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">PASAJES LOCALES</text>
+            <text x="800" y="143" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">TOPE TOTAL DÍA</text>
+            <text x="910" y="143" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ACCIONES</text>
+
+            <!-- Row 1: Veracruz N1 -->
+            <rect x="15" y="155" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="176" font-size="10" font-weight="bold" fill="#0284c7">ZON-VER (Veracruz)</text>
+            <text x="210" y="176" font-size="10" fill="#1e293b">JER-N1 · Magistrados y Consejeros</text>
+            <text x="430" y="176" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$1,850.00</text>
+            <text x="560" y="176" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$1,050.00</text>
+            <text x="680" y="176" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$350.00</text>
+            <text x="800" y="176" font-size="10" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$3,250.00</text>
+            <text x="910" y="176" font-size="11" fill="#0284c7" text-anchor="middle">✏ 👁</text>
+
+            <!-- Row 2: Veracruz N2 -->
+            <rect x="15" y="191" width="930" height="34" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="212" font-size="10" font-weight="bold" fill="#0284c7">ZON-VER (Veracruz)</text>
+            <text x="210" y="212" font-size="10" fill="#1e293b">JER-N2 · Jueces y Directores</text>
+            <text x="430" y="212" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$1,450.00</text>
+            <text x="560" y="212" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$850.00</text>
+            <text x="680" y="212" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$250.00</text>
+            <text x="800" y="212" font-size="10" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$2,550.00</text>
+            <text x="910" y="212" font-size="11" fill="#0284c7" text-anchor="middle">✏ 👁</text>
+
+            <!-- Row 3: Nacional N1 -->
+            <rect x="15" y="227" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="25" y="248" font-size="10" font-weight="bold" fill="#0284c7">ZON-NAC (Nacional)</text>
+            <text x="210" y="248" font-size="10" fill="#1e293b">JER-N1 · Magistrados y Consejeros</text>
+            <text x="430" y="248" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$2,950.00</text>
+            <text x="560" y="248" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$1,450.00</text>
+            <text x="680" y="248" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$550.00</text>
+            <text x="800" y="248" font-size="10" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$4,950.00</text>
+            <text x="910" y="248" font-size="11" fill="#0284c7" text-anchor="middle">✏ 👁</text>
+
+            <!-- Row 4: Nacional N2 -->
+            <rect x="15" y="263" width="930" height="34" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="25" y="284" font-size="10" font-weight="bold" fill="#0284c7">ZON-NAC (Nacional)</text>
+            <text x="210" y="284" font-size="10" fill="#1e293b">JER-N2 · Jueces y Directores</text>
+            <text x="430" y="284" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$2,300.00</text>
+            <text x="560" y="284" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$1,150.00</text>
+            <text x="680" y="284" font-size="10" font-family="monospace" fill="#334155" text-anchor="end">$400.00</text>
+            <text x="800" y="284" font-size="10" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$3,850.00</text>
+            <text x="910" y="284" font-size="11" fill="#0284c7" text-anchor="middle">✏ 👁</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: MODAL AJUSTE -->
+    <div id="wf-wfvia2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.1.2 Actualización de Cuota Diaria de Viáticos</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 650 380" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="650" height="380" fill="#ffffff" stroke="#cbd5e1" rx="8"/>
+            <rect width="650" height="45" fill="#183125" rx="8"/>
+            <text x="20" y="28" font-size="13" font-weight="bold" fill="#ffffff">Parametrización de Cuotas por Zona y Jerarquía</text>
+            <text x="620" y="28" font-size="14" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
+
+            <text x="30" y="75" font-size="11" font-weight="bold" fill="#334155">Zona Geográfica:</text>
+            <rect x="30" y="85" width="270" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="103" font-size="11" fill="#1e293b">ZON-VER · Estado de Veracruz</text>
+
+            <text x="330" y="75" font-size="11" font-weight="bold" fill="#334155">Nivel Jerárquico:</text>
+            <rect x="330" y="85" width="290" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="340" y="103" font-size="11" fill="#1e293b">JER-N2 · Jueces y Directores</text>
+
+            <!-- Cuotas -->
+            <text x="30" y="140" font-size="11" font-weight="bold" fill="#334155">Hospedaje por Noche ($):</text>
+            <rect x="30" y="150" width="180" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="168" font-size="11" font-family="monospace" fill="#1e293b">1,450.00</text>
+
+            <text x="230" y="140" font-size="11" font-weight="bold" fill="#334155">Alimentación Diaria ($):</text>
+            <rect x="230" y="150" width="180" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="240" y="168" font-size="11" font-family="monospace" fill="#1e293b">850.00</text>
+
+            <text x="430" y="140" font-size="11" font-weight="bold" fill="#334155">Pasajes Locales ($):</text>
+            <rect x="430" y="150" width="190" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="440" y="168" font-size="11" font-family="monospace" fill="#1e293b">250.00</text>
+
+            <!-- Parámetros adicionales -->
+            <text x="30" y="205" font-size="11" font-weight="bold" fill="#334155">Tope Máximo Sin CFDI (%):</text>
+            <rect x="30" y="215" width="180" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="233" font-size="11" font-family="monospace" fill="#1e293b">20.00 %</text>
+
+            <text x="230" y="205" font-size="11" font-weight="bold" fill="#334155">Ejercicio Fiscal Vigente:</text>
+            <rect x="230" y="215" width="180" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="240" y="233" font-size="11" fill="#1e293b">2026</text>
+
+            <!-- Resumen Informativo -->
+            <rect x="30" y="260" width="590" height="55" fill="#f0fdf4" stroke="#86efac" rx="4"/>
+            <text x="45" y="282" font-size="11" font-weight="bold" fill="#166534">Tope Diario Total Resultante: $2,550.00 MXN</text>
+            <text x="45" y="300" font-size="10" fill="#15803d">Límite comprobable sin factura: $220.00 MXN / día (20% de alimentos y pasajes).</text>
+
+            <!-- Buttons -->
+            <rect x="410" y="330" width="100" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="460" y="350" font-size="11" font-weight="bold" fill="#64748b" text-anchor="middle">Cancelar</text>
+            <rect x="520" y="330" width="100" height="32" fill="#183125" rx="4"/>
+            <text x="570" y="350" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar Cuota</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF3: CALCULADORA -->
+    <div id="wf-wfvia3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Simulador / Calculadora Oficial de Viáticos PJEV</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Herramienta para Comisiones en 05.2.3</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 850 340" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="850" height="340" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect width="850" height="40" fill="#f8fafc" stroke="#cbd5e1" rx="6"/>
+            <text x="25" y="25" font-size="12" font-weight="bold" fill="#183125">Calculadora de Techos Financieros para Oficio de Comisión (Anexo 5)</text>
+
+            <!-- Inputs Panel Izquierdo -->
+            <text x="30" y="70" font-size="10" font-weight="bold" fill="#334155">Zona de Destino:</text>
+            <rect x="30" y="80" width="220" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="40" y="97" font-size="10" fill="#1e293b">ZON-VER · Xalapa a Coatzacoalcos</text>
+
+            <text x="30" y="125" font-size="10" font-weight="bold" fill="#334155">Nivel del Servidor:</text>
+            <rect x="30" y="135" width="220" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="40" y="152" font-size="10" fill="#1e293b">JER-N3 · Secretario de Acuerdos</text>
+
+            <text x="30" y="180" font-size="10" font-weight="bold" fill="#334155">Días Naturales de Comisión:</text>
+            <rect x="30" y="190" width="100" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="40" y="207" font-size="10" font-family="monospace" fill="#1e293b">3 días</text>
+
+            <text x="150" y="180" font-size="10" font-weight="bold" fill="#334155">¿Requiere Pernocta?</text>
+            <rect x="150" y="190" width="100" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="160" y="207" font-size="10" fill="#15803d">SÍ (2 Noches)</text>
+
+            <rect x="30" y="240" width="220" height="30" fill="#183125" rx="4"/>
+            <text x="140" y="260" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Calcular Techo Máximo</text>
+
+            <!-- Results Panel Derecho -->
+            <rect x="280" y="55" width="540" height="255" fill="#f8fafc" stroke="#e2e8f0" rx="6"/>
+            <text x="300" y="80" font-size="12" font-weight="bold" fill="#183125">Desglose Presupuestal de Techos Autorizados:</text>
+
+            <!-- Línea Hospedaje -->
+            <text x="300" y="115" font-size="11" fill="#334155">Hospedaje (2 Noches @ $1,150.00):</text>
+            <text x="790" y="115" font-size="11" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$2,300.00 MXN</text>
+
+            <!-- Línea Alimentos -->
+            <text x="300" y="145" font-size="11" fill="#334155">Alimentación (3 Días @ $650.00):</text>
+            <text x="790" y="145" font-size="11" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$1,950.00 MXN</text>
+
+            <!-- Línea Pasajes -->
+            <text x="300" y="175" font-size="11" fill="#334155">Pasajes Locales (3 Días @ $200.00):</text>
+            <text x="790" y="175" font-size="11" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$600.00 MXN</text>
+
+            <line x1="300" y1="195" x2="790" y2="195" stroke="#cbd5e1" stroke-dasharray="4"/>
+
+            <!-- Total -->
+            <text x="300" y="225" font-size="13" font-weight="bold" fill="#183125">TECHO FINANCIERO TOTAL AUTORIZADO:</text>
+            <text x="790" y="225" font-size="15" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$4,850.00 MXN</text>
+
+            <rect x="300" y="245" width="490" height="45" fill="#fef3c7" stroke="#fcd34d" rx="4"/>
+            <text x="315" y="263" font-size="10" font-weight="bold" fill="#92400e">Tope Máximo de Gastos Menores Sin Comprobante Fiscal (20%):</text>
+            <text x="315" y="278" font-size="10" fill="#78350f">Hasta $510.00 MXN amparables mediante relación firmada (excluye hospedaje).</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. INTEGRACIONES Y DEPENDENCIAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Integraciones y Dependencias Inter-módulos</div>
+    <table class="props-table">
+      <thead><tr><th>Módulo / Subsistema</th><th>Relación Técnica</th><th>Efecto de Integración</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>05.2.3 Gastos a comprobar</strong></td>
+          <td>Emisión de anticipo</td>
+          <td>Calcula el importe máximo a transferir en la orden de comisión institucional (Anexo 5).</td>
+        </tr>
+        <tr>
+          <td><strong>05.2.1 Afectación del Gasto</strong></td>
+          <td>Comprobación de viáticos</td>
+          <td>Audita las facturas CFDI de hospedaje y alimentos presentadas contra los techos del tabulador (Anexo 6).</td>
+        </tr>
+        <tr>
+          <td><strong>04.2.1 Registro de Ingresos</strong></td>
+          <td>Reintegro de remanentes</td>
+          <td>Recibe los depósitos bancarios de devoluciones de viáticos no ejercidos bajo la clave <code>ING-REI-VIA</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>01.3.2 Catálogo de Empleados</strong></td>
+          <td>Identificación de jerarquía</td>
+          <td>Provee el cargo y nivel salarial oficial del servidor público comisionado para fijar la tarifa automáticamente.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 12. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Casos de Prueba (Validación QA)</div>
+    <table class="props-table">
+      <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Entrada / Acción</th><th>Resultado Esperado</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-VIA-01</strong></td>
+          <td>Cálculo de comisión de 1 día sin pernocta</td>
+          <td>Zona Veracruz, Nivel 2 (Juez), 1 día, pernocta = false.</td>
+          <td>Hospedaje = $0.00, Alimentos = $850.00, Pasajes = $250.00. Total = $1,100.00 MXN.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-VIA-02</strong></td>
+          <td>Factura de hotel que excede el tabulador</td>
+          <td>Comisión Nivel 3 (Tope $1,150.00) presenta factura de hotel por $1,600.00 MXN.</td>
+          <td>El sistema reconoce $1,150.00 como gasto devengable y marca $450.00 como excedente no cubierto.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-VIA-03</strong></td>
+          <td>Exceso en gastos sin comprobante fiscal</td>
+          <td>Comisión de 3 días con $600.00 de gastos sin factura (Tope autorizado: $510.00).</td>
+          <td>El validador marca error: $90.00 deben ser reintegrados a la cuenta bancaria del PJEV.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-VIA-04</strong></td>
+          <td>Comisión fuera de plazo de 5 días hábiles</td>
+          <td>Intentar ingresar comprobación con 12 días naturales tras el fin de la comisión.</td>
+          <td>Alerta preventiva por vencimiento de plazo legal; notifica al área de nóminas para retención cautelar.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 13. HISTORIAL DE VERSIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">13</span> Historial de Versiones</div>
+    <table class="props-table">
+      <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Cambios Realizados</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>1.0.0</code></td>
+          <td>2026-09-02</td>
+          <td>Equipo SIAF-PJEV / Dix Consultoría</td>
+          <td>Documentación inicial del tabulador de viáticos bajo estándar DOC-08, 3 zonas geográficas, 4 jerarquías, cuotas institucionales oficiales, DDL PostgreSQL, SPs de consulta y cálculo, controlador NestJS y Wireframes SVG interactivos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  function showWF(wfId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('wf-' + wfId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showSP(spId, btn) {
+    document.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('sp-' + spId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showDBTab(tabId, btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const container = parent.parentElement;
+    container.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('dbt-' + tabId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
