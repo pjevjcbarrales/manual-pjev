@@ -1303,18 +1303,223 @@ export class AfectacionesCxpController {
   <div class="doc-section">
     <div class="section-title"><span class="section-num">9</span> Propuesta Visual de Interfaz (Wireframes Nativos)</div>
 
-    <div class="wf-tabs">
-      <button class="wf-tab active" onclick="showWF('wfag1',this)">1. Modal de Clasificación del Trámite (Wizard)</button>
-      <button class="wf-tab" onclick="showWF('wfag2',this)">2. Formulario Maestro-Detalle y Grid CFDIs</button>
-      <button class="wf-tab" onclick="showWF('wfag3',this)">3. Previsualizador de Póliza Contable</button>
+    <!-- DOCTRINA DE INTERFAZ PJEV: SIMPLE VS COMPLEJO -->
+    <div class="info-box" style="margin-bottom:20px;">
+      <div class="info-title" style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:16px;">🏛️</span>
+        <strong>Doctrina de Interfaz PJEV: Pantalla Principal y Modales [Simple vs. Complejo]</strong>
+      </div>
+      <p style="font-size:12.5px; margin:6px 0 10px; line-height:1.6;">
+        El frontend de SIAF-PJEV estandariza la interacción de usuario distinguiendo claramente entre el <strong>Listado Maestro (Bandeja de Entrada)</strong> y las <strong>Ventanas Modales</strong>, las cuales se dividen en dos arquitecturas según la complejidad de la entidad:
+      </p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:10px;">
+        <div style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 14px;">
+          <div style="font-weight:700; color:var(--pjev-verde-oscuro); font-size:12.5px; margin-bottom:5px; display:flex; align-items:center; gap:6px;">
+            <span>📋</span> Modal Simple (Catálogos y Parámetros)
+          </div>
+          <p style="font-size:11.5px; color:var(--pjev-texto-muted); margin:0; line-height:1.5;">
+            Utilizado en entidades unitarias (ej. <code>05.1.1 Requisitos</code>, <code>05.1.2 Tarifas</code>, <code>05.1.3 Retenciones</code>).
+            Presenta una ventana modal atómica de un solo nivel (ancho estándar <code>650px</code> - <code>800px</code>) con controles de captura directa y botones estándar <code>Cancelar</code> y <code>Guardar</code>.
+          </p>
+        </div>
+        <div style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 14px;">
+          <div style="font-weight:700; color:var(--pjev-verde-oscuro); font-size:12.5px; margin-bottom:5px; display:flex; align-items:center; gap:6px;">
+            <span>📑</span> Modal Complejo (Registros Transaccionales Compuestos)
+          </div>
+          <p style="font-size:11.5px; color:var(--pjev-texto-muted); margin:0; line-height:1.5;">
+            Utilizado en módulos transaccionales como <code>05.2.1 Afectación del Gasto</code> y <code>05.2.2 Orden de Pago</code>.
+            Presenta una ventana de alta capacidad (ancho extendido <code>1700px</code>, <code>compact</code>) que gestiona <strong>3 Modos Operativos</strong>:
+            <br>• <strong>[Nuevo]</strong>: Paso 0 (Wizard de clasificación) + Paso 1 (Alta de cabecera maestra bloqueando subpaneles hijos).
+            <br>• <strong>[Edición]</strong>: Cabecera editable + Grid de Partidas (1:N) + Expediente Digital CFDI + Resumen de comprobantes + Barra de acciones de Workflow.
+            <br>• <strong>[Consulta]</strong>: Solo lectura protegida con badge de devengo y link directo a la póliza en Contabilidad.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <!-- WF1: MODAL ASISTENTE (IDÉNTICO A LA CAPTURA DEL CLIENTE) -->
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wfag1',this)">1. Pantalla de Inicio (Listado Maestro)</button>
+      <button class="wf-tab" onclick="showWF('wfag2',this)">2. Modal Asistente (Paso 0: Clasificación)</button>
+      <button class="wf-tab" onclick="showWF('wfag3',this)">3. Modal Complejo [Nuevo] (Paso 1: Cabecera)</button>
+      <button class="wf-tab" onclick="showWF('wfag4',this)">4. Modal Complejo [Edición] (Compuesto)</button>
+      <button class="wf-tab" onclick="showWF('wfag5',this)">5. Modal Complejo [Consulta] (Póliza A.1)</button>
+    </div>
+
+    <!-- WF1: PANTALLA DE INICIO (LISTADO MAESTRO CON FILTROS Y DATAGRID) -->
     <div id="wf-wfag1" class="wf-panel active">
       <div class="wf-box">
         <div class="wf-bar">
-          <span class="wf-bar-label">05.2.1 Modal de Selección del Trámite · Asistente Guiado PJEV-UI</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">4 Tipos Principales y Subtipos con Descripción</span>
+          <span class="wf-bar-label">05.2.1 Pantalla Principal · Bandeja de Entrada de Afectaciones de Gasto</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">SiafCard Filtros + SiafDataGrid + SiafInfoPanel</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 560" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <!-- Background Principal -->
+            <rect width="960" height="560" fill="#f8fafc" rx="6" stroke="#cbd5e1"/>
+            
+            <!-- App Bar Superior Institucional PJEV -->
+            <rect width="960" height="42" fill="#183125" rx="6"/>
+            <text x="20" y="26" font-size="13" font-weight="bold" fill="#ffffff">SIAF-PJEV</text>
+            <text x="95" y="26" font-size="11" fill="#cbd5e1">| Sistema Integral de Administración Financiera</text>
+            <rect x="730" y="10" width="110" height="22" fill="#2d4a3b" rx="4"/>
+            <text x="785" y="24" font-size="10" fill="#ffffff" text-anchor="middle">Ejercicio: 2026</text>
+            <circle cx="865" cy="21" r="10" fill="#8c6e3d"/>
+            <text x="865" y="25" font-size="10" fill="#ffffff" text-anchor="middle" font-weight="bold">U</text>
+            <text x="885" y="25" font-size="10" fill="#ffffff">Operador CxP</text>
+
+            <!-- Breadcrumb & Header de Página -->
+            <text x="20" y="66" font-size="10" fill="#64748b">Finanzas  /  Registro  /  <tspan font-weight="bold" fill="#183125">Afectación de Gasto</tspan></text>
+            <text x="20" y="88" font-size="16" font-weight="bold" fill="#183125">Afectaciones de Gasto (Devengado)</text>
+            
+            <!-- Botón Principal + Nueva Afectación -->
+            <rect x="765" y="65" width="175" height="32" fill="#183125" rx="4" cursor="pointer"/>
+            <text x="852" y="85" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nueva Afectación</text>
+
+            <!-- Card de Filtros (SiafCard) -->
+            <rect x="20" y="105" width="920" height="85" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            
+            <!-- Filtro 1: Tipo de Trámite -->
+            <text x="35" y="125" font-size="9" font-weight="bold" fill="#475569">TIPO DE TRÁMITE</text>
+            <rect x="35" y="132" width="140" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="45" y="149" font-size="10" fill="#1e293b">Todos (4 Tipos) ▼</text>
+
+            <!-- Filtro 2: Procedimiento -->
+            <text x="185" y="125" font-size="9" font-weight="bold" fill="#475569">PROCEDIMIENTO</text>
+            <rect x="185" y="132" width="165" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="195" y="149" font-size="10" fill="#1e293b">Todos los procedimientos ▼</text>
+
+            <!-- Filtro 3: Estatus Workflow -->
+            <text x="360" y="125" font-size="9" font-weight="bold" fill="#475569">ESTATUS WORKFLOW</text>
+            <rect x="360" y="132" width="130" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="370" y="149" font-size="10" fill="#1e293b">Todos los estatus ▼</text>
+
+            <!-- Filtro 4: Tipo Beneficiario -->
+            <text x="500" y="125" font-size="9" font-weight="bold" fill="#475569">BENEFICIARIO</text>
+            <rect x="500" y="132" width="125" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="510" y="149" font-size="10" fill="#1e293b">Todos ▼</text>
+
+            <!-- Filtro 5: Rango de Fechas -->
+            <text x="635" y="125" font-size="9" font-weight="bold" fill="#475569">FECHA DESDE / HASTA</text>
+            <rect x="635" y="132" width="95" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="645" y="149" font-size="9" fill="#1e293b">01/09/2026</text>
+            <rect x="735" y="132" width="95" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="745" y="149" font-size="9" fill="#1e293b">30/09/2026</text>
+
+            <!-- Botón Buscar -->
+            <rect x="840" y="132" width="85" height="26" fill="#183125" rx="4" cursor="pointer"/>
+            <text x="882" y="149" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Buscar</text>
+
+            <!-- Contadores de Registros -->
+            <text x="35" y="178" font-size="10" fill="#64748b">Total: <tspan font-weight="bold" fill="#1e293b">142 registros</tspan></text>
+            <text x="925" y="178" font-size="11" font-weight="bold" fill="#15803d" text-anchor="end">Total Página: $3,450,210.00 MXN</text>
+
+            <!-- Card DataGrid (SiafDataGrid) -->
+            <rect x="20" y="200" width="920" height="315" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            
+            <!-- Table Header -->
+            <rect x="21" y="201" width="918" height="28" fill="#f1f5f9"/>
+            <text x="35" y="219" font-size="9" font-weight="bold" fill="#475569">FOLIO</text>
+            <text x="120" y="219" font-size="9" font-weight="bold" fill="#475569">FECHA</text>
+            <text x="185" y="219" font-size="9" font-weight="bold" fill="#475569">TIPO / PROCEDIMIENTO</text>
+            <text x="350" y="219" font-size="9" font-weight="bold" fill="#475569">BENEFICIARIO</text>
+            <text x="520" y="219" font-size="9" font-weight="bold" fill="#475569">CONCEPTO</text>
+            <text x="670" y="219" font-size="9" font-weight="bold" fill="#475569" text-anchor="end">TOTAL ($)</text>
+            <text x="760" y="219" font-size="9" font-weight="bold" fill="#475569" text-anchor="center">ESTATUS</text>
+            <text x="840" y="219" font-size="9" font-weight="bold" fill="#475569">PÓLIZA</text>
+            <text x="900" y="219" font-size="9" font-weight="bold" fill="#475569">ACCIONES</text>
+
+            <!-- Fila 1: Borrador -->
+            <text x="35" y="247" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">AG-2026-00142</text>
+            <text x="120" y="247" font-size="9" fill="#334155">02/09/2026</text>
+            <text x="185" y="247" font-size="9" font-weight="bold" fill="#183125">💵 ARRENDAMIENTO</text>
+            <text x="350" y="247" font-size="9" fill="#1e293b">INMOBILIARIA VERACRUZANA...</text>
+            <text x="520" y="247" font-size="9" fill="#64748b">Renta Juzgado 4to Poza Rica</text>
+            <text x="670" y="247" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$23,200.00</text>
+            <rect x="725" y="235" width="70" height="16" fill="#e2e8f0" rx="8"/>
+            <text x="760" y="247" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">BORRADOR</text>
+            <text x="830" y="247" font-size="9" fill="#94a3b8">PENDIENTE</text>
+            <text x="895" y="247" font-size="11" fill="#0284c7" cursor="pointer">✏️ 👁 📜</text>
+            <line x1="25" y1="258" x2="935" y2="258" stroke="#f1f5f9"/>
+
+            <!-- Fila 2: Enviada -->
+            <text x="35" y="277" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">AG-2026-00141</text>
+            <text x="120" y="277" font-size="9" fill="#334155">01/09/2026</text>
+            <text x="185" y="277" font-size="9" font-weight="bold" fill="#183125">📦 COMPRA_PEDIDO</text>
+            <text x="350" y="277" font-size="9" fill="#1e293b">PAPELERÍA DEL GOLFO S.A.</text>
+            <text x="520" y="277" font-size="9" fill="#64748b">Suministro papel bond juzgados</text>
+            <text x="670" y="277" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$145,800.00</text>
+            <rect x="725" y="265" width="70" height="16" fill="#dbeafe" rx="8"/>
+            <text x="760" y="277" font-size="8" font-weight="bold" fill="#1d4ed8" text-anchor="middle">ENVIADA</text>
+            <text x="830" y="277" font-size="9" fill="#94a3b8">PENDIENTE</text>
+            <text x="895" y="277" font-size="11" fill="#0284c7" cursor="pointer">👁 📜</text>
+            <line x1="25" y1="288" x2="935" y2="288" stroke="#f1f5f9"/>
+
+            <!-- Fila 3: Aprobada (Tipo 4 No Presupuestario) -->
+            <text x="35" y="307" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">AG-2026-00140</text>
+            <text x="120" y="307" font-size="9" fill="#334155">28/08/2026</text>
+            <text x="185" y="307" font-size="9" font-weight="bold" fill="#166534">🏛 TERCEROS_INST</text>
+            <text x="350" y="307" font-size="9" fill="#1e293b">SEFIPLAN VERACRUZ</text>
+            <text x="520" y="307" font-size="9" fill="#64748b">Entero retención 3% nómina Q16</text>
+            <text x="670" y="307" font-size="10" font-family="monospace" font-weight="bold" fill="#166534" text-anchor="end">$380,450.00</text>
+            <rect x="725" y="295" width="70" height="16" fill="#dcfce7" rx="8"/>
+            <text x="760" y="307" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">APROBADA</text>
+            <rect x="815" y="295" width="65" height="16" fill="#dcfce7" rx="4"/>
+            <text x="847" y="306" font-size="8" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="middle">PE-2026-042</text>
+            <text x="895" y="307" font-size="11" fill="#0284c7" cursor="pointer">👁 📖 📜</text>
+            <line x1="25" y1="318" x2="935" y2="318" stroke="#f1f5f9"/>
+
+            <!-- Fila 4: Regresada -->
+            <text x="35" y="337" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">AG-2026-00139</text>
+            <text x="120" y="337" font-size="9" fill="#334155">25/08/2026</text>
+            <text x="185" y="337" font-size="9" font-weight="bold" fill="#183125">✈ COMP_VIATICOS</text>
+            <text x="350" y="337" font-size="9" fill="#1e293b">LIC. CARLOS HERRERA (EMP)</text>
+            <text x="520" y="337" font-size="9" fill="#64748b">Viáticos comisión Xalapa-Veracruz</text>
+            <text x="670" y="337" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$4,850.00</text>
+            <rect x="725" y="325" width="70" height="16" fill="#fef3c7" rx="8"/>
+            <text x="760" y="337" font-size="8" font-weight="bold" fill="#b45309" text-anchor="middle">REGRESADA</text>
+            <text x="830" y="337" font-size="9" fill="#94a3b8">PENDIENTE</text>
+            <text x="895" y="337" font-size="11" fill="#0284c7" cursor="pointer">✏️ 👁 📜</text>
+            <line x1="25" y1="348" x2="935" y2="348" stroke="#f1f5f9"/>
+
+            <!-- Fila 5: Nómina Aprobada -->
+            <text x="35" y="367" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">AG-2026-00138</text>
+            <text x="120" y="367" font-size="9" fill="#334155">20/08/2026</text>
+            <text x="185" y="367" font-size="9" font-weight="bold" fill="#183125">👥 NOMINA</text>
+            <text x="350" y="367" font-size="9" fill="#1e293b">DIR. DE ADMÓN. (UA)</text>
+            <text x="520" y="367" font-size="9" fill="#64748b">Nómina 1ra quincena agosto</text>
+            <text x="670" y="367" font-size="10" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$1,820,000.00</text>
+            <rect x="725" y="355" width="70" height="16" fill="#dcfce7" rx="8"/>
+            <text x="760" y="367" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">APROBADA</text>
+            <rect x="815" y="355" width="65" height="16" fill="#dcfce7" rx="4"/>
+            <text x="847" y="366" font-size="8" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="middle">PE-2026-039</text>
+            <text x="895" y="367" font-size="11" fill="#0284c7" cursor="pointer">👁 📖 📜</text>
+
+            <!-- Paginación de la Tabla -->
+            <rect x="21" y="475" width="918" height="39" fill="#ffffff" rx="6"/>
+            <line x1="21" y1="475" x2="939" y2="475" stroke="#cbd5e1"/>
+            <text x="35" y="499" font-size="10" fill="#64748b">Mostrando 1 a 5 de 142 registros</text>
+            <rect x="720" y="483" width="75" height="23" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="757" y="498" font-size="9" fill="#475569" text-anchor="middle">◀ Anterior</text>
+            <rect x="800" y="483" width="24" height="23" fill="#183125" rx="4"/>
+            <text x="812" y="498" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">1</text>
+            <rect x="828" y="483" width="24" height="23" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="840" y="498" font-size="9" fill="#475569" text-anchor="middle">2</text>
+            <rect x="856" y="483" width="75" height="23" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="893" y="498" font-size="9" fill="#475569" text-anchor="middle">Siguiente ▶</text>
+
+            <!-- Barra Informativa Inferior -->
+            <text x="25" y="540" font-size="10" fill="#64748b">💡 Para registrar un trámite presione <tspan font-weight="bold" fill="#183125">+ Nueva Afectación</tspan>. El sistema desplegará el Asistente Wizard y el Modal Complejo de Captura.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF2: MODAL ASISTENTE (PASO 0: CLASIFICACIÓN DEL TRÁMITE) -->
+    <div id="wf-wfag2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.2.1 Modal Asistente de Clasificación · Paso 0 Guiado PJEV-UI</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">4 Familias Macro y 15 Subtipos con Iconos y Descripciones</span>
         </div>
         <div class="wf-svg-area">
           <svg viewBox="0 0 920 540" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
@@ -1350,7 +1555,7 @@ export class AfectacionesCxpController {
             <text x="480" y="130" font-size="9" fill="#64748b">Viáticos (Anexo 6), sujetos a</text>
             <text x="480" y="143" font-size="9" fill="#64748b">comprobar y caja chica.</text>
 
-            <!-- Card 4: No Afecta Presupuesto (NUEVO) -->
+            <!-- Card 4: No Afecta Presupuesto -->
             <rect x="685" y="85" width="210" height="75" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" rx="6"/>
             <text x="700" y="112" font-size="12" font-weight="bold" fill="#166534">🏛 4. No Afecta Ppto.</text>
             <text x="700" y="130" font-size="9" fill="#15803d">Entero retenciones SAT/IPE, garantías</text>
@@ -1369,11 +1574,11 @@ export class AfectacionesCxpController {
             <rect x="80" y="242" width="105" height="15" fill="#f1f5f9" rx="3"/>
             <text x="132" y="253" font-size="8" fill="#475569" text-anchor="middle">Servicios Personales</text>
 
-            <!-- Subtipo 2: Arrendamiento -->
-            <rect x="465" y="195" width="430" height="70" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <!-- Subtipo 2: Arrendamiento (Seleccionado) -->
+            <rect x="465" y="195" width="430" height="70" fill="#fdfbf7" stroke="#183125" stroke-width="2" rx="6"/>
             <rect x="475" y="207" width="34" height="34" fill="#f1f5f9" rx="4"/>
             <text x="492" y="228" font-size="14" text-anchor="middle">🏢</text>
-            <text x="520" y="218" font-size="11" font-weight="bold" fill="#1e293b">Arrendamiento de Inmuebles</text>
+            <text x="520" y="218" font-size="11" font-weight="bold" fill="#183125">Arrendamiento de Inmuebles</text>
             <text x="520" y="233" font-size="9" fill="#64748b">Pago mensual de rentas de bienes inmuebles para juzgados y sedes.</text>
             <rect x="520" y="242" width="100" height="15" fill="#f1f5f9" rx="3"/>
             <text x="570" y="253" font-size="8" fill="#475569" text-anchor="middle">Recursos Materiales</text>
@@ -1421,182 +1626,350 @@ export class AfectacionesCxpController {
             <rect x="620" y="492" width="120" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
             <text x="680" y="512" font-size="11" font-weight="bold" fill="#475569" text-anchor="middle">Volver al Listado</text>
 
-            <rect x="755" y="492" width="140" height="32" fill="#183125" rx="4"/>
+            <rect x="755" y="492" width="140" height="32" fill="#183125" rx="4" cursor="pointer"/>
             <text x="825" y="512" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Continuar ➔</text>
           </svg>
         </div>
       </div>
     </div>
 
-    <!-- WF2: FORMULARIO MAESTRO-DETALLE -->
-    <div id="wf-wfag2" class="wf-panel">
-      <div class="wf-box">
-        <div class="wf-bar">
-          <span class="wf-bar-label">05.2.1 Formulario de Captura Maestro-Detalle · Afectación del Gasto</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Cabecera + Grid de CFDIs + Partidas Presupuestarias</span>
-        </div>
-        <div class="wf-svg-area">
-          <svg viewBox="0 0 920 460" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="920" height="460" fill="#f8fafc" rx="6" stroke="#cbd5e1"/>
-            
-            <!-- Cabecera Form -->
-            <rect x="15" y="15" width="890" height="110" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="30" y="38" font-size="12" font-weight="bold" fill="#183125">Trámite: AG-2026-00124</text>
-            <rect x="180" y="24" width="75" height="18" fill="#e2e8f0" rx="9"/>
-            <text x="217" y="37" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">BORRADOR</text>
-
-            <text x="30" y="65" font-size="10" font-weight="bold" fill="#64748b">Procedimiento:</text>
-            <text x="120" y="65" font-size="10" font-weight="bold" fill="#1e293b">ARRENDAMIENTO (1. Gasto Directo)</text>
-
-            <text x="360" y="65" font-size="10" font-weight="bold" fill="#64748b">Beneficiario (Proveedor):</text>
-            <text x="490" y="65" font-size="10" font-weight="bold" fill="#0284c7">INMOBILIARIA VERACRUZANA S.A. DE C.V.</text>
-
-            <text x="30" y="95" font-size="10" font-weight="bold" fill="#64748b">Concepto:</text>
-            <text x="90" y="95" font-size="10" fill="#1e293b">Pago de renta del inmueble que ocupa el Juzgado Cuarto de Primera Instancia de Poza Rica, Ver.</text>
-
-            <text x="730" y="45" font-size="10" fill="#64748b">Importe Bruto Total:</text>
-            <text x="730" y="68" font-size="16" font-family="monospace" font-weight="bold" fill="#183125">$23,200.00 MXN</text>
-
-            <!-- Sección Facturas CFDIs -->
-            <rect x="15" y="135" width="890" height="140" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="30" y="155" font-size="11" font-weight="bold" fill="#183125">Comprobantes Fiscales Vinculados (CFDI 4.0)</text>
-            <rect x="760" y="142" width="130" height="22" fill="#183125" rx="3"/>
-            <text x="825" y="156" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Cargar XML Timbrado</text>
-
-            <!-- Table Header CFDIs -->
-            <rect x="25" y="170" width="870" height="22" fill="#f1f5f9"/>
-            <text x="35" y="185" font-size="9" font-weight="bold" fill="#475569">UUID SAT</text>
-            <text x="240" y="185" font-size="9" font-weight="bold" fill="#475569">RFC EMISOR</text>
-            <text x="380" y="185" font-size="9" font-weight="bold" fill="#475569">SUBTOTAL</text>
-            <text x="480" y="185" font-size="9" font-weight="bold" fill="#475569">IVA</text>
-            <text x="580" y="185" font-size="9" font-weight="bold" fill="#475569">RETENCIONES</text>
-            <text x="700" y="185" font-size="9" font-weight="bold" fill="#475569">TOTAL FACTURA</text>
-            <text x="830" y="185" font-size="9" font-weight="bold" fill="#475569">ESTATUS SAT</text>
-
-            <!-- Row 1 CFDI -->
-            <text x="35" y="210" font-size="9" font-family="monospace" fill="#0284c7">4A2E8B1C-90DF-4E33-A12B-9876543210AB</text>
-            <text x="240" y="210" font-size="9" font-family="monospace" fill="#1e293b">IVE990101XYZ</text>
-            <text x="380" y="210" font-size="9" font-family="monospace" fill="#334155">$20,000.00</text>
-            <text x="480" y="210" font-size="9" font-family="monospace" fill="#334155">$3,200.00</text>
-            <text x="580" y="210" font-size="9" font-family="monospace" fill="#991b1b">-$4,266.67</text>
-            <text x="700" y="210" font-size="9" font-family="monospace" font-weight="bold" fill="#183125">$23,200.00</text>
-            <rect x="825" y="200" width="55" height="15" fill="#dcfce7" rx="3"/>
-            <text x="852" y="211" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">VIGENTE</text>
-
-            <!-- Sección Clasificación Presupuestaria -->
-            <rect x="15" y="285" width="890" height="120" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="30" y="305" font-size="11" font-weight="bold" fill="#183125">Clasificación Presupuestaria del Gasto (Detalle Programático)</text>
-
-            <!-- Table Header Partidas -->
-            <rect x="25" y="318" width="870" height="22" fill="#f1f5f9"/>
-            <text x="35" y="333" font-size="9" font-weight="bold" fill="#475569">CENTRO DE COSTO</text>
-            <text x="180" y="333" font-size="9" font-weight="bold" fill="#475569">ESTRUCTURA PROGRAMÁTICA (FN-PR-SP-PY)</text>
-            <text x="460" y="333" font-size="9" font-weight="bold" fill="#475569">FUENTE</text>
-            <text x="560" y="333" font-size="9" font-weight="bold" fill="#475569">PARTIDA (COG)</text>
-            <text x="700" y="333" font-size="9" font-weight="bold" fill="#475569">MES</text>
-            <text x="790" y="333" font-size="9" font-weight="bold" fill="#475569">IMPORTE ($)</text>
-
-            <!-- Row 1 Partida -->
-            <text x="35" y="358" font-size="9" fill="#1e293b">11304 · Juzgado 4to Poza Rica</text>
-            <text x="180" y="358" font-size="9" font-family="monospace" fill="#334155">1.2.1 - 01 - 04 - 002 (Impartición Justicia)</text>
-            <text x="460" y="358" font-size="9" fill="#334155">111 Rec. Fiscales</text>
-            <text x="560" y="358" font-size="9" font-family="monospace" font-weight="bold" fill="#0284c7">32201 Arrendamiento</text>
-            <text x="700" y="358" font-size="9" fill="#334155">Septiembre</text>
-            <text x="790" y="358" font-size="9" font-family="monospace" font-weight="bold" fill="#15803d">$23,200.00</text>
-
-            <!-- Action Bar -->
-            <rect x="15" y="415" width="890" height="35" fill="#f1f5f9" rx="4"/>
-            <text x="30" y="437" font-size="10" font-weight="bold" fill="#15803d">✓ Cuadratura Perfecta: Comprobantes ($23,200.00) = Presupuesto ($23,200.00)</text>
-
-            <rect x="580" y="420" width="140" height="26" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="650" y="437" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">Previsualizar Póliza</text>
-
-            <rect x="735" y="420" width="160" height="26" fill="#183125" rx="3"/>
-            <text x="815" y="437" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Enviar a Revisión ➔</text>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- WF3: PREVISUALIZADOR DE PÓLIZA -->
+    <!-- WF3: MODAL COMPLEJO EN MODO [NUEVO] (PASO 1: ALTA DE CABECERA) -->
     <div id="wf-wfag3" class="wf-panel">
       <div class="wf-box">
         <div class="wf-bar">
-          <span class="wf-bar-label">05.2.1 Simulación Contable y Presupuestal · Matriz CONAC A.1</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Póliza Automática Tipo PE (Devengado)</span>
+          <span class="wf-bar-label">05.2.1 Modal Complejo · Modo [Nuevo] · Paso 1: Alta del Encabezado</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">SiafModal (1700px) + Bloqueo Guiado de Subpaneles</span>
         </div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 850 320" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="850" height="320" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            <rect width="850" height="38" fill="#183125" rx="6"/>
-            <text x="25" y="24" font-size="12" font-weight="bold" fill="#ffffff">Previsualización de Póliza de Devengo (Momento Contable CONAC A.1)</text>
+          <svg viewBox="0 0 940 500" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <!-- Modal Window Background -->
+            <rect width="940" height="500" fill="#ffffff" rx="8" stroke="#cbd5e1"/>
+            
+            <!-- Modal Header -->
+            <rect width="940" height="46" fill="#183125" rx="8"/>
+            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Nueva Afectación de Gasto</text>
+            <text x="220" y="28" font-size="11" fill="#cbd5e1">— Captura del encabezado, partidas presupuestales y documentación soporte.</text>
+            <rect x="895" y="11" width="24" height="24" fill="#2d4a3b" rx="4"/>
+            <text x="907" y="27" font-size="12" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
 
-            <!-- Table Header -->
-            <rect x="20" y="48" width="810" height="24" fill="#f1f5f9"/>
-            <text x="30" y="64" font-size="9" font-weight="bold" fill="#475569">CUENTA CONTABLE</text>
-            <text x="160" y="64" font-size="9" font-weight="bold" fill="#475569">NOMBRE DE LA CUENTA</text>
-            <text x="500" y="64" font-size="9" font-weight="bold" fill="#475569">NATURALEZA</text>
-            <text x="640" y="64" font-size="9" font-weight="bold" fill="#475569" text-anchor="end">DEBE ($)</text>
-            <text x="790" y="64" font-size="9" font-weight="bold" fill="#475569" text-anchor="end">HABER ($)</text>
+            <!-- Badge Procedimiento Seleccionado -->
+            <rect x="25" y="60" width="890" height="34" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="81" font-size="10" font-weight="bold" fill="#475569">Procedimiento Seleccionado:</text>
+            <rect x="195" y="68" width="280" height="18" fill="#183125" rx="4"/>
+            <text x="335" y="81" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">ARRENDAMIENTO (1. Gasto Directo · Recursos Mat.)</text>
+            <text x="895" y="81" font-size="10" fill="#0284c7" text-anchor="end" cursor="pointer">Cambiar Procedimiento ↻</text>
 
-            <!-- Line 1: Gasto -->
-            <text x="30" y="92" font-size="10" font-family="monospace" fill="#0284c7">5.1.3.2.3221</text>
-            <text x="160" y="92" font-size="10" fill="#1e293b">Arrendamiento de Edificios y Locales</text>
-            <text x="500" y="92" font-size="9" fill="#64748b">Gasto Contable (Patrimonial)</text>
-            <text x="640" y="92" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$20,000.00</text>
-            <text x="790" y="92" font-size="10" text-anchor="end">-</text>
+            <!-- Card Encabezado Form -->
+            <rect x="25" y="105" width="890" height="180" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            
+            <!-- Campo 1: Organización / Centro de Costo -->
+            <text x="45" y="130" font-size="10" font-weight="bold" fill="#475569">ORGANIZACIÓN / CENTRO DE COSTO *</text>
+            <rect x="45" y="138" width="410" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="55" y="156" font-size="10" fill="#1e293b">11304 · Juzgado Cuarto de Primera Instancia Poza Rica</text>
 
-            <!-- Line 2: IVA -->
-            <text x="30" y="118" font-size="10" font-family="monospace" fill="#0284c7">1.1.9.1.0101</text>
-            <text x="160" y="118" font-size="10" fill="#1e293b">IVA Pendiente de Acreditar</text>
-            <text x="500" y="118" font-size="9" fill="#64748b">Activo Circulante</text>
-            <text x="640" y="118" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$3,200.00</text>
-            <text x="790" y="118" font-size="10" text-anchor="end">-</text>
+            <!-- Campo 2: Fecha Elaboración -->
+            <text x="480" y="130" font-size="10" font-weight="bold" fill="#475569">FECHA DE ELABORACIÓN *</text>
+            <rect x="480" y="138" width="180" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="490" y="156" font-size="10" fill="#1e293b">02/09/2026</text>
 
-            <!-- Line 3: Pasivo Neto -->
-            <text x="30" y="144" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.2.0101</text>
-            <text x="160" y="144" font-size="10" fill="#1e293b">Proveedores por Pagar a Corto Plazo</text>
-            <text x="500" y="144" font-size="9" fill="#15803d">Neto por Pagar (Orden de Pago)</text>
-            <text x="640" y="144" font-size="10" text-anchor="end">-</text>
-            <text x="790" y="144" font-size="10" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$18,933.33</text>
+            <!-- Campo 3: Importe Total del Pago -->
+            <text x="685" y="130" font-size="10" font-weight="bold" fill="#475569">IMPORTE TOTAL DEL PAGO *</text>
+            <rect x="685" y="138" width="210" height="28" fill="#fdfbf7" stroke="#183125" stroke-width="1.5" rx="4"/>
+            <text x="885" y="157" font-size="13" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$23,200.00 MXN</text>
 
-            <!-- Line 4: Retenciones -->
-            <text x="30" y="170" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.7.0103</text>
-            <text x="160" y="170" font-size="10" fill="#1e293b">Retención ISR Arrendamiento (10%)</text>
-            <text x="500" y="170" font-size="9" fill="#991b1b">Pasivo por Retención Fiscal</text>
-            <text x="640" y="170" font-size="10" text-anchor="end">-</text>
-            <text x="790" y="170" font-size="10" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">$2,000.00</text>
+            <!-- Campo 4: Beneficiario (Selector contextual para Proveedor) -->
+            <text x="45" y="188" font-size="10" font-weight="bold" fill="#475569">BENEFICIARIO (TIPO: BIEN_INMUEBLE / PROVEEDOR) *</text>
+            <rect x="45" y="196" width="410" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="55" y="214" font-size="10" fill="#0284c7">🏢 INMOBILIARIA VERACRUZANA S.A. DE C.V. (RFC: IVE990101XYZ)</text>
 
-            <!-- Line 5: Retención IVA -->
-            <text x="30" y="196" font-size="10" font-family="monospace" fill="#0284c7">2.1.1.7.0202</text>
-            <text x="160" y="196" font-size="10" fill="#1e293b">Retención IVA Arrendamiento (100%)</text>
-            <text x="500" y="196" font-size="9" fill="#991b1b">Pasivo por Retención Fiscal</text>
-            <text x="640" y="196" font-size="10" text-anchor="end">-</text>
-            <text x="790" y="196" font-size="10" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">$2,266.67</text>
+            <!-- Campo 5: Concepto o Justificación -->
+            <text x="480" y="188" font-size="10" font-weight="bold" fill="#475569">CONCEPTO O JUSTIFICACIÓN DEL GASTO *</text>
+            <rect x="480" y="196" width="415" height="58" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="490" y="214" font-size="9.5" fill="#1e293b">Pago mensual de renta correspondiente al mes de septiembre 2026</text>
+            <text x="490" y="228" font-size="9.5" fill="#1e293b">para el inmueble que ocupa la sede del Juzgado 4to Poza Rica.</text>
+            <text x="885" y="248" font-size="8" fill="#94a3b8" text-anchor="end">128 / 500 car.</text>
 
-            <!-- Presupuestario -->
-            <line x1="20" y1="212" x2="830" y2="212" stroke="#cbd5e1" stroke-dasharray="3"/>
-            <text x="30" y="232" font-size="10" font-family="monospace" fill="#15803d">8.2.5.0.0000</text>
-            <text x="160" y="232" font-size="10" fill="#1e293b">Presupuesto de Egresos Devengado</text>
-            <text x="500" y="232" font-size="9" fill="#166534">Momento Presupuestario</text>
-            <text x="640" y="232" font-size="10" font-family="monospace" font-weight="bold" fill="#166534" text-anchor="end">$23,200.00</text>
-            <text x="790" y="232" font-size="10" text-anchor="end">-</text>
+            <!-- CAJA DE AVISO GUIADO INSTITUCIONAL (Amarillo / Crema PJEV) -->
+            <rect x="25" y="300" width="890" height="60" fill="#fefce8" stroke="#fef08a" stroke-width="1.5" rx="6"/>
+            <circle cx="55" cy="330" r="14" fill="#fef08a"/>
+            <text x="55" y="335" font-size="14" text-anchor="middle">⚠️</text>
+            <text x="80" y="325" font-size="11" font-weight="bold" fill="#854d0e">Aviso del Flujo Guiado:</text>
+            <text x="80" y="342" font-size="10.5" fill="#713f12">Primero guarde el encabezado. Después podrá capturar las partidas presupuestales y adjuntar la documentación soporte en esta misma ventana.</text>
 
-            <text x="30" y="258" font-size="10" font-family="monospace" fill="#15803d">8.2.4.0.0000</text>
-            <text x="160" y="258" font-size="10" fill="#1e293b">Presupuesto de Egresos Comprometido</text>
-            <text x="500" y="258" font-size="9" fill="#166534">Amortización de Compromiso</text>
-            <text x="640" y="258" font-size="10" text-anchor="end">-</text>
-            <text x="790" y="258" font-size="10" font-family="monospace" font-weight="bold" fill="#166534" text-anchor="end">$23,200.00</text>
+            <!-- Subpaneles Hijos Bloqueados (Opacity 0.4 + Candado) -->
+            <g opacity="0.45">
+              <rect x="25" y="375" width="435" height="45" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+              <text x="45" y="402" font-size="10" font-weight="bold" fill="#475569">🔒 Partidas Presupuestarias (Deshabilitado)</text>
 
-            <!-- Sumas Iguales -->
-            <rect x="20" y="278" width="810" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <text x="30" y="297" font-size="11" font-weight="bold" fill="#183125">SUMAS IGUALES (PÓLIZA CUADRADA):</text>
-            <text x="640" y="297" font-size="11" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$46,400.00</text>
-            <text x="790" y="297" font-size="11" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$46,400.00</text>
+              <rect x="480" y="375" width="435" height="45" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+              <text x="500" y="402" font-size="10" font-weight="bold" fill="#475569">🔒 Expediente Digital CFDI y Documentos (Deshabilitado)</text>
+            </g>
+
+            <!-- Footer Botones -->
+            <line x1="0" y1="440" x2="940" y2="440" stroke="#e2e8f0"/>
+            <rect x="610" y="452" width="140" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="680" y="472" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">Cambiar Procedimiento</text>
+
+            <rect x="765" y="452" width="150" height="32" fill="#183125" rx="4" cursor="pointer"/>
+            <text x="840" y="472" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">💾 Crear Afectación</text>
           </svg>
         </div>
       </div>
     </div>
+
+    <!-- WF4: MODAL COMPLEJO EN MODO [EDICIÓN] (FORMULARIO COMPUESTO MAESTRO-DETALLE) -->
+    <div id="wf-wfag4" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.2.1 Modal Complejo · Modo [Edición] · Encabezado + Partidas + CFDIs + Expediente Digital</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">SiafModal (1700px) + SiafExpedienteDigitalMin + Resumen CFDI</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 620" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <!-- Modal Background Window -->
+            <rect width="960" height="620" fill="#ffffff" rx="8" stroke="#cbd5e1"/>
+            
+            <!-- Modal Header -->
+            <rect width="960" height="42" fill="#183125" rx="8"/>
+            <text x="25" y="26" font-size="12" font-weight="bold" fill="#ffffff">Afectación de Gasto: AG-2026-00142</text>
+            <rect x="270" y="12" width="75" height="18" fill="#e2e8f0" rx="9"/>
+            <text x="307" y="25" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">BORRADOR</text>
+            <text x="360" y="26" font-size="10" fill="#cbd5e1">| Procedimiento: ARRENDAMIENTO | C. Costo: 11304 Poza Rica</text>
+            <rect x="915" y="10" width="22" height="22" fill="#2d4a3b" rx="4"/>
+            <text x="926" y="25" font-size="11" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
+
+            <!-- Barra de Acciones de Workflow (SiafPageHeader.ActionBar) -->
+            <rect x="20" y="52" width="920" height="38" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            
+            <rect x="30" y="58" width="135" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+            <text x="97" y="75" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle">💾 Guardar Encabezado</text>
+
+            <rect x="175" y="58" width="130" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+            <text x="240" y="75" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">👁 Previsualizar Póliza</text>
+
+            <rect x="315" y="58" width="85" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+            <text x="357" y="75" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">📜 Historial</text>
+
+            <rect x="410" y="58" width="125" height="26" fill="#ffffff" stroke="#fca5a5" rx="4" cursor="pointer"/>
+            <text x="472" y="75" font-size="10" font-weight="bold" fill="#991b1b" text-anchor="middle">🗑 Cancelar Trámite</text>
+
+            <rect x="765" y="58" width="165" height="26" fill="#183125" rx="4" cursor="pointer"/>
+            <text x="847" y="75" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Enviar a Revisión ➔</text>
+
+            <!-- Encabezado Resumido / Editable -->
+            <rect x="20" y="98" width="920" height="60" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="35" y="118" font-size="9" font-weight="bold" fill="#64748b">BENEFICIARIO:</text>
+            <text x="120" y="118" font-size="10" font-weight="bold" fill="#0284c7">INMOBILIARIA VERACRUZANA S.A. DE C.V. (RFC: IVE990101XYZ)</text>
+            <text x="580" y="118" font-size="9" font-weight="bold" fill="#64748b">IMPORTE TOTAL:</text>
+            <text x="680" y="118" font-size="12" font-family="monospace" font-weight="bold" fill="#15803d">$23,200.00 MXN</text>
+            
+            <text x="35" y="142" font-size="9" font-weight="bold" fill="#64748b">CONCEPTO:</text>
+            <text x="120" y="142" font-size="9.5" fill="#334155">Pago de renta de inmueble para juzgados foráneos (Poza Rica) correspondiente al mes de septiembre 2026.</text>
+
+            <!-- PANEL 1: PARTIDAS PRESUPUESTARIAS (AfectacionPartidasGrid) -->
+            <rect x="20" y="168" width="920" height="145" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="21" y="169" width="918" height="28" fill="#f8fafc" rx="6"/>
+            <text x="35" y="187" font-size="11" font-weight="bold" fill="#183125">Partidas Presupuestarias (AfectacionPartidasGrid)</text>
+            <rect x="785" y="173" width="145" height="20" fill="#183125" rx="3" cursor="pointer"/>
+            <text x="857" y="187" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Agregar Partida</text>
+
+            <!-- Table Header Partidas -->
+            <rect x="30" y="202" width="900" height="20" fill="#f1f5f9"/>
+            <text x="40" y="215" font-size="8.5" font-weight="bold" fill="#475569">C. COSTO</text>
+            <text x="140" y="215" font-size="8.5" font-weight="bold" fill="#475569">ESTRUCTURA PROGRAMÁTICA (FN-PR-SP-PY)</text>
+            <text x="430" y="215" font-size="8.5" font-weight="bold" fill="#475569">FUENTE</text>
+            <text x="540" y="215" font-size="8.5" font-weight="bold" fill="#475569">PARTIDA COG</text>
+            <text x="680" y="215" font-size="8.5" font-weight="bold" fill="#475569">MES</text>
+            <text x="760" y="215" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="end">IMPORTE ($)</text>
+            <text x="850" y="215" font-size="8.5" font-weight="bold" fill="#475569">ACCIONES</text>
+
+            <!-- Partida Row 1 -->
+            <text x="40" y="238" font-size="9" fill="#1e293b">11304 Poza Rica</text>
+            <text x="140" y="238" font-size="9" font-family="monospace" fill="#334155">1.2.1 - 01 - 04 - 002 (Impartición Justicia)</text>
+            <text x="430" y="238" font-size="9" fill="#334155">111 Rec. Fiscales</text>
+            <text x="540" y="238" font-size="9" font-family="monospace" font-weight="bold" fill="#0284c7">32201 Arrendamiento</text>
+            <text x="680" y="238" font-size="9" fill="#334155">Septiembre</text>
+            <text x="760" y="238" font-size="10" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$23,200.00</text>
+            <text x="850" y="238" font-size="10" fill="#0284c7" cursor="pointer">✏️ 🗑️</text>
+
+            <!-- Total Partidas -->
+            <line x1="30" y1="255" x2="930" y2="255" stroke="#cbd5e1"/>
+            <text x="540" y="275" font-size="10" font-weight="bold" fill="#475569">TOTAL PARTIDAS REGISTRADAS:</text>
+            <text x="760" y="275" font-size="11" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$23,200.00 MXN</text>
+
+            <!-- PANEL 2: DOS COLUMNAS AL 50% / 50% -->
+            
+            <!-- Columna Izquierda: SiafExpedienteDigitalMin -->
+            <rect x="20" y="323" width="450" height="230" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="21" y="324" width="448" height="28" fill="#f8fafc" rx="6"/>
+            <text x="35" y="342" font-size="11" font-weight="bold" fill="#183125">Documentación Soporte (SiafExpedienteDigitalMin)</text>
+            <rect x="360" y="328" width="100" height="20" fill="#183125" rx="3" cursor="pointer"/>
+            <text x="410" y="342" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Adjuntar Doc</text>
+
+            <!-- Item 1: Factura XML timbrada -->
+            <rect x="30" y="360" width="430" height="42" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="377" font-size="9" font-weight="bold" fill="#0284c7">📄 Factura SAT (XML Timbrado)</text>
+            <text x="40" y="392" font-size="8" font-family="monospace" fill="#64748b">UUID: 4A2E8B1C-90DF-4E33-A12B-9876543210AB</text>
+            <rect x="375" y="372" width="75" height="18" fill="#dcfce7" rx="3"/>
+            <text x="412" y="384" font-size="7.5" font-weight="bold" fill="#15803d" text-anchor="middle">VALIDADO SAT ✓</text>
+
+            <!-- Item 2: Factura PDF -->
+            <rect x="30" y="410" width="430" height="42" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="427" font-size="9" font-weight="bold" fill="#1e293b">📑 Factura Representación Impresa (PDF)</text>
+            <text x="40" y="442" font-size="8" fill="#64748b">factura_septiembre_2026_pozarica.pdf (1.2 MB)</text>
+            <rect x="385" y="422" width="65" height="18" fill="#f1f5f9" rx="3"/>
+            <text x="417" y="434" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">CARGADO ✓</text>
+
+            <!-- Item 3: Contrato Arrendamiento Checklist 05.1.1 -->
+            <rect x="30" y="460" width="430" height="42" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="477" font-size="9" font-weight="bold" fill="#1e293b">📁 Contrato de Arrendamiento Vigente (Checklist 05.1.1)</text>
+            <text x="40" y="492" font-size="8" fill="#64748b">contrato_arrendamiento_2026_pj.pdf (4.8 MB)</text>
+            <rect x="385" y="472" width="65" height="18" fill="#dcfce7" rx="3"/>
+            <text x="417" y="484" font-size="7.5" font-weight="bold" fill="#15803d" text-anchor="middle">CONFORME ✓</text>
+
+            <text x="35" y="535" font-size="8.5" fill="#15803d">✓ Checklist normativo 100% satisfecho para envío a revisión.</text>
+
+            <!-- Columna Derecha: SiafCard Resumen Documental CFDI -->
+            <rect x="490" y="323" width="450" height="230" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="491" y="324" width="448" height="28" fill="#f8fafc" rx="6"/>
+            <text x="505" y="342" font-size="11" font-weight="bold" fill="#183125">Resumen Documental CFDI</text>
+            <text x="925" y="342" font-size="9" fill="#64748b" text-anchor="end">1 XML activo timbrado</text>
+
+            <g transform="translate(505, 365)">
+              <text x="0" y="15" font-size="10" fill="#475569">Subtotal CFDI:</text>
+              <text x="415" y="15" font-size="11" font-family="monospace" fill="#1e293b" text-anchor="end">$20,000.00</text>
+
+              <text x="0" y="40" font-size="10" fill="#475569">IVA Trasladado (002 - 16%):</text>
+              <text x="415" y="40" font-size="11" font-family="monospace" fill="#1e293b" text-anchor="end">$3,200.00</text>
+
+              <text x="0" y="65" font-size="10" fill="#991b1b">Retenciones del XML (ISR e IVA):</text>
+              <text x="415" y="65" font-size="11" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">-$4,266.67</text>
+
+              <line x1="0" y1="80" x2="415" y2="80" stroke="#cbd5e1"/>
+
+              <text x="0" y="102" font-size="11" font-weight="bold" fill="#183125">Total Facturado CFDI:</text>
+              <text x="415" y="102" font-size="14" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$23,200.00</text>
+
+              <text x="0" y="125" font-size="11" font-weight="bold" fill="#0284c7">Líquido Neto Estimado a Proveedor:</text>
+              <text x="415" y="125" font-size="13" font-family="monospace" font-weight="bold" fill="#0284c7" text-anchor="end">$18,933.33</text>
+            </g>
+
+            <!-- Barra de Cuadratura Perfecta -->
+            <rect x="505" y="515" width="420" height="25" fill="#dcfce7" rx="4"/>
+            <text x="715" y="531" font-size="9.5" font-weight="bold" fill="#15803d" text-anchor="middle">✓ Cuadratura: Partidas ($23,200.00) = CFDIs ($23,200.00)</text>
+
+            <!-- Trazabilidad Inferior -->
+            <text x="25" y="585" font-size="9" fill="#64748b">Bitácora: 02/09/2026 10:15 hrs · Borrador registrado por mramirez (Operador CxP) · Periodo Contable Septiembre 2026.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF5: MODAL COMPLEJO EN MODO [CONSULTA] (APROBADO Y DEVENGADO CON PÓLIZA A.1) -->
+    <div id="wf-wfag5" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">05.2.1 Modal Complejo · Modo [Consulta] · Trámite Aprobado y Asiento Contable A.1</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Solo Lectura + Póliza PE Asentada en Contabilidad</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 940 480" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="940" height="480" fill="#ffffff" rx="8" stroke="#cbd5e1"/>
+            
+            <!-- Modal Header -->
+            <rect width="940" height="42" fill="#183125" rx="8"/>
+            <text x="25" y="26" font-size="12" font-weight="bold" fill="#ffffff">Afectación de Gasto: AG-2026-00140 (Consulta)</text>
+            <rect x="330" y="12" width="80" height="18" fill="#dcfce7" rx="9"/>
+            <text x="370" y="25" font-size="8.5" font-weight="bold" fill="#15803d" text-anchor="middle">APROBADA</text>
+            <rect x="420" y="12" width="130" height="18" fill="#8c6e3d" rx="4"/>
+            <text x="485" y="24" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">PÓLIZA: PE-2026-00042</text>
+            <rect x="895" y="10" width="22" height="22" fill="#2d4a3b" rx="4"/>
+            <text x="906" y="25" font-size="11" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
+
+            <!-- Barra de Acciones de Solo Lectura -->
+            <rect x="20" y="52" width="900" height="36" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="35" y="74" font-size="10" font-weight="bold" fill="#64748b">🔒 Trámite congelado e inmutable tras devengo contable.</text>
+            
+            <rect x="580" y="57" width="110" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+            <text x="635" y="74" font-size="9.5" font-weight="bold" fill="#475569" text-anchor="middle">📜 Historial (4)</text>
+
+            <rect x="700" y="57" width="140" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+            <text x="770" y="74" font-size="9.5" font-weight="bold" fill="#475569" text-anchor="middle">🖨 Imprimir Devengo</text>
+
+            <rect x="850" y="57" width="60" height="26" fill="#183125" rx="4" cursor="pointer"/>
+            <text x="880" y="74" font-size="9.5" font-weight="bold" fill="#ffffff" text-anchor="middle">Póliza ➔</text>
+
+            <!-- Previsualizador de Asientos de Devengo CONAC A.1 -->
+            <rect x="20" y="100" width="900" height="350" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <rect x="21" y="101" width="898" height="26" fill="#183125" rx="6"/>
+            <text x="35" y="118" font-size="11" font-weight="bold" fill="#ffffff">Asiento de Devengo Presupuestario y Contable (Matriz CONAC A.1)</text>
+
+            <!-- Table Header Póliza -->
+            <rect x="30" y="135" width="880" height="22" fill="#f1f5f9"/>
+            <text x="40" y="150" font-size="8.5" font-weight="bold" fill="#475569">CUENTA</text>
+            <text x="140" y="150" font-size="8.5" font-weight="bold" fill="#475569">DESCRIPCIÓN DE LA CUENTA</text>
+            <text x="500" y="150" font-size="8.5" font-weight="bold" fill="#475569">NATURALEZA</text>
+            <text x="660" y="150" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="end">DEBE ($)</text>
+            <text x="800" y="150" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="end">HABER ($)</text>
+
+            <!-- Asientos Patrimoniales -->
+            <text x="40" y="178" font-size="9" font-family="monospace" fill="#0284c7">5.1.3.2.3221</text>
+            <text x="140" y="178" font-size="9" fill="#1e293b">Arrendamiento de Edificios y Locales</text>
+            <text x="500" y="178" font-size="8.5" fill="#64748b">Gasto Contable Patrimonial</text>
+            <text x="660" y="178" font-size="9.5" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$20,000.00</text>
+            <text x="800" y="178" font-size="9" text-anchor="end">-</text>
+
+            <text x="40" y="202" font-size="9" font-family="monospace" fill="#0284c7">1.1.9.1.0101</text>
+            <text x="140" y="202" font-size="9" fill="#1e293b">IVA Pendiente de Acreditar</text>
+            <text x="500" y="202" font-size="8.5" fill="#64748b">Activo Circulante</text>
+            <text x="660" y="202" font-size="9.5" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$3,200.00</text>
+            <text x="800" y="202" font-size="9" text-anchor="end">-</text>
+
+            <text x="40" y="226" font-size="9" font-family="monospace" fill="#991b1b">2.1.1.7.0101</text>
+            <text x="140" y="226" font-size="9" fill="#1e293b">Retenciones de ISR por Arrendamiento (10%)</text>
+            <text x="500" y="226" font-size="8.5" fill="#64748b">Pasivo Circulante</text>
+            <text x="660" y="226" font-size="9" text-anchor="end">-</text>
+            <text x="800" y="226" font-size="9.5" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">$2,000.00</text>
+
+            <text x="40" y="250" font-size="9" font-family="monospace" fill="#991b1b">2.1.1.7.0201</text>
+            <text x="140" y="250" font-size="9" fill="#1e293b">Retenciones de IVA por Arrendamiento (2/3)</text>
+            <text x="500" y="250" font-size="8.5" fill="#64748b">Pasivo Circulante</text>
+            <text x="660" y="250" font-size="9" text-anchor="end">-</text>
+            <text x="800" y="250" font-size="9.5" font-family="monospace" font-weight="bold" fill="#991b1b" text-anchor="end">$2,133.33</text>
+
+            <text x="40" y="274" font-size="9" font-family="monospace" fill="#0284c7">2.1.1.2.0001</text>
+            <text x="140" y="274" font-size="9" font-weight="bold" fill="#1e293b">Proveedores por Pagar a Corto Plazo</text>
+            <text x="500" y="274" font-size="8.5" fill="#64748b">Pasivo a Liquidar en CxP</text>
+            <text x="660" y="274" font-size="9" text-anchor="end">-</text>
+            <text x="800" y="274" font-size="9.5" font-family="monospace" font-weight="bold" fill="#0284c7" text-anchor="end">$19,066.67</text>
+
+            <!-- Asientos Presupuestales -->
+            <line x1="30" y1="290" x2="910" y2="290" stroke="#cbd5e1" stroke-dasharray="3,3"/>
+            
+            <text x="40" y="312" font-size="9" font-family="monospace" fill="#15803d">8.2.5.0.0000</text>
+            <text x="140" y="312" font-size="9" font-weight="bold" fill="#1e293b">Presupuesto de Egresos Devengado</text>
+            <text x="500" y="312" font-size="8.5" fill="#15803d">Momento Presupuestario</text>
+            <text x="660" y="312" font-size="9.5" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$23,200.00</text>
+            <text x="800" y="312" font-size="9" text-anchor="end">-</text>
+
+            <text x="40" y="336" font-size="9" font-family="monospace" fill="#15803d">8.2.4.0.0000</text>
+            <text x="140" y="336" font-size="9" fill="#1e293b">Presupuesto de Egresos Comprometido</text>
+            <text x="500" y="336" font-size="8.5" fill="#15803d">Amortización de Compromiso</text>
+            <text x="660" y="336" font-size="9" text-anchor="end">-</text>
+            <text x="800" y="336" font-size="9.5" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$23,200.00</text>
+
+            <!-- Sumas Iguales -->
+            <rect x="30" y="360" width="880" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="40" y="379" font-size="10" font-weight="bold" fill="#183125">SUMAS IGUALES (PÓLIZA DE DEVENGO CUADRADA):</text>
+            <text x="660" y="379" font-size="11" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$46,400.00</text>
+            <text x="800" y="379" font-size="11" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$46,400.00</text>
+
+            <text x="35" y="420" font-size="9" fill="#64748b">Nota CONAC: Esta póliza alimenta automáticamente la balanza de comprobación y habilita la creación de la Orden de Pago (05.2.2) hacia Tesorería.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- 10. INTEGRACIONES Y DEPENDENCIAS -->
