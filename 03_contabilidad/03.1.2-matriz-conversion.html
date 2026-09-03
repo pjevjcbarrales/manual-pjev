@@ -45,7 +45,57 @@
     <!-- 1. Descripción General -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-      <p>La Matriz de Conversión es el cerebro del "Registro Único". Es un diccionario de reglas que traduce cada transacción presupuestal (COG) a su equivalente contable (Cuenta). Cuando el área de Egresos realiza el pago de una factura (Partida 21101), la matriz indica al sistema que automáticamente debe cargar a Gastos (5121) y abonar a Bancos (1112).</p>
+      <p>La Matriz de Conversión es el motor de cálculo automático del principio de <strong>"Registro Único"</strong> mandateado por la Ley General de Contabilidad Gubernamental. Traduce de forma determinista y en tiempo real cada momento presupuestal (COG en Egresos, CRI en Ingresos) a sus respectivos asientos contables patrimoniales (Cargos y Abonos), eliminando la captura manual de cuentas contables por parte de los operadores.</p>
+      
+      <p>En el SIAF-PJEV, la administración de matrices opera bajo el esquema <code>contabilidad.matriz_conversion</code>, <code>contabilidad.matriz_conversion_regla</code> y <code>contabilidad.matriz_conversion_movimiento</code>, permitiendo al Jefe de Contabilidad parametrizar las siguientes matrices oficiales del ejercicio 2026:</p>
+
+      <table class="props-table" style="font-size:12px; margin-top:10px;">
+        <thead><tr><th>ID</th><th>Clave Matriz</th><th>Ámbito / Momento CONAC</th><th>Nombre Institucional</th><th>Propósito y Tratamiento Contable</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>12</code></td>
+            <td><code>A1_DEVENGADO_GASTOS</code></td>
+            <td><span class="badge-w" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">E · Devengado (DEV)</span></td>
+            <td>A.1 Devengado de Gastos</td>
+            <td>Reconoce el gasto (5.x) y el pasivo. En el Capítulo 1000 (103 reglas), abona homogéneamente a la cuenta puente <code>2.1.1.9.1000.0001 (Nómina por Liquidar)</code>.</td>
+          </tr>
+          <tr>
+            <td><code>22</code></td>
+            <td><code>A0_RECLASIFICA_ORDEN_PAGO</code></td>
+            <td><span class="badge-s" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">E · Ejercido (EJE)</span></td>
+            <td>Reclasificación Pasiva de Órdenes de Pago</td>
+            <td><strong>Nueva Matriz Institucional:</strong> Al autorizar la Orden de Pago (05.2.2), disminuye la bolsa puente (Cargo a <code>2.1.1.9.1000.0001</code>) y acredita el pasivo líquido exigible (Abono a <code>2.1.1.1.xxxx</code>).</td>
+          </tr>
+          <tr>
+            <td><code>13</code></td>
+            <td><code>A2_PAGADO_GASTOS</code></td>
+            <td><span class="badge-a" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">E · Pagado (PAG)</span></td>
+            <td>A.2 Pagado de Gastos</td>
+            <td>Al liquidar en Tesorería (06.2.1), cancela el pasivo líquido (Cargo a <code>2.1.1.1.xxxx</code>) y acredita la cuenta bancaria de salida (Abono a <code>1.1.1.2.xxxx</code>).</td>
+          </tr>
+          <tr>
+            <td><code>14</code></td>
+            <td><code>B1_INGRESO_DEVENGADO</code></td>
+            <td><span class="badge-w" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">I · Devengado (DEV)</span></td>
+            <td>B.1 Ingreso Devengado</td>
+            <td>Cuentas por cobrar (1.1.2.x) vs Ingresos de gestión (4.x).</td>
+          </tr>
+          <tr>
+            <td><code>15</code></td>
+            <td><code>B2_INGRESO_RECAUDADO</code></td>
+            <td><span class="badge-a" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">I · Recaudado (REC)</span></td>
+            <td>B.2 Ingreso Recaudado</td>
+            <td>Entrada a Bancos (1.1.1.2) vs Cancelación de Cuentas por cobrar (1.1.2.x).</td>
+          </tr>
+          <tr>
+            <td><code>16</code></td>
+            <td><code>B3_INGRESO_SIMULTANEO</code></td>
+            <td><span class="badge-a" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">I · Simultáneo (DEV+REC)</span></td>
+            <td>B.3 Ingreso Devengado y Recaudado Simultáneo</td>
+            <td>Entrada directa a Bancos (1.1.1.2) vs Ingresos de gestión (4.x) en caja directa.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- 2. Marco Normativo -->

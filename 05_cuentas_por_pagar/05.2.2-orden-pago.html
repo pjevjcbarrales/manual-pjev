@@ -697,7 +697,7 @@ $$;</code></pre>
       </div>
     </div>
 
-    <!-- SP 4: PÓLIZA DE RECLASIFICACIÓN CONTABLE -->
+    <!-- SP 4: PÓLIZA DE RECLASIFICACIÓN CONTABLE (MOTOR MATRIZ A0) -->
     <div id="sp-spop4" class="sp-panel">
       <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Póliza de Reclasificación: <code>cxp.fn_generar_poliza_reclasificacion_op</code></h4>
       <div class="code-wrap">
@@ -715,14 +715,18 @@ DECLARE
     v_op RECORD;
     v_poliza_id INTEGER;
     v_folio_poliza VARCHAR(20);
+    v_regla_id BIGINT;
+    v_mov RECORD;
+    v_renglon INTEGER := 1;
 BEGIN
     SELECT * INTO v_op FROM cxp.ordenes_pago WHERE op_id = p_op_id AND ejercicio_fiscal = p_ejercicio;
-    IF NOT FOUND THEN RETURN jsonb_build_object('error', -1, 'mensaje', 'Orden no encontrada.'); END IF;
+    IF NOT FOUND THEN RETURN jsonb_build_object('error', -1, 'mensaje', 'Orden de pago no encontrada.'); END IF;
 
-    -- Genera Folio de Póliza Diario (DI)
+    -- 1. Genera Folio Consecutivo de Póliza Diario (DI)
     SELECT 'DI-' || p_ejercicio || '-' || LPAD(COALESCE(MAX(SUBSTRING(p_folio FROM '[0-9]+$')::INTEGER), 0) + 1::TEXT, 5, '0')
       INTO v_folio_poliza FROM contabilidad.poliza WHERE p_ejercicio = p_ejercicio;
 
+    -- 2. Inserta Encabezado de Póliza Cuadrada
     INSERT INTO contabilidad.poliza (
         p_ejercicio, p_tipo, p_folio, p_fecha, p_concepto, p_total_debe, p_total_haber,
         p_cuadrada, p_estado, usuario_c
@@ -732,23 +736,49 @@ BEGIN
         v_op.importe_neto, v_op.importe_neto, true, 'APLICADA', p_usuario
     ) RETURNING p_id INTO v_poliza_id;
 
-    -- Renglón 1: Cargo a la cuenta puente (Disminuye 2.1.1.9.1000.0001)
-    INSERT INTO contabilidad.poliza_detalle (
-        pd_poliza_id, pd_ejercicio, pd_renglon, pd_cuenta, pd_debe, pd_haber, pd_concepto
-    ) VALUES (
-        v_poliza_id, p_ejercicio, 1, v_op.cuenta_contable_origen, v_op.importe_neto, 0.00,
-        'Cancelación pasivo concentrador nómina quincenal'
-    );
+    -- 3. Localizar regla activa en la Matriz A0_RECLASIFICA_ORDEN_PAGO (Momento Ejercido)
+    SELECT mcr.mcr_id INTO v_regla_id
+      FROM contabilidad.matriz_conversion_regla mcr
+      JOIN contabilidad.matriz_conversion mcv ON mcv.mcv_id = mcr.mcr_matriz_id
+     WHERE mcv.mcv_clave = 'A0_RECLASIFICA_ORDEN_PAGO'
+       AND mcv.mcv_ejercicio = p_ejercicio
+       AND mcv.mcv_estado = 'ACTIVA'
+       AND mcr.mcr_evento_codigo = 'RECLASIFICACION_OP'
+       AND mcr.estatus_registro = 1
+     ORDER BY mcr.mcr_id ASC
+     LIMIT 1;
 
-    -- Renglón 2: Abono al pasivo líquido exigible (Nace 2.1.1.1.1000.0001)
-    INSERT INTO contabilidad.poliza_detalle (
-        pd_poliza_id, pd_ejercicio, pd_renglon, pd_cuenta, pd_debe, pd_haber, pd_concepto
-    ) VALUES (
-        v_poliza_id, p_ejercicio, 2, v_op.cuenta_contable_pasivo, 0.00, v_op.importe_neto,
-        'Reconocimiento pasivo líquido exigible a dispersar por Tesorería'
-    );
+    -- 4. Si existe regla parametrizada por el Contador General en 03.1.2, aplicar sus asientos dinámicos
+    IF v_regla_id IS NOT NULL THEN
+        FOR v_mov IN
+            SELECT mcm.mcm_naturaleza, cc.cc_cuentapuntos, mcm.mcm_descripcion
+              FROM contabilidad.matriz_conversion_movimiento mcm
+              JOIN contabilidad.catalogo_cuentas cc ON cc.cc_id = mcm.mcm_cuenta_id
+             WHERE mcm.mcm_regla_id = v_regla_id
+               AND mcm.mcm_ambito = 'C'
+               AND mcm.estatus_registro = 1
+             ORDER BY mcm.mcm_orden ASC
+        LOOP
+            INSERT INTO contabilidad.poliza_detalle (
+                pd_poliza_id, pd_ejercicio, pd_renglon, pd_cuenta, pd_debe, pd_haber, pd_concepto
+            ) VALUES (
+                v_poliza_id, p_ejercicio, v_renglon, v_mov.cc_cuentapuntos,
+                CASE WHEN v_mov.mcm_naturaleza = 'D' THEN v_op.importe_neto ELSE 0.00 END,
+                CASE WHEN v_mov.mcm_naturaleza = 'H' THEN v_op.importe_neto ELSE 0.00 END,
+                v_mov.mcm_descripcion
+            );
+            v_renglon := v_renglon + 1;
+        END LOOP;
+    ELSE
+        -- Fallback estándar institucional
+        INSERT INTO contabilidad.poliza_detalle (pd_poliza_id, pd_ejercicio, pd_renglon, pd_cuenta, pd_debe, pd_haber, pd_concepto)
+        VALUES (v_poliza_id, p_ejercicio, 1, v_op.cuenta_contable_origen, v_op.importe_neto, 0.00, 'Cancelación pasivo concentrador nómina');
 
-    RETURN jsonb_build_object('error', 0, 'mensaje', 'Póliza de reclasificación generada.', 
+        INSERT INTO contabilidad.poliza_detalle (pd_poliza_id, pd_ejercicio, pd_renglon, pd_cuenta, pd_debe, pd_haber, pd_concepto)
+        VALUES (v_poliza_id, p_ejercicio, 2, v_op.cuenta_contable_pasivo, 0.00, v_op.importe_neto, 'Reconocimiento pasivo líquido exigible');
+    END IF;
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'Póliza de reclasificación generada exitosamente vía Matriz A0.', 
         'data', jsonb_build_object('poliza_id', v_poliza_id, 'folio_poliza', v_folio_poliza));
 END;
 $$;</code></pre>
@@ -861,11 +891,39 @@ export class OrdenesPagoCxpController {
         </p>
       </div>
 
-      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-OP-04 · Reclasificación Contable de Nómina (2.1.1.9 a 2.1.1.1)</strong>
-        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          Para el procedimiento <code>NOMINA</code>, la autorización formal de la Orden de Pago detona automáticamente la póliza de reclasificación contable Tipo Diario (<code>DI</code>): carga a la cuenta puente <code>2.1.1.9.1000.0001 Nómina por Liquidar</code> y abona a <code>2.1.1.1.1000.0001 Remuneraciones por Pagar</code>, individualizando la obligación exigible antes de la dispersión bancaria.
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:14px 18px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-OP-04 · Reclasificación Contable de Nómina vía Matriz de Conversión A0 (2.1.1.9 a 2.1.1.1)</strong>
+        <p style="font-size:12px; margin:6px 0 8px; color:var(--pjev-texto); line-height:1.6;">
+          Para el procedimiento <code>NOMINA</code>, la autorización formal de la Orden de Pago detona automáticamente una póliza contable de Diario (<code>DI</code>) gobernada por la <strong>Matriz de Conversión A0_RECLASIFICA_ORDEN_PAGO</strong> (Momento Ejercido, <code>mc_id = 5</code>), evitando código duro en la aplicación. La arquitectura opera en tres etapas integradas:
         </p>
+        <ol style="font-size:12px; color:var(--pjev-texto-muted); margin-left:18px; line-height:1.6; margin-bottom:10px;">
+          <li><strong>Etapa 1 (Devengo de Gasto en 05.2.1 / Matriz A.1)</strong>: Las 103 reglas del Capítulo 1000 devengan el gasto bruto reconociendo el pasivo en la cuenta puente concentradora <code>2.1.1.9.1000.0001 OTRAS CUENTAS POR PAGAR VARIAS (Nómina por Liquidar)</code> [Migración 179].</li>
+          <li><strong>Etapa 2 (Reclasificación en 05.2.2 / Matriz A0)</strong>: Al autorizar la Orden de Pago, el evento <code>RECLASIFICACION_OP</code> traspasa el importe neto exigible disminuyendo la bolsa puente (Cargo a <code>2.1.1.9.1000.0001</code>) y acreditando el pasivo líquido (Abono a <code>2.1.1.1.xxxx</code>) [Migración 180].</li>
+          <li><strong>Etapa 3 (Pagado en 06.2.1 / Matriz A.2)</strong>: Al liquidar en Tesorería, la Matriz A.2 cancela el pasivo <code>2.1.1.1.xxxx</code> contra la chequera bancaria <code>1.1.1.2.xxxx</code> y devenga los momentos presupuestales 8.2.6 y 8.2.7.</li>
+        </ol>
+        <table class="props-table" style="font-size:11px; margin-top:6px;">
+          <thead><tr><th>Regla en Matriz A0</th><th>Cuenta Cargo (Debe)</th><th>Cuenta Abono (Haber)</th><th>Fórmula / Destino</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>R_OP_NOMINA_NETA</code></td>
+              <td><code>2.1.1.9.1000.0001</code> (Puente Nómina)</td>
+              <td><code>2.1.1.1.1000.0001</code> (Personal Permanente)</td>
+              <td><code>NETO_PAGAR</code> (Dispersión masiva nómina)</td>
+            </tr>
+            <tr>
+              <td><code>R_OP_NOMINA_TRANSITORIO</code></td>
+              <td><code>2.1.1.9.1000.0001</code> (Puente Nómina)</td>
+              <td><code>2.1.1.1.2000.0001</code> (Personal Eventual)</td>
+              <td><code>NETO_PAGAR</code> (Nómina transitoria)</td>
+            </tr>
+            <tr>
+              <td><code>R_OP_PENSION_ALIMENTICIA</code></td>
+              <td><code>2.1.1.9.1000.0001</code> (Puente Nómina)</td>
+              <td><code>2.1.1.9.3000.0001</code> (Pensión Alimenticia)</td>
+              <td><code>NETO_PAGAR</code> (Cheque/SPEI a acreedora judicial)</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
