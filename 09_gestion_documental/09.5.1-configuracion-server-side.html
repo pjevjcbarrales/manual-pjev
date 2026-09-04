@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.5.1 Configuración Server-Side y Requerimientos — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.5 · Integración y Componentes</span> ›
+    <span>09.5.1 Configuración Server-Side y Requerimientos</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.5.1</div>
+      <h1 class="elem-title">Configuración Server-Side y Requerimientos de Infraestructura</h1>
+      <p class="elem-desc">Guía técnica y de arquitectura para la implementación del backend de archivos en NestJS, almacenamiento desacoplado (NAS, MinIO, S3), seguridad de streaming, base de datos PostgreSQL y requerimientos de escáneres masivos para recopiladores contables.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Guía Técnica de Servidor</span>
+        <span class="mod-badge badge-s">Backend & Storage (DOC-08)</span>
+        <span class="mod-badge badge-norm">NOM-151 / MinIO / PostgreSQL</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">⚙️ Desacoplamiento de Almacenamiento e Ingesta Segura</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      El subsistema de archivos <strong>nunca almacena archivos binarios dentro de PostgreSQL</strong> como campos <code>BYTEA</code> o <code>BLOB</code>. La base de datos únicamente gestiona metadatos, índices, hashes SHA-256 y relaciones polimórficas.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Los binarios físicos se administran a través del patrón <strong>Driver de Almacenamiento Desacoplado (`IFileStorageDriver`)</strong>, permitiendo alternar de forma transparente entre un disco local/NAS institucional, un clúster local MinIO (S3-compatible) o una nube privada gubernamental sin modificar una sola línea de código del sistema.
+    </p>
+  </div>
+
+  <!-- 1. REQUERIMIENTOS DE INFRAESTRUCTURA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Requerimientos de Infraestructura y Hardware</div>
+    <p>Para soportar el escaneo masivo del archivo contable histórico y corriente del Poder Judicial, se estipulan los siguientes requerimientos:</p>
+    
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Especificación Mínima</th>
+          <th>Especificación Recomendada (Producción PJEV)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Almacenamiento Físico</strong></td>
+          <td>NAS institucional de 4 TB en RAID 5.</td>
+          <td>SAN / Clúster MinIO distribuido de 16 TB con respaldo en modo WORM (Write Once Read Many).</td>
+        </tr>
+        <tr>
+          <td><strong>Servidor de Aplicaciones (NestJS)</strong></td>
+          <td>4 vCPUs, 8 GB RAM, disco SSD NVMe para cache temporal de subida.</td>
+          <td>8 vCPUs, 16 GB RAM, SSD NVMe clase empresarial con streaming I/O sin retención en memoria.</td>
+        </tr>
+        <tr>
+          <td><strong>Red Institucional</strong></td>
+          <td>Gigabit Ethernet (1 Gbps) LAN en juzgados y oficinas.</td>
+          <td>Enlace dedicado de 10 Gbps entre Servidor de Aplicaciones y Storage MinIO/NAS.</td>
+        </tr>
+        <tr>
+          <td><strong>Escáneres de Producción</strong></td>
+          <td>Escáner departamental dúplex (40 ppm) con alimentador automático (ADF).</td>
+          <td>Escáneres masivos de alta velocidad (80-120 ppm) Fujitsu/Canon con soporte para hojas separadoras con código QR/Barras y hot-folders SMB/FTP.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. BASE DE DATOS POSTGRESQL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Requerimientos y Configuración de PostgreSQL</div>
+    <p>La base de datos PostgreSQL requiere habilitar las extensiones criptográficas para validar hashes de integridad y generar identificadores universales únicos:</p>
+
+    <div class="code-wrap">
+<pre><code>-- Extensiones obligatorias en PostgreSQL 15+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Esquema transversal dedicado
+CREATE SCHEMA IF NOT EXISTS archivos;
+GRANT USAGE ON SCHEMA archivos TO siaf_app;
+
+-- Tablespace opcional para índices pesados de archivos
+-- ALTER TABLE archivos.documento SET TABLESPACE ts_archivos_indices;</code></pre>
+    </div>
+  </div>
+
+  <!-- 3. ARQUITECTURA BACKEND NESTJS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Configuración Backend (NestJS + Prisma)</div>
+    
+    <p>El backend implementa la interfaz canónica de almacenamiento desacoplado:</p>
+
+    <div class="code-wrap">
+<pre><code>// Interfaz de abstracción (src/archivos/interfaces/file-storage-driver.interface.ts)
+export interface IFileStorageDriver {
+  upload(fileStream: NodeJS.ReadableStream, relativePath: string): Promise<{ ruta_storage: string; tamanio_bytes: number }>;
+  getStream(relativePath: string): Promise<NodeJS.ReadableStream>;
+  delete(relativePath: string): Promise<void>;
+  exists(relativePath: string): Promise<boolean>;
+}</code></pre>
+    </div>
+
+    <p>Variables de entorno obligatorias en el archivo <code>.env</code>:</p>
+
+    <div class="code-wrap">
+<pre><code># Configuración del Motor de Archivos SIAF-PJEV
+STORAGE_DRIVER=minio               # Opciones: 'local', 'minio', 's3'
+STORAGE_LOCAL_BASE_PATH=/mnt/storage_pjev/archivos/
+STORAGE_MAX_FILE_SIZE_MB=30        # Límite general por archivo
+
+# Credenciales MinIO / S3 Institucional
+MINIO_ENDPOINT=minio.pjev.gob.mx
+MINIO_PORT=9000
+MINIO_USE_SSL=true
+MINIO_ACCESS_KEY=pjev_siaf_admin
+MINIO_SECRET_KEY=clave_super_segura_2026
+MINIO_BUCKET_NAME=siaf-expedientes-digitales
+
+# Integración Prestador de Certificación NOM-151 (PSC)
+PSC_NOM151_API_URL=https://api.psc-acreditado.gob.mx/v1/timestamp
+PSC_NOM151_API_KEY=token_acreditacion_secretaria_economia_2026</code></pre>
+    </div>
+
+    <p>Pipeline de seguridad en subida de archivos (NestJS Interceptor):</p>
+    <ul style="font-size:12px; line-height:1.7; color:var(--pjev-texto);">
+      <li><strong>Validación de Magic Bytes:</strong> Inspección de los primeros bytes reales del binario mediante la librería <code>file-type</code> para bloquear scripts maliciosos disfrazados de PDF o XML.</li>
+      <li><strong>Cálculo en Stream de SHA-256:</strong> El resumen criptográfico se genera conforme el flujo de bytes entra al servidor, sin almacenar buffers pesados en la memoria RAM de Node.js.</li>
+      <li><strong>Estructura de Almacenamiento en Disco:</strong> Particionamiento por año y mes con nombre UUID sanitizado:<br>
+        <code>{BUCKET}/{AÑO}/{MES}/{UUID_DOCUMENTO}/original.{ext}</code>
+      </li>
+      <li><strong>Headers de Visualización Segura:</strong><br>
+        <code>Content-Disposition: inline; filename="expediente.pdf"</code><br>
+        <code>X-Content-Type-Options: nosniff</code><br>
+        <code>Content-Security-Policy: default-src 'none'</code>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 4. DIAGRAMA ARQUITECTÓNICO SVG -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Diagrama de Flujo e Infraestructura Server-Side</div>
+
+    <div class="wf-box">
+      <div class="wf-bar">
+        <span>Arquitectura de Servidor y Flujo de Ingesta Masiva</span>
+        <span style="color:var(--pjev-verde-oscuro);">Infraestructura PJEV</span>
+      </div>
+      <div class="wf-svg-area">
+        <svg viewBox="0 0 960 400" width="100%" height="400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="960" height="400" fill="#f8fafc" rx="6"/>
+          
+          <!-- Bloque 1: Ingesta -->
+          <rect x="30" y="50" width="190" height="300" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <rect x="30" y="50" width="190" height="36" fill="#065f46" rx="6 6 0 0"/>
+          <text x="125" y="73" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">1. INGESTA / ORIGEN</text>
+          
+          <rect x="45" y="105" width="160" height="55" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+          <text x="125" y="127" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle">Escáner de Producción</text>
+          <text x="125" y="145" font-size="8.5" fill="#64748b" text-anchor="middle">Legajos Físicos Contables</text>
+
+          <rect x="45" y="175" width="160" height="55" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+          <text x="125" y="197" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle">Subida por Formulario</text>
+          <text x="125" y="215" font-size="8.5" fill="#64748b" text-anchor="middle">Next.js &lt;EntityFiles /&gt;</text>
+
+          <rect x="45" y="245" width="160" height="55" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+          <text x="125" y="267" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle">Repositorio CFDI 4.0</text>
+          <text x="125" y="285" font-size="8.5" fill="#64748b" text-anchor="middle">Descarga Automática SAT</text>
+
+          <!-- Flecha 1 -> 2 -->
+          <line x1="220" y1="200" x2="265" y2="200" stroke="#065f46" stroke-width="2"/>
+          <polygon points="265,200 257,195 257,205" fill="#065f46"/>
+
+          <!-- Bloque 2: API NestJS -->
+          <rect x="270" y="50" width="220" height="300" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <rect x="270" y="50" width="220" height="36" fill="#0369a1" rx="6 6 0 0"/>
+          <text x="380" y="73" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">2. BACKEND (NestJS)</text>
+
+          <rect x="285" y="100" width="190" height="42" fill="#eff6ff" stroke="#bfdbfe" rx="4"/>
+          <text x="380" y="118" font-size="9.5" font-weight="bold" fill="#1e40af" text-anchor="middle">Magic Bytes (file-type)</text>
+          <text x="380" y="132" font-size="8" fill="#1e3a8a" text-anchor="middle">Bloqueo de extensiones falsas</text>
+
+          <rect x="285" y="152" width="190" height="42" fill="#eff6ff" stroke="#bfdbfe" rx="4"/>
+          <text x="380" y="170" font-size="9.5" font-weight="bold" fill="#1e40af" text-anchor="middle">Stream SHA-256 Digest</text>
+          <text x="380" y="184" font-size="8" fill="#1e3a8a" text-anchor="middle">Generación de huella digital</text>
+
+          <rect x="285" y="204" width="190" height="42" fill="#eff6ff" stroke="#bfdbfe" rx="4"/>
+          <text x="380" y="222" font-size="9.5" font-weight="bold" fill="#1e40af" text-anchor="middle">División y Grapado</text>
+          <text x="380" y="236" font-size="8" fill="#1e3a8a" text-anchor="middle">Pares indivisibles XML + PDF</text>
+
+          <rect x="285" y="256" width="190" height="42" fill="#eff6ff" stroke="#bfdbfe" rx="4"/>
+          <text x="380" y="274" font-size="9.5" font-weight="bold" fill="#1e40af" text-anchor="middle">Driver IFileStorage</text>
+          <text x="380" y="288" font-size="8" fill="#1e3a8a" text-anchor="middle">Desacoplamiento MinIO / NAS</text>
+
+          <!-- Flecha 2 -> 3 (arriba a DB, abajo a Storage) -->
+          <line x1="490" y1="130" x2="535" y2="130" stroke="#0369a1" stroke-width="2"/>
+          <polygon points="535,130 527,125 527,135" fill="#0369a1"/>
+
+          <line x1="490" y1="270" x2="535" y2="270" stroke="#0369a1" stroke-width="2"/>
+          <polygon points="535,270 527,265 527,275" fill="#0369a1"/>
+
+          <!-- Bloque 3: Base de Datos -->
+          <rect x="540" y="50" width="180" height="145" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <rect x="540" y="50" width="180" height="32" fill="#334155" rx="6 6 0 0"/>
+          <text x="630" y="71" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="middle">3. POSTGRESQL (Metadatos)</text>
+          <text x="555" y="102" font-size="9" fill="#334155">• archivos.documento</text>
+          <text x="555" y="118" font-size="9" fill="#334155">• archivos.documento_relacion</text>
+          <text x="555" y="134" font-size="9" fill="#334155">• archivos.documento_bitacora</text>
+          <text x="555" y="150" font-size="8" font-weight="bold" fill="#065f46">Auditoría, Hash, CGCA, CADIDO</text>
+
+          <!-- Bloque 4: Storage Binarios -->
+          <rect x="540" y="205" width="180" height="145" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <rect x="540" y="205" width="180" height="32" fill="#166534" rx="6 6 0 0"/>
+          <text x="630" y="226" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="middle">4. STORAGE (Binarios)</text>
+          <text x="555" y="258" font-size="9" fill="#334155">• MinIO S3 Clúster / NAS</text>
+          <text x="555" y="274" font-size="9" fill="#334155">• Ruta: {YYYY}/{MM}/{UUID}</text>
+          <text x="555" y="290" font-size="9" fill="#334155">• Inmutabilidad WORM</text>
+          <text x="555" y="306" font-size="8" font-weight="bold" fill="#166534">Sin saturar base de datos</text>
+
+          <!-- Bloque 5: Prestador Certificación NOM-151 -->
+          <line x1="720" y1="200" x2="765" y2="200" stroke="#d97706" stroke-width="2"/>
+          <polygon points="765,200 757,195 757,205" fill="#d97706"/>
+
+          <rect x="770" y="120" width="160" height="160" fill="#fef3c7" stroke="#f59e0b" rx="6"/>
+          <rect x="770" y="120" width="160" height="32" fill="#d97706" rx="6 6 0 0"/>
+          <text x="850" y="141" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">5. PSC NOM-151</text>
+          <text x="780" y="175" font-size="9" font-weight="bold" fill="#78350f">Acreditado por SE</text>
+          <text x="780" y="195" font-size="8.5" fill="#92400e">• Emisión de Constancia</text>
+          <text x="780" y="210" font-size="8.5" fill="#92400e">• Sello de Tiempo TSA</text>
+          <text x="780" y="225" font-size="8.5" fill="#92400e">• Equivalencia Probatoria</text>
+          <text x="780" y="245" font-size="8" font-weight="bold" fill="#166534">Validez legal ante ORFIS</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

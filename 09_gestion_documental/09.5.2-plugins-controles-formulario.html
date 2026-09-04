@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.5.2 Plugins y Controles UI para Formularios — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.5 · Integración y Componentes</span> ›
+    <span>09.5.2 Plugins y Controles UI para Formularios</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.5.2</div>
+      <h1 class="elem-title">Plugins y Controles UI para Formularios (Next.js / React)</h1>
+      <p class="elem-desc">Catálogo de componentes y controles de interfaz de usuario desacoplados, listos para ser importados en cualquier formulario del SIAF-PJEV (Cuentas por Pagar, Afectación de Gastos, Orden de Pago, Registro de Ingresos, Contratos y Pólizas) para adjuntar, visualizar, estampar sellos y estructurar recopiladores digitales con una sola línea de código.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Guía de Desarrollo Frontend</span>
+        <span class="mod-badge badge-s">React / Next.js / TypeScript</span>
+        <span class="mod-badge badge-norm">Componentes Reutilizables</span>
+        <span class="mod-badge badge-pjev">Estándar UI PJEV</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">🧩 Plug & Play en Formularios del SIAF</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      El equipo de desarrollo (Cristian, Eunice, Daryl) <strong>no debe programar la lógica de subida de archivos, cálculo de SHA-256 ni conexión con storage en cada módulo</strong>.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Para incorporar el expediente digital completo en una pantalla de Afectación de Gastos o en una Póliza Contable, basta con importar el componente <code>&lt;EntityFiles /&gt;</code> indicando el módulo y el ID del registro. El componente se encarga de la tabla de archivos, la zona Drag & Drop, la previsualización modal, las insignias CADIDO y el estampado de sellos oficiales.
+    </p>
+  </div>
+
+  <!-- 1. CATÁLOGO DE CONTROLES DISPONIBLES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Catálogo de Controles Disponibles</div>
+    
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Control / Componente</th>
+          <th>Ubicación</th>
+          <th>Propósito y Cuándo Usarlo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>&lt;EntityFiles /&gt;</code></td>
+          <td><code>src/components/files/EntityFiles.tsx</code></td>
+          <td><strong>Gestor Integral de Expediente:</strong> Tabla completa con dropzone, lista de documentos vinculados, preview en modal, descarga, sellado y borrado lógico. Se usa en la pestaña de anexos o pie de página de cualquier formulario maestro.</td>
+        </tr>
+        <tr>
+          <td><code>&lt;SingleFileField /&gt;</code></td>
+          <td><code>src/components/files/SingleFileField.tsx</code></td>
+          <td><strong>Campo de Archivo Específico:</strong> Campo de formulario para requerir un único documento obligatorio (ej. <em>"Subir Contrato Firmado (PDF)"</em> o <em>"Ficha de Depósito SEFIPLAN"</em>). Muestra estado de carga, chip con nombre y botón de previsualización.</td>
+        </tr>
+        <tr>
+          <td><code>&lt;ScanBatchDropzone /&gt;</code></td>
+          <td><code>src/components/files/ScanBatchDropzone.tsx</code></td>
+          <td><strong>Zona de Digitalización Masiva:</strong> Diseñado para Contabilidad y Archivo. Recibe PDFs multi-página escaneados, reconoce códigos QR u hojas separadoras y divide automáticamente las pólizas armando los <em>Recopiladores Digitales</em>.</td>
+        </tr>
+        <tr>
+          <td><code>&lt;FilePreviewModal /&gt;</code></td>
+          <td><code>src/components/files/FilePreviewModal.tsx</code></td>
+          <td><strong>Visor Universal Web:</strong> Modal interactivo con zoom, rotación, visualización de PDF/A en canvas, presentación limpia de XML CFDI 4.0 mediante XSLT, e inspección de sellos y firmas.</td>
+        </tr>
+        <tr>
+          <td><code>&lt;DigitalStampPicker /&gt;</code></td>
+          <td><code>src/components/files/DigitalStampPicker.tsx</code></td>
+          <td><strong>Paleta de Sellos Institucionales:</strong> Botón desplegable que muestra los sellos a los que el usuario tiene acceso (<em>Revisión Conforme</em>, <em>Autorizado Pago</em>, etc.) y los estampa directamente en el documento.</td>
+        </tr>
+        <tr>
+          <td><code>&lt;ArchivalBadge /&gt;</code></td>
+          <td><code>src/components/files/ArchivalBadge.tsx</code></td>
+          <td><strong>Insignia Semafórica LGA:</strong> Muestra si el documento está en <em>Trámite</em>, <em>Concentración</em> o <em>Histórico</em>, y los años de vigencia restantes según el CADIDO.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. ESPECIFICACIÓN TÉCNICA DE PROPS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Interfaces TypeScript y Props</div>
+
+    <div class="code-wrap">
+<pre><code>// 1. Props para el componente maestro <EntityFiles />
+export interface EntityFilesProps {
+  moduloSiaf: 'cxp' | 'contabilidad' | 'presupuesto' | 'ingresos' | 'materiales';
+  entidadOrigen: string;              // ej: 'afectacion_gasto', 'poliza', 'orden_pago'
+  registroId: string | number;        // ID del registro guardado (o ticket temporal si es nuevo)
+  isTemporal?: boolean;               // TRUE si el formulario aún no se guarda en firme
+  readOnly?: boolean;                 // TRUE para deshabilitar subidas o eliminaciones
+  permitirSellos?: boolean;           // TRUE para mostrar la paleta de sellos digitales
+  cgcaCodigoSugerido?: string;        // ej: 'PJEV-DGA-RF-1S.02'
+  onFilesChanged?: (count: number) => void;
+}
+
+// 2. Props para el campo individual <SingleFileField />
+export interface SingleFileFieldProps {
+  label: string;
+  tipoDocumento: string;              // ej: 'CFDI_PDF_REP', 'CON_OBR_PUB'
+  value?: string;                     // UUID del archivo actualmente asignado
+  onChange: (fileId: string | null) => void;
+  required?: boolean;
+  disabled?: boolean;
+  accept?: string;                    // ej: '.pdf, .xml'
+  maxSizeMB?: number;
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 3. EJEMPLOS DE INTEGRACIÓN LISTOS PARA USAR -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Ejemplos Prácticos de Integración en Formularios</div>
+
+    <p><strong>Ejemplo 1: Integración de Expediente en Formulario de Afectación de Gastos (CXP)</strong></p>
+    <div class="code-wrap">
+<pre><code>// src/modules/cxp/components/AfectacionGastoForm.tsx
+import React, { useState } from 'react';
+import { EntityFiles } from '@/components/files/EntityFiles';
+
+export const AfectacionGastoForm = ({ idAfectacion, esNuevo }: Props) => {
+  // Ticket temporal generado en el cliente si es nuevo registro
+  const [ticketTemp] = useState(() => esNuevo ? crypto.randomUUID() : null);
+
+  return (
+    &lt;form className="siaf-form"&gt;
+      &lt;h3&gt;Datos Generales del Gasto&lt;/h3&gt;
+      {/* Campos del encabezado: Proveedor, Monto, COG, Centro Gestor */}
+
+      &lt;div className="anexos-section" style={{ marginTop: '24px' }}&gt;
+        &lt;h4&gt;Expediente Digital y Comprobantes&lt;/h4&gt;
+        
+        {/* COMPONENTE REUTILIZABLE: Todo el manejo de archivos en 1 línea */}
+        &lt;EntityFiles
+          moduloSiaf="cxp"
+          entidadOrigen="afectacion_gasto"
+          registroId={esNuevo ? ticketTemp! : idAfectacion}
+          isTemporal={esNuevo}
+          cgcaCodigoSugerido="PJEV-DGA-RF-1S.02"
+          permitirSellos={!esNuevo}
+        /&gt;
+      &lt;/div&gt;
+
+      &lt;button type="submit"&gt;Guardar Afectación&lt;/button&gt;
+    &lt;/form&gt;
+  );
+};</code></pre>
+    </div>
+
+    <p><strong>Ejemplo 2: Integración de Recopilador Digital en Formulario de Póliza Contable</strong></p>
+    <div class="code-wrap">
+<pre><code>// src/modules/contabilidad/components/PolizaContableForm.tsx
+import React from 'react';
+import { EntityFiles } from '@/components/files/EntityFiles';
+import { ScanBatchDropzone } from '@/components/files/ScanBatchDropzone';
+
+export const PolizaContableForm = ({ polizaId, numeroPoliza }: Props) => {
+  return (
+    &lt;div className="poliza-container"&gt;
+      &lt;h2&gt;Póliza Contable: {numeroPoliza}&lt;/h2&gt;
+      {/* Asientos Contables: Cuentas, Cargos y Abonos */}
+
+      {/* ZONA DE ESCANEO MASIVO / RECOPILADOR DIGITAL */}
+      &lt;div className="recopilador-digital-box"&gt;
+        &lt;h4&gt;Recopilador Digital de Evidencia Contable (LGA / NOM-151)&lt;/h4&gt;
+        
+        &lt;ScanBatchDropzone
+          polizaId={polizaId}
+          onBatchProcessed={() => console.log('Recopilador ensamblado')}
+        /&gt;
+
+        &lt;EntityFiles
+          moduloSiaf="contabilidad"
+          entidadOrigen="poliza"
+          registroId={polizaId}
+          cgcaCodigoSugerido="PJEV-DGA-RF-1S.01"
+          permitirSellos={true}
+        /&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+};</code></pre>
+    </div>
+  </div>
+
+  <!-- 4. WIREFRAME SVG INTERACTIVO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Representación Visual del Componente Embebido</div>
+
+    <div class="wf-box">
+      <div class="wf-bar">
+        <span>Vista Previa: Control &lt;EntityFiles /&gt; dentro de un Formulario SIAF</span>
+        <span style="color:var(--pjev-verde-oscuro);">Frontend Reutilizable</span>
+      </div>
+      <div class="wf-svg-area">
+        <svg viewBox="0 0 960 490" width="100%" height="490" xmlns="http://www.w3.org/2000/svg">
+          <rect width="960" height="490" fill="#f8fafc" rx="6"/>
+          
+          <!-- Marco de Formulario Padre -->
+          <rect x="20" y="20" width="920" height="450" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <rect x="20" y="20" width="920" height="38" fill="#f1f5f9" rx="6 6 0 0"/>
+          <text x="35" y="44" font-size="12" font-weight="bold" fill="#334155">Afectación de Gasto #852 — DISTRIBUIDORA DE PAPELERÍA XALAPA S.A. DE C.V.</text>
+
+          <!-- Componente <EntityFiles /> embebido -->
+          <rect x="40" y="75" width="880" height="375" fill="#f8fafc" stroke="#065f46" stroke-width="1.5" rx="6"/>
+          
+          <!-- Encabezado del componente -->
+          <rect x="40" y="75" width="880" height="36" fill="#065f46" rx="5 5 0 0"/>
+          <text x="55" y="98" font-size="11" font-weight="bold" fill="#ffffff">📁 Expediente Digital Vinculado (Componente &lt;EntityFiles /&gt;)</text>
+          
+          <!-- Badges de estatus y sellado en el header del widget -->
+          <rect x="710" y="81" width="95" height="24" fill="#047857" rx="3"/>
+          <text x="757" y="97" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">🏷️ Estampar Sello</text>
+
+          <rect x="815" y="81" width="95" height="24" fill="#ffffff" rx="3"/>
+          <text x="862" y="97" font-size="10" font-weight="bold" fill="#065f46" text-anchor="middle">+ Adjuntar Archivo</text>
+
+          <!-- Zona Dropzone compacta -->
+          <rect x="55" y="122" width="850" height="50" fill="#ffffff" stroke="#cbd5e1" stroke-dasharray="4 3" rx="4"/>
+          <text x="480" y="145" font-size="10.5" font-weight="bold" fill="#065f46" text-anchor="middle">Arrastre aquí facturas (XML + PDF), contratos u oficios para indexar</text>
+          <text x="480" y="160" font-size="9" fill="#64748b" text-anchor="middle">Verificación automática de Magic Bytes, Hash SHA-256 y detección de pares CFDI</text>
+
+          <!-- Tabla interna de archivos del registro -->
+          <rect x="55" y="182" width="850" height="26" fill="#e2e8f0"/>
+          <text x="65" y="199" font-size="9" font-weight="bold" fill="#334155">DOCUMENTO / NOMBRE</text>
+          <text x="310" y="199" font-size="9" font-weight="bold" fill="#334155">TIPO</text>
+          <text x="440" y="199" font-size="9" font-weight="bold" fill="#334155">TAMAÑO</text>
+          <text x="520" y="199" font-size="9" font-weight="bold" fill="#334155">ESTADO CADIDO</text>
+          <text x="660" y="199" font-size="9" font-weight="bold" fill="#334155">SELLOS APLICADOS</text>
+          <text x="810" y="199" font-size="9" font-weight="bold" fill="#334155">ACCIONES</text>
+
+          <!-- Fila 1: Factura PDF -->
+          <rect x="55" y="210" width="850" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+          <text x="65" y="230" font-size="10" font-weight="bold" fill="#1e293b">📄 Factura_Papeleria_A491.pdf</text>
+          <text x="65" y="243" font-size="8.5" fill="#64748b">Hash: a8f29c...31e4 (Íntegro)</text>
+          <rect x="310" y="219" width="75" height="16" fill="#e0f2fe" rx="3"/>
+          <text x="347" y="231" font-size="8.5" font-weight="bold" fill="#0369a1" text-anchor="middle">CFDI_PDF</text>
+          <text x="440" y="233" font-size="10" fill="#334155">2.4 MB</text>
+          <rect x="520" y="219" width="70" height="16" fill="#ecfdf5" rx="3"/>
+          <text x="555" y="231" font-size="8.5" font-weight="bold" fill="#065f46" text-anchor="middle">Trámite (1a)</text>
+          <rect x="660" y="219" width="105" height="16" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
+          <text x="712" y="231" font-size="8" font-weight="bold" fill="#065f46" text-anchor="middle">✓ Revisión Conforme</text>
+          <text x="810" y="233" font-size="10" fill="#2563eb">👁️ Ver · ⬇️ · 🗑️</text>
+
+          <!-- Fila 2: Factura XML Grapada -->
+          <rect x="55" y="250" width="850" height="38" fill="#f8fafc" stroke="#f1f5f9"/>
+          <text x="65" y="270" font-size="10" font-weight="bold" fill="#1e293b">📎 Factura_Papeleria_A491.xml (Grapado a PDF)</text>
+          <text x="65" y="283" font-size="8.5" fill="#64748b">UUID SAT: 4A12B890-C12D-4E5F-8899-0123456789AB</text>
+          <rect x="310" y="259" width="75" height="16" fill="#ecfdf5" rx="3"/>
+          <text x="347" y="271" font-size="8.5" font-weight="bold" fill="#065f46" text-anchor="middle">CFDI_XML</text>
+          <text x="440" y="273" font-size="10" fill="#334155">48 KB</text>
+          <rect x="520" y="259" width="70" height="16" fill="#ecfdf5" rx="3"/>
+          <text x="555" y="271" font-size="8.5" font-weight="bold" fill="#065f46" text-anchor="middle">Trámite (1a)</text>
+          <text x="660" y="273" font-size="8.5" fill="#64748b">Heredado del PDF</text>
+          <text x="810" y="273" font-size="10" fill="#2563eb">👁️ XML · ⬇️</text>
+
+          <!-- Fila 3: Remisión de Almacén escaneada -->
+          <rect x="55" y="290" width="850" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+          <text x="65" y="310" font-size="10" font-weight="bold" fill="#1e293b">🏛️ Remision_Entrada_Almacen_852.pdf</text>
+          <text x="65" y="323" font-size="8.5" fill="#166534">Certificado NOM-151 (PSC-SE-2026-88412-TSA)</text>
+          <rect x="310" y="299" width="75" height="16" fill="#fef3c7" rx="3"/>
+          <text x="347" y="311" font-size="8.5" font-weight="bold" fill="#92400e" text-anchor="middle">REMISION</text>
+          <text x="440" y="313" font-size="10" fill="#334155">1.1 MB</text>
+          <rect x="520" y="299" width="70" height="16" fill="#ecfdf5" rx="3"/>
+          <text x="555" y="311" font-size="8.5" font-weight="bold" fill="#065f46" text-anchor="middle">Trámite (1a)</text>
+          <rect x="660" y="299" width="105" height="16" fill="#eff6ff" stroke="#bfdbfe" rx="3"/>
+          <text x="712" y="311" font-size="8" font-weight="bold" fill="#1e40af" text-anchor="middle">✓ Almacén PJEV</text>
+          <text x="810" y="313" font-size="10" fill="#2563eb">👁️ Ver · ⬇️ · 🗑️</text>
+
+          <!-- Pie del widget -->
+          <rect x="55" y="338" width="850" height="95" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="70" y="360" font-size="9.5" font-weight="bold" fill="#065f46">Beneficios para el Desarrollador:</text>
+          <text x="70" y="378" font-size="9" fill="#334155">• <strong>Cero SQL y Cero Código de Upload:</strong> El componente realiza las llamadas automáticas a <code>/api/v1/archivos/subir</code> y asocia las relaciones en base de datos.</text>
+          <text x="70" y="394" font-size="9" fill="#334155">• <strong>Soporte para Nuevos Registros:</strong> Si el formulario aún no tiene ID en firme, genera un <code>ticket_temporal</code> que se consolida al guardar la entidad.</text>
+          <text x="70" y="410" font-size="9" fill="#334155">• <strong>Auditoría Transparente:</strong> Cada clic de visualización o descarga asienta el evento en <code>archivos.documento_bitacora</code> sin código adicional.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>
