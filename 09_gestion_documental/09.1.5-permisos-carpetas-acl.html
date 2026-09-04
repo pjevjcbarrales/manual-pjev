@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.1.5 Permisos de Carpetas y Matriz ACL — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.1 · Catálogos Archivísticos</span> ›
+    <span>09.1.5 Permisos de Carpetas y Matriz ACL</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.1.5</div>
+      <h1 class="elem-title">Permisos de Carpetas y Matriz de Control de Acceso (ACL)</h1>
+      <p class="elem-desc">Configuración de seguridad y gobernanza de acceso a carpetas, expedientes y series archivísticas del CGCA. Establece qué roles o usuarios tienen facultades para consultar metadatos, visualizar en línea (streaming), descargar binarios originales o testados, adjuntar, sellar o eliminar documentos.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Seguridad y Gobernanza (DOC-08)</span>
+        <span class="mod-badge badge-norm">LGTAIP / LGPDPPSO / IVAI</span>
+        <span class="mod-badge badge-pjev">Matriz ACL Granular</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">🔒 Separación Estricta: "Solo Lectura" vs "Permiso de Descarga"</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      Uno de los mayores riesgos en la gestión documental es la fuga de información confidencial. Para evitarlo, el sistema implementa la filosofía <strong>Zero-Trust</strong> de DocuWare:
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      <strong>1. Solo Lectura en Pantalla (Streaming):</strong> El usuario puede hojear y revisar el documento en el visor web interactivo, pero se le aplica una <strong>marca de agua diagonal semitransparente</strong> con su nombre de usuario, fecha, hora e IP, bloqueando la descarga del archivo binario a su computadora local.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      <strong>2. Permiso Explícito de Descarga:</strong> Solo los roles autorizados (titular del área productora, auditor facultado) pueden extraer el PDF/XML original a disco local.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>09.1.5 Permisos de Carpetas y Matriz ACL</strong> define los privilegios granulares aplicables a las carpetas y expedientes institucionales. Resuelve las políticas de acceso bajo una matriz multidimensional:</p>
+
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th>Privilegio</th>
+          <th>Código ACL</th>
+          <th>Efecto en la Interfaz y en el Backend</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ver Metadatos</strong></td>
+          <td><code>VER_METADATOS</code></td>
+          <td>El expediente aparece en la lista y resultados de búsqueda con sus datos generales (proveedor, monto, folio), pero sin acceso a ver el contenido de los archivos.</td>
+        </tr>
+        <tr>
+          <td><strong>Visualizar en Pantalla</strong></td>
+          <td><code>VER_STREAM</code></td>
+          <td>Permite abrir el visor web universal en modo solo lectura. El backend sirve el archivo vía streaming temporal en memoria y aplica marca de agua institucional.</td>
+        </tr>
+        <tr>
+          <td><strong>Descargar Original</strong></td>
+          <td><code>DESCARGAR_ORIGINAL</code></td>
+          <td>Habilita el botón <em>"Descargar Archivo Original"</em>. Permite bajar el archivo binario auténtico tal como fue cargado al repositorio.</td>
+        </tr>
+        <tr>
+          <td><strong>Descargar Versión Pública</strong></td>
+          <td><code>DESCARGAR_PUB</code></td>
+          <td>Permite descargar únicamente la versión testada (con rectángulos negros sobre datos personales) aprobada por el Comité de Transparencia (IVAI).</td>
+        </tr>
+        <tr>
+          <td><strong>Subir / Anexar</strong></td>
+          <td><code>SUBIR_DOCS</code></td>
+          <td>Habilita la zona Drag & Drop y el botón <em>"+ Adjuntar Archivo"</em> en los formularios y en la bandeja de entrada.</td>
+        </tr>
+        <tr>
+          <td><strong>Estampar Sellos</strong></td>
+          <td><code>ESTAMPAR_SELLOS</code></td>
+          <td>Muestra la paleta de sellos oficiales autorizados para el rol del usuario (Revisión Conforme, Autorizado Pago, Pagado, etc.).</td>
+        </tr>
+        <tr>
+          <td><strong>Versionar / Sustituir</strong></td>
+          <td><code>VERSIONAR</code></td>
+          <td>Permite cargar una nueva versión correctiva de un archivo, obligando a justificar el motivo del cambio en la bitácora inmutable.</td>
+        </tr>
+        <tr>
+          <td><strong>Administrar Carpeta</strong></td>
+          <td><code>ADMIN_CARPETA</code></td>
+          <td>Facultad para modificar la matriz de permisos de la carpeta y autorizar transferencias o dictámenes de baja.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Modelo de Datos y Diccionario de Campos</div>
+    <p>Tabla nativa: <code>archivos.acl_permiso_carpeta</code> en PostgreSQL:</p>
+
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Tipo</th>
+          <th>Nulo</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>id_permiso</code></td>
+          <td><code>SERIAL (PK)</code></td>
+          <td>No</td>
+          <td>Identificador único de la regla de acceso.</td>
+        </tr>
+        <tr>
+          <td><code>cgca_codigo</code></td>
+          <td><code>VARCHAR(50) (FK)</code></td>
+          <td>Sí</td>
+          <td>Serie o subserie archivística a la que aplica (o <code>'*'</code> para comodín global).</td>
+        </tr>
+        <tr>
+          <td><code>modulo_siaf</code></td>
+          <td><code>VARCHAR(30)</code></td>
+          <td>Sí</td>
+          <td>Módulo delimitado (ej. <code>'cxp'</code>, <code>'contabilidad'</code>, <code>'ingresos'</code>, <code>'*'</code>).</td>
+        </tr>
+        <tr>
+          <td><code>rol</code></td>
+          <td><code>VARCHAR(50)</code></td>
+          <td>Sí</td>
+          <td>Rol de usuario asignado (ej. <code>'ANALISTA_CXP'</code>, <code>'AUDITOR_OIC'</code>, <code>'DIRECTOR_DGA'</code>).</td>
+        </tr>
+        <tr>
+          <td><code>usuario_id</code></td>
+          <td><code>INT</code></td>
+          <td>Sí</td>
+          <td>Identificador de usuario específico (para excepciones nominativas individuales).</td>
+        </tr>
+        <tr>
+          <td><code>puede_ver_metadatos</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Default TRUE. Visibilidad de índices.</td>
+        </tr>
+        <tr>
+          <td><code>puede_ver_stream</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Default TRUE. Acceso al visor web.</td>
+        </tr>
+        <tr>
+          <td><code>puede_descargar_original</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Default FALSE. Privilegio restringido de descarga física.</td>
+        </tr>
+        <tr>
+          <td><code>puede_descargar_version_publica</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Default TRUE. Descarga de versión testada IVAI.</td>
+        </tr>
+        <tr>
+          <td><code>puede_subir</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Default FALSE. Carga de nuevos archivos.</td>
+        </tr>
+        <tr>
+          <td><code>puede_sellar</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Default FALSE. Aplicación de sellos digitales.</td>
+        </tr>
+        <tr>
+          <td><code>puede_versionar</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Default FALSE. Sustitución controlada.</td>
+        </tr>
+        <tr>
+          <td><code>aplica_marca_agua</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Default TRUE si <code>puede_descargar_original = FALSE</code>.</td>
+        </tr>
+        <tr>
+          <td><code>estatus_registro</code></td>
+          <td><code>SMALLINT</code></td>
+          <td>No</td>
+          <td><code>1</code> = Activo, <code>0</code> = Inactivo.</td>
+        </tr>
+        <tr>
+          <td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td>
+          <td>Auditoría</td>
+          <td>-</td>
+          <td>Trazabilidad estándar PJEV.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. STORED PROCEDURES (UBICACIÓN MANDATORIA) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Stored Procedures Canónicos</div>
+
+    <div class="code-wrap">
+<pre><code>-- SP 1: archivos.fn_leer_permisos_carpeta
+CREATE OR REPLACE FUNCTION archivos.fn_leer_permisos_carpeta(
+    p_filtros JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_cgca VARCHAR(50);
+    v_rol VARCHAR(50);
+    v_resultado JSONB;
+BEGIN
+    v_cgca := p_filtros->>'cgca_codigo';
+    v_rol := p_filtros->>'rol';
+
+    SELECT COALESCE(jsonb_agg(row_to_json(r)), '[]'::jsonb)
+    INTO v_resultado
+    FROM (
+        SELECT 
+            p.id_permiso,
+            p.cgca_codigo,
+            c.serie AS serie_nombre,
+            p.modulo_siaf,
+            p.rol,
+            p.usuario_id,
+            p.puede_ver_metadatos,
+            p.puede_ver_stream,
+            p.puede_descargar_original,
+            p.puede_descargar_version_publica,
+            p.puede_subir,
+            p.puede_sellar,
+            p.puede_versionar,
+            p.aplica_marca_agua,
+            p.estatus_registro,
+            p.usuario_c,
+            p.fecha_c
+        FROM archivos.acl_permiso_carpeta p
+        LEFT JOIN archivos.cgca_catalogo c ON p.cgca_codigo = c.cgca_codigo
+        WHERE p.estatus_registro = COALESCE((p_filtros->>'estatus_registro')::smallint, 1)
+          AND (v_cgca IS NULL OR p.cgca_codigo = v_cgca OR p.cgca_codigo = '*')
+          AND (v_rol IS NULL OR p.rol = v_rol)
+        ORDER BY p.cgca_codigo ASC, p.rol ASC
+    ) r;
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', v_resultado);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error en fn_leer_permisos_carpeta: ' || SQLERRM, 'data', '[]'::jsonb);
+END;
+$$;</code></pre>
+    </div>
+
+    <div class="code-wrap">
+<pre><code>-- SP 2: archivos.fn_evaluar_acceso_documento (Evaluación en Caliente)
+CREATE OR REPLACE FUNCTION archivos.fn_evaluar_acceso_documento(
+    p_documento_id UUID,
+    p_usuario VARCHAR(50),
+    p_rol VARCHAR(50),
+    p_accion VARCHAR(30) -- 'STREAM', 'DESCARGAR', 'SUBIR', 'SELLAR'
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_cgca VARCHAR(50);
+    v_clasificacion VARCHAR(25);
+    v_puede BOOLEAN := FALSE;
+    v_marca_agua BOOLEAN := TRUE;
+BEGIN
+    -- 1. Obtener serie y clasificación del documento
+    SELECT cgca_codigo, clasificacion_seguridad
+    INTO v_cgca, v_clasificacion
+    FROM archivos.documento
+    WHERE id = p_documento_id AND estatus_registro = 1;
+
+    IF v_cgca IS NULL THEN
+        RETURN jsonb_build_object('autorizado', FALSE, 'motivo', 'Documento no encontrado o inactivo.');
+    END IF;
+
+    -- 2. El Administrador General de Archivos tiene permiso irrestricto
+    IF p_rol = 'ADMIN_ARCHIVOS' OR p_rol = 'ADMIN_SISTEMA' THEN
+        RETURN jsonb_build_object('autorizado', TRUE, 'marca_agua', FALSE);
+    END IF;
+
+    -- 3. Evaluar reglas ACL específicas o comodines
+    IF p_accion = 'STREAM' THEN
+        SELECT puede_ver_stream, aplica_marca_agua INTO v_puede, v_marca_agua
+        FROM archivos.acl_permiso_carpeta
+        WHERE estatus_registro = 1
+          AND (cgca_codigo = v_cgca OR cgca_codigo = '*')
+          AND (rol = p_rol OR usuario_id = (SELECT id_usuario FROM config.usuarios WHERE clave_usuario = p_usuario LIMIT 1))
+        ORDER BY (CASE WHEN cgca_codigo = '*' THEN 1 ELSE 2 END) DESC LIMIT 1;
+
+    ELSIF p_accion = 'DESCARGAR' THEN
+        -- Si es información confidencial y el usuario no es el área productora, solo puede descargar versión pública
+        SELECT puede_descargar_original INTO v_puede
+        FROM archivos.acl_permiso_carpeta
+        WHERE estatus_registro = 1
+          AND (cgca_codigo = v_cgca OR cgca_codigo = '*')
+          AND (rol = p_rol OR usuario_id = (SELECT id_usuario FROM config.usuarios WHERE clave_usuario = p_usuario LIMIT 1))
+        ORDER BY (CASE WHEN cgca_codigo = '*' THEN 1 ELSE 2 END) DESC LIMIT 1;
+        v_marca_agua := FALSE;
+    END IF;
+
+    -- Si no hay regla específica, denegar por defecto
+    v_puede := COALESCE(v_puede, FALSE);
+
+    RETURN jsonb_build_object(
+        'autorizado', v_puede,
+        'marca_agua', COALESCE(v_marca_agua, TRUE),
+        'motivo', CASE WHEN NOT v_puede THEN 'No cuenta con facultades de ' || p_accion || ' para esta serie.' ELSE 'OK' END
+    );
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 4. SERVICIOS REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Servicios API REST (Swagger / NestJS)</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Endpoint</th>
+          <th>Guards</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/v1/archivos/acl</code></td>
+          <td><code>JwtAuthGuard, Roles('ADMIN_ARCHIVOS')</code></td>
+          <td>Consulta la matriz completa de permisos por carpeta y rol.</td>
+        </tr>
+        <tr>
+          <td><span class="method post">POST</span></td>
+          <td><code>/api/v1/archivos/acl</code></td>
+          <td><code>Roles('ADMIN_ARCHIVOS')</code></td>
+          <td>Asigna privilegios de lectura, streaming, descarga o subida a un rol o usuario.</td>
+        </tr>
+        <tr>
+          <td><span class="method patch">PATCH</span></td>
+          <td><code>/api/v1/archivos/acl/:id</code></td>
+          <td><code>Roles('ADMIN_ARCHIVOS')</code></td>
+          <td>Modifica banderas de descarga o marca de agua.</td>
+        </tr>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/v1/archivos/:id/permisos-usuario</code></td>
+          <td><code>JwtAuthGuard</code></td>
+          <td>Retorna los permisos en caliente del usuario actual sobre el archivo indicado (para ocultar botones en el frontend).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. WIREFRAMES SVG NATIVOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Interfaz de Usuario (Matriz ACL y Visor Protegido)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="switchWfTab('wf-acl-matrix', this)">Matriz de Permisos (Grid)</button>
+      <button class="wf-tab" onclick="switchWfTab('wf-watermark-view', this)">Visor en Modo Solo Lectura (Marca de Agua)</button>
+    </div>
+
+    <div id="wf-acl-matrix" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span>09.1.5 Matriz de Control de Acceso por Carpeta / Serie (ACL)</span>
+          <span style="color:var(--pjev-verde-oscuro);">Gobernanza y Privacidad</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 460" width="100%" height="460" xmlns="http://www.w3.org/2000/svg">
+            <rect width="960" height="460" fill="#f8fafc" rx="6"/>
+            <!-- Barra superior -->
+            <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Matriz de Privilegios de Carpetas y Expedientes (DocuWare Access Control)</text>
+            <rect x="780" y="28" width="145" height="28" fill="#065f46" rx="4"/>
+            <text x="852" y="46" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Asignar Permiso</text>
+
+            <!-- Encabezado Matriz -->
+            <rect x="20" y="80" width="920" height="32" fill="#065f46" rx="2"/>
+            <text x="35" y="100" font-size="9.5" font-weight="bold" fill="#ffffff">SERIE / CARPETA CGCA</text>
+            <text x="230" y="100" font-size="9.5" font-weight="bold" fill="#ffffff">ROL INSTITUCIONAL</text>
+            <text x="400" y="100" font-size="9.5" font-weight="bold" fill="#ffffff">METADATOS</text>
+            <text x="500" y="100" font-size="9.5" font-weight="bold" fill="#ffffff">STREAM VISOR</text>
+            <text x="610" y="100" font-size="9.5" font-weight="bold" fill="#ffffff">DESCARGAR</text>
+            <text x="720" y="100" font-size="9.5" font-weight="bold" fill="#ffffff">SUBIR DOCS</text>
+            <text x="820" y="100" font-size="9.5" font-weight="bold" fill="#ffffff">MARCA AGUA</text>
+            <text x="900" y="100" font-size="9.5" font-weight="bold" fill="#ffffff">ACCIONES</text>
+
+            <!-- Fila 1: Pólizas / Analista CXP -->
+            <rect x="20" y="115" width="920" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="138" font-size="10.5" font-weight="bold" fill="#065f46">1S.01 Pólizas Contables</text>
+            <rect x="230" y="125" width="120" height="18" fill="#eff6ff" rx="3"/>
+            <text x="290" y="138" font-size="9.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ANALISTA_CXP</text>
+            <text x="430" y="138" font-size="12" fill="#16a34a" text-anchor="middle">✓</text>
+            <text x="540" y="138" font-size="12" fill="#16a34a" text-anchor="middle">✓</text>
+            <text x="645" y="138" font-size="12" fill="#dc2626" text-anchor="middle">✕ (Bloqueado)</text>
+            <text x="755" y="138" font-size="12" fill="#16a34a" text-anchor="middle">✓</text>
+            <rect x="815" y="125" width="60" height="18" fill="#fef3c7" rx="3"/>
+            <text x="845" y="138" font-size="8.5" font-weight="bold" fill="#92400e" text-anchor="middle">Activa</text>
+            <text x="910" y="138" font-size="10.5" fill="#2563eb">Editar</text>
+
+            <!-- Fila 2: Pólizas / Auditor OIC -->
+            <rect x="20" y="155" width="920" height="38" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="35" y="178" font-size="10.5" font-weight="bold" fill="#065f46">1S.01 Pólizas Contables</text>
+            <rect x="230" y="165" width="120" height="18" fill="#fef2f2" rx="3"/>
+            <text x="290" y="178" font-size="9.5" font-weight="bold" fill="#991b1b" text-anchor="middle">AUDITOR_OIC</text>
+            <text x="430" y="178" font-size="12" fill="#16a34a" text-anchor="middle">✓</text>
+            <text x="540" y="178" font-size="12" fill="#16a34a" text-anchor="middle">✓</text>
+            <text x="645" y="178" font-size="12" fill="#16a34a" text-anchor="middle">✓ (Autorizado)</text>
+            <text x="755" y="178" font-size="12" fill="#dc2626" text-anchor="middle">✕ (Solo lect.)</text>
+            <rect x="815" y="165" width="60" height="18" fill="#e2e8f0" rx="3"/>
+            <text x="845" y="178" font-size="8.5" fill="#475569" text-anchor="middle">No aplica</text>
+            <text x="910" y="178" font-size="10.5" fill="#2563eb">Editar</text>
+
+            <!-- Fila 3: Nómina / Analista CXP (Restringido) -->
+            <rect x="20" y="195" width="920" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="218" font-size="10.5" font-weight="bold" fill="#991b1b">3S.01 Nómina y Personal</text>
+            <rect x="230" y="205" width="120" height="18" fill="#eff6ff" rx="3"/>
+            <text x="290" y="218" font-size="9.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ANALISTA_CXP</text>
+            <text x="430" y="218" font-size="12" fill="#dc2626" text-anchor="middle">✕ Sin acceso</text>
+            <text x="540" y="218" font-size="12" fill="#dc2626" text-anchor="middle">✕</text>
+            <text x="645" y="218" font-size="12" fill="#dc2626" text-anchor="middle">✕</text>
+            <text x="755" y="218" font-size="12" fill="#dc2626" text-anchor="middle">✕</text>
+            <rect x="815" y="205" width="60" height="18" fill="#e2e8f0" rx="3"/>
+            <text x="845" y="218" font-size="8.5" fill="#475569" text-anchor="middle">Bloqueado</text>
+            <text x="910" y="218" font-size="10.5" fill="#2563eb">Editar</text>
+
+            <!-- Nota Explicativa -->
+            <rect x="20" y="255" width="920" height="180" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="35" y="280" font-size="11" font-weight="bold" fill="#065f46">Políticas de Control de Descarga y Prevención de Fugas:</text>
+            <text x="35" y="305" font-size="10" fill="#334155">• Si un rol tiene <code>STREAM = ✓</code> pero <code>DESCARGAR = ✕</code>, el visor web suprime el botón de descarga y bloquea el clic derecho del ratón.</text>
+            <text x="35" y="330" font-size="10" fill="#334155">• El visor renderiza en el fondo una marca de agua diagonal con la leyenda: <strong>"CONSULTA EN LÍNEA PJEV · USUARIO: [USERNAME] · IP: [IP_CLIENTE] · FECHA: [TIMESTAMP]"</strong>.</text>
+            <text x="35" y="355" font-size="10" fill="#334155">• Todo intento de descarga no autorizada queda registrado en <code>archivos.documento_bitacora</code> con bandera de alerta de seguridad.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div id="wf-watermark-view" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span>Demostración: Visor en Modo "Solo Lectura con Marca de Agua"</span>
+          <span style="color:var(--pjev-dorado);">Protección Antifuga de Datos</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 480" width="100%" height="480" xmlns="http://www.w3.org/2000/svg">
+            <rect width="960" height="480" fill="#1e293b" rx="6"/>
+            <!-- Barra superior del visor protegido -->
+            <rect x="20" y="15" width="920" height="40" fill="#0f172a" rx="4"/>
+            <text x="35" y="40" font-size="11" font-weight="bold" fill="#ffffff">📄 Poliza_Egreso_D114.pdf (Modo Consulta Protegida)</text>
+            
+            <rect x="680" y="22" width="110" height="26" fill="#fef3c7" rx="3"/>
+            <text x="735" y="39" font-size="9.5" font-weight="bold" fill="#92400e" text-anchor="middle">👁️ Solo Lectura</text>
+
+            <rect x="800" y="22" width="125" height="26" fill="#475569" opacity="0.6" rx="3"/>
+            <text x="862" y="39" font-size="9.5" fill="#94a3b8" text-anchor="middle">🚫 Descarga Inactiva</text>
+
+            <!-- Hoja del documento protegida -->
+            <rect x="180" y="70" width="600" height="390" fill="#ffffff" rx="2"/>
+            
+            <!-- Contenido simulado de la póliza -->
+            <text x="210" y="105" font-size="12" font-weight="bold" fill="#065f46">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+            <text x="210" y="125" font-size="10" fill="#64748b">PÓLIZA DE EGRESOS PRESUPUESTAL #D-114 · MARZO 2026</text>
+            <line x1="210" y1="135" x2="750" y2="135" stroke="#cbd5e1"/>
+
+            <text x="210" y="165" font-size="10" fill="#334155">Cuenta: 5.1.2.1.2111 — Materiales y Útiles de Oficina</text>
+            <text x="680" y="165" font-size="10" font-family="monospace" fill="#334155">$48,210.00</text>
+            <text x="210" y="190" font-size="10" fill="#334155">Cuenta: 1.1.1.2.0101 — BBVA Pagadora Gasto Corriente</text>
+            <text x="680" y="190" font-size="10" font-family="monospace" fill="#334155">$48,210.00</text>
+
+            <!-- MARCA DE AGUA DIAGONAL EN COLOR ROJO/GRIS SEMITRANSPARENTE -->
+            <g transform="rotate(-30 480 260)" opacity="0.25">
+              <text x="180" y="240" font-size="22" font-weight="bold" fill="#dc2626" font-family="sans-serif">
+                SOLO LECTURA EN LÍNEA · PJEV
+              </text>
+              <text x="140" y="270" font-size="14" font-weight="bold" fill="#dc2626" font-family="sans-serif">
+                USUARIO: EGARCIA (CXP) · IP: 192.168.10.42 · 03/09/2026 13:14:02
+              </text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+  function switchWfTab(panelId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById(panelId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+</body>
+</html>
