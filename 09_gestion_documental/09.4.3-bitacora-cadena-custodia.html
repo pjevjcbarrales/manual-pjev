@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.4.3 Cadena de Custodia y Bitácora LGA — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.4 · Informes y Auditoría</span> ›
+    <span>09.4.3 Cadena de Custodia y Bitácora LGA</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.4.3</div>
+      <h1 class="elem-title">Cadena de Custodia y Bitácora Inmutable (LGA Art. 45)</h1>
+      <p class="elem-desc">Consola de auditoría forense y trazabilidad inmutable del subsistema de archivos. Registra cronológicamente cada evento de carga, visualización, descarga, estampado de sellos, versionamiento o baja lógica con usuario, IP, estampa de tiempo y contexto transaccional.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Auditoría Forense (DOC-08)</span>
+        <span class="mod-badge badge-norm">LGA Art. 45 Trazabilidad</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">🔒 Garantía de Inalterabilidad y No Repudio</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      El <strong>Artículo 45 de la Ley General de Archivos</strong> exige que los sistemas automatizados garanticen de manera fehaciente la <strong>Trazabilidad y la Cadena de Custodia</strong> de todo documento electrónico.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      En el SIAF-PJEV, la tabla <code>archivos.documento_bitacora</code> opera como una bitácora inmutable en modo append-only (solo inserción, sin permisos de actualización ni borrado para ningún usuario operativo). Registra qué usuario consultó o descargó un documento, desde qué dirección IP y en qué milisegundo exacto.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>09.4.3 Cadena de Custodia y Bitácora LGA</strong> es la herramienta de fiscalización interna del sistema documental. Permite a los Auditores del Órgano Interno de Control y al personal de la Dirección de Tecnologías:</p>
+    <ul style="font-size:12px; line-height:1.7; color:var(--pjev-texto);">
+      <li><strong>Auditoría por Documento:</strong> Conocer la historia completa y genealógica de un archivo desde que fue subido hasta su eventual transferencia o dictamen.</li>
+      <li><strong>Monitoreo de Accesos a Información Confidencial:</strong> Rastrear quién visualizó o descargó documentos marcados como <code>RESERVADO</code> o <code>CONFIDENCIAL</code> conforme a las leyes de transparencia.</li>
+      <li><strong>Detección de Anomalías:</strong> Identificar descargas masivas inusuales, intentos de acceso fuera de horario laboral o peticiones desde IPs desconocidas.</li>
+    </ul>
+  </div>
+
+  <!-- 2. SERVICIOS Y STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Consulta de Auditoría y Stored Procedures</div>
+
+    <div class="code-wrap">
+<pre><code>-- Consulta avanzada de auditoría forense
+CREATE OR REPLACE FUNCTION archivos.fn_consultar_bitacora(
+    p_filtros JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_doc_id UUID;
+    v_usuario VARCHAR(50);
+    v_evento VARCHAR(40);
+    v_resultado JSONB;
+BEGIN
+    v_doc_id := (p_filtros->>'documento_id')::uuid;
+    v_usuario := p_filtros->>'usuario';
+    v_evento := p_filtros->>'evento';
+
+    SELECT COALESCE(jsonb_agg(row_to_json(r)), '[]'::jsonb)
+    INTO v_resultado
+    FROM (
+        SELECT 
+            b.id,
+            b.documento_id,
+            d.nombre_original,
+            d.hash_sha256,
+            b.evento,
+            b.usuario,
+            b.ip_cliente,
+            b.user_agent,
+            b.detalles_json,
+            b.fecha_evento
+        FROM archivos.documento_bitacora b
+        JOIN archivos.documento d ON b.documento_id = d.id
+        WHERE (v_doc_id IS NULL OR b.documento_id = v_doc_id)
+          AND (v_usuario IS NULL OR b.usuario = v_usuario)
+          AND (v_evento IS NULL OR b.evento = v_evento)
+        ORDER BY b.fecha_evento DESC
+        LIMIT 100
+    ) r;
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', v_resultado);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 3. WIREFRAMES SVG NATIVOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Interfaz de Auditoría Forense y Bitácora</div>
+
+    <div class="wf-box">
+      <div class="wf-bar">
+        <span>09.4.3 Consola de Auditoría de Cadena de Custodia (LGA Art. 45)</span>
+        <span style="color:var(--pjev-verde-oscuro);">Trazabilidad Inmutable</span>
+      </div>
+      <div class="wf-svg-area">
+        <svg viewBox="0 0 960 460" width="100%" height="460" xmlns="http://www.w3.org/2000/svg">
+          <rect width="960" height="460" fill="#f8fafc" rx="6"/>
+          <!-- Barra superior -->
+          <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Cadena de Custodia y Registro Inmutable de Auditoría (LGA Art. 45)</text>
+          
+          <rect x="790" y="28" width="135" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+          <text x="857" y="46" font-size="11" fill="#334155" text-anchor="middle">Exportar Log CSV</text>
+
+          <!-- Filtros de Auditoría -->
+          <rect x="20" y="75" width="920" height="45" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+          <text x="35" y="102" font-size="11" fill="#94a3b8">Filtrar por usuario, IP, evento o UUID de archivo...</text>
+          <rect x="620" y="84" width="140" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="3"/>
+          <text x="630" y="102" font-size="10.5" fill="#475569">Evento: Todos ▼</text>
+          <rect x="770" y="84" width="150" height="28" fill="#065f46" rx="3"/>
+          <text x="845" y="102" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">🔍 Buscar en Bitácora</text>
+
+          <!-- Encabezado Grid -->
+          <rect x="20" y="130" width="920" height="30" fill="#065f46" rx="2"/>
+          <text x="35" y="149" font-size="9.5" font-weight="bold" fill="#ffffff">FECHA / HORA EXACTA</text>
+          <text x="190" y="149" font-size="9.5" font-weight="bold" fill="#ffffff">EVENTO AUDITADO</text>
+          <text x="360" y="149" font-size="9.5" font-weight="bold" fill="#ffffff">DOCUMENTO AFECTADO</text>
+          <text x="600" y="149" font-size="9.5" font-weight="bold" fill="#ffffff">USUARIO RESPONSABLE</text>
+          <text x="760" y="149" font-size="9.5" font-weight="bold" fill="#ffffff">DIRECCIÓN IP</text>
+          <text x="870" y="149" font-size="9.5" font-weight="bold" fill="#ffffff">DETALLE</text>
+
+          <!-- Fila 1 -->
+          <rect x="20" y="164" width="920" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+          <text x="35" y="187" font-size="10" font-family="monospace" fill="#334155">03/09/2026 13:14:02</text>
+          <rect x="190" y="174" width="145" height="18" fill="#ecfdf5" rx="4"/>
+          <text x="262" y="187" font-size="9" font-weight="bold" fill="#065f46" text-anchor="middle">SELLO_REVISION_CONFORME</text>
+          <text x="360" y="187" font-size="10.5" font-weight="bold" fill="#1e293b">Factura_Papeleria_A491.pdf</text>
+          <text x="600" y="187" font-size="10.5" fill="#334155">Eunice G. (CXP)</text>
+          <text x="760" y="187" font-size="10" font-family="monospace" fill="#64748b">192.168.10.42</text>
+          <text x="880" y="187" font-size="10.5" fill="#2563eb">Ver JSON</text>
+
+          <!-- Fila 2 -->
+          <rect x="20" y="204" width="920" height="38" fill="#f8fafc" stroke="#f1f5f9"/>
+          <text x="35" y="227" font-size="10" font-family="monospace" fill="#334155">03/09/2026 13:10:45</text>
+          <rect x="190" y="214" width="145" height="18" fill="#eff6ff" rx="4"/>
+          <text x="262" y="227" font-size="9" font-weight="bold" fill="#1e40af" text-anchor="middle">PREVISUALIZACION_STREAM</text>
+          <text x="360" y="227" font-size="10.5" font-weight="bold" fill="#1e293b">Factura_Papeleria_A491.pdf</text>
+          <text x="600" y="227" font-size="10.5" fill="#334155">Julio César (DGA)</text>
+          <text x="760" y="227" font-size="10" font-family="monospace" fill="#64748b">192.168.10.15</text>
+          <text x="880" y="227" font-size="10.5" fill="#2563eb">Ver JSON</text>
+
+          <!-- Fila 3 -->
+          <rect x="20" y="244" width="920" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+          <text x="35" y="267" font-size="10" font-family="monospace" fill="#334155">03/09/2026 11:25:10</text>
+          <rect x="190" y="254" width="145" height="18" fill="#fef3c7" rx="4"/>
+          <text x="262" y="267" font-size="9" font-weight="bold" fill="#92400e" text-anchor="middle">VINCULAR_ENTIDAD_CXP</text>
+          <text x="360" y="267" font-size="10.5" font-weight="bold" fill="#1e293b">Factura_Papeleria_A491.pdf</text>
+          <text x="600" y="267" font-size="10.5" fill="#334155">Cristian G. (Dev)</text>
+          <text x="760" y="267" font-size="10" font-family="monospace" fill="#64748b">192.168.10.28</text>
+          <text x="880" y="267" font-size="10.5" fill="#2563eb">Ver JSON</text>
+
+          <!-- Fila 4 -->
+          <rect x="20" y="284" width="920" height="38" fill="#f8fafc" stroke="#f1f5f9"/>
+          <text x="35" y="307" font-size="10" font-family="monospace" fill="#334155">03/09/2026 11:24:01</text>
+          <rect x="190" y="294" width="145" height="18" fill="#ecfdf5" rx="4"/>
+          <text x="262" y="307" font-size="9" font-weight="bold" fill="#065f46" text-anchor="middle">CARGA_INICIAL_HASH</text>
+          <text x="360" y="307" font-size="10.5" font-weight="bold" fill="#1e293b">Factura_Papeleria_A491.pdf</text>
+          <text x="600" y="307" font-size="10.5" fill="#334155">Cristian G. (Dev)</text>
+          <text x="760" y="307" font-size="10" font-family="monospace" fill="#64748b">192.168.10.28</text>
+          <text x="880" y="307" font-size="10.5" fill="#2563eb">Ver JSON</text>
+
+          <!-- Nota al pie -->
+          <rect x="20" y="340" width="920" height="85" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="365" font-size="11" font-weight="bold" fill="#065f46">Certificación Forense del Registro:</text>
+          <text x="35" y="388" font-size="10" fill="#334155">• Esta tabla no admite operaciones <code>UPDATE</code> ni <code>DELETE</code>. Toda acción es un asiento cronológico inmutable.</text>
+          <text x="35" y="406" font-size="10" fill="#334155">• En caso de auditoría judicial o del ORFIS, el log se exporta con firma digital institucional del Administrador de Base de Datos.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

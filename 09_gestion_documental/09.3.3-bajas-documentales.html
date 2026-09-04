@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.3.3 Bajas Documentales y Destino Final — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.3 · Procesos y Ciclo de Vida</span> ›
+    <span>09.3.3 Bajas Documentales y Destino Final</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.3.3</div>
+      <h1 class="elem-title">Bajas Documentales y Destino Final (AGN / Consejo Estatal)</h1>
+      <p class="elem-desc">Procedimiento legal y tecnológico para dictaminar y ejecutar la baja definitiva de documentos públicos una vez extinguidos sus plazos de retención precautoria en Archivo de Concentración, previa aprobación del Comité de Archivos y autorización formal del AGN.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Proceso Normativo (DOC-08)</span>
+        <span class="mod-badge badge-norm">LGA Arts. 11, 14 / Lineamientos AGN</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">⚠️ Blindaje Legal contra Destrucción Indebida</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      El <strong>Artículo 11 de la LGA</strong> tipifica como delito la supresión, alteración o destrucción no autorizada de documentos de archivo en posesión de los poderes públicos.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      En el SIAF-PJEV, la baja documental no es un simple botón de "borrado". Requiere un dictamen técnico de que el expediente carece de valores secundarios, la formulación del <strong>Acta Circunstanciada de Baja Documental</strong> y la carga del folio de autorización emitido por el Consejo Estatal de Archivos de Veracruz y el Archivo General de la Nación (AGN).
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>09.3.3 Bajas Documentales y Destino Final</strong> rige el protocolo de disposición para series archivísticas con destino <code>BAJA_DOCUMENTAL</code> en el CADIDO. Consta de 4 etapas obligatorias:</p>
+    <ol style="font-size:12px; line-height:1.7; color:var(--pjev-texto);">
+      <li><strong>Identificación de Expedientes Prescritos:</strong> El sistema detecta documentos con plazo de guarda en Concentración cumplido (ej. facturas y comprobaciones que han cumplido los 5 años exigidos por el CFF Art. 30).</li>
+      <li><strong>Dictamen del Comité de Archivos del PJEV:</strong> Sesión formal donde se constata que no existen litigios, juicios pendientes ni observaciones activas del ORFIS o la ASF sobre la cuenta pública de esos años.</li>
+      <li><strong>Autorización Oficial:</strong> Emisión de la declaratoria de baja documental y notificación al Archivo General del Estado.</li>
+      <li><strong>Ejecución y Preservación de Evidencia:</strong> Se procede a la deshabilitación lógica definitiva en base de datos. Sin embargo, <strong>la ficha de metadatos, el hash SHA-256 original y el acta de baja permanecen inmutables en la bitácora perpetua</strong> para fines de trazabilidad histórica.</li>
+    </ol>
+  </div>
+
+  <!-- 2. STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Procedimiento de Ejecución de Baja Documental</div>
+
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION archivos.fn_ejecutar_baja_documental(
+    p_lote_ids UUID[],
+    p_folio_acta VARCHAR(100),
+    p_acuerdo_comite VARCHAR(100),
+    p_oficio_autorizacion_agn VARCHAR(100),
+    p_usuario VARCHAR(50)
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_total_bajas INT;
+BEGIN
+    -- Validar que se provea autorización oficial
+    IF p_oficio_autorizacion_agn IS NULL OR LENGTH(TRIM(p_oficio_autorizacion_agn)) = 0 THEN
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Por mandato de la LGA, se exige registrar el oficio de autorización del AGN/Consejo Estatal.', 'data', null);
+    END IF;
+
+    -- 1. Desactivación lógica (soft-delete institucional)
+    WITH actualizados AS (
+        UPDATE archivos.documento
+        SET estado_archivistico = 'BAJA',
+            estatus_registro = 0,
+            usuario_m = p_usuario,
+            fecha_m = clock_timestamp()
+        WHERE id = ANY(p_lote_ids)
+          AND estado_archivistico = 'CONCENTRACION'
+          AND estatus_registro = 1
+        RETURNING id
+    )
+    SELECT COUNT(*) INTO v_total_bajas FROM actualizados;
+
+    -- 2. Bitácora inmutable de baja
+    INSERT INTO archivos.documento_bitacora (
+        documento_id, evento, usuario, detalles_json
+    )
+    SELECT 
+        id,
+        'BAJA_DOCUMENTAL_AUTORIZADA',
+        p_usuario,
+        jsonb_build_object(
+            'folio_acta', p_folio_acta,
+            'acuerdo_comite', p_acuerdo_comite,
+            'oficio_agn', p_oficio_autorizacion_agn
+        )
+    FROM unnest(p_lote_ids) AS id;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'Baja documental ejecutada formalmente.',
+        'data', jsonb_build_object('total_expedientes_baja', v_total_bajas)
+    );
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 3. WIREFRAMES SVG -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Interfaz de Dictamen y Bajas Documentales</div>
+
+    <div class="wf-box">
+      <div class="wf-bar">
+        <span>09.3.3 Consola de Bajas Documentales y Dictamen AGN</span>
+        <span style="color:var(--pjev-dorado);">Comité de Archivos PJEV</span>
+      </div>
+      <div class="wf-svg-area">
+        <svg viewBox="0 0 960 460" width="100%" height="460" xmlns="http://www.w3.org/2000/svg">
+          <rect width="960" height="460" fill="#f8fafc" rx="6"/>
+          <!-- Barra superior -->
+          <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Dictamen de Disposición y Bajas Documentales (LGA / AGN)</text>
+          
+          <rect x="740" y="28" width="185" height="28" fill="#b91c1c" rx="4"/>
+          <text x="832" y="46" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">⚡ Tramitar Baja Formal</text>
+
+          <!-- Card de Alerta de Expedientes Prescritos -->
+          <rect x="20" y="75" width="920" height="110" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <text x="35" y="100" font-size="11" font-weight="bold" fill="#b45309">EXPEDIENTES CON VIGENCIA EN CONCENTRACIÓN AGOTADA (CANDIDATOS A BAJA):</text>
+          <text x="35" y="125" font-size="10.5" fill="#334155">Serie: <strong>1S.02 Cuentas por Pagar y Facturación (Comprobaciones Ejercicio Fiscal 2020)</strong></text>
+          <text x="35" y="145" font-size="10" fill="#64748b">Plazo legal: 1 año trámite + 5 años concentración cumplidos al 31/12/2025. Destino CADIDO: <strong>BAJA DOCUMENTAL</strong>.</text>
+          <text x="35" y="165" font-size="10" fill="#047857">✓ Verificación ORFIS / ASF: Sin pliegos de observaciones activos ni créditos fiscales pendientes.</text>
+
+          <!-- Grid de Expedientes a Dictaminar -->
+          <rect x="20" y="200" width="920" height="28" fill="#065f46" rx="2"/>
+          <text x="35" y="218" font-size="9.5" font-weight="bold" fill="#ffffff">NO. EXPEDIENTE</text>
+          <text x="240" y="218" font-size="9.5" font-weight="bold" fill="#ffffff">CONTENIDO AMARADO</text>
+          <text x="500" y="218" font-size="9.5" font-weight="bold" fill="#ffffff">AÑO FISCAL</text>
+          <text x="640" y="218" font-size="9.5" font-weight="bold" fill="#ffffff">VENCIMIENTO</text>
+          <text x="780" y="218" font-size="9.5" font-weight="bold" fill="#ffffff">VALORES SECUNDARIOS</text>
+          <text x="890" y="218" font-size="9.5" font-weight="bold" fill="#ffffff">ACCIONES</text>
+
+          <!-- Fila 1 -->
+          <rect x="20" y="232" width="920" height="36" fill="#ffffff" stroke="#f1f5f9"/>
+          <text x="35" y="254" font-size="10.5" font-family="monospace" fill="#065f46">EXP-CXP-2020-00891</text>
+          <text x="240" y="254" font-size="10.5" fill="#1e293b">Comprobaciones de Viáticos Operativos</text>
+          <text x="500" y="254" font-size="10.5" fill="#334155">2020</text>
+          <text x="640" y="254" font-size="10.5" fill="#166534">31/12/2025 (Cumplido)</text>
+          <text x="780" y="254" font-size="10" fill="#64748b">Ninguno (Prescrito)</text>
+          <text x="895" y="254" font-size="10.5" fill="#2563eb">Ver Cédula</text>
+
+          <!-- Fila 2 -->
+          <rect x="20" y="270" width="920" height="36" fill="#f8fafc" stroke="#f1f5f9"/>
+          <text x="35" y="292" font-size="10.5" font-family="monospace" fill="#065f46">EXP-CXP-2020-00892</text>
+          <text x="240" y="292" font-size="10.5" fill="#1e293b">Facturas Proveedores Consumibles</text>
+          <text x="500" y="292" font-size="10.5" fill="#334155">2020</text>
+          <text x="640" y="292" font-size="10.5" fill="#166534">31/12/2025 (Cumplido)</text>
+          <text x="780" y="292" font-size="10" fill="#64748b">Ninguno (Prescrito)</text>
+          <text x="895" y="292" font-size="10.5" fill="#2563eb">Ver Cédula</text>
+
+          <!-- Barra de Dictamen -->
+          <rect x="20" y="325" width="920" height="115" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <text x="35" y="350" font-size="11" font-weight="bold" fill="#065f46">Requisitos de Ejecución Legal de Baja:</text>
+          <text x="35" y="375" font-size="10" fill="#334155">1. Acta del Comité de Archivo No. <strong>PJEV-CA-ACTA-2026/04</strong> aprobada por unanimidad.</text>
+          <text x="35" y="395" font-size="10" fill="#334155">2. Oficio de No Oposición del Archivo General del Estado de Veracruz (AGEV) / AGN con folio validado.</text>
+          <text x="35" y="415" font-size="10" fill="#b91c1c">3. La ejecución genera el Inventario de Baja Documental foliado y resguarda a perpetuidad la huella SHA-256 en bitácora.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

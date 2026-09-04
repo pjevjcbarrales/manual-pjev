@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.1.4 Sellos Digitales Institucionales — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.1 · Catálogos Archivísticos</span> ›
+    <span>09.1.4 Sellos Digitales Institucionales</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.1.4</div>
+      <h1 class="elem-title">Catálogo de Sellos Digitales Institucionales</h1>
+      <p class="elem-desc">Catálogo de configuración de sellos visuales y criptográficos del Poder Judicial (modelo DocuWare Stamps). Define la apariencia gráfica, los roles facultados, las exigencias de e.firma y los disparadores de transición transaccional en el ciclo de vida del gasto o ingreso.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Configuración Workflow (DOC-08)</span>
+        <span class="mod-badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc;">Benchmark: DocuWare Stamps</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">🖋️ Sellos con Fuerza Probatoria y Triggers de Estado</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      A diferencia de un simple "check" en un formulario, los <strong>Sellos Digitales</strong> operan como en DocuWare: imprimen un distintivo visual estilizado en el visor sobre el documento (con nombre del funcionario, cargo, fecha, hora y folio) y al mismo tiempo <strong>asientan un registro criptográfico inmutable en la bitácora</strong> (Art. 45 LGA).
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Asimismo, el catálogo permite configurar si el sello detona la transición del trámite padre (ej. estampar <em>"AUTORIZADO PARA PAGO"</em> cambia automáticamente la Afectación de Gasto a estado <code>AUTORIZADA</code> y habilita la generación de la Orden de Pago).
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El catálogo <strong>09.1.4 Sellos Digitales Institucionales</strong> administra el padrón de sellos oficiales del PJEV:</p>
+
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th>Clave Sello</th>
+          <th>Denominación Oficial</th>
+          <th>Color y Distintivo</th>
+          <th>Roles Autorizados</th>
+          <th>Efecto Transaccional</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>SELLO_REV_CXP</code></td>
+          <td>Revisión Documental Conforme</td>
+          <td><span style="color:#059669; font-weight:bold;">🟩 Verde Esmeralda</span></td>
+          <td>Analista de Cuentas por Pagar</td>
+          <td>Habilita el envío del trámite a firma directiva.</td>
+        </tr>
+        <tr>
+          <td><code>SELLO_AUT_DGA</code></td>
+          <td>Autorizado para Pago</td>
+          <td><span style="color:#2563eb; font-weight:bold;">🟦 Azul Cobalto</span></td>
+          <td>Director General de Administración</td>
+          <td>Pasa la afectación a <code>AUTORIZADA</code> y genera Orden de Pago.</td>
+        </tr>
+        <tr>
+          <td><code>SELLO_PAG_TES</code></td>
+          <td>Pagado / Dispersado SPEI</td>
+          <td><span style="color:#b45309; font-weight:bold;">🟨 Dorado / Ámbar</span></td>
+          <td>Jefe de Tesorería y Pagos</td>
+          <td>Asienta fecha valor, folio SPEI y congela el expediente en WORM.</td>
+        </tr>
+        <tr>
+          <td><code>SELLO_CON_POL</code></td>
+          <td>Contabilizado en Póliza</td>
+          <td><span style="color:#7c3aed; font-weight:bold;">🟪 Púrpura Institucional</span></td>
+          <td>Subdirector de Contabilidad</td>
+          <td>Vincula folio de póliza definitiva y cierra el periodo.</td>
+        </tr>
+        <tr>
+          <td><code>SELLO_COT_NOM</code></td>
+          <td>Cotejado con el Original</td>
+          <td><span style="color:#0284c7; font-weight:bold;">🏛️ Azul Celeste</span></td>
+          <td>Oficialía de Partes / Archivo</td>
+          <td>Asocia constancia NOM-151 para digitalización certificada.</td>
+        </tr>
+        <tr>
+          <td><code>SELLO_OBS_REC</code></td>
+          <td>Rechazado / Observado</td>
+          <td><span style="color:#dc2626; font-weight:bold;">🟥 Rojo Carmesí</span></td>
+          <td>Revisores y Directores</td>
+          <td>Regresa el trámite a <code>OBSERVADO</code> solicitando corrección.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Modelo de Datos y Diccionario de Campos</div>
+    <p>Tabla nativa: <code>archivos.sello_catalogo</code> en PostgreSQL:</p>
+
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Tipo</th>
+          <th>Nulo</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>id_sello</code></td>
+          <td><code>SERIAL (PK)</code></td>
+          <td>No</td>
+          <td>Identificador único del sello.</td>
+        </tr>
+        <tr>
+          <td><code>clave_sello</code></td>
+          <td><code>VARCHAR(50) (UQ)</code></td>
+          <td>No</td>
+          <td>Identificador mnemotécnico (ej. <code>SELLO_AUT_DGA</code>).</td>
+        </tr>
+        <tr>
+          <td><code>nombre_sello</code></td>
+          <td><code>VARCHAR(100)</code></td>
+          <td>No</td>
+          <td>Texto principal impreso en el sello (ej. <em>AUTORIZADO PARA PAGO</em>).</td>
+        </tr>
+        <tr>
+          <td><code>color_hex</code></td>
+          <td><code>CHAR(7)</code></td>
+          <td>No</td>
+          <td>Color institucional de borde y texto (ej. <code>#059669</code>).</td>
+        </tr>
+        <tr>
+          <td><code>roles_permitidos</code></td>
+          <td><code>TEXT</code></td>
+          <td>No</td>
+          <td>Roles separados por coma con facultades para estampar.</td>
+        </tr>
+        <tr>
+          <td><code>requiere_efirma</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Indica si exige certificado SAT (e.firma/FIEL) o contraseña de sesión.</td>
+        </tr>
+        <tr>
+          <td><code>estatus_disparado</code></td>
+          <td><code>VARCHAR(40)</code></td>
+          <td>Sí</td>
+          <td>Nuevo estado que adquiere el trámite padre al aplicar este sello.</td>
+        </tr>
+        <tr>
+          <td><code>estatus_registro</code></td>
+          <td><code>SMALLINT</code></td>
+          <td>No</td>
+          <td><code>1</code> = Activo, <code>0</code> = Inactivo.</td>
+        </tr>
+        <tr>
+          <td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td>
+          <td>Auditoría</td>
+          <td>-</td>
+          <td>Trazabilidad estándar PJEV.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. STORED PROCEDURES (UBICACIÓN MANDATORIA) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Stored Procedures Canónicos</div>
+
+    <div class="code-wrap">
+<pre><code>-- SP 1: archivos.fn_leer_catalogo_sellos
+CREATE OR REPLACE FUNCTION archivos.fn_leer_catalogo_sellos(
+    p_filtros JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_resultado JSONB;
+BEGIN
+    SELECT COALESCE(jsonb_agg(row_to_json(r)), '[]'::jsonb)
+    INTO v_resultado
+    FROM (
+        SELECT 
+            s.id_sello,
+            s.clave_sello,
+            s.nombre_sello,
+            s.color_hex,
+            s.roles_permitidos,
+            s.requiere_efirma,
+            s.estatus_disparado,
+            s.estatus_registro,
+            s.usuario_c,
+            s.fecha_c
+        FROM archivos.sello_catalogo s
+        WHERE s.estatus_registro = COALESCE((p_filtros->>'estatus_registro')::smallint, 1)
+        ORDER BY s.id_sello ASC
+    ) r;
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', v_resultado);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error en fn_leer_catalogo_sellos: ' || SQLERRM, 'data', '[]'::jsonb);
+END;
+$$;</code></pre>
+    </div>
+
+    <div class="code-wrap">
+<pre><code>-- SP 2: archivos.fn_crud_catalogo_sellos
+CREATE OR REPLACE FUNCTION archivos.fn_crud_catalogo_sellos(
+    p_operacion VARCHAR(20),
+    p_datos JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_id INT;
+    v_clave VARCHAR(50);
+    v_usuario VARCHAR(50);
+BEGIN
+    v_usuario := COALESCE(p_datos->>'usuario', 'SISTEMA');
+
+    IF p_operacion = 'INSERT' THEN
+        v_clave := UPPER(TRIM(p_datos->>'clave_sello'));
+
+        IF EXISTS (SELECT 1 FROM archivos.sello_catalogo WHERE clave_sello = v_clave) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La clave de sello ya existe: ' || v_clave, 'data', null);
+        END IF;
+
+        INSERT INTO archivos.sello_catalogo (
+            clave_sello, nombre_sello, color_hex, roles_permitidos,
+            requiere_efirma, estatus_disparado, estatus_registro, usuario_c, fecha_c
+        ) VALUES (
+            v_clave,
+            p_datos->>'nombre_sello',
+            COALESCE(p_datos->>'color_hex', '#059669'),
+            p_datos->>'roles_permitidos',
+            COALESCE((p_datos->>'requiere_efirma')::boolean, FALSE),
+            p_datos->>'estatus_disparado',
+            1, v_usuario, clock_timestamp()
+        ) RETURNING id_sello INTO v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Sello institucional registrado con éxito.', 'data', jsonb_build_object('id_sello', v_id));
+
+    ELSIF p_operacion = 'UPDATE' THEN
+        v_id := (p_datos->>'id_sello')::int;
+
+        UPDATE archivos.sello_catalogo
+        SET nombre_sello = p_datos->>'nombre_sello',
+            color_hex = p_datos->>'color_hex',
+            roles_permitidos = p_datos->>'roles_permitidos',
+            requiere_efirma = (p_datos->>'requiere_efirma')::boolean,
+            estatus_disparado = p_datos->>'estatus_disparado',
+            usuario_m = v_usuario,
+            fecha_m = clock_timestamp()
+        WHERE id_sello = v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Sello institucional actualizado.', 'data', jsonb_build_object('id_sello', v_id));
+
+    ELSIF p_operacion = 'DESACTIVAR' THEN
+        v_id := (p_datos->>'id_sello')::int;
+
+        UPDATE archivos.sello_catalogo
+        SET estatus_registro = 0,
+            usuario_m = v_usuario,
+            fecha_m = clock_timestamp()
+        WHERE id_sello = v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Sello institucional desactivado.', 'data', jsonb_build_object('id_sello', v_id));
+
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Operación no válida: ' || p_operacion, 'data', null);
+    END IF;
+
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error en fn_crud_catalogo_sellos: ' || SQLERRM, 'data', null);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 4. SERVICIOS REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Servicios API REST (Swagger / NestJS)</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Endpoint</th>
+          <th>Guards</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/v1/archivos/sellos</code></td>
+          <td><code>JwtAuthGuard</code></td>
+          <td>Obtiene el catálogo de sellos disponibles según el rol del usuario actual.</td>
+        </tr>
+        <tr>
+          <td><span class="method post">POST</span></td>
+          <td><code>/api/v1/archivos/sellos</code></td>
+          <td><code>Roles('ADMIN_SISTEMA')</code></td>
+          <td>Registra una nueva configuración de sello institucional.</td>
+        </tr>
+        <tr>
+          <td><span class="method patch">PATCH</span></td>
+          <td><code>/api/v1/archivos/sellos/:id</code></td>
+          <td><code>Roles('ADMIN_SISTEMA')</code></td>
+          <td>Actualiza colores, roles o estado disparado.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. WIREFRAMES SVG NATIVOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Interfaz de Usuario (Configurador de Sellos)</div>
+
+    <div class="wf-box">
+      <div class="wf-bar">
+        <span>09.1.4 Catálogo de Sellos Digitales Institucionales</span>
+        <span style="color:var(--pjev-verde-oscuro);">Paleta de Sellos DocuWare Style</span>
+      </div>
+      <div class="wf-svg-area">
+        <svg viewBox="0 0 960 460" width="100%" height="460" xmlns="http://www.w3.org/2000/svg">
+          <rect width="960" height="460" fill="#f8fafc" rx="6"/>
+          <!-- Barra superior -->
+          <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Configuración de Sellos Digitales Institucionales (DocuWare Stamps)</text>
+          
+          <rect x="780" y="28" width="145" height="28" fill="#065f46" rx="4"/>
+          <text x="852" y="46" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Diseñar Sello</text>
+
+          <!-- Muestrario de Sellos Diseñados -->
+          <rect x="20" y="80" width="445" height="160" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <text x="35" y="105" font-size="11" font-weight="bold" fill="#334155">SELLO: REVISIÓN CONFORME (CXP)</text>
+          <text x="35" y="125" font-size="9.5" fill="#64748b">Roles: Analista CXP · Dispara estado: EN_REVISION_DIRECTIVA</text>
+          
+          <!-- Vista previa del sello 1 -->
+          <rect x="35" y="140" width="415" height="85" fill="#ecfdf5" stroke="#059669" stroke-width="2" rx="4"/>
+          <text x="242" y="168" font-size="12" font-weight="bold" fill="#065f46" text-anchor="middle">✓ REVISIÓN DOCUMENTAL CONFORME</text>
+          <text x="242" y="186" font-size="9.5" fill="#047857" text-anchor="middle">SUBDIRECCIÓN DE CUENTAS POR PAGAR · PJEV</text>
+          <text x="242" y="202" font-size="8.5" fill="#047857" text-anchor="middle">[NOMBRE_USUARIO] · [FECHA_HORA] · [TICKET_TRAMITE]</text>
+
+          <!-- Sello 2 -->
+          <rect x="495" y="80" width="445" height="160" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <text x="510" y="105" font-size="11" font-weight="bold" fill="#334155">SELLO: AUTORIZADO PARA PAGO (DGA)</text>
+          <text x="510" y="125" font-size="9.5" fill="#64748b">Roles: Director DGA · Exige e.firma · Dispara estado: AUTORIZADA</text>
+
+          <!-- Vista previa del sello 2 -->
+          <rect x="510" y="140" width="415" height="85" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="4"/>
+          <text x="717" y="168" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle">⚡ AUTORIZADO PARA PAGO</text>
+          <text x="717" y="186" font-size="9.5" fill="#1e3a8a" text-anchor="middle">DIRECCIÓN GENERAL DE ADMINISTRACIÓN</text>
+          <text x="717" y="202" font-size="8.5" fill="#1e3a8a" text-anchor="middle">FIRMA DIGITAL SAT VALIDADA · [FECHA_HORA]</text>
+
+          <!-- Sello 3 -->
+          <rect x="20" y="260" width="445" height="160" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <text x="35" y="285" font-size="11" font-weight="bold" fill="#334155">SELLO: PAGADO Y DISPERSADO (TESORERÍA)</text>
+          <text x="35" y="305" font-size="9.5" fill="#64748b">Roles: Tesorero · Registra SPEI · Dispara estado: PAGADO</text>
+
+          <rect x="35" y="320" width="415" height="85" fill="#fef3c7" stroke="#d97706" stroke-width="2" rx="4"/>
+          <text x="242" y="348" font-size="12" font-weight="bold" fill="#92400e" text-anchor="middle">💵 PAGADO / SPEI DISPERSADO</text>
+          <text x="242" y="366" font-size="9.5" fill="#78350f" text-anchor="middle">DEPARTAMENTO DE TESORERÍA Y BANCOS</text>
+          <text x="242" y="382" font-size="8.5" fill="#78350f" text-anchor="middle">CLAVE RASTREO: [SPEI_TRACKING] · [FECHA_VALOR]</text>
+
+          <!-- Sello 4 -->
+          <rect x="495" y="260" width="445" height="160" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+          <text x="510" y="285" font-size="11" font-weight="bold" fill="#334155">SELLO: COTEJADO CON ORIGINAL (NOM-151)</text>
+          <text x="510" y="305" font-size="9.5" fill="#64748b">Roles: Archivo / Oficialía · Vincula Constancia PSC de Conservación</text>
+
+          <rect x="510" y="320" width="415" height="85" fill="#ecfeff" stroke="#0891b2" stroke-width="2" rx="4"/>
+          <text x="717" y="348" font-size="12" font-weight="bold" fill="#0e7490" text-anchor="middle">🏛️ COTEJADO CON EL ORIGINAL</text>
+          <text x="717" y="366" font-size="9.5" fill="#155e75" text-anchor="middle">UNIDAD CENTRAL DE ARCHIVOS · DIGITALIZACIÓN CERTIFICADA</text>
+          <text x="717" y="382" font-size="8.5" fill="#155e75" text-anchor="middle">NOM-151-SCFI-2016 · CONSTANCIA PSC: [FOLIO_PSC]</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.1.3 Tipos Documentales y Metadatos — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.1 · Catálogos Archivísticos</span> ›
+    <span>09.1.3 Tipos Documentales y Metadatos</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.1.3</div>
+      <h1 class="elem-title">Tipos Documentales y Metadatos Requeridos</h1>
+      <p class="elem-desc">Catálogo maestro de tipologías documentales institucionales del SIAF-PJEV (ej. Facturas XML/PDF, Oficios de Ministración, Contratos, Bitácoras, Cédulas de Inventario). Define las extensiones autorizadas, límites de tamaño, obligatoriedad y el esquema de metadatos estandarizados conforme al AGN e ISO 23081.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Catálogo Base (DOC-08)</span>
+        <span class="mod-badge badge-norm">ISO 23081 / AGN</span>
+        <span class="mod-badge badge-pjev">Transversal SIAF</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">📋 Estandarización de Requisitos y Metadatos</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      Este catálogo unifica y gobierna las definiciones dispersas de requisitos documentales del sistema (como <code>05.1.1</code> en Cuentas por Pagar y <code>07.1.5</code> en Recursos Materiales). 
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Para cada tipo documental se estipula la <strong>extensión permitida</strong> (ej. forzosamente <code>.xml</code> o <code>.pdf</code>), el <strong>límite de peso en megabytes</strong>, si requiere <strong>firma electrónica avanzada</strong> y cuáles <strong>metadatos contextuales</strong> deben capturarse u obtenerse automáticamente (ej. UUID SAT, RFC Emisor, No. de Oficio, Monto amparado).
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El catálogo <strong>09.1.3 Tipos Documentales y Metadatos</strong> es el validador funcional del subsistema de archivos. Cuando un usuario intenta cargar un archivo en cualquier formulario del SIAF a través del componente <code>&lt;EntityFiles /&gt;</code> o <code>&lt;SingleFileField /&gt;</code>, el sistema consulta este catálogo para aplicar las restricciones técnicas y registrar los metadatos correspondientes:</p>
+
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th>Clave Tipo</th>
+          <th>Nombre Oficial</th>
+          <th>Formatos</th>
+          <th>Peso Máx</th>
+          <th>Metadatos Clave Extraídos / Requeridos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>CFDI_XML_40</code></td>
+          <td>Comprobante Fiscal Digital XML (CFDI 4.0)</td>
+          <td><code>.xml</code></td>
+          <td>5 MB</td>
+          <td>UUID SAT, RFC Emisor, RFC Receptor, Fecha Timbrado, Total, IVA, Moneda.</td>
+        </tr>
+        <tr>
+          <td><code>CFDI_PDF_REP</code></td>
+          <td>Representación Impresa de Factura</td>
+          <td><code>.pdf</code></td>
+          <td>15 MB</td>
+          <td>Folio Fiscal SAT, No. Factura, Proveedor, Código QR.</td>
+        </tr>
+        <tr>
+          <td><code>OFI_MIN_SEF</code></td>
+          <td>Oficio de Ministración SEFIPLAN</td>
+          <td><code>.pdf</code></td>
+          <td>10 MB</td>
+          <td>No. Oficio, Fecha Emisión, Ramo / Fuente, Importe Ministrado.</td>
+        </tr>
+        <tr>
+          <td><code>CON_OBR_PUB</code></td>
+          <td>Contrato de Obra o Servicios Formalizado</td>
+          <td><code>.pdf</code></td>
+          <td>30 MB</td>
+          <td>No. Contrato, Proveedor, Monto Máximo, Vigencia, Fianza Vinculada.</td>
+        </tr>
+        <tr>
+          <td><code>ACT_ENT_ALM</code></td>
+          <td>Acta de Entrada y Remisión de Almacén</td>
+          <td><code>.pdf</code></td>
+          <td>10 MB</td>
+          <td>No. Pedido, No. Entrada, Sellos de Almacén, Claves CUCOP.</td>
+        </tr>
+        <tr>
+          <td><code>POL_CHE_BANC</code></td>
+          <td>Póliza Cheque / Comprobante SPEI</td>
+          <td><code>.pdf</code></td>
+          <td>10 MB</td>
+          <td>Cuenta Pagadora, Clave Rastreo SPEI, Beneficiario, Fecha Valor.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Modelo de Datos y Diccionario de Campos</div>
+    <p>Tabla nativa: <code>archivos.tipo_documento_catalogo</code> en PostgreSQL:</p>
+
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Tipo</th>
+          <th>Nulo</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>id_tipo_documento</code></td>
+          <td><code>SERIAL (PK)</code></td>
+          <td>No</td>
+          <td>Identificador único del tipo documental.</td>
+        </tr>
+        <tr>
+          <td><code>clave_tipo</code></td>
+          <td><code>VARCHAR(50) (UQ)</code></td>
+          <td>No</td>
+          <td>Clave alfanumérica única (ej. <code>CFDI_XML_40</code>, <code>OFI_MIN_SEF</code>).</td>
+        </tr>
+        <tr>
+          <td><code>nombre_tipo</code></td>
+          <td><code>VARCHAR(150)</code></td>
+          <td>No</td>
+          <td>Nombre descriptivo visible al usuario.</td>
+        </tr>
+        <tr>
+          <td><code>extensiones_permitidas</code></td>
+          <td><code>VARCHAR(50)</code></td>
+          <td>No</td>
+          <td>Extensiones separadas por coma (ej. <code>pdf</code>, <code>xml</code>, <code>xlsx</code>).</td>
+        </tr>
+        <tr>
+          <td><code>mime_permitidos</code></td>
+          <td><code>TEXT</code></td>
+          <td>No</td>
+          <td>Tipos MIME para verificación de Magic Bytes (ej. <code>application/pdf,text/xml</code>).</td>
+        </tr>
+        <tr>
+          <td><code>tamano_max_mb</code></td>
+          <td><code>NUMERIC(4,1)</code></td>
+          <td>No</td>
+          <td>Límite superior por archivo (Default: <code>15.0</code> MB).</td>
+        </tr>
+        <tr>
+          <td><code>requiere_firma_electronica</code></td>
+          <td><code>BOOLEAN</code></td>
+          <td>No</td>
+          <td>Indica si el documento debe validarse con e.firma / FIEL del titular.</td>
+        </tr>
+        <tr>
+          <td><code>esquema_metadatos_json</code></td>
+          <td><code>JSONB</code></td>
+          <td>Sí</td>
+          <td>Definición del schema JSON con los atributos requeridos (campos extra).</td>
+        </tr>
+        <tr>
+          <td><code>estatus_registro</code></td>
+          <td><code>SMALLINT</code></td>
+          <td>No</td>
+          <td><code>1</code> = Activo, <code>0</code> = Inactivo.</td>
+        </tr>
+        <tr>
+          <td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td>
+          <td>Campos Auditoría</td>
+          <td>-</td>
+          <td>Trazabilidad estándar PJEV.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. STORED PROCEDURES (UBICACIÓN MANDATORIA) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Stored Procedures Canónicos</div>
+
+    <div class="code-wrap">
+<pre><code>-- SP 1: archivos.fn_leer_tipo_documento
+CREATE OR REPLACE FUNCTION archivos.fn_leer_tipo_documento(
+    p_filtros JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_id INT;
+    v_clave VARCHAR(50);
+    v_resultado JSONB;
+BEGIN
+    v_id := (p_filtros->>'id_tipo_documento')::int;
+    v_clave := p_filtros->>'clave_tipo';
+
+    SELECT COALESCE(jsonb_agg(row_to_json(r)), '[]'::jsonb)
+    INTO v_resultado
+    FROM (
+        SELECT 
+            t.id_tipo_documento,
+            t.clave_tipo,
+            t.nombre_tipo,
+            t.extensiones_permitidas,
+            t.tamano_max_mb,
+            t.requiere_firma_electronica,
+            t.esquema_metadatos_json,
+            t.estatus_registro,
+            t.usuario_c,
+            t.fecha_c,
+            t.usuario_m,
+            t.fecha_m
+        FROM archivos.tipo_documento_catalogo t
+        WHERE t.estatus_registro = COALESCE((p_filtros->>'estatus_registro')::smallint, 1)
+          AND (v_id IS NULL OR t.id_tipo_documento = v_id)
+          AND (v_clave IS NULL OR t.clave_tipo ILIKE '%' || v_clave || '%')
+        ORDER BY t.nombre_tipo ASC
+    ) r;
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', v_resultado);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error en fn_leer_tipo_documento: ' || SQLERRM, 'data', '[]'::jsonb);
+END;
+$$;</code></pre>
+    </div>
+
+    <div class="code-wrap">
+<pre><code>-- SP 2: archivos.fn_crud_tipo_documento
+CREATE OR REPLACE FUNCTION archivos.fn_crud_tipo_documento(
+    p_operacion VARCHAR(20),
+    p_datos JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_id INT;
+    v_clave VARCHAR(50);
+    v_usuario VARCHAR(50);
+BEGIN
+    v_usuario := COALESCE(p_datos->>'usuario', 'SISTEMA');
+
+    IF p_operacion = 'INSERT' THEN
+        v_clave := UPPER(TRIM(p_datos->>'clave_tipo'));
+
+        IF EXISTS (SELECT 1 FROM archivos.tipo_documento_catalogo WHERE clave_tipo = v_clave) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La clave de tipo documental ya existe: ' || v_clave, 'data', null);
+        END IF;
+
+        INSERT INTO archivos.tipo_documento_catalogo (
+            clave_tipo, nombre_tipo, extensiones_permitidas, mime_permitidos,
+            tamano_max_mb, requiere_firma_electronica, esquema_metadatos_json,
+            estatus_registro, usuario_c, fecha_c
+        ) VALUES (
+            v_clave,
+            p_datos->>'nombre_tipo',
+            LOWER(p_datos->>'extensiones_permitidas'),
+            p_datos->>'mime_permitidos',
+            COALESCE((p_datos->>'tamano_max_mb')::numeric, 15.0),
+            COALESCE((p_datos->>'requiere_firma_electronica')::boolean, FALSE),
+            p_datos->'esquema_metadatos_json',
+            1, v_usuario, clock_timestamp()
+        ) RETURNING id_tipo_documento INTO v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tipo documental creado exitosamente.', 'data', jsonb_build_object('id_tipo_documento', v_id));
+
+    ELSIF p_operacion = 'UPDATE' THEN
+        v_id := (p_datos->>'id_tipo_documento')::int;
+
+        UPDATE archivos.tipo_documento_catalogo
+        SET nombre_tipo = p_datos->>'nombre_tipo',
+            extensiones_permitidas = LOWER(p_datos->>'extensiones_permitidas'),
+            mime_permitidos = p_datos->>'mime_permitidos',
+            tamano_max_mb = (p_datos->>'tamano_max_mb')::numeric,
+            requiere_firma_electronica = (p_datos->>'requiere_firma_electronica')::boolean,
+            esquema_metadatos_json = p_datos->'esquema_metadatos_json',
+            usuario_m = v_usuario,
+            fecha_m = clock_timestamp()
+        WHERE id_tipo_documento = v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tipo documental actualizado con éxito.', 'data', jsonb_build_object('id_tipo_documento', v_id));
+
+    ELSIF p_operacion = 'DESACTIVAR' THEN
+        v_id := (p_datos->>'id_tipo_documento')::int;
+
+        UPDATE archivos.tipo_documento_catalogo
+        SET estatus_registro = 0,
+            usuario_m = v_usuario,
+            fecha_m = clock_timestamp()
+        WHERE id_tipo_documento = v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Tipo documental desactivado.', 'data', jsonb_build_object('id_tipo_documento', v_id));
+
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Operación no válida: ' || p_operacion, 'data', null);
+    END IF;
+
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error en fn_crud_tipo_documento: ' || SQLERRM, 'data', null);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 4. SERVICIOS REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Servicios API REST (Swagger / NestJS)</div>
+    <table class="props-table">
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Endpoint</th>
+          <th>Guards</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code>/api/v1/archivos/tipos-documento</code></td>
+          <td><code>JwtAuthGuard</code></td>
+          <td>Lista los tipos de documento y sus reglas técnicas de carga.</td>
+        </tr>
+        <tr>
+          <td><span class="method post">POST</span></td>
+          <td><code>/api/v1/archivos/tipos-documento</code></td>
+          <td><code>Roles('ADMIN_ARCHIVOS')</code></td>
+          <td>Registra una nueva tipología documental con esquema de metadatos.</td>
+        </tr>
+        <tr>
+          <td><span class="method patch">PATCH</span></td>
+          <td><code>/api/v1/archivos/tipos-documento/:id</code></td>
+          <td><code>Roles('ADMIN_ARCHIVOS')</code></td>
+          <td>Modifica extensiones, límites de peso o esquema JSON.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. WIREFRAMES SVG -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Interfaz de Usuario (Wireframes)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="switchWfTab('wf-grid-td', this)">Catálogo de Tipos (Grid)</button>
+      <button class="wf-tab" onclick="switchWfTab('wf-modal-td', this)">Modal de Configuración de Metadatos</button>
+    </div>
+
+    <div id="wf-grid-td" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span>09.1.3 Catálogo de Tipos Documentales y Metadatos</span>
+          <span style="color:var(--pjev-verde-oscuro);">Reglas de Carga y Validación</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 450" width="100%" height="450" xmlns="http://www.w3.org/2000/svg">
+            <rect width="960" height="450" fill="#f8fafc" rx="6"/>
+            <!-- Barra superior -->
+            <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Tipos Documentales y Esquema de Metadatos</text>
+            <rect x="780" y="28" width="145" height="28" fill="#065f46" rx="4"/>
+            <text x="852" y="46" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nuevo Tipo Doc.</text>
+
+            <!-- Encabezado Grid -->
+            <rect x="20" y="80" width="920" height="32" fill="#065f46" rx="2"/>
+            <text x="35" y="100" font-size="10" font-weight="bold" fill="#ffffff">CLAVE</text>
+            <text x="180" y="100" font-size="10" font-weight="bold" fill="#ffffff">DENOMINACIÓN DEL DOCUMENTO</text>
+            <text x="460" y="100" font-size="10" font-weight="bold" fill="#ffffff">FORMATOS</text>
+            <text x="570" y="100" font-size="10" font-weight="bold" fill="#ffffff">PESO MÁX.</text>
+            <text x="680" y="100" font-size="10" font-weight="bold" fill="#ffffff">FIRMA ELECTRÓNICA</text>
+            <text x="870" y="100" font-size="10" font-weight="bold" fill="#ffffff">ACCIONES</text>
+
+            <!-- Fila 1 -->
+            <rect x="20" y="115" width="920" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="138" font-size="10.5" font-family="monospace" font-weight="bold" fill="#065f46">CFDI_XML_40</text>
+            <text x="180" y="138" font-size="11" font-weight="bold" fill="#1e293b">Comprobante Fiscal Digital (CFDI 4.0 XML)</text>
+            <rect x="460" y="125" width="45" height="18" fill="#ecfdf5" rx="4"/>
+            <text x="482" y="138" font-size="9.5" font-weight="bold" fill="#065f46" text-anchor="middle">.xml</text>
+            <text x="590" y="138" font-size="11" fill="#334155">5.0 MB</text>
+            <text x="710" y="138" font-size="10" fill="#64748b">No requerida (SAT)</text>
+            <text x="875" y="138" font-size="11" fill="#2563eb">Editar · Metadatos</text>
+
+            <!-- Fila 2 -->
+            <rect x="20" y="155" width="920" height="38" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="35" y="178" font-size="10.5" font-family="monospace" font-weight="bold" fill="#065f46">CFDI_PDF_REP</text>
+            <text x="180" y="178" font-size="11" font-weight="bold" fill="#1e293b">Representación Impresa de Factura (PDF)</text>
+            <rect x="460" y="165" width="45" height="18" fill="#fee2e2" rx="4"/>
+            <text x="482" y="178" font-size="9.5" font-weight="bold" fill="#991b1b" text-anchor="middle">.pdf</text>
+            <text x="590" y="178" font-size="11" fill="#334155">15.0 MB</text>
+            <text x="710" y="178" font-size="10" fill="#64748b">No requerida</text>
+            <text x="875" y="178" font-size="11" fill="#2563eb">Editar · Metadatos</text>
+
+            <!-- Fila 3 -->
+            <rect x="20" y="195" width="920" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="218" font-size="10.5" font-family="monospace" font-weight="bold" fill="#065f46">CON_OBR_PUB</text>
+            <text x="180" y="218" font-size="11" font-weight="bold" fill="#1e293b">Contrato de Obra o Servicios Formalizado</text>
+            <rect x="460" y="205" width="45" height="18" fill="#fee2e2" rx="4"/>
+            <text x="482" y="218" font-size="9.5" font-weight="bold" fill="#991b1b" text-anchor="middle">.pdf</text>
+            <text x="590" y="218" font-size="11" font-weight="bold" fill="#1e293b">30.0 MB</text>
+            <rect x="700" y="205" width="80" height="18" fill="#eff6ff" rx="4"/>
+            <text x="740" y="218" font-size="9" font-weight="bold" fill="#1e40af" text-anchor="middle">✓ Obligatoria</text>
+            <text x="875" y="218" font-size="11" fill="#2563eb">Editar · Metadatos</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div id="wf-modal-td" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span>Modal: Configuración de Tipo Documental y Metadatos</span>
+          <span style="color:var(--pjev-dorado);">Esquema JSON de Extracción</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 740 430" width="100%" height="430" xmlns="http://www.w3.org/2000/svg">
+            <rect width="740" height="430" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <!-- Modal header -->
+            <rect width="740" height="45" fill="#065f46" rx="6 6 0 0"/>
+            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Configuración Técnica de Tipo Documental</text>
+
+            <text x="35" y="75" font-size="11" font-weight="bold" fill="#334155">Clave Única *</text>
+            <rect x="35" y="85" width="220" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="45" y="105" font-size="11" font-family="monospace" fill="#065f46">OFI_MIN_SEF</text>
+
+            <text x="280" y="75" font-size="11" font-weight="bold" fill="#334155">Denominación *</text>
+            <rect x="280" y="85" width="425" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="290" y="105" font-size="11" fill="#1e293b">Oficio de Ministración SEFIPLAN</text>
+
+            <text x="35" y="140" font-size="11" font-weight="bold" fill="#334155">Formatos Autorizados *</text>
+            <rect x="35" y="150" width="220" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="45" y="170" font-size="11" fill="#1e293b">pdf</text>
+
+            <text x="280" y="140" font-size="11" font-weight="bold" fill="#334155">Peso Máximo (MB) *</text>
+            <rect x="280" y="150" width="180" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="290" y="170" font-size="11" fill="#1e293b">10.0 MB</text>
+
+            <text x="485" y="140" font-size="11" font-weight="bold" fill="#334155">Firma Electrónica</text>
+            <rect x="485" y="150" width="220" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="500" y="170" font-size="11" fill="#0369a1">☑ e.firma Opcional</text>
+
+            <text x="35" y="205" font-size="11" font-weight="bold" fill="#334155">Metadatos Específicos Requeridos (JSON Schema)</text>
+            <rect x="35" y="215" width="670" height="130" fill="#1e293b" rx="4"/>
+            <text x="45" y="240" font-size="10" font-family="monospace" fill="#38bdf8">{"numero_oficio": {"type": "string", "required": true},</text>
+            <text x="45" y="260" font-size="10" font-family="monospace" fill="#38bdf8"> "fecha_oficio": {"type": "date", "required": true},</text>
+            <text x="45" y="280" font-size="10" font-family="monospace" fill="#38bdf8"> "importe_ministrado": {"type": "number", "required": true},</text>
+            <text x="45" y="300" font-size="10" font-family="monospace" fill="#38bdf8"> "fuente_financiamiento": {"type": "string", "required": true}}</text>
+
+            <!-- Botones -->
+            <rect x="490" y="375" width="100" height="32" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="540" y="395" font-size="11" fill="#475569" text-anchor="middle">Cancelar</text>
+
+            <rect x="605" y="375" width="100" height="32" fill="#065f46" rx="4"/>
+            <text x="655" y="395" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar Tipo</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+<script>
+  function switchWfTab(panelId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById(panelId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+</body>
+</html>

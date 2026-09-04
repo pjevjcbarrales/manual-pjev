@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.4.2 Vigencias y Vencimientos CADIDO — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.4 · Informes y Auditoría</span> ›
+    <span>09.4.2 Vigencias y Vencimientos CADIDO</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.4.2</div>
+      <h1 class="elem-title">Reporte de Vigencias y Vencimientos CADIDO</h1>
+      <p class="elem-desc">Panel de control analítico y semaforización de plazos legales de conservación documental. Permite alertar oportunamente sobre transferencias primarias pendientes y la extinción de plazos precautorios de guarda (5 y 10 años) conforme a la LGA, CFF y LGCG.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Reporte de Control (DOC-08)</span>
+        <span class="mod-badge badge-norm">CADIDO / CFF Art. 30</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">⏱️ Monitoreo Activo de Prescripción Legal</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      El <strong>Reporte de Vigencias</strong> provee visibilidad en tiempo real para evitar que los expedientes del Poder Judicial queden en el limbo operativo.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Mediante un semáforo tricromático (Verde: En plazo; Amarillo: Próximo a vencer en 90 días; Rojo: Vencido / Prescrito), la Unidad Central de Archivos y los titulares de área planifican sus transferencias masivas y arman las solicitudes de dictamen para el Comité de Archivos.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>09.4.2 Vigencias y Vencimientos CADIDO</strong> agrupa el universo documental bajo tres perspectivas de control temporal:</p>
+    <ul style="font-size:12px; line-height:1.7; color:var(--pjev-texto);">
+      <li><strong>Alertas de Transferencia Primaria:</strong> Documentos en <em>Archivo de Trámite</em> cuya fecha de creación más los años de trámite del CADIDO hayan sido superados.</li>
+      <li><strong>Alertas de Guarda Precautoria en Concentración:</strong> Expedientes en <em>Archivo de Concentración</em> que están a punto de cumplir o han superado los 5 años fiscales (CFF Art. 30).</li>
+      <li><strong>Proyección de Bajas y Transferencias Históricas:</strong> Estimación de volumen y expedientes candidatos a dictaminar en el siguiente ejercicio fiscal.</li>
+    </ul>
+  </div>
+
+  <!-- 2. SERVICIOS Y STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Consulta Analítica de Vigencias</div>
+
+    <div class="code-wrap">
+<pre><code>-- Consulta generadora del Reporte de Vigencias y Vencimientos
+CREATE OR REPLACE FUNCTION archivos.fn_reporte_vigencias(
+    p_filtros JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_resultado JSONB;
+BEGIN
+    SELECT COALESCE(jsonb_agg(row_to_json(r)), '[]'::jsonb)
+    INTO v_resultado
+    FROM (
+        SELECT 
+            d.id,
+            d.nombre_original,
+            d.cgca_codigo,
+            c.seccion,
+            c.serie,
+            d.estado_archivistico,
+            d.fecha_c,
+            cad.vigencia_tramite_anios,
+            cad.vigencia_concentracion_anios,
+            cad.destino_final,
+            (d.fecha_c + (cad.vigencia_tramite_anios || ' years')::interval)::date AS fecha_vencimiento_tramite,
+            (d.fecha_c + ((cad.vigencia_tramite_anios + cad.vigencia_concentracion_anios) || ' years')::interval)::date AS fecha_vencimiento_concentracion,
+            CASE 
+                WHEN d.estado_archivistico = 'TRAMITE' AND CURRENT_DATE >= (d.fecha_c + (cad.vigencia_tramite_anios || ' years')::interval)::date THEN 'VENCIDO_TRAMITE'
+                WHEN d.estado_archivistico = 'CONCENTRACION' AND CURRENT_DATE >= (d.fecha_c + ((cad.vigencia_tramite_anios + cad.vigencia_concentracion_anios) || ' years')::interval)::date THEN 'VENCIDO_CONCENTRACION'
+                ELSE 'EN_PLAZO'
+            END AS semaforo_vigencia
+        FROM archivos.documento d
+        JOIN archivos.cgca_catalogo c ON d.cgca_codigo = c.cgca_codigo
+        JOIN archivos.cadido_catalogo cad ON d.cgca_codigo = cad.cgca_codigo
+        WHERE d.estatus_registro = 1
+        ORDER BY fecha_vencimiento_concentracion ASC
+    ) r;
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', v_resultado);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 3. WIREFRAMES SVG -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Interfaz del Tablero de Vigencias</div>
+
+    <div class="wf-box">
+      <div class="wf-bar">
+        <span>09.4.2 Tablero Semafórico de Vigencias CADIDO</span>
+        <span style="color:var(--pjev-verde-oscuro);">Control de Prescripción Legal</span>
+      </div>
+      <div class="wf-svg-area">
+        <svg viewBox="0 0 960 450" width="100%" height="450" xmlns="http://www.w3.org/2000/svg">
+          <rect width="960" height="450" fill="#f8fafc" rx="6"/>
+          <!-- Barra superior -->
+          <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Reporte Semafórico de Vigencias y Vencimientos Documentales</text>
+          
+          <rect x="800" y="28" width="125" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+          <text x="862" y="46" font-size="11" fill="#334155" text-anchor="middle">Exportar XLSX</text>
+
+          <!-- Tarjetas Semáforo -->
+          <rect x="20" y="75" width="290" height="70" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="98" font-size="10" fill="#64748b">EN PLAZO REGULAR</text>
+          <text x="35" y="125" font-size="18" font-weight="bold" fill="#166534">58,190 expedientes</text>
+          <circle cx="280" cy="110" r="10" fill="#22c55e"/>
+
+          <rect x="335" y="75" width="290" height="70" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="350" y="98" font-size="10" fill="#64748b">POR VENCER EN TRÁMITE (&lt; 90 DÍAS)</text>
+          <text x="350" y="125" font-size="18" font-weight="bold" fill="#b45309">1,420 por transferir</text>
+          <circle cx="595" cy="110" r="10" fill="#f59e0b"/>
+
+          <rect x="650" y="75" width="290" height="70" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="665" y="98" font-size="10" fill="#64748b">PLAZO AGOTADO EN CONCENTRACIÓN</text>
+          <text x="665" y="125" font-size="18" font-weight="bold" fill="#b91c1c">314 para baja/histórico</text>
+          <circle cx="910" cy="110" r="10" fill="#ef4444"/>
+
+          <!-- Encabezado Grid -->
+          <rect x="20" y="160" width="920" height="30" fill="#065f46" rx="2"/>
+          <text x="35" y="179" font-size="9.5" font-weight="bold" fill="#ffffff">SERIE CGCA</text>
+          <text x="180" y="179" font-size="9.5" font-weight="bold" fill="#ffffff">DENOMINACIÓN</text>
+          <text x="440" y="179" font-size="9.5" font-weight="bold" fill="#ffffff">ESTADO ACTUAL</text>
+          <text x="580" y="179" font-size="9.5" font-weight="bold" fill="#ffffff">VENCIMIENTO TRÁMITE</text>
+          <text x="730" y="179" font-size="9.5" font-weight="bold" fill="#ffffff">VENCIMIENTO CONCENT.</text>
+          <text x="870" y="179" font-size="9.5" font-weight="bold" fill="#ffffff">SEMÁFORO</text>
+
+          <!-- Fila 1 -->
+          <rect x="20" y="194" width="920" height="38" fill="#ffffff" stroke="#f1f5f9"/>
+          <text x="35" y="217" font-size="10.5" font-family="monospace" fill="#065f46">1S.01</text>
+          <text x="180" y="217" font-size="10.5" font-weight="bold" fill="#1e293b">Pólizas Contables y Presupuestales (2025)</text>
+          <text x="440" y="217" font-size="10.5" fill="#334155">Trámite (1 año)</text>
+          <text x="580" y="217" font-size="10.5" font-weight="bold" fill="#b45309">31/12/2025 (Expiró)</text>
+          <text x="730" y="217" font-size="10.5" fill="#334155">31/12/2030</text>
+          <rect x="860" y="204" width="80" height="18" fill="#fef3c7" rx="9"/>
+          <text x="900" y="217" font-size="9" font-weight="bold" fill="#92400e" text-anchor="middle">Transferir</text>
+
+          <!-- Fila 2 -->
+          <rect x="20" y="234" width="920" height="38" fill="#f8fafc" stroke="#f1f5f9"/>
+          <text x="35" y="257" font-size="10.5" font-family="monospace" fill="#065f46">1S.02</text>
+          <text x="180" y="257" font-size="10.5" font-weight="bold" fill="#1e293b">Cuentas por Pagar y Facturas (2020)</text>
+          <text x="440" y="257" font-size="10.5" fill="#334155">Concentración (5 años)</text>
+          <text x="580" y="257" font-size="10.5" fill="#64748b">31/12/2021</text>
+          <text x="730" y="257" font-size="10.5" font-weight="bold" fill="#b91c1c">31/12/2025 (Cumplido)</text>
+          <rect x="860" y="244" width="80" height="18" fill="#fee2e2" rx="9"/>
+          <text x="900" y="257" font-size="9" font-weight="bold" fill="#991b1b" text-anchor="middle">Agotado</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

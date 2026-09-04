@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09.3.4 Depuración de Temporales — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>09 · Gestión Documental</span> ›
+    <span>09.3 · Procesos y Ciclo de Vida</span> ›
+    <span>09.3.4 Depuración de Temporales</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">09.3.4</div>
+      <h1 class="elem-title">Depuración Automática de Archivos Temporales</h1>
+      <p class="elem-desc">Proceso batch automatizado (Garbage Collector nocturno) para la detección y purga segura de archivos temporales huérfanos con más de 24 horas de antigüedad que nunca fueron consolidados en un trámite en firme del SIAF-PJEV.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
+        <span class="mod-badge badge-s">Mantenimiento y Storage (DOC-08)</span>
+        <span class="mod-badge badge-norm">Cron Batch Nocturno</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">🧹 Higiene de Almacenamiento y Optimización de Disco</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      Cuando un usuario abre un formulario de alta (ej. <em>Afectación de Gasto</em> o <em>Registro de Ingreso</em>) y sube documentos antes de guardar el encabezado, estos se almacenan provisionalmente con <code>es_temporal = TRUE</code> vinculados a un <strong>ticket de sesión</strong>.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      Si el usuario cancela la captura, pierde la conexión o cierra la pestaña, los archivos quedan huérfanos. Este proceso se ejecuta todas las noches a las 02:00 hrs para purgar el almacenamiento físico (MinIO/NAS) y deshabilitar los registros en base de datos, evitando fugas de almacenamiento.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>09.3.4 Depuración de Temporales</strong> previene la acumulación silenciosa de archivos basura sin comprometer en ningún momento los expedientes consolidados del Poder Judicial:</p>
+    <ul style="font-size:12px; line-height:1.7; color:var(--pjev-texto);">
+      <li><strong>Ventana de Gracia Transaccional:</strong> Todo archivo temporal dispone de <strong>24 horas de vigencia</strong> para que el usuario concluya su trámite.</li>
+      <li><strong>Doble Purga (Base de Datos + Almacenamiento):</strong>
+        <ol style="padding-left:16px;">
+          <li>El SP localiza los registros huérfanos y los marca con <code>estatus_registro = 0</code>.</li>
+          <li>El servicio NestJS invoca <code>IFileStorageDriver.delete(ruta_storage)</code> para liberar los bloques físicos en el disco institucional.</li>
+        </ol>
+      </li>
+      <li><strong>Monitoreo y Forzado Manual:</strong> Los administradores pueden consultar el volumen de temporales activos y forzar una depuración inmediata si el almacenamiento alcanza umbrales de alerta.</li>
+    </ul>
+  </div>
+
+  <!-- 2. SERVICIOS Y STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Servicios y Procedimientos Canónicos</div>
+
+    <div class="code-wrap">
+<pre><code>-- Stored Procedure invocado por el Cron nocturno de NestJS
+CREATE OR REPLACE FUNCTION archivos.fn_depurar_archivos_temporales()
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = archivos, public
+AS $$
+DECLARE
+    v_total_depurados INT;
+    v_bytes_liberados BIGINT;
+BEGIN
+    WITH eliminados AS (
+        UPDATE archivos.documento
+        SET estatus_registro = 0,
+            usuario_m = 'JOB_GARBAGE_COLLECTOR',
+            fecha_m = clock_timestamp()
+        WHERE es_temporal = TRUE 
+          AND fecha_c < (clock_timestamp() - INTERVAL '24 hours')
+          AND estatus_registro = 1
+        RETURNING id, tamanio_bytes, ruta_storage
+    )
+    SELECT COUNT(*), COALESCE(SUM(tamanio_bytes), 0)
+    INTO v_total_depurados, v_bytes_liberados
+    FROM eliminados;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'Depuración de archivos temporales concluida.',
+        'data', jsonb_build_object(
+            'total_depurados', v_total_depurados,
+            'megabytes_liberados', ROUND(v_bytes_liberados / (1024.0 * 1024.0), 2)
+        )
+    );
+END;
+$$;</code></pre>
+    </div>
+
+    <div class="code-wrap">
+<pre><code>// Cron Job en NestJS (archivos.task.ts)
+@Injectable()
+export class ArchivosTaskService {
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject('FILE_STORAGE_DRIVER') private readonly storage: IFileStorageDriver
+  ) {}
+
+  @Cron('0 2 * * *') // Todas las madrugadas a las 02:00 hrs
+  async purgaNocturnaTemporales() {
+    // 1. Obtener lista de rutas de almacenamiento a eliminar físicamente
+    const huerfanos = await this.prisma.$queryRaw`
+      SELECT id, ruta_storage FROM archivos.documento
+      WHERE es_temporal = TRUE AND fecha_c < (NOW() - INTERVAL '24 hours') AND estatus_registro = 1
+    `;
+
+    // 2. Eliminar del Storage (MinIO / NAS)
+    for (const doc of huerfanos) {
+      await this.storage.delete(doc.ruta_storage);
+    }
+
+    // 3. Ejecutar SP de actualización en base de datos
+    await this.prisma.$queryRaw`SELECT archivos.fn_depurar_archivos_temporales();`;
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 3. WIREFRAMES SVG -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Interfaz de Monitoreo de Almacenamiento</div>
+
+    <div class="wf-box">
+      <div class="wf-bar">
+        <span>09.3.4 Consola de Monitoreo y Depuración de Temporales</span>
+        <span style="color:var(--pjev-verde-oscuro);">Higiene de Storage</span>
+      </div>
+      <div class="wf-svg-area">
+        <svg viewBox="0 0 960 420" width="100%" height="420" xmlns="http://www.w3.org/2000/svg">
+          <rect width="960" height="420" fill="#f8fafc" rx="6"/>
+          <!-- Barra superior -->
+          <rect x="20" y="20" width="920" height="45" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="47" font-size="13" font-weight="bold" fill="#065f46">Control y Depuración de Archivos Temporales (Garbage Collector)</text>
+          
+          <rect x="740" y="28" width="185" height="28" fill="#b91c1c" rx="4"/>
+          <text x="832" y="46" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">🧹 Ejecutar Purga Ahora</text>
+
+          <!-- Métricas de temporales -->
+          <rect x="20" y="75" width="290" height="75" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="35" y="100" font-size="10" fill="#64748b">TEMPORALES VIGENTES (&lt; 24 HORAS)</text>
+          <text x="35" y="128" font-size="18" font-weight="bold" fill="#0369a1">42 archivos (118.4 MB)</text>
+
+          <rect x="335" y="75" width="290" height="75" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="350" y="100" font-size="10" fill="#b45309">HUÉRFANOS POR PURGAR (&gt; 24 HORAS)</text>
+          <text x="350" y="128" font-size="18" font-weight="bold" fill="#b91c1c">18 archivos (45.2 MB)</text>
+
+          <rect x="650" y="75" width="290" height="75" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+          <text x="665" y="100" font-size="10" fill="#64748b">ÚLTIMA EJECUCIÓN PROGRAMADA</text>
+          <text x="665" y="128" font-size="15" font-weight="bold" fill="#166534">Hoy a las 02:00 hrs (OK)</text>
+
+          <!-- Tarjeta informativa de política de retención temporal -->
+          <rect x="20" y="170" width="920" height="225" fill="#ffffff" stroke="#e2e8f0" rx="6"/>
+          <text x="40" y="200" font-size="12" font-weight="bold" fill="#065f46">POLÍTICAS Y REGLAS DE DEPURACIÓN TEMPORAL:</text>
+          
+          <text x="40" y="230" font-size="11" fill="#334155">1. <strong>Regla de Aislamiento:</strong> Ningún documento que cuente con <code>es_temporal = FALSE</code> o que esté vinculado a una entidad definitiva puede ser alcanzado por este proceso.</text>
+          
+          <text x="40" y="265" font-size="11" fill="#334155">2. <strong>Frecuencia del Cron:</strong> La tarea programada de NestJS se ejecuta de manera silenciosa a las 02:00 hrs todos los días del año.</text>
+
+          <text x="40" y="300" font-size="11" fill="#334155">3. <strong>Sincronización Física y Lógica:</strong> Si la eliminación en el driver de almacenamiento (MinIO/NAS) falla, la base de datos no desactiva el registro y genera una alerta técnica en el log del sistema para evitar archivos fantasma.</text>
+
+          <text x="40" y="335" font-size="11" fill="#334155">4. <strong>Bitácora de Auditoría:</strong> Cada ciclo de depuración registra la cantidad de archivos purgados y el total de bytes liberados en la bitácora institucional.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="foot-nav"></div>
+    <div class="foot-center">
+      Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Poder Judicial del Estado de Veracruz<br>
+      <span class="foot-gold">Dix Consultoría</span> · 2026
+    </div>
+    <div class="foot-nav"></div>
+  </div>
+
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>
