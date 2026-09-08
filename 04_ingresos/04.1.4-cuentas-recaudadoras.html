@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04.1.4 Cuentas Bancarias Recaudadoras — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-norm { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-pjev { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-doc  { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .badge-prop { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .tag-status { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .tag-ministracion { background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+    .tag-auxiliar     { background:#fef3c7; color:#92400e; border:1px solid #fde047; }
+    .tag-propios      { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+    .tag-juzgados     { background:#ede9fe; color:#6d28d9; border:1px solid #c4b5fd; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; font-family: var(--font-mono); }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.put    { background: #fff3e0; color: #e65100; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>04 · Ingresos</span> ›
+    <span>04.1 · Catálogos</span> ›
+    <span>04.1.4 Cuentas Bancarias Recaudadoras</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">04.1.4</div>
+      <h1 class="elem-title">Cuentas Bancarias Recaudadoras</h1>
+      <p class="elem-desc">Catálogo maestro del padrón de cuentas bancarias institucionales del Poder Judicial donde radican los depósitos de ministraciones estatales, aranceles, fondos auxiliares y consignaciones, enlazadas unívocamente al Plan de Cuentas (COA 1.1.1.2).</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-a">Modo B — Catálogo Institucional de Tesorería</span>
+        <span class="mod-badge badge-s">Tipo: Análisis Funcional (DOC-08)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout-box">
+    <div class="callout-title">📌 Vínculo Bancario Institucional y Enlace Contable Inmutable</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      A diferencia de los conceptos de ingreso (que clasifican el <em>por qué</em> se percibe un recurso), este catálogo administra el <em>dónde</em> ingresa materialmente el flujo de efectivo. Cada cuenta bancaria registrada debe contar forzosamente con una subcuenta contable de la clase <strong>1.1.1.2 Bancos / Tesorería</strong> en el Catálogo de Cuentas (COA).
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      <em>Principio de Conciliación:</em> La existencia de este catálogo alimenta el selector de cuenta en el encabezado de <code>04.2.1</code> y permite el cotejo automático de depósitos en el módulo <code>04.3.1 Conciliación de Ingresos</code>, evitando inconsistencias entre los estados de cuenta bancarios y la contabilidad gubernamental.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El catálogo <strong>04.1.4 Cuentas Bancarias Recaudadoras</strong> constituye el registro formal de las cuentas de cheques e inversión aperturadas a nombre del Poder Judicial del Estado de Veracruz en las instituciones financieras autorizadas (BBVA México, Banorte, Santander, etc.).</p>
+    <p>Su función primordial es regular la radicación del efectivo que ingresa al Tribunal, ya sea por ministraciones presupuestales ordinarias o extraordinarias remitidas por SEFIPLAN, recaudación de aranceles judiciales, pagos de peritajes y derechos de copias en el Fondo Auxiliar para la Impartición de Justicia, o consignaciones en juzgados de primera instancia.</p>
+  </div>
+
+  <!-- 2. OBJETIVO Y ALCANCE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Objetivo y Alcance</div>
+    <p><strong>Objetivo:</strong> Garantizar el control estricto, la parametrización bancaria y la vinculación contable obligatoria de las cuentas recaudadoras institucionales del PJEV, proveyendo al subsistema de ingresos de datos bancarios verificados (CLABE de 18 dígitos con algoritmo de chequeo, convenios CIE y subcuenta contable específica).</p>
+
+    <table class="props-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th style="width:50%;">Dentro del Alcance</th>
+          <th style="width:50%;">Fuera del Alcance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5;">
+              <li>Padrón institucional de cuentas bancarias activas del PJEV.</li>
+              <li>Validación sintáctica y de longitud de la CLABE Interbancaria (18 dígitos).</li>
+              <li>Registro de convenios de cobranza (CIE BBVA u homólogos) para ventanilla y practicajas.</li>
+              <li>Tipificación del fondo institucional (Ministración, Fondo Auxiliar, Recursos Propios, Juzgados).</li>
+              <li>Asignación forzosa de la subcuenta de activo <code>1.1.1.2.X</code> del Plan de Cuentas.</li>
+              <li>Inmutabilidad y protección contra borrado físico si la cuenta posee movimientos registrados.</li>
+            </ul>
+          </td>
+          <td>
+            <ul style="padding-left:16px; margin:0; line-height:1.5; color:#991b1b;">
+              <li>Emisión y dispersión de cheques o transferencias de pago a proveedores o nómina (corresponde a Egresos / Pagos <code>06.2</code>).</li>
+              <li>Cálculo de conciliación bancaria mensual (se realiza en <code>03.3.2</code> y <code>04.3.1</code>).</li>
+              <li>Apertura o cancelación jurídica de contratos con las entidades bancarias (proceso extra-sistema).</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. ORIGEN DE LOS REQUERIMIENTOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Origen y Sustento de los Requerimientos</div>
+    <table class="props-table" style="margin-bottom: 24px;">
+      <thead>
+        <tr>
+          <th style="width:25%;">Clasificación</th>
+          <th style="width:35%;">Requerimiento Específico</th>
+          <th style="width:40%;">Sustento y Evidencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge-norm">Requerimiento Normativo</span></td>
+          <td>Registro inmediato del ingreso recaudado en cuentas bancarias oficiales.</td>
+          <td>Ley General de Contabilidad Gubernamental (LGCG) Art. 34 y 38: los activos líquidos deben reflejar fielmente las cuentas específicas autorizadas donde se depositan los fondos públicos.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-pjev">Evidencia Manual PJEV</span></td>
+          <td>Control de cuentas por fondo de destino y naturaleza jurisdiccional.</td>
+          <td>Manual de Procedimientos de Tesorería PJEV: exige separar en cuentas independientes los recursos de gasto de operación, el Fondo Auxiliar para la Impartición de Justicia y los depósitos de garantía en juzgados.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-doc">Evidencia Doc. Fuente</span></td>
+          <td>Fichas y comprobantes oficiales de depósito bancario en línea (BBVA Net Cash).</td>
+          <td>Comprobantes de depósito bancario donde consta la cuenta recaudadora receptora (ej. <code>0126144101</code>), folio de operación bancaria, importe y fecha valor.</td>
+        </tr>
+        <tr>
+          <td><span class="badge-prop">Propuesta de Diseño</span></td>
+          <td>Selector único de cuentas ligadas al Plan de Cuentas (COA 1.1.1.2) en 04.2.1.</td>
+          <td>Arquitectura SIAF-PJEV: sustituye texto libre por un combo institucional alimentado por este catálogo, permitiendo que la contabilización del activo sea inmediata y sin error humano.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. PADRÓN INSTITUCIONAL SEMILLA DE CUENTAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Padrón Institucional Semilla de Cuentas (Ejercicio 2026)</div>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:12px;">
+      Cuentas maestras aperturadas en el sistema bancario nacional a nombre del Poder Judicial del Estado de Veracruz:
+    </p>
+    <table class="props-table" style="font-size:11px;">
+      <thead>
+        <tr>
+          <th style="width:16%;">Institución Bancaria</th>
+          <th style="width:12%;">Número de Cuenta</th>
+          <th style="width:18%;">CLABE Interbancaria</th>
+          <th style="width:12%;">Convenio / Sucursal</th>
+          <th style="width:22%;">Subcuenta Contable COA (1.1.1.2)</th>
+          <th style="width:14%;">Fondo Institucional</th>
+          <th style="width:6%;">Estatus</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>BBVA México, S.A.</strong></td>
+          <td><code style="font-size:11px; font-weight:bold;">0126144101</code></td>
+          <td><code style="font-size:10px;">012840001261441017</code></td>
+          <td><code>CIE-184920</code><br><span style="font-size:9px; color:#64748b;">Suc. 0128 Xalapa Centro</span></td>
+          <td><code>1.1.1.2.01.001</code><br><span style="font-size:9px; color:#64748b;">BBVA Ministración Estatal Ordinaria</span></td>
+          <td><span class="tag-status tag-ministracion">Ministración</span></td>
+          <td><span class="tag-status" style="background:#ecfdf5; color:#065f46;">Activa</span></td>
+        </tr>
+        <tr>
+          <td><strong>Banorte, S.A.</strong></td>
+          <td><code style="font-size:11px; font-weight:bold;">0481920194</code></td>
+          <td><code style="font-size:10px;">072840004819201946</code></td>
+          <td><span style="color:#94a3b8;">N/A (Transferencia)</span><br><span style="font-size:9px; color:#64748b;">Suc. 0481 Las Trancas</span></td>
+          <td><code>1.1.1.2.02.001</code><br><span style="font-size:9px; color:#64748b;">Banorte Fondo Auxiliar Impartición Justicia</span></td>
+          <td><span class="tag-status tag-auxiliar">Fondo Auxiliar</span></td>
+          <td><span class="tag-status" style="background:#ecfdf5; color:#065f46;">Activa</span></td>
+        </tr>
+        <tr>
+          <td><strong>BBVA México, S.A.</strong></td>
+          <td><code style="font-size:11px; font-weight:bold;">0119284712</code></td>
+          <td><code style="font-size:10px;">012840001192847124</code></td>
+          <td><code>CIE-192834</code><br><span style="font-size:9px; color:#64748b;">Suc. 0128 Xalapa Centro</span></td>
+          <td><code>1.1.1.2.01.002</code><br><span style="font-size:9px; color:#64748b;">BBVA Recursos Propios y Aranceles</span></td>
+          <td><span class="tag-status tag-propios">Recursos Propios</span></td>
+          <td><span class="tag-status" style="background:#ecfdf5; color:#065f46;">Activa</span></td>
+        </tr>
+        <tr>
+          <td><strong>Santander México, S.A.</strong></td>
+          <td><code style="font-size:11px; font-weight:bold;">6550918234</code></td>
+          <td><code style="font-size:10px;">014840655091823451</code></td>
+          <td><span style="color:#94a3b8;">N/A (Transferencia)</span><br><span style="font-size:9px; color:#64748b;">Suc. 6550 Plaza Crystal</span></td>
+          <td><code>1.1.1.2.03.001</code><br><span style="font-size:9px; color:#64748b;">Santander Depósitos Juzgados 1ra Instancia</span></td>
+          <td><span class="tag-status tag-juzgados">Juzgados</span></td>
+          <td><span class="tag-status" style="background:#ecfdf5; color:#065f46;">Activa</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. DICCIONARIO DE CAMPOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Diccionario de Campos (<code>ingresos.cat_cuentas_recaudadoras</code>)</div>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>cuenta_recaudadora_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí</td><td>Identificador único del registro de cuenta recaudadora.</td></tr>
+        <tr><td><code>institucion_bancaria</code></td><td><code>VARCHAR(80)</code></td><td>Sí</td><td>Nombre de la Institución de Banca Múltiple (ej. <code>BBVA México, S.A.</code>).</td></tr>
+        <tr><td><code>numero_cuenta</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Número de cuenta bancaria asignado por el banco (hasta 20 caracteres).</td></tr>
+        <tr><td><code>clabe_interbancaria</code></td><td><code>VARCHAR(18)</code></td><td>Sí</td><td>CLABE Interbancaria estandarizada a 18 dígitos con dígito verificador.</td></tr>
+        <tr><td><code>sucursal</code></td><td><code>VARCHAR(50)</code></td><td>No</td><td>Nombre o número de la sucursal de radicación.</td></tr>
+        <tr><td><code>convenio_cie</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td>Identificador de convenio para pagos en ventanilla o practicajas bancarias.</td></tr>
+        <tr><td><code>nombre_identificador</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Etiqueta amigable visible en los combos de la interfaz gráfica.</td></tr>
+        <tr><td><code>tipo_fondo</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td><code>MINISTRACION_ESTATAL</code> | <code>FONDO_AUXILIAR</code> | <code>RECURSOS_PROPIOS</code> | <code>DEPOSITOS_JUZGADOS</code>.</td></tr>
+        <tr><td><code>cuenta_contable_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia a la subcuenta correspondiente de la clase <code>1.1.1.2</code> en <code>contabilidad.cat_cuentas</code>.</td></tr>
+        <tr><td><code>saldo_inicial</code></td><td><code>NUMERIC(16,2)</code></td><td>Sí</td><td>Saldo de apertura o base de conciliación para el ejercicio fiscal.</td></tr>
+        <tr><td><code>permite_deposito_directo</code></td><td><code>BOOLEAN</code></td><td>Sí</td><td>Indica si la cuenta se habilita para el registro de ingresos en <code>04.2.1</code>.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Inactivo (Baja lógica).</td></tr>
+        <tr><td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td><td><code>Auditoría</code></td><td>Sí</td><td>Rastreo inmutable de creación y modificación institucional.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. PROCEDIMIENTOS ALMACENADOS (LEER Y CRUD) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Gobernanza transaccional en PostgreSQL bajo convención <code>SECURITY DEFINER</code>, <code>SET search_path</code> y respuesta estándar JSONB.
+    </p>
+
+    <!-- 6.1 LEER -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.1. Procedimiento LEER (<code>ingresos.fn_leer_cuentas_recaudadoras</code>)</h4>
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_cuentas_recaudadoras(
+    p_usuario VARCHAR,
+    p_tipo_fondo VARCHAR DEFAULT NULL,
+    p_solo_activos BOOLEAN DEFAULT TRUE
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, contabilidad, config, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'cuenta_recaudadora_id', cr.cuenta_recaudadora_id,
+            'institucion_bancaria', cr.institucion_bancaria,
+            'numero_cuenta', cr.numero_cuenta,
+            'clabe_interbancaria', cr.clabe_interbancaria,
+            'sucursal', cr.sucursal,
+            'convenio_cie', cr.convenio_cie,
+            'nombre_identificador', cr.nombre_identificador,
+            'tipo_fondo', cr.tipo_fondo,
+            'cuenta_contable_id', cr.cuenta_contable_id,
+            'cuenta_contable_clave', cc.clave,
+            'cuenta_contable_desc', cc.nombre,
+            'saldo_inicial', cr.saldo_inicial,
+            'permite_deposito_directo', cr.permite_deposito_directo,
+            'estatus_registro', cr.estatus_registro
+        ) ORDER BY cr.cuenta_recaudadora_id
+    )
+    INTO v_data
+    FROM ingresos.cat_cuentas_recaudadoras cr
+    LEFT JOIN contabilidad.cat_cuentas cc ON cc.cuenta_id = cr.cuenta_contable_id
+    WHERE (NOT p_solo_activos OR cr.estatus_registro = 1)
+      AND (p_tipo_fondo IS NULL OR cr.tipo_fondo = p_tipo_fondo);
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'Cuentas recaudadoras recuperadas exitosamente.',
+        'data', COALESCE(v_data, '[]'::jsonb)
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error al consultar cuentas recaudadoras: ' || SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 6.2 CRUD -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.2. Procedimiento CRUD (<code>ingresos.fn_crud_cuentas_recaudadoras</code>)</h4>
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_crud_cuentas_recaudadoras(
+    p_accion VARCHAR,
+    p_usuario VARCHAR,
+    p_payload JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, contabilidad, config, public
+AS $$
+DECLARE
+    v_id BIGINT;
+    v_clabe VARCHAR;
+    v_cuenta VARCHAR;
+    v_banco VARCHAR;
+    v_cta_contable_id BIGINT;
+BEGIN
+    IF p_accion = 'CREAR' THEN
+        v_banco           := TRIM(p_payload->>'institucion_bancaria');
+        v_cuenta          := TRIM(p_payload->>'numero_cuenta');
+        v_clabe           := TRIM(p_payload->>'clabe_interbancaria');
+        v_cta_contable_id := (p_payload->>'cuenta_contable_id')::BIGINT;
+
+        -- Validación de 18 dígitos en CLABE
+        IF length(v_clabe) != 18 OR v_clabe !~ '^[0-9]+$' THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La CLABE interbancaria debe tener exactamente 18 dígitos numéricos.');
+        END IF;
+
+        -- Unicidad de cuenta bancaria en el mismo banco
+        IF EXISTS (
+            SELECT 1 FROM ingresos.cat_cuentas_recaudadoras
+            WHERE institucion_bancaria = v_banco
+              AND numero_cuenta = v_cuenta
+              AND estatus_registro = 1
+        ) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Ya existe una cuenta activa con ese número para ' || v_banco);
+        END IF;
+
+        -- Validación de existencia de cuenta contable 1.1.1.2
+        IF NOT EXISTS (
+            SELECT 1 FROM contabilidad.cat_cuentas
+            WHERE cuenta_id = v_cta_contable_id
+              AND clave LIKE '1.1.1.2%'
+        ) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La cuenta contable debe pertenecer a la clase 1.1.1.2 (Bancos / Tesorería).');
+        END IF;
+
+        INSERT INTO ingresos.cat_cuentas_recaudadoras (
+            institucion_bancaria, numero_cuenta, clabe_interbancaria, sucursal,
+            convenio_cie, nombre_identificador, tipo_fondo, cuenta_contable_id,
+            saldo_inicial, permite_deposito_directo, estatus_registro,
+            usuario_c, fecha_c
+        ) VALUES (
+            v_banco, v_cuenta, v_clabe, TRIM(p_payload->>'sucursal'),
+            TRIM(p_payload->>'convenio_cie'), TRIM(p_payload->>'nombre_identificador'),
+            p_payload->>'tipo_fondo', v_cta_contable_id,
+            COALESCE((p_payload->>'saldo_inicial')::NUMERIC, 0.00),
+            COALESCE((p_payload->>'permite_deposito_directo')::BOOLEAN, TRUE),
+            1, p_usuario, CURRENT_TIMESTAMP
+        ) RETURNING cuenta_recaudadora_id INTO v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Cuenta recaudadora registrada exitosamente.', 'data', jsonb_build_object('cuenta_recaudadora_id', v_id));
+
+    ELSIF p_accion = 'EDITAR' THEN
+        v_id := (p_payload->>'cuenta_recaudadora_id')::BIGINT;
+        v_clabe := TRIM(p_payload->>'clabe_interbancaria');
+
+        IF length(v_clabe) != 18 OR v_clabe !~ '^[0-9]+$' THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La CLABE interbancaria debe tener exactamente 18 dígitos numéricos.');
+        END IF;
+
+        UPDATE ingresos.cat_cuentas_recaudadoras SET
+            sucursal                 = TRIM(p_payload->>'sucursal'),
+            convenio_cie             = TRIM(p_payload->>'convenio_cie'),
+            nombre_identificador     = TRIM(p_payload->>'nombre_identificador'),
+            permite_deposito_directo = (p_payload->>'permite_deposito_directo')::BOOLEAN,
+            usuario_m                = p_usuario,
+            fecha_m                  = CURRENT_TIMESTAMP
+        WHERE cuenta_recaudadora_id = v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Cuenta recaudadora actualizada.', 'data', jsonb_build_object('cuenta_recaudadora_id', v_id));
+
+    ELSIF p_accion = 'CAMBIAR_ESTATUS' THEN
+        v_id := (p_payload->>'cuenta_recaudadora_id')::BIGINT;
+
+        -- Protección: No inactivar si existen ingresos con saldo o en tránsito
+        IF (p_payload->>'estatus_registro')::SMALLINT = 0 THEN
+            IF EXISTS (
+                SELECT 1 FROM ingresos.ing_ingresos
+                WHERE cuenta_bancaria_id = v_id
+                  AND estado_ingreso NOT IN ('CANCELADO')
+            ) THEN
+                RETURN jsonb_build_object('error', -1, 'mensaje', 'No se puede inactivar una cuenta con ingresos registrados vigentes.');
+            END IF;
+        END IF;
+
+        UPDATE ingresos.cat_cuentas_recaudadoras SET
+            estatus_registro = (p_payload->>'estatus_registro')::SMALLINT,
+            usuario_m        = p_usuario,
+            fecha_m          = CURRENT_TIMESTAMP
+        WHERE cuenta_recaudadora_id = v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Estatus de la cuenta actualizado.', 'data', jsonb_build_object('cuenta_recaudadora_id', v_id));
+    END IF;
+
+    RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no soportada: ' || p_accion, 'data', NULL);
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 7. SERVICIOS REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Servicios API REST (Controlador NestJS)</div>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Método</th><th>Ruta del Endpoint</th><th>Body / Parámetros</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/cuentas-recaudadoras</code></td>
+          <td>Query: <code>?tipo_fondo=MINISTRACION_ESTATAL</code></td>
+          <td>Consultar el padrón de cuentas bancarias institucionales para selectores de pantalla.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/cuentas-recaudadoras</code></td>
+          <td>Body: <code>CreateCuentaRecaudadoraDto</code></td>
+          <td>Registrar una nueva cuenta bancaria con validación de 18 dígitos CLABE.</td>
+        </tr>
+        <tr>
+          <td><code class="method put">PUT</code></td>
+          <td><code>/api/v1/ingresos/cuentas-recaudadoras/:id</code></td>
+          <td>Body: <code>UpdateCuentaRecaudadoraDto</code></td>
+          <td>Actualizar datos operativos de sucursal, convenio CIE o nombre amigable.</td>
+        </tr>
+        <tr>
+          <td><code class="method patch">PATCH</code></td>
+          <td><code>/api/v1/ingresos/cuentas-recaudadoras/:id/estatus</code></td>
+          <td>Body: <code>{ estatus_registro: 0 | 1 }</code></td>
+          <td>Inactivación o reactivación con validación de operaciones asociadas.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-wrap">
+<pre><code>// NestJS Controller: CuentasRecaudadorasController
+@ApiTags('04.1.4 Cuentas Bancarias Recaudadoras')
+@Controller('api/v1/ingresos/cuentas-recaudadoras')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class CuentasRecaudadorasController {
+  constructor(private readonly service: CuentasRecaudadorasService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Listar cuentas bancarias recaudadoras activas' })
+  async listar(
+    @Query('tipo_fondo') tipoFondo?: string,
+    @CurrentUser() user: UserSession
+  ) {
+    return this.service.leerCuentas(user.username, tipoFondo);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Registrar nueva cuenta bancaria recaudadora' })
+  async crear(@Body() dto: CreateCuentaRecaudadoraDto, @CurrentUser() user: UserSession) {
+    return this.service.crudCuenta('CREAR', user.username, dto);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Actualizar datos de una cuenta recaudadora' })
+  async actualizar(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCuentaRecaudadoraDto,
+    @CurrentUser() user: UserSession
+  ) {
+    return this.service.crudCuenta('EDITAR', user.username, { ...dto, cuenta_recaudadora_id: id });
+  }
+
+  @Patch(':id/estatus')
+  @ApiOperation({ summary: 'Modificar estatus de la cuenta bancaria (Baja lógica)' })
+  async cambiarEstatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CambiarEstatusDto,
+    @CurrentUser() user: UserSession
+  ) {
+    return this.service.crudCuenta('CAMBIAR_ESTATUS', user.username, { ...dto, cuenta_recaudadora_id: id });
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Reglas de Negocio Institucionales</div>
+    <table class="props-table">
+      <thead><tr><th>Código</th><th>Regla</th><th>Descripción Operativa</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>RN-CTA-01</code></td>
+          <td><strong>Validación Estricta de 18 Dígitos en CLABE</strong></td>
+          <td>Toda cuenta bancaria debe registrar una CLABE Interbancaria con una longitud exacta de 18 dígitos exclusivamente numéricos. El SP rechaza cualquier registro con longitud diferente.</td>
+        </tr>
+        <tr>
+          <td><code>RN-CTA-02</code></td>
+          <td><strong>Unicidad por Institución Bancaria y Cuenta</strong></td>
+          <td>No se permite el registro duplicado de un mismo número de cuenta para una misma entidad financiera mientras el registro previo continúe en estado activo (<code>estatus_registro = 1</code>).</td>
+        </tr>
+        <tr>
+          <td><code>RN-CTA-03</code></td>
+          <td><strong>Enlace Contable Forzoso al COA (Clase 1.1.1.2)</strong></td>
+          <td>El campo <code>cuenta_contable_id</code> es obligatorio y debe apuntar ineludiblemente a una subcuenta activa de la clase <code>1.1.1.2 Bancos / Tesorería</code>. El sistema no permite cuentas de orden ni de resultados.</td>
+        </tr>
+        <tr>
+          <td><code>RN-CTA-04</code></td>
+          <td><strong>Inmutabilidad Bancaria de Operaciones Vigentes</strong></td>
+          <td>Una vez que una cuenta bancaria ha registrado depósitos aplicados en el módulo <code>04.2.1</code> o participado en conciliaciones de <code>04.3.1</code>, sus campos estructurales (Banco, Número de Cuenta y Cuenta Contable) quedan bloqueados para edición.</td>
+        </tr>
+        <tr>
+          <td><code>RN-CTA-05</code></td>
+          <td><strong>Protección Referencial de Inactivación</strong></td>
+          <td>El SP rechaza la inactivación (baja lógica) de una cuenta recaudadora si existen registros de ingresos en estado <code>RECIBIDO</code>, <code>EN_CONCILIACION</code> o <code>CONCILIADO</code> en el ejercicio en curso.</td>
+        </tr>
+        <tr>
+          <td><code>RN-CTA-06</code></td>
+          <td><strong>Filtro Automático en Formularios de Ingresos</strong></td>
+          <td>El selector desplegable "Cuenta Bancaria Destino" del módulo <code>04.2.1</code> debe listar únicamente las cuentas activas que tengan habilitada la bandera <code>permite_deposito_directo = true</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 9. WIREFRAMES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Wireframes de Interfaz de Usuario (PJEV-UI)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Vistas de administración bancaria configuradas conforme al diseño y lineamientos visuales del PJEV:
+    </p>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="switchWfTab('wf1', this)">WF1 · Catálogo Principal de Cuentas Recaudadoras</button>
+      <button class="wf-tab" onclick="switchWfTab('wf2', this)">WF2 · Modal de Registro y Enlace Contable</button>
+    </div>
+
+    <!-- PANEL WF1 -->
+    <div id="panel-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">04.1.4 Catálogo de Cuentas Bancarias Recaudadoras — Grid Principal</span>
+          <span class="mod-badge badge-a">Modo B · Tesorería</span>
+        </div>
+        <div class="wf-svg-area">
+<svg viewBox="0 0 1000 620" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="background:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <defs>
+    <filter id="wf4-shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- Barra Superior del Módulo -->
+  <rect x="20" y="20" width="960" height="56" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#wf4-shadow)"/>
+  <text x="40" y="53" font-size="16" font-weight="700" fill="#004943">04.1.4 Catálogo de Cuentas Bancarias Recaudadoras</text>
+  <rect x="730" y="32" width="230" height="32" rx="6" fill="#004943"/>
+  <text x="845" y="52" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle">+ Nueva Cuenta Bancaria</text>
+
+  <!-- Tarjetas Resumen Superior (KPIs de Cuentas) -->
+  <rect x="20" y="90" width="305" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" filter="url(#wf4-shadow)"/>
+  <text x="35" y="112" font-size="10" font-weight="700" fill="#64748b" text-transform="uppercase">TOTAL CUENTAS ACTIVAS</text>
+  <text x="35" y="142" font-size="22" font-weight="800" fill="#004943">4</text>
+  <text x="65" y="142" font-size="11" fill="#64748b">Cuentas institucionales vigentes</text>
+
+  <rect x="345" y="90" width="310" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" filter="url(#wf4-shadow)"/>
+  <text x="360" y="112" font-size="10" font-weight="700" fill="#64748b" text-transform="uppercase">BANCO PRINCIPAL RECEPTOR</text>
+  <text x="360" y="142" font-size="18" font-weight="800" fill="#1e293b">BBVA México</text>
+  <text x="480" y="142" font-size="11" fill="#64748b">2 Cuentas (Ministración + Propios)</text>
+
+  <rect x="675" y="90" width="305" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" filter="url(#wf4-shadow)"/>
+  <text x="690" y="112" font-size="10" font-weight="700" fill="#64748b" text-transform="uppercase">ENLACE CONTABLE AL COA</text>
+  <text x="690" y="142" font-size="18" font-weight="800" fill="#059669">100% Vinculadas</text>
+  <text x="825" y="142" font-size="11" fill="#64748b">Subcuentas 1.1.1.2</text>
+
+  <!-- Tabla de Cuentas Bancarias -->
+  <rect x="20" y="176" width="960" height="420" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#wf4-shadow)"/>
+
+  <!-- Cabecera Tabla -->
+  <path d="M 20 176 L 980 176 L 980 212 L 20 212 Z" fill="#004943"/>
+  <text x="35" y="199" font-size="11" font-weight="700" fill="#deac50">INSTITUCIÓN / BANCO</text>
+  <text x="180" y="199" font-size="11" font-weight="700" fill="#deac50">NÚMERO CUENTA</text>
+  <text x="300" y="199" font-size="11" font-weight="700" fill="#deac50">CLABE INTERBANCARIA</text>
+  <text x="470" y="199" font-size="11" font-weight="700" fill="#deac50">CONVENIO / SUCURSAL</text>
+  <text x="630" y="199" font-size="11" font-weight="700" fill="#deac50">ENLACE CONTABLE (COA 1.1.1.2)</text>
+  <text x="830" y="199" font-size="11" font-weight="700" fill="#deac50">FONDO / DESTINO</text>
+  <text x="930" y="199" font-size="11" font-weight="700" fill="#deac50" text-anchor="middle">ACCIONES</text>
+
+  <!-- Fila 1: BBVA Ministración Ordinaria -->
+  <rect x="20" y="212" width="960" height="46" fill="#ffffff" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="35" y="234" font-size="12" font-weight="700" fill="#1e293b">BBVA México, S.A.</text>
+  <text x="35" y="248" font-size="10" fill="#64748b">Suc. 0128 Xalapa Centro</text>
+  <text x="180" y="240" font-size="11" font-family="monospace" font-weight="700" fill="#004943">0126144101</text>
+  <text x="300" y="240" font-size="11" font-family="monospace" fill="#334155">012840001261441017</text>
+  <rect x="470" y="226" width="70" height="18" rx="3" fill="#f1f5f9"/>
+  <text x="505" y="239" font-size="10" font-family="monospace" fill="#475569" text-anchor="middle">CIE-184920</text>
+  <text x="630" y="234" font-size="11" font-weight="600" fill="#1e293b">1.1.1.2.01.001</text>
+  <text x="630" y="248" font-size="10" fill="#64748b">BBVA Ministración Ordinaria</text>
+  <rect x="830" y="226" width="85" height="20" rx="10" fill="#e0f2fe"/>
+  <text x="872" y="240" font-size="10" font-weight="700" fill="#0369a1" text-anchor="middle">Ministración</text>
+  <text x="930" y="240" font-size="12" fill="#0284c7" font-weight="bold" text-anchor="middle">✎  👁</text>
+
+  <!-- Fila 2: Banorte Fondo Auxiliar -->
+  <rect x="20" y="258" width="960" height="46" fill="#f8fafc" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="35" y="280" font-size="12" font-weight="700" fill="#1e293b">Banorte, S.A.</text>
+  <text x="35" y="294" font-size="10" fill="#64748b">Suc. 0481 Las Trancas</text>
+  <text x="180" y="286" font-size="11" font-family="monospace" font-weight="700" fill="#004943">0481920194</text>
+  <text x="300" y="286" font-size="11" font-family="monospace" fill="#334155">072840004819201946</text>
+  <text x="470" y="286" font-size="10" fill="#94a3b8">N/A (Transferencia)</text>
+  <text x="630" y="280" font-size="11" font-weight="600" fill="#1e293b">1.1.1.2.02.001</text>
+  <text x="630" y="294" font-size="10" fill="#64748b">Banorte Fondo Auxiliar</text>
+  <rect x="830" y="272" width="85" height="20" rx="10" fill="#fef3c7"/>
+  <text x="872" y="286" font-size="10" font-weight="700" fill="#92400e" text-anchor="middle">Fdo. Auxiliar</text>
+  <text x="930" y="286" font-size="12" fill="#0284c7" font-weight="bold" text-anchor="middle">✎  👁</text>
+
+  <!-- Fila 3: BBVA Recursos Propios -->
+  <rect x="20" y="304" width="960" height="46" fill="#ffffff" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="35" y="326" font-size="12" font-weight="700" fill="#1e293b">BBVA México, S.A.</text>
+  <text x="35" y="340" font-size="10" fill="#64748b">Suc. 0128 Xalapa Centro</text>
+  <text x="180" y="332" font-size="11" font-family="monospace" font-weight="700" fill="#004943">0119284712</text>
+  <text x="300" y="332" font-size="11" font-family="monospace" fill="#334155">012840001192847124</text>
+  <rect x="470" y="318" width="70" height="18" rx="3" fill="#f1f5f9"/>
+  <text x="505" y="331" font-size="10" font-family="monospace" fill="#475569" text-anchor="middle">CIE-192834</text>
+  <text x="630" y="326" font-size="11" font-weight="600" fill="#1e293b">1.1.1.2.01.002</text>
+  <text x="630" y="340" font-size="10" fill="#64748b">BBVA Recursos Propios / Aranceles</text>
+  <rect x="830" y="318" width="85" height="20" rx="10" fill="#ecfdf5"/>
+  <text x="872" y="332" font-size="10" font-weight="700" fill="#065f46" text-anchor="middle">Rec. Propios</text>
+  <text x="930" y="332" font-size="12" fill="#0284c7" font-weight="bold" text-anchor="middle">✎  👁</text>
+
+  <!-- Fila 4: Santander Juzgados -->
+  <rect x="20" y="350" width="960" height="46" fill="#f8fafc" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="35" y="372" font-size="12" font-weight="700" fill="#1e293b">Santander México, S.A.</text>
+  <text x="35" y="386" font-size="10" fill="#64748b">Suc. 6550 Plaza Crystal</text>
+  <text x="180" y="378" font-size="11" font-family="monospace" font-weight="700" fill="#004943">6550918234</text>
+  <text x="300" y="378" font-size="11" font-family="monospace" fill="#334155">014840655091823451</text>
+  <text x="470" y="378" font-size="10" fill="#94a3b8">N/A (Transferencia)</text>
+  <text x="630" y="372" font-size="11" font-weight="600" fill="#1e293b">1.1.1.2.03.001</text>
+  <text x="630" y="386" font-size="10" fill="#64748b">Santander Depósitos Juzgados</text>
+  <rect x="830" y="364" width="85" height="20" rx="10" fill="#ede9fe"/>
+  <text x="872" y="378" font-size="10" font-weight="700" fill="#6d28d9" text-anchor="middle">Juzgados</text>
+  <text x="930" y="378" font-size="12" fill="#0284c7" font-weight="bold" text-anchor="middle">✎  👁</text>
+
+  <!-- Paginador Footer -->
+  <rect x="20" y="540" width="960" height="50" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="40" y="570" font-size="11" fill="#64748b">Mostrando 4 de 4 cuentas bancarias institucionales activas</text>
+  <rect x="915" y="552" width="30" height="26" rx="4" fill="#004943"/>
+  <text x="930" y="569" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+</svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL WF2 -->
+    <div id="panel-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">04.1.4 Modal de Registro / Edición de Cuenta con Validación de CLABE y Enlace COA</span>
+          <span class="mod-badge badge-s">Modal Interactivo</span>
+        </div>
+        <div class="wf-svg-area">
+<svg viewBox="0 0 1000 660" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="background:#0f172a; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <defs>
+    <filter id="modal-shadow-cta" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="10" stdDeviation="15" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Fondo semitransparente detrás del modal -->
+  <rect x="0" y="0" width="1000" height="660" fill="#0f172a" opacity="0.75"/>
+
+  <!-- Modal Principal -->
+  <rect x="110" y="30" width="780" height="600" rx="10" fill="#ffffff" filter="url(#modal-shadow-cta)"/>
+
+  <!-- Cabecera Modal -->
+  <path d="M 110 30 L 890 30 Q 890 30 890 40 L 890 75 L 110 75 Z" fill="#004943"/>
+  <text x="135" y="58" font-size="15" font-weight="700" fill="#ffffff">Registrar / Editar Cuenta Bancaria Recaudadora</text>
+  <text x="860" y="58" font-size="16" font-weight="700" fill="#94a3b8" cursor="pointer">✕</text>
+
+  <!-- Cuerpo Modal -->
+  <!-- Fila 1: Institución Bancaria y Sucursal -->
+  <text x="135" y="105" font-size="10" font-weight="700" fill="#475569" text-transform="uppercase">INSTITUCIÓN BANCARIA *</text>
+  <rect x="135" y="112" width="350" height="32" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="148" y="132" font-size="12" fill="#1e293b">BBVA México, S.A. Institución de Banca Múltiple ▼</text>
+
+  <text x="515" y="105" font-size="10" font-weight="700" fill="#475569" text-transform="uppercase">SUCURSAL BANCARIA *</text>
+  <rect x="515" y="112" width="345" height="32" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="528" y="132" font-size="12" fill="#1e293b">0128 Xalapa Centro Enríquez</text>
+
+  <!-- Fila 2: Número de Cuenta y CLABE Interbancaria (18 dígitos) -->
+  <text x="135" y="172" font-size="10" font-weight="700" fill="#475569" text-transform="uppercase">NÚMERO DE CUENTA (HASTA 20 DÍGITOS) *</text>
+  <rect x="135" y="180" width="350" height="32" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="148" y="200" font-size="12" font-family="monospace" font-weight="700" fill="#004943">0126144101</text>
+  <text x="135" y="224" font-size="9" fill="#64748b">Número asignado por la institución para depósitos directos.</text>
+
+  <text x="515" y="172" font-size="10" font-weight="700" fill="#475569" text-transform="uppercase">CLABE INTERBANCARIA (18 DÍGITOS) *</text>
+  <rect x="515" y="180" width="345" height="32" rx="4" fill="#ffffff" stroke="#059669" stroke-width="1.5"/>
+  <text x="528" y="200" font-size="12" font-family="monospace" font-weight="700" fill="#059669">012840001261441017</text>
+  <text x="820" y="200" font-size="12" fill="#059669" font-weight="bold">✓ 18 dig.</text>
+  <text x="515" y="224" font-size="9" fill="#059669">Algoritmo de dígito verificador bancario validado exitosamente.</text>
+
+  <!-- Fila 3: Convenio CIE y Tipo de Fondo -->
+  <text x="135" y="252" font-size="10" font-weight="700" fill="#475569" text-transform="uppercase">CONVENIO CIE / SERVICIO BANCOMER (OPCIONAL)</text>
+  <rect x="135" y="260" width="350" height="32" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="148" y="280" font-size="12" font-family="monospace" fill="#334155">CIE-184920</text>
+  <text x="135" y="304" font-size="9" fill="#64748b">Para cobranza referenciada en ventanilla o practicajas bancarias.</text>
+
+  <text x="515" y="252" font-size="10" font-weight="700" fill="#475569" text-transform="uppercase">TIPO DE FONDO / DESTINO INSTITUCIONAL *</text>
+  <rect x="515" y="260" width="345" height="32" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="528" y="280" font-size="12" fill="#1e293b">MINISTRACION_ESTATAL · Ministración Ordinaria ▼</text>
+
+  <!-- Fila 4: Enlace Contable COA (Clase 1.1.1.2) -->
+  <rect x="135" y="325" width="725" height="110" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="155" y="350" font-size="12" font-weight="700" fill="#004943">Vinculación Contable Obligatoria con el Plan de Cuentas (COA)</text>
+  <text x="155" y="368" font-size="10" fill="#64748b">Todo depósito registrado contra esta cuenta afectará automáticamente la subcuenta de activo disponible:</text>
+
+  <text x="155" y="390" font-size="10" font-weight="700" fill="#475569" text-transform="uppercase">SUBCUENTA CONTABLE (CLASE 1.1.1.2 BANCOS / TESORERÍA) *</text>
+  <rect x="155" y="396" width="685" height="30" rx="4" fill="#ffffff" stroke="#004943" stroke-width="1.2"/>
+  <text x="170" y="416" font-size="11" font-family="monospace" font-weight="700" fill="#004943">1.1.1.2.01.001 — BBVA México Cta 0126144101 (Ministración Ordinaria Gto Corriente)</text>
+
+  <!-- Fila 5: Nombre Descriptivo y Saldo Inicial -->
+  <text x="135" y="462" font-size="10" font-weight="700" fill="#475569" text-transform="uppercase">NOMBRE IDENTIFICADOR PARA SELECTORES DE PANTALLA *</text>
+  <rect x="135" y="470" width="480" height="32" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="148" y="490" font-size="12" fill="#1e293b">BBVA CTA 0126144101 - MINISTRACIÓN ESTATAL 2026</text>
+
+  <text x="635" y="462" font-size="10" font-weight="700" fill="#475569" text-transform="uppercase">PERMITE DEPÓSITO DIRECTO</text>
+  <rect x="635" y="470" width="225" height="32" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="650" y="490" font-size="12" font-weight="600" fill="#065f46">☑ Sí (Habilitado en 04.2.1)</text>
+
+  <!-- Pie Modal Botones -->
+  <line x1="110" y1="550" x2="890" y2="550" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="630" y="568" width="110" height="36" rx="6" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="685" y="591" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">Cancelar</text>
+
+  <rect x="755" y="568" width="115" height="36" rx="6" fill="#004943"/>
+  <text x="812" y="591" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Guardar Cuenta</text>
+</svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Casos de Prueba (QA / UAT)</div>
+    <table class="props-table">
+      <thead><tr><th>ID Caso</th><th>Escenario Evaluado</th><th>Resultado Esperado</th><th>Tipo de Prueba</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>CP-CTA-01</code></td>
+          <td>Registro de cuenta bancaria con CLABE válida de 18 dígitos y enlace a 1.1.1.2.01.001.</td>
+          <td>El SP <code>fn_crud_cuentas_recaudadoras</code> devuelve <code>error: 0</code> y crea el registro exitosamente.</td>
+          <td>Funcional / Backend</td>
+        </tr>
+        <tr>
+          <td><code>CP-CTA-02</code></td>
+          <td>Intento de captura de CLABE con 16 dígitos o caracteres no numéricos.</td>
+          <td>El SP rechaza la petición con <code>error: -1</code> indicando que la CLABE debe tener exactamente 18 dígitos.</td>
+          <td>Validación de Datos</td>
+        </tr>
+        <tr>
+          <td><code>CP-CTA-03</code></td>
+          <td>Intento de vinculación a una cuenta contable ajena a la clase 1.1.1.2 (ej. 4.1.1.1 o 2.1.1.1).</td>
+          <td>El sistema bloquea la operación indicando que solo se admiten cuentas de activo disponible (Bancos).</td>
+          <td>Integridad Contable</td>
+        </tr>
+        <tr>
+          <td><code>CP-CTA-04</code></td>
+          <td>Intento de inactivar una cuenta con movimientos aplicados en <code>04.2.1</code>.</td>
+          <td>El sistema deniega la baja lógica bajo la regla <code>RN-CTA-05</code>.</td>
+          <td>Integridad Referencial</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 11. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Historial de Versiones</div>
+    <table class="props-table">
+      <thead><tr><th>Versión</th><th>Fecha</th><th>Autor</th><th>Descripción de Modificaciones</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>v1.0.0</code></td>
+          <td>2026-09-08</td>
+          <td>Equipo SIAF-PJEV / Dix Consultoría</td>
+          <td>Estandarización integral bajo la norma DOC-08, reubicación oficial como módulo 04.1.4, incorporación de Stored Procedures con respuesta JSONB, endpoints Swagger/NestJS y validación estricta de CLABEs institucionales.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+function switchWfTab(tabId, btn) {
+  document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + tabId).classList.add('active');
+}
+</script>
+</body>
+</html>

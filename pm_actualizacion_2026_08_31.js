@@ -300,6 +300,42 @@
     ],
     evidencia:'Catálogo tipificado de causales de ajuste y cancelación con severidad (BAJA, MEDIA, ALTA) y autorizaciones requeridas, consumido por registro, conciliación y cierre.'
   });
+  ing('04.1.3','04.1 Catálogos','Claves presupuestales y carteras SEFIPLAN',{
+    perfil:'ing',
+    f2:90,
+    rutas:['/ing/claves-sefiplan'],
+    responsable:'Eunice',
+    documentacion:'Análisis funcional canónico',
+    documento:'04_ingresos/04.1.3-claves-sefiplan.html',
+    nombre:'Claves presupuestales y carteras SEFIPLAN',
+    opciones:[
+      '1. Padrón anual por ejercicio fiscal (2026)',
+      '2. Homologación Órgano (TSJ, TCA, TDJ, OAJ) y Capítulos (1000..6000)',
+      '3. Desglose y validación de los 11 segmentos programáticos SEFIPLAN',
+      '4. Mapeo de carteras oficiales (000184001, 000186001, 000618001, 000619001)',
+      '5. Nemotécnicos de Caja (1 OPE-1, 1 NOM-1, 1 OPE-2, 1 OPE-7, 1 OPE-8)',
+      '6. Servicio REST /resolver para autocompletado en movimientos 04.2.1'
+    ],
+    evidencia:'Catálogo de enlace interinstitucional con SEFIPLAN que administra por ejercicio fiscal las carteras y claves programáticas de 11 segmentos para autocompletar los movimientos de ministración sin captura manual.'
+  });
+  ing('04.1.4','04.1 Catálogos','Cuentas bancarias recaudadoras',{
+    perfil:'ing',
+    f2:90,
+    rutas:['/ing/cuentas-recaudadoras'],
+    responsable:'Eunice',
+    documentacion:'Análisis funcional canónico',
+    documento:'04_ingresos/04.1.4-cuentas-recaudadoras.html',
+    nombre:'Cuentas bancarias recaudadoras',
+    opciones:[
+      '1. Padrón institucional de cuentas (BBVA, Banorte, Santander)',
+      '2. Validación estricta de CLABE Interbancaria (18 dígitos numéricos)',
+      '3. Convenios CIE y referencias bancarias para ventanilla y practicajas',
+      '4. Clasificación por fondo (Ministración, Fondo Auxiliar, Recursos Propios, Juzgados)',
+      '5. Enlace contable obligatorio con subcuentas 1.1.1.2 Bancos/Tesorería del COA',
+      '6. Protección contra bajas lógicas de cuentas con movimientos vigentes'
+    ],
+    evidencia:'Catálogo institucional de tesorería que administra las cuentas bancarias receptoras de recursos, validando CLABEs de 18 dígitos y enlazando obligatoriamente a la cuenta 1.1.1.2 del COA.'
+  });
   ing('04.2.1','04.2 Registro','Registro de ingresos',{
     responsable:'Eunice',
     estado:'Pendiente de desarrollo',
@@ -431,6 +467,8 @@
   const responsablesPorModulo = {
     '04.1.1': 'Eunice',
     '04.1.2': 'Eunice',
+    '04.1.3': 'Eunice',
+    '04.1.4': 'Eunice',
     '04.2.1': 'Eunice',
     '04.3.1': 'Eunice',
     '04.3.2': 'Eunice',
