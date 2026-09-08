@@ -268,37 +268,31 @@
     responsable:'Eunice',
     documentacion:'Análisis funcional canónico',
     documento:'04_ingresos/04.1.1-conceptos-ingreso.html',
+    nombre:'Tipos y subtipos de trámite de ingreso',
     opciones:[
-      'Ministración estatal',
-      'Ministración etiquetada',
-      'Renta',
-      'Reintegros',
-      'Rendimientos',
-      'Venta de bases',
-      'Otros ingresos'
+      '1. Ministraciones (Ordinaria, Extraordinaria, Convenios Federales)',
+      '2. Ingresos Propios (Rendimientos bancarios, Arrendamientos, Derechos, Venta de bases)',
+      '3. Reintegros y Recuperaciones (Viáticos, Nómina indebida, Devolución anticipos)',
+      '4. Fondos en Tránsito (Depósitos no identificados, Aclaración y reclasificación)'
     ],
-    evidencia:'Catálogo canónico para clasificar la naturaleza del ingreso y sus banderas de distribución presupuestaria y enlace a CRI y matrices contables.'
+    evidencia:'Catálogo rector estructurado en 4 macro-familias y 12 procedimientos canónicos (espejo con Egresos 05.2.1) que alimenta el Wizard Modal de Registro y parametriza el enlace a CRI y Matriz CONAC.'
   });
-  ing('04.1.2','04.1 Catálogos','Tipos de movimiento de ingreso',{
+  ing('04.1.2','04.1 Catálogos','Pre-pólizas y reglas de conversión',{
     perfil:'ing',
     f2:90,
-    rutas:['/ing/tipos-mov'],
+    rutas:['/ing/prepolizas'],
     responsable:'Eunice',
     documentacion:'Análisis funcional inicial',
     documento:'04_ingresos/04.1.2-tipos-movimiento-ingreso.html',
     opciones:[
-      'Registro esperado',
-      'Devengado',
-      'Recaudado',
-      'Devengado y recaudado simultáneo',
-      'Aplicación de depósito',
-      'Ajuste',
-      'Cancelación',
-      'Reverso',
-      'Reclasificación',
-      'Regularización'
+      'Matriz 14: B.1 Ingreso Devengado (Cuentas por cobrar 1.1.2 vs 4.1.5)',
+      'Matriz 15: B.2 Ingreso Recaudado (Bancos 1.1.1.2 vs Cuentas por cobrar)',
+      'Matriz 16: B.3 Ingreso Simultáneo (Bancos 1.1.1.2 vs 4.1.5 en firme)',
+      'Regla Extrapresupuestal de Pasivo en Custodia (Bancos vs 2.1.9.9)',
+      'Motor determinista de cálculo de Pre-póliza activa desde MODO BORRADOR',
+      'Validación de balance aritmético (Debe = Haber) con tolerancia cero'
     ],
-    evidencia:'Documentación funcional creada; implementación por verificar. Define el ciclo de vida y momentos contables 8.1.4 y 8.1.5.'
+    evidencia:'Motor de integración contable conectado a contabilidad.matriz_conversion (03.1.2); genera en tiempo real el pre-asiento contable y presupuestal desde el modo borrador sin alterar el Libro Diario.'
   });
   ing('04.1.3','04.1 Catálogos','Motivos de ajuste o cancelación',{
     responsable:'Eunice',
@@ -327,15 +321,15 @@
     documentacion:'Análisis funcional inicial',
     documento:'04_ingresos/04.2.1-registro-ingresos.html',
     opciones:[
-      'Nuevo ingreso esperado',
-      'Registrar ingreso recibido',
-      'Guardar borrador',
-      'Distribuir por capítulo y fuente',
-      'Vincular depósito',
-      'Consultar saldo pendiente',
-      'Ajustar o cancelar',
-      'Consultar seguimiento'
-    ]
+      'Wizard Modal de selección de Trámite (4 familias / 12 subtipos)',
+      'Formulario adaptativo por procedimiento',
+      'Pre-póliza en tiempo real visible y validada en MODO BORRADOR',
+      'Desglose presupuestario por Capítulos (1000 a 5000) y Fuentes',
+      'Gestión de depósitos bancarios y parcialidades 1:N',
+      'Control de saldos pendientes por percibir',
+      'Formalización inmutable con folio oficial'
+    ],
+    evidencia:'Módulo central unificado con experiencia Wizard idéntica a Egresos 05.2.1 y pre-póliza oficial evaluada desde el borrador.'
   });
   ing('04.3.1','04.3 Procesos','Conciliación de ingresos',{
     perfil:'conta',
