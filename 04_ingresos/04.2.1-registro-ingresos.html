@@ -81,7 +81,7 @@
       <strong>2. Lo que se Captura en el Sistema es la Orden de Pago (Solicitud de Recursos):</strong> El capturista registra en el formulario la <strong>Orden de Ministración individual</strong> amparada en el oficio (ej. Trámite <code>2026-011</code>, Clave <code>01-06-2026</code> por $51,958,628.00 para <em>Nómina</em>, o por $21,157,862.50 para <em>Gastos de Operación</em>), especificando la cuenta de abono (<code>BBVA Cta. 0126144101</code>) y desglosando las partidas presupuestales por <strong>Órgano Judicial Beneficiario</strong> (Tribunal Superior de Justicia, Tribunal de Conciliación y Arbitraje, Tribunal de Disciplina Judicial y Órgano de Administración Judicial). Al formalizar la orden, se genera de forma <strong>subyacente</strong> la cuenta por cobrar y el devengo presupuestal (Matriz B.1).
     </p>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
-      <strong>3. La Conciliación con el Banco Dispara la Recaudación:</strong> Cuando SEFIPLAN realiza la transferencia electrónica a la cuenta concentradora BBVA (<code>0126144101</code>), el analista coteja el extracto en línea (ej. <code>BBVA Net Cash · Depósito REFBNTC00316148 por $21,157,862.50</code>). Al conciliar el depósito bancario con la orden devengada, la contabilidad <strong>subyacente</strong> liquida la cuenta por cobrar y detona la Matriz B.2 (Recaudado).
+      <strong>3. Selección de Banco y Registro de Comprobante (Principio KISS):</strong> No se replican portales bancarios externos ni interfaces complejas ajenas al SIAF. El analista simplemente selecciona la institución bancaria y cuenta institucional PJEV receptora, el sistema presenta los campos correspondientes para registrar el comprobante de abono (fecha de operación, clave de rastreo SPEI / referencia, importe) y le permite <strong>registrar el documento probatorio</strong> (adjuntando el archivo digital PDF o imagen). Al registrar el documento y aplicarlo a la orden devengada, el saldo pendiente se liquida y la contabilidad <strong>subyacente</strong> detona la Matriz B.2 (Recaudado) de forma 100% automática e invisible.
     </p>
   </div>
 
@@ -92,8 +92,8 @@
     <p>La operación se fundamenta en tres niveles de procesamiento con contabilidad automática en segundo plano:</p>
     <ol style="font-size:13px; color:var(--pjev-texto); margin-left:20px; line-height:1.6;">
       <li><strong>Nivel 1: Selección de Trámite y Evidencia Digital (Oficio Soporte):</strong> El capturista clasifica el trámite en el <strong>Wizard Modal (Paso 0)</strong> seleccionando el procedimiento (ej. <code>MIN_ESTATAL_ORD · Ministración Ordinaria Estatal</code>) y adjunta el oficio macro de trámite enviado a SEFIPLAN (ej. <code>Of. DGA/0367/2026</code>) como respaldo digital del expediente.</li>
-      <li><strong>Nivel 2: Captura Sustantiva de la Orden de Ministración (Paso 1 — Devengo Subyacente):</strong> Se capturan los datos de la <strong>Solicitud / Orden de Recursos</strong>: clave de orden (ej. <code>01-06-2026</code>), número de trámite SEFIPLAN (ej. <code>2026-011</code>), concepto (ej. <em>1a. Ministración de Junio · Nómina</em>), instrucción de abono bancario (<code>BBVA Bancomer Cta. 0126144101</code>), y el desglose de partidas por clave presupuestal y órgano beneficiario (Tribunal Superior de Justicia, Tribunal de Conciliación, Tribunal de Disciplina y OAJ). En segundo plano, el motor <code>03.1.2</code> genera la cuenta por cobrar a SEFIPLAN (Matriz B.1).</li>
-      <li><strong>Nivel 3: Conciliación Bancaria y Recaudación (Paso 2 — Recaudado Subyacente):</strong> Al recibirse los fondos en el extracto bancario de BBVA Net Cash (<code>0126144101</code>), el analista asocia la referencia bancaria del depósito (ej. <code>REFBNTC00316148</code> por $21,157,862.50), extinguiendo el saldo pendiente y detonando la recaudación patrimonial y presupuestal sin captura contable manual.</li>
+      <li><strong>Nivel 2: Captura Sustantiva de la Orden de Ministración (Paso 1 — Devengo Subyacente):</strong> Se capturan los datos de la <strong>Solicitud / Orden de Recursos</strong>: clave de orden (ej. <code>01-06-2026</code>), número de trámite SEFIPLAN (ej. <code>2026-011</code>), concepto (ej. <em>1a. Ministración de Junio · Nómina</em>), instrucción de abono bancario (<code>BBVA Cta. 0126144101</code>), y el desglose de partidas por clave presupuestal y órgano beneficiario (Tribunal Superior de Justicia, Tribunal de Conciliación, Tribunal de Disciplina y OAJ). En segundo plano, el motor <code>03.1.2</code> genera la cuenta por cobrar a SEFIPLAN (Matriz B.1).</li>
+      <li><strong>Nivel 3: Selección de Banco, Registro de Comprobante y Recaudación (Paso 2 — Principio KISS):</strong> Al acreditarse los fondos, el analista elige en el sistema la institución bancaria receptora (ej. <code>BBVA México</code>) y su cuenta institucional, registra los datos del comprobante y adjunta el documento digital probatorio. El sistema liquida el saldo pendiente a $0.00 y detona de forma 100% subyacente la recaudación (Matriz CONAC B.2) sin intervención contable del usuario.</li>
     </ol>
   </div>
 
@@ -135,8 +135,8 @@
         </tr>
         <tr>
           <td><strong>Operador Bancario / Cajero</strong></td>
-          <td>Identificación de depósitos bancarios y conciliación de extractos.</td>
-          <td>Cotejar depósitos en BBVA Net Cash (0126144101) y asociar transferencias a órdenes devengadas para liquidar saldos.</td>
+          <td>Identificación de depósitos bancarios y registro de comprobantes.</td>
+          <td>Elegir la institución bancaria receptora, registrar el comprobante con sus datos de abono, adjuntar el documento probatorio y asociarlo a la orden devengada para liquidar saldos.</td>
         </tr>
         <tr>
           <td><strong>Jefe del Departamento de Ingresos</strong></td>
@@ -186,13 +186,14 @@
           </ul>
         </li>
         <li><strong>Tablero de Mensajes de Workflow (<code>IngresoHistorialTimeline</code>):</strong> Las revisiones y justificaciones entre el capturista (L.C. Aldo Rafael Domínguez) y los autorizadores (L.C. Gloria García Sánchez, Mtra. Yuriana Martínez Olvera, L.C. Julio César Villalba Gómez) se registran de forma inmutable.</li>
-        <li><strong>Paso 2 — Conciliación Bancaria con BBVA Net Cash y Recaudación:</strong>
-          Al transferir SEFIPLAN los fondos a la cuenta <code>0126144101</code>:
+        <li><strong>Paso 2 — Selección de Banco, Registro de Comprobante y Recaudación Subyacente (Principio KISS):</strong>
+          Al confirmarse la recepción de los fondos:
           <ul style="margin-top:4px;">
-            <li>El operador consulta los movimientos del día en <strong>BBVA Net Cash</strong> (ej. Depósito de tercero <code>REFBNTC00316148</code> de fecha <code>09/06/2026</code> por <code>$ 21,157,862.50 MXN</code> para Gastos de Operación).</li>
-            <li>Vincula el depósito bancario con la orden devengada correspondiente.</li>
-            <li>El saldo por cobrar se liquida automáticamente ($0.00) y el estatus transita a <code>RECAUDADO</code>.</li>
-            <li>De forma <strong>subyacente</strong>, se dispara la Matriz CONAC B.2: Cargo a <code>1.1.1.2 BBVA Bancomer 0126144101</code> vs Abono a <code>1.1.2.2 Cuentas por Cobrar SEFIPLAN</code>, y afectación de <code>8.1.4 Devengada</code> a <code>8.1.5 Ley Recaudada</code>.</li>
+            <li>El operador selecciona la institución bancaria receptora (ej. <strong>BBVA México</strong>) y la cuenta institucional PJEV correspondiente (<code>0126144101 "MINISTRACION 2026"</code>).</li>
+            <li>El sistema presenta el formulario directo para capturar los datos del comprobante: fecha de operación (<code>09/06/2026</code>), referencia / clave de rastreo SPEI (<code>REFBNTC00316148</code>) e importe acreditado (<code>$ 21,157,862.50 MXN</code>).</li>
+            <li>Permite <strong>registrar el documento probatorio</strong> mediante la carga del archivo digital del comprobante (PDF o imagen).</li>
+            <li>Al guardar el registro, el comprobante se asocia a la orden devengada, liquidando el saldo pendiente a $0.00 y transitando el estatus a <code>RECAUDADO</code>.</li>
+            <li>De forma <strong>100% subyacente e invisible</strong>, el motor contable dispara la Matriz CONAC B.2 (Cargo a <code>1.1.1.2 Bancos</code> vs Abono a <code>1.1.2.2 Cuentas por Cobrar</code>, y Cargo a <code>8.1.4 Ley Devengada</code> vs Abono a <code>8.1.5 Ley Recaudada</code>) sin intervención contable del usuario.</li>
           </ul>
         </li>
       </ol>
@@ -257,6 +258,28 @@
         <tr><td><code>fecha_envio</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha formal de operación/envío asentada por el usuario.</td></tr>
         <tr><td><code>usuario_accion</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Cuenta institucional del usuario que ejecutó la acción de workflow.</td></tr>
         <tr><td><code>fecha_accion</code></td><td><code>TIMESTAMP</code></td><td>Sí (Servidor)</td><td>Fecha y hora exacta de registro en PostgreSQL (<code>clock_timestamp()</code>) para auditoría forense.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.4 Registro de Comprobantes Bancarios y Depósitos (<code>ingresos.ingresos_depositos</code>)</h3>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Almacena el registro simplificado de cada depósito bancario asociado a la orden devengada, vinculando el banco elegido, datos del comprobante y el documento digital probatorio adjunto (Principio KISS).
+    </p>
+    <table class="props-table" style="margin-bottom: 20px;">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Propósito Operativo</th></tr></thead>
+      <tbody>
+        <tr><td><code>deposito_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí (Auto)</td><td>Identificador correlativo del comprobante bancario registrado.</td></tr>
+        <tr><td><code>ingreso_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia a la orden devengada en <code>ingresos.ingresos_encabezado</code>.</td></tr>
+        <tr><td><code>banco_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Institución bancaria seleccionada por el usuario (ej. <em>BBVA México, Santander, Banorte</em>).</td></tr>
+        <tr><td><code>cuenta_bancaria_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Cuenta receptora institucional PJEV seleccionada (ej. <code>0126144101 "MINISTRACION 2026"</code>).</td></tr>
+        <tr><td><code>fecha_operacion</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha de acreditación bancaria asentada en el comprobante (ej. <code>09/06/2026</code>).</td></tr>
+        <tr><td><code>tipo_movimiento</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Modalidad: <code>TRANSFERENCIA_SPEI</code>, <code>DEPOSITO_VENTANILLA</code>, <code>CHEQUE</code>.</td></tr>
+        <tr><td><code>referencia_bancaria</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Clave de rastreo SPEI o número de autorización bancaria (ej. <code>REFBNTC00316148</code>).</td></tr>
+        <tr><td><code>importe_depositado</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto acreditado según el comprobante bancario (ej. <code>$ 21,157,862.50</code>).</td></tr>
+        <tr><td><code>archivo_documento_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al documento probatorio registrado (archivo PDF o imagen del comprobante).</td></tr>
+        <tr><td><code>nombre_archivo</code></td><td><code>VARCHAR(255)</code></td><td>Sí</td><td>Nombre del archivo cargado (ej. <code>comprobante_spei_09062026.pdf</code>).</td></tr>
+        <tr><td><code>poliza_recaudado_id</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>Póliza contable Matriz B.2 generada automáticamente de forma subyacente.</td></tr>
+        <tr><td><code>estatus_deposito</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td><code>CONCILIADO</code> | <code>APLICADO</code> | <code>CANCELADO</code>.</td></tr>
       </tbody>
     </table>
   </div>
@@ -504,6 +527,47 @@ BEGIN
         UPDATE ingresos.ingreso_prepoliza_detalles SET es_borrador = false WHERE ingreso_id = v_id;
 
         RETURN jsonb_build_object('error', 0, 'mensaje', 'Ingreso formalizado con folio ' || v_folio, 'data', jsonb_build_object('ingreso_id', v_id, 'folio', v_folio));
+
+    ELSIF p_accion = 'REGISTRAR_DEPOSITO' THEN
+        v_id := (p_payload->>'ingreso_id')::BIGINT;
+
+        -- 1. Insertar comprobante de depósito bancario registrado (KISS)
+        INSERT INTO ingresos.ingresos_depositos (
+            ingreso_id, banco_id, cuenta_bancaria_id, fecha_operacion,
+            tipo_movimiento, referencia_bancaria, importe_depositado,
+            archivo_documento_id, nombre_archivo, estatus_deposito,
+            usuario_c, fecha_c
+        ) VALUES (
+            v_id,
+            (p_payload->>'banco_id')::BIGINT,
+            (p_payload->>'cuenta_bancaria_id')::BIGINT,
+            COALESCE((p_payload->>'fecha_operacion')::DATE, CURRENT_DATE),
+            COALESCE(p_payload->>'tipo_movimiento', 'TRANSFERENCIA_SPEI'),
+            p_payload->>'referencia_bancaria',
+            (p_payload->>'importe_depositado')::DECIMAL(18,2),
+            (p_payload->>'archivo_documento_id')::BIGINT,
+            p_payload->>'nombre_archivo',
+            'CONCILIADO',
+            p_usuario, CURRENT_TIMESTAMP
+        );
+
+        -- 2. Disminuir saldo pendiente y transitar estatus a RECAUDADO si liquida
+        UPDATE ingresos.ingresos_encabezado SET
+            saldo_pendiente = GREATEST(0, saldo_pendiente - (p_payload->>'importe_depositado')::DECIMAL(18,2)),
+            estatus = CASE 
+                WHEN (saldo_pendiente - (p_payload->>'importe_depositado')::DECIMAL(18,2)) <= 0 THEN 'RECAUDADO' 
+                ELSE 'PARCIAL' 
+            END,
+            usuario_m = p_usuario,
+            fecha_m = CURRENT_TIMESTAMP
+        WHERE ingreso_id = v_id;
+
+        -- 3. Disparo subyacente de la Matriz CONAC B.2 (Recaudado en segundo plano)
+        RETURN jsonb_build_object(
+            'error', 0,
+            'mensaje', 'Depósito bancario y documento probatorio registrados exitosamente. Recaudación subyacente aplicada.',
+            'data', jsonb_build_object('ingreso_id', v_id, 'estatus', 'RECAUDADO')
+        );
     END IF;
 
     RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no reconocida: ' || p_accion, 'data', NULL);
@@ -682,9 +746,9 @@ $$;</code></pre>
         </tr>
         <tr>
           <td><code class="method post">POST</code></td>
-          <td><code>/api/v1/ingresos/:id/asociar-deposito</code></td>
-          <td>Body: <code>AsociarDepositoDto</code></td>
-          <td>Registra cobranza en parcialidad SPEI sobre saldo pendiente.</td>
+          <td><code>/api/v1/ingresos/:id/registrar-deposito</code></td>
+          <td>Body: <code>RegistrarDocumentoDepositoDto</code></td>
+          <td>Registra el comprobante de depósito (banco, cuenta, rastreo SPEI, importe y documento probatorio adjunto) liquidando saldo y detonando Matriz B.2 (KISS).</td>
         </tr>
         <tr>
           <td><code class="method get">GET</code></td>
@@ -733,10 +797,14 @@ export class IngresosController {
     return this.service.formalizar(user, BigInt(id));
   }
 
-  @Post(':id/asociar-deposito')
-  @ApiOperation({ summary: 'Asociar depósito bancario / cobranza parcial' })
-  async asociarDeposito(@Param('id') id: string, @CurrentUser() user: UserSession, @Body() dto: AsociarDepositoDto) {
-    return this.service.asociarDeposito(user, BigInt(id), dto);
+  @Post(':id/registrar-deposito')
+  @ApiOperation({ summary: 'Registrar comprobante de depósito bancario y documento probatorio (Principio KISS)' })
+  async registrarDeposito(
+    @Param('id') id: string,
+    @CurrentUser() user: UserSession,
+    @Body() dto: RegistrarDocumentoDepositoDto
+  ) {
+    return this.service.registrarDeposito(user, BigInt(id), dto);
   }
 
   @Get(':id/historial')
@@ -811,9 +879,9 @@ export class IngresosController {
         </p>
       </div>
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-08 · Recaudación Subyacente al Conciliar Extracto Bancario BBVA Net Cash</strong>
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-08 · Registro Simple de Comprobante Bancario y Recaudación Subyacente (Principio KISS)</strong>
         <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          La afectación de recaudación (Matriz CONAC 03.1.2 B.2) es 100% invisible y no requiere captura contable manual. Al verificar y conciliar el abono en el extracto en línea de BBVA Net Cash (cuenta <code>0126144101</code> "MINISTRACION 2026", depósito de tercero con referencia <code>REFBNTC00316148</code> por $21,157,862.50), el sistema extingue de forma automática la cuenta por cobrar (1.1.2.2 a 1.1.1.2) y transita la Ley de Ingresos Devengada a Recaudada (8.1.4 a 8.1.5).
+          El sistema descarta la simulación compleja de portales bancarios externos y aplica el principio KISS (<em>Keep It Simple</em>): el analista únicamente selecciona el banco receptor (ej. <em>BBVA México</em>) y la cuenta institucional PJEV (<code>0126144101 "MINISTRACION 2026"</code>), registra los datos del abono (fecha, clave de rastreo SPEI / referencia e importe) y <strong>registra el documento comprobatorio</strong> (adjuntando el PDF o imagen). Al registrar el depósito, el sistema liquida el saldo pendiente a $0.00 y de forma 100% subyacente e invisible detona la recaudación (Matriz CONAC 03.1.2 B.2: cargo a Bancos 1.1.1.2 vs abono a Cuentas por Cobrar 1.1.2.2 y Ley Devengada 8.1.4 a Ley Recaudada 8.1.5) sin intervención ni asientos manuales de contabilidad.
         </p>
       </div>
     </div>
@@ -827,7 +895,7 @@ export class IngresosController {
       <button class="wf-tab active" onclick="showWF('wf1',this)">1. Bandeja Principal de Ingresos</button>
       <button class="wf-tab" onclick="showWF('wf2',this)">2. Modal Asistente (Paso 0: Selección de Trámite)</button>
       <button class="wf-tab" onclick="showWF('wf3',this)">3. Captura Administrativa (Paso 1: Oficio y Techo)</button>
-      <button class="wf-tab" onclick="showWF('wf4',this)">4. Conciliación Bancaria (Paso 2: Cobro y Parcialidades)</button>
+      <button class="wf-tab" onclick="showWF('wf4',this)">4. Registro de Depósito Bancario y Recaudación (Paso 2: Elección de Banco y Comprobante)</button>
       <button class="wf-tab" onclick="showWF('wf5',this)">5. Tablero de Mensajes e Historial (Modales)</button>
     </div>
 
@@ -1215,112 +1283,123 @@ export class IngresosController {
       </div>
     </div>
 
-    <!-- WF4: SEGUIMIENTO Y CONCILIACION BANCARIA (PASO 2) -->
+    <!-- WF4: SEGUIMIENTO Y REGISTRO DE DEPOSITO BANCARIO (PASO 2) -->
     <div id="wf-wf4" class="wf-panel">
       <div class="wf-box">
         <div class="wf-bar">
-          <span class="wf-bar-label">Conciliación Bancaria y Recaudación Posterior: Extracto BBVA Net Cash (Paso 2)</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Extracto BBVA Net Cash · Depósito REFBNTC00316148 ($21,157,862.50) · Matriz CONAC B.2</span>
+          <span class="wf-bar-label">Registro de Depósito Bancario y Recaudación Posterior (Paso 2) · Principio KISS</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Elección de Banco · Registro de Comprobante · Matriz CONAC B.2 Subyacente</span>
         </div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 960 560" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="960" height="560" fill="#f8fafc" rx="4"/>
+          <svg viewBox="0 0 960 620" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="620" fill="#f8fafc" rx="4"/>
             
-            <!-- Header Resumen de la Orden Devengada -->
-            <rect x="15" y="15" width="930" height="65" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <!-- 1. Header Resumen de la Orden Devengada a Liquidar -->
+            <rect x="15" y="15" width="930" height="60" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
             <text x="30" y="38" font-size="13" font-weight="bold" fill="#183125">Orden 02-06-2026 · 1a. Ministración Junio 2026 (Gastos de Operación) · Trámite SEFIPLAN 2026-011</text>
-            <text x="30" y="58" font-size="9.5" fill="#64748b">Oficio Soporte: Of. DGA/0367/2026 | Cuenta Receptora: 0126144101 BBVA "MINISTRACION 2026" | Devengo: 28/05/2026 | Ente: SEFIPLAN</text>
-            <rect x="760" y="24" width="170" height="24" fill="#dcfce7" rx="12"/>
-            <text x="845" y="40" font-size="9.5" font-weight="bold" fill="#15803d" text-anchor="middle">✓ RECAUDADO Y CONCILIADO</text>
+            <text x="30" y="58" font-size="9.5" fill="#64748b">Oficio Soporte: Of. DGA/0367/2026 | Cuenta Estipulada: BBVA 0126144101 | Devengo: 28/05/2026 | Ente: SEFIPLAN</text>
+            <rect x="750" y="24" width="180" height="24" fill="#dcfce7" rx="12"/>
+            <text x="840" y="40" font-size="9.5" font-weight="bold" fill="#15803d" text-anchor="middle">✓ RECAUDADO Y CONCILIADO</text>
 
-            <!-- Status de Cuadre Financiero -->
-            <rect x="15" y="88" width="300" height="52" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="25" y="105" font-size="8.5" fill="#64748b">MONTO DEVENGADO DE LA ORDEN (B.1)</text>
-            <text x="25" y="127" font-size="13" font-weight="bold" fill="#1e293b">$ 21,157,862.50 MXN</text>
+            <!-- 2. Status Financiero de Cuadre -->
+            <rect x="15" y="85" width="300" height="48" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="25" y="102" font-size="8.5" fill="#64748b">MONTO DEVENGADO DE LA ORDEN (B.1)</text>
+            <text x="25" y="122" font-size="12.5" font-weight="bold" fill="#1e293b">$ 21,157,862.50 MXN</text>
 
-            <rect x="330" y="88" width="300" height="52" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="340" y="105" font-size="8.5" fill="#15803d">RECAUDADO EN BANCOS BBVA (B.2)</text>
-            <text x="340" y="127" font-size="13" font-weight="bold" fill="#15803d">$ 21,157,862.50 MXN (1 Depósito)</text>
+            <rect x="330" y="85" width="300" height="48" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="340" y="102" font-size="8.5" fill="#15803d">DEPÓSITOS BANCARIOS REGISTRADOS (B.2)</text>
+            <text x="340" y="122" font-size="12.5" font-weight="bold" fill="#15803d">$ 21,157,862.50 MXN (1 Comprobante)</text>
 
-            <rect x="645" y="88" width="300" height="52" fill="#f0fdf4" stroke="#a7f3d0" rx="4"/>
-            <text x="655" y="105" font-size="8.5" font-weight="bold" fill="#065f46">SALDO PENDIENTE POR RECAUDAR</text>
-            <text x="655" y="127" font-size="13" font-weight="bold" fill="#047857">$ 0.00 MXN (Liquidado 100%)</text>
+            <rect x="645" y="85" width="300" height="48" fill="#f0fdf4" stroke="#a7f3d0" rx="4"/>
+            <text x="655" y="102" font-size="8.5" font-weight="bold" fill="#065f46">SALDO PENDIENTE POR RECAUDAR</text>
+            <text x="655" y="122" font-size="12.5" font-weight="bold" fill="#047857">$ 0.00 MXN (Liquidado 100%)</text>
 
-            <!-- Panel Oficial BBVA Net Cash (Fiel a la Imagen 3) -->
-            <rect x="15" y="150" width="930" height="185" fill="#ffffff" stroke="#004481" stroke-width="1.5" rx="5"/>
-            <rect x="15" y="150" width="930" height="26" fill="#004481" rx="5 5 0 0"/>
-            <text x="30" y="167" font-size="10" font-weight="bold" fill="#ffffff">BBVA Net Cash · Comprobante Oficial de Depósito Bancario en Línea</text>
-            <text x="930" y="167" font-size="9" fill="#bfdbfe" text-anchor="end">Consulta: 09/06/2026 15:36:16 h • Contrato: 00412852</text>
+            <!-- 3. Formulario Simple de Registro de Depósito Bancario (Principio KISS) -->
+            <rect x="15" y="142" width="930" height="205" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="5"/>
+            <rect x="15" y="142" width="930" height="26" fill="#183125" rx="5 5 0 0"/>
+            <text x="30" y="159" font-size="10" font-weight="bold" fill="#ffffff">➕ REGISTRAR COMPROBANTE DE DEPÓSITO BANCARIO (PRINCIPIO KISS — KEEP IT SIMPLE)</text>
+            <text x="930" y="159" font-size="8.5" fill="#a7f3d0" text-anchor="end">Seleccione el banco, complete los datos y registre el documento</text>
 
-            <!-- Datos BBVA Net Cash -->
-            <text x="30" y="195" font-size="8.5" font-weight="bold" fill="#475569">CUENTA DE ABONO:</text>
-            <text x="160" y="195" font-size="9.5" font-family="monospace" font-weight="bold" fill="#004481">0126144101</text>
-            <text x="260" y="195" font-size="8.5" font-weight="bold" fill="#475569">TITULAR:</text>
-            <text x="320" y="195" font-size="9.5" font-weight="bold" fill="#1e293b">PODER JUDICIAL DEL ESTADO DE VERACRUZ (MINISTRACION 2026)</text>
+            <!-- Fila 1: Selección de Banco, Cuenta y Tipo -->
+            <text x="30" y="185" font-size="8.5" font-weight="bold" fill="#475569">1. INSTITUCIÓN BANCARIA (*):</text>
+            <rect x="30" y="192" width="280" height="28" fill="#f8fafc" stroke="#183125" stroke-width="1.5" rx="4"/>
+            <text x="42" y="210" font-size="9.5" font-weight="bold" fill="#183125">🏛️ BBVA México</text>
+            <text x="295" y="209" font-size="9" fill="#64748b">▼</text>
 
-            <text x="30" y="217" font-size="8.5" font-weight="bold" fill="#475569">BANCO RECEPTOR:</text>
-            <text x="160" y="217" font-size="9" fill="#1e293b">BBVA Bancomer</text>
-            <text x="260" y="217" font-size="8.5" font-weight="bold" fill="#475569">TIPO DE MOVIMIENTO:</text>
-            <text x="400" y="217" font-size="9" font-weight="bold" fill="#1e293b">Depósito de un tercero (Transferencia SPEI SEFIPLAN)</text>
+            <text x="330" y="185" font-size="8.5" font-weight="bold" fill="#475569">2. CUENTA INSTITUCIONAL PJEV (*):</text>
+            <rect x="330" y="192" width="330" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="342" y="210" font-size="9" font-family="monospace" font-weight="bold" fill="#004481">0126144101 · MINISTRACION 2026</text>
+            <text x="645" y="209" font-size="9" fill="#64748b">▼</text>
 
-            <text x="30" y="239" font-size="8.5" font-weight="bold" fill="#475569">FECHA DE OPERACIÓN:</text>
-            <text x="160" y="239" font-size="9.5" font-family="monospace" font-weight="bold" fill="#1e293b">09/06/2026</text>
-            <text x="260" y="239" font-size="8.5" font-weight="bold" fill="#475569">REFERENCIA BANCARIA:</text>
-            <text x="400" y="239" font-size="9.5" font-family="monospace" font-weight="bold" fill="#004481">REFBNTC00316148</text>
+            <text x="680" y="185" font-size="8.5" font-weight="bold" fill="#475569">3. TIPO DE MOVIMIENTO (*):</text>
+            <rect x="680" y="192" width="250" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <text x="692" y="210" font-size="9" fill="#334155">Transferencia SPEI / Depósito tercero</text>
+            <text x="915" y="209" font-size="9" fill="#64748b">▼</text>
 
-            <text x="30" y="261" font-size="8.5" font-weight="bold" fill="#475569">CONCEPTO / DESCRIPCIÓN:</text>
-            <text x="160" y="261" font-size="9" fill="#1e293b">GASTOS DE OPERACION 1A QNA JUNIO 2026 (Orden 02-06-2026)</text>
+            <!-- Fila 2: Fecha, Referencia e Importe -->
+            <text x="30" y="238" font-size="8.5" font-weight="bold" fill="#475569">4. FECHA DE OPERACIÓN / ABONO (*):</text>
+            <rect x="30" y="245" width="280" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="42" y="263" font-size="9" font-family="monospace" fill="#1e293b">09/06/2026</text>
+            <text x="292" y="263" font-size="9" fill="#64748b">📅</text>
 
-            <!-- Caja Importe Recibido BBVA -->
-            <rect x="30" y="275" width="460" height="45" fill="#f0f9ff" stroke="#93c5fd" rx="4"/>
-            <text x="45" y="293" font-size="8.5" font-weight="bold" fill="#0369a1">IMPORTE RECIBIDO EN BANCOS:</text>
-            <text x="45" y="312" font-size="14" font-weight="bold" fill="#004481">$ 21,157,862.50 MXN</text>
-            <text x="230" y="311" font-size="8" fill="#64748b">(Veintiún millones ciento cincuenta y siete mil ochocientos sesenta y dos pesos 50/100 M.N.)</text>
+            <text x="330" y="238" font-size="8.5" font-weight="bold" fill="#475569">5. REFERENCIA BANCARIA / RASTREO SPEI (*):</text>
+            <rect x="330" y="245" width="330" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="342" y="263" font-size="9" font-family="monospace" font-weight="bold" fill="#004481">REFBNTC00316148</text>
 
-            <!-- Sello Oficial de Recepción OAJ (Fiel a Imagen 3) -->
-            <rect x="580" y="185" width="345" height="135" fill="#fffbeb" stroke="#b45309" stroke-dasharray="3 3" rx="4"/>
-            <text x="752" y="205" font-size="8.5" font-weight="bold" fill="#b45309" text-anchor="middle">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
-            <text x="752" y="220" font-size="8" font-weight="bold" fill="#78350f" text-anchor="middle">ÓRGANO DE ADMINISTRACIÓN JUDICIAL</text>
-            <text x="752" y="234" font-size="7.5" fill="#92400e" text-anchor="middle">SUBDIRECCIÓN DE RECURSOS FINANCIEROS</text>
-            <text x="752" y="247" font-size="7.5" fill="#92400e" text-anchor="middle">DEPARTAMENTO DE TESORERÍA</text>
-            <rect x="660" y="255" width="185" height="24" fill="#b45309" rx="3"/>
-            <text x="752" y="271" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">09 JUN 2026 · RECIBIDO</text>
-            <text x="752" y="295" font-size="7.5" font-style="italic" fill="#78350f" text-anchor="middle">Conciliado vs Orden 02-06-2026 · Cuadre 100%</text>
-            <text x="752" y="307" font-size="7" fill="#92400e" text-anchor="middle">Sello Digital Forense de Recepción en Tesorería</text>
+            <text x="680" y="238" font-size="8.5" font-weight="bold" fill="#475569">6. IMPORTE ACREDITADO ($) (*):</text>
+            <rect x="680" y="245" width="250" height="28" fill="#f0f9ff" stroke="#93c5fd" rx="4"/>
+            <text x="692" y="263" font-size="10.5" font-weight="bold" fill="#004481">$ 21,157,862.50 MXN</text>
 
-            <!-- Tabla de Conciliación Bancaria y Póliza Subyacente -->
-            <rect x="15" y="348" width="930" height="98" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
-            <rect x="15" y="348" width="930" height="22" fill="#183125" rx="5 5 0 0"/>
-            <text x="30" y="363" font-size="9" font-weight="bold" fill="#ffffff">DEPÓSITOS BANCARIOS CONCILIADOS (MATRIZ CONAC B.2 RECAUDADO EN SEGUNDO PLANO)</text>
+            <!-- Fila 3: Documento Comprobatorio Digital y Botón Registrar -->
+            <text x="30" y="291" font-size="8.5" font-weight="bold" fill="#475569">7. REGISTRAR DOCUMENTO COMPROBATORIO (PDF / IMAGEN) (*):</text>
+            <rect x="30" y="298" width="460" height="34" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <rect x="34" y="302" width="130" height="26" fill="#f1f5f9" stroke="#94a3b8" rx="3"/>
+            <text x="99" y="318" font-size="8.5" font-weight="bold" fill="#334155" text-anchor="middle">📎 Adjuntar Archivo</text>
+            <text x="175" y="318" font-size="8.5" fill="#0284c7">📄 comprobante_spei_09062026.pdf</text>
+            <text x="395" y="318" font-size="8" fill="#64748b">(184 KB)</text>
+            <text x="465" y="318" font-size="9" fill="#15803d">✓</text>
 
-            <rect x="25" y="375" width="910" height="18" fill="#f1f5f9"/>
-            <text x="35" y="387" font-size="7.5" font-weight="bold" fill="#475569">FECHA VALOR</text>
-            <text x="130" y="387" font-size="7.5" font-weight="bold" fill="#475569">REFERENCIA BBVA</text>
-            <text x="280" y="387" font-size="7.5" font-weight="bold" fill="#475569">CUENTA BANCARIA PJEV</text>
-            <text x="510" y="387" font-size="7.5" font-weight="bold" fill="#475569">PÓLIZA B.2 SUBYACENTE</text>
-            <text x="740" y="387" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="end">ABONO BANCARIO ($)</text>
-            <text x="850" y="387" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="center">ESTATUS</text>
+            <!-- Botón de Registro y Aplicación -->
+            <rect x="680" y="298" width="250" height="34" fill="#183125" rx="4"/>
+            <text x="805" y="319" font-size="9.5" font-weight="bold" fill="#ffffff" text-anchor="middle">💾 Registrar Documento y Aplicar</text>
 
-            <rect x="25" y="396" width="910" height="24" fill="#ffffff" stroke="#f1f5f9"/>
-            <text x="35" y="412" font-size="8.5" fill="#1e293b">09/06/2026</text>
-            <text x="130" y="412" font-size="8.5" font-family="monospace" font-weight="bold" fill="#004481">REFBNTC00316148</text>
-            <text x="280" y="412" font-size="8.5" fill="#1e293b">BBVA 0126144101 (MINISTRACION 2026)</text>
-            <text x="510" y="412" font-size="8.5" font-weight="bold" fill="#15803d">POL-ING-2026-0048 (Recaudado B.2)</text>
-            <text x="740" y="412" font-size="9" font-weight="bold" fill="#15803d" text-anchor="end">21,157,862.50</text>
-            <rect x="805" y="400" width="90" height="16" fill="#dcfce7" rx="8"/>
-            <text x="850" y="412" font-size="7.5" font-weight="bold" fill="#15803d" text-anchor="middle">✓ CONCILIADO</text>
+            <!-- 4. Tabla de Comprobantes Registrados y Aplicados -->
+            <rect x="15" y="358" width="930" height="135" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <rect x="15" y="358" width="930" height="22" fill="#334155" rx="5 5 0 0"/>
+            <text x="30" y="373" font-size="9" font-weight="bold" fill="#ffffff">COMPROBANTES BANCARIOS REGISTRADOS PARA ESTA ORDEN (1 DOCUMENTO APLICADO)</text>
 
-            <rect x="25" y="422" width="910" height="18" fill="#f8fafc"/>
-            <text x="35" y="434" font-size="7.5" font-weight="bold" fill="#065f46">✓ Cuadre Bancario Exacto:</text>
-            <text x="160" y="434" font-size="7.5" fill="#334155">El depósito de $21,157,862.50 cubre el 100% de la orden 02-06-2026 (Gastos de Operación). Saldo pendiente liquidado a cero.</text>
+            <rect x="25" y="384" width="910" height="18" fill="#f1f5f9"/>
+            <text x="35" y="396" font-size="7.5" font-weight="bold" fill="#475569">FECHA OPERACIÓN</text>
+            <text x="130" y="396" font-size="7.5" font-weight="bold" fill="#475569">BANCO / CUENTA</text>
+            <text x="290" y="396" font-size="7.5" font-weight="bold" fill="#475569">REFERENCIA BANCARIA / SPEI</text>
+            <text x="490" y="396" font-size="7.5" font-weight="bold" fill="#475569">DOCUMENTO REGISTRADO</text>
+            <text x="690" y="396" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="end">IMPORTE ACREDITADO ($)</text>
+            <text x="785" y="396" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">ESTATUS</text>
+            <text x="880" y="396" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">ACCIONES</text>
 
-            <!-- Nota Explicativa Subyacente -->
-            <rect x="15" y="458" width="930" height="88" fill="#f0fdf4" stroke="#a7f3d0" rx="4"/>
-            <text x="30" y="476" font-size="8.5" font-weight="bold" fill="#065f46">⚙️ Contabilidad Subyacente en la Conciliación Bancaria (Matriz CONAC 03.1.2 B.2 en Segundo Plano):</text>
-            <text x="30" y="493" font-size="8" fill="#166534">Al asociar el extracto bancario de BBVA Net Cash, el motor contable genera de forma invisible las pólizas patrimonial y presupuestal sin intervención manual:</text>
-            <text x="30" y="508" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Afectación Patrimonial:</tspan> Cargo a BBVA Bancomer Concentradora (1.1.1.2.0126) vs Abono a Cuentas por Cobrar a Corto Plazo SEFIPLAN (1.1.2.2.0001) por $21,157,862.50</text>
-            <text x="30" y="522" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Afectación Presupuestal:</tspan> Cargo a Ley de Ingresos Devengada (8.1.4 CRI 9.1.1.1) vs Abono a Ley de Ingresos Recaudada (8.1.5 CRI 9.1.1.1) por $21,157,862.50</text>
-            <text x="30" y="536" font-size="7.5" font-style="italic" fill="#065f46">El analista de Tesorería únicamente valida el extracto bancario y asocia la referencia; la contabilidad y el presupuesto se sincronizan en automático.</text>
+            <rect x="25" y="404" width="910" height="25" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="420" font-size="8.5" fill="#1e293b">09/06/2026</text>
+            <text x="130" y="420" font-size="8.5" fill="#1e293b">BBVA México · *4101</text>
+            <text x="290" y="420" font-size="8.5" font-family="monospace" font-weight="bold" fill="#004481">REFBNTC00316148</text>
+            <text x="490" y="420" font-size="8.5" fill="#0284c7">📄 comprobante_spei_09062026.pdf</text>
+            <text x="690" y="420" font-size="9" font-weight="bold" fill="#15803d" text-anchor="end">21,157,862.50</text>
+            <rect x="740" y="409" width="85" height="16" fill="#dcfce7" rx="8"/>
+            <text x="782" y="421" font-size="7.5" font-weight="bold" fill="#15803d" text-anchor="middle">✓ CONCILIADO</text>
+            <text x="860" y="420" font-size="8.5" fill="#0284c7">👁️ Ver</text>
+            <text x="895" y="420" font-size="8.5" fill="#64748b">📥 Descargar</text>
+
+            <rect x="25" y="431" width="910" height="20" fill="#f8fafc"/>
+            <text x="35" y="444" font-size="7.5" font-weight="bold" fill="#065f46">✓ Cuadre Financiero:</text>
+            <text x="145" y="444" font-size="7.5" fill="#334155">Total Comprobantes: $21,157,862.50 MXN (100% de la orden cubierta). Saldo pendiente liquidado a cero.</text>
+
+            <!-- 5. Principio KISS y Contabilidad Subyacente -->
+            <rect x="15" y="502" width="930" height="103" fill="#f0fdf4" stroke="#a7f3d0" rx="4"/>
+            <text x="30" y="520" font-size="8.5" font-weight="bold" fill="#065f46">⚙️ Principio KISS y Contabilidad Subyacente (Matriz CONAC 03.1.2 B.2 en Segundo Plano):</text>
+            <text x="30" y="536" font-size="8" fill="#166534">• <tspan font-weight="bold">Operación Simple y Directa:</tspan> El usuario no navega por portales bancarios externos ni lidia con interfaces ajenas; simplemente elige el banco, registra los datos del abono y adjunta el documento probatorio digital.</text>
+            <text x="30" y="552" font-size="8" fill="#166534">• <tspan font-weight="bold">Generación Automática e Invisible:</tspan> Al registrar el documento, el motor contable genera en automático las pólizas patrimonial y presupuestal sin captura manual:</text>
+            <text x="45" y="567" font-size="8" fill="#1e293b">1. <tspan font-weight="bold">Afectación Patrimonial:</tspan> Cargo a BBVA Bancomer Concentradora (1.1.1.2.0126) vs Abono a Cuentas por Cobrar SEFIPLAN (1.1.2.2.0001) por $21,157,862.50</text>
+            <text x="45" y="581" font-size="8" fill="#1e293b">2. <tspan font-weight="bold">Afectación Presupuestal:</tspan> Cargo a Ley de Ingresos Devengada (8.1.4 CRI 9.1.1.1) vs Abono a Ley de Ingresos Recaudada (8.1.5 CRI 9.1.1.1) por $21,157,862.50</text>
+            <text x="30" y="596" font-size="7.5" font-style="italic" fill="#065f46">El analista de Tesorería solo administra el registro del comprobante; la contabilidad y el presupuesto se sincronizan de forma invisible.</text>
           </svg>
         </div>
       </div>
@@ -1435,9 +1514,9 @@ export class IngresosController {
         </tr>
         <tr>
           <td><code>CP-ING-03</code></td>
-          <td>Conciliación Bancaria BBVA Net Cash y Recaudación Subyacente (B.2)</td>
-          <td>Asociar depósito en línea del extracto BBVA Net Cash (cuenta <code>0126144101</code>, referencia <code>REFBNTC00316148</code> por $21,157,862.50) a la orden de gastos de operación <code>02-06-2026</code>.</td>
-          <td>El saldo pendiente se reduce a $0.00, estatus transita a <code>RECAUDADO</code>, y se genera automáticamente la Matriz B.2 CONAC: Cargo a Bancos BBVA (1.1.1.2.0126) vs Abono a Cuentas por Cobrar (1.1.2.2.0001) y Cargo a Ley Devengada (8.1.4) vs Abono a Ley Recaudada (8.1.5).</td>
+          <td>Registro Simple de Depósito Bancario y Recaudación Subyacente (B.2) — Principio KISS</td>
+          <td>Seleccionar la institución bancaria receptora (<code>BBVA México</code>), la cuenta PJEV (<code>0126144101</code>), capturar fecha (<code>09/06/2026</code>), referencia de rastreo SPEI (<code>REFBNTC00316148</code>), importe (<code>$ 21,157,862.50</code>) y adjuntar el comprobante digital PDF. Clic en <code>[Registrar Documento y Aplicar]</code>.</td>
+          <td>Inserta el registro en <code>ingresos.ingresos_depositos</code>, extingue el saldo pendiente a $0.00, transita la orden a <code>RECAUDADO</code>, y de forma 100% subyacente dispara la Matriz B.2 CONAC: Cargo a Bancos (1.1.1.2) vs Abono a Cuentas por Cobrar (1.1.2.2) y Cargo a Ley Devengada (8.1.4) vs Abono a Ley Recaudada (8.1.5).</td>
         </tr>
         <tr>
           <td><code>CP-ING-04</code></td>
@@ -1455,6 +1534,12 @@ export class IngresosController {
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción del Cambio</th></tr></thead>
       <tbody>
+        <tr>
+          <td><code>v2.4.0</code></td>
+          <td>07/09/2026</td>
+          <td>Julio César / Eunice</td>
+          <td><strong>Simplificación de Conciliación Bancaria bajo Principio KISS (Keep It Simple):</strong> Eliminación de interfaces y recuadros que simulaban portales bancarios externos propietarios (como BBVA Net Cash), estableciendo un flujo nativo, directo y sencillo en el SIAF: (1) Selector de institución bancaria (ej. <em>BBVA México</em>) y cuenta institucional PJEV; (2) Despliegue de campos claros para registrar el comprobante de depósito (fecha de operación, clave de rastreo SPEI / referencia e importe) y registrar el documento digital probatorio en PDF o imagen; (3) Incorporación formal de la tabla <code>ingresos.ingresos_depositos</code>, acción <code>REGISTRAR_DEPOSITO</code> en <code>fn_crud_ingreso</code> y endpoint <code>POST /api/v1/ingresos/:id/registrar-deposito</code>; (4) Liquidación inmediata del saldo pendiente a $0.00 y detonación 100% subyacente de la Matriz CONAC B.2 (Recaudado) sin intervención contable del usuario.</td>
+        </tr>
         <tr>
           <td><code>v2.3.0</code></td>
           <td>07/09/2026</td>
