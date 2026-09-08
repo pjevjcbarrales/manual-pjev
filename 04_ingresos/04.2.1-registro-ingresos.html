@@ -73,15 +73,20 @@
 
   <!-- CALLOUT DE DELIMITACIÓN ARQUITECTÓNICA -->
   <div class="callout-box">
-    <div class="callout-title">📌 Flujo Oficial de Datos: Evidencia Documental, Captura de Orden y Conciliación Bancaria</div>
+    <div class="callout-title">📌 Arquitectura de Captura: Formulario Compuesto, Doble Archivo Físico Firmado y Grid PJEV-UI</div>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
-      <strong>1. El Oficio Institucional es Evidencia de Origen:</strong> El oficio macro dirigido a SEFIPLAN (ej. <code>Of. DGA/0367/2026</code> por $192,785,075.00) notifica el paquete global de órdenes del mes. En el sistema <strong>no se capturan pólizas ni partidas de este oficio</strong>; opera como documento digital probatorio adjunto (PDF) en el expediente del trámite.
+      <strong>1. Formulario Compuesto (Maestro-Detalle):</strong> Siguiendo el estándar canónico de SIAF-PJEV y la experiencia de Egresos (<code>05.2.1</code>), la captura se organiza en dos niveles: un <strong>Encabezado Maestro</strong> (datos generales, importe total y sustento documental) y una sección de <strong>Movimientos Presupuestales</strong> (partidas distribuidas en un grid interactivo de la <code>PJEV-UI</code>).
     </p>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
-      <strong>2. Lo que se Captura en el Sistema es la Orden de Pago (Solicitud de Recursos):</strong> El capturista registra en el formulario la <strong>Orden de Ministración individual</strong> amparada en el oficio (ej. Trámite <code>2026-011</code>, Clave <code>01-06-2026</code> por $51,958,628.00 para <em>Nómina</em>, o por $21,157,862.50 para <em>Gastos de Operación</em>), especificando la cuenta de abono (<code>BBVA Cta. 0126144101</code>) y desglosando las partidas presupuestales por <strong>Órgano Judicial Beneficiario</strong> (Tribunal Superior de Justicia, Tribunal de Conciliación y Arbitraje, Tribunal de Disciplina Judicial y Órgano de Administración Judicial). Al formalizar la orden, se genera de forma <strong>subyacente</strong> la cuenta por cobrar y el devengo presupuestal (Matriz B.1).
+      <strong>2. Carga Obligatoria de los Dos Archivos Físicos Firmados:</strong> Para satisfacer la comprobación fiscal y de auditoría interna/ORFIS, el encabezado exige adjuntar los dos documentos fuente digitalizados:
+      (1) <em>Oficio de Solicitud DGA a SEFIPLAN</em> con sello de acuse oficial de recepción (ej. <code>Of. DGA/0367/2026</code>); y
+      (2) <em>Formato Oficial de Solicitud / Orden de Cobro</em> debidamente signado por los funcionarios autorizadores (Elaboró, Solicitante DGA, Vo. Bo. Egresos, Directora General de Programación y Presupuesto, Jefa de Ordenes de Pago y Tesorera).
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      <strong>3. Modal de Captura de Movimientos y Clave Programática:</strong> Las partidas del grid no se capturan escribiendo cadenas alfanuméricas complejas. Al pulsar <code>[+ Agregar Partida]</code>, se despliega un <strong>Modal de la PJEV-UI</strong> donde el usuario únicamente selecciona el <strong>Órgano Jurisdiccional</strong> (TSJ, TCA, TDJ, OAJ) y el <strong>Capítulo de Gasto</strong> (1000, 2000, 3000, 6000), el sistema autocompleta la clave SEFIPLAN (<code>41300X...</code>) y la referencia de Caja (<code>1 OPE-X</code> o <code>1 NOM-X</code>), y el capturista sólo digita el importe.
     </p>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
-      <strong>3. Selección de Banco y Registro de Comprobante (Principio KISS):</strong> No se replican portales bancarios externos ni interfaces complejas ajenas al SIAF. El analista simplemente selecciona la institución bancaria y cuenta institucional PJEV receptora, el sistema presenta los campos correspondientes para registrar el comprobante de abono (fecha de operación, clave de rastreo SPEI / referencia, importe) y le permite <strong>registrar el documento probatorio</strong> (adjuntando el archivo digital PDF o imagen). Al registrar el documento y aplicarlo a la orden devengada, el saldo pendiente se liquida y la contabilidad <strong>subyacente</strong> detona la Matriz B.2 (Recaudado) de forma 100% automática e invisible.
+      <strong>4. Cuadre Obligatorio Estricto (Oficio vs. Orden de Cobro):</strong> El sistema valida en tiempo real que <code>Σ Importes de Movimientos = Importe Total del Encabezado</code> (Diferencia = $0.00). Si existe alguna discrepancia, el botón de formalización permanece bloqueado para garantizar que el devengo contable subyacente (Matriz B.1) sea matemáticamente exacto.
     </p>
   </div>
 
@@ -89,10 +94,11 @@
   <div class="doc-section">
     <div class="section-title"><span class="section-num">1</span> Descripción General</div>
     <p>El módulo <strong>04.2.1 Registro de Ingresos</strong> es el núcleo transaccional del Departamento de Recursos Financieros (Tesorería) del Poder Judicial del Estado de Veracruz para captar, vigilar y controlar las entradas monetarias institucionales.</p>
-    <p>La operación se fundamenta en tres niveles de procesamiento con contabilidad automática en segundo plano:</p>
+    <p>La operación se fundamenta en un flujo estructurado e intuitivo homologado con Egresos:</p>
     <ol style="font-size:13px; color:var(--pjev-texto); margin-left:20px; line-height:1.6;">
-      <li><strong>Nivel 1: Selección de Trámite y Evidencia Digital (Oficio Soporte):</strong> El capturista clasifica el trámite en el <strong>Wizard Modal (Paso 0)</strong> seleccionando el procedimiento (ej. <code>MIN_ESTATAL_ORD · Ministración Ordinaria Estatal</code>) y adjunta el oficio macro de trámite enviado a SEFIPLAN (ej. <code>Of. DGA/0367/2026</code>) como respaldo digital del expediente.</li>
-      <li><strong>Nivel 2: Captura Sustantiva de la Orden de Ministración (Paso 1 — Devengo Subyacente):</strong> Se capturan los datos de la <strong>Solicitud / Orden de Recursos</strong>: clave de orden (ej. <code>01-06-2026</code>), número de trámite SEFIPLAN (ej. <code>2026-011</code>), concepto (ej. <em>1a. Ministración de Junio · Nómina</em>), instrucción de abono bancario (<code>BBVA Cta. 0126144101</code>), y el desglose de partidas por clave presupuestal y órgano beneficiario (Tribunal Superior de Justicia, Tribunal de Conciliación, Tribunal de Disciplina y OAJ). En segundo plano, el motor <code>03.1.2</code> genera la cuenta por cobrar a SEFIPLAN (Matriz B.1).</li>
+      <li><strong>Nivel 1: Selección de Trámite en Asistente (Paso 0):</strong> El capturista clasifica el trámite en el <strong>Wizard Modal</strong> seleccionando la macro-familia y el procedimiento (ej. <code>MIN_ESTATAL_ORD · Ministración Ordinaria Estatal</code>).</li>
+      <li><strong>Nivel 2: Formulario Compuesto con Doble Archivo Firmado y Grid de Movimientos (Paso 1 — Devengo Subyacente):</strong> 
+        Se capturan los datos sustantivos del encabezado (clave de orden, número de trámite, cuenta receptora e importe total de la ministración) y se cargan los **dos archivos probatorios digitalizados con firmas y acuses**. Posteriormente, se desglosan las partidas en el grid de la PJEV-UI mediante modales emergentes simples por Órgano y Capítulo. Al cuadrar al centavo y formalizar, el motor <code>03.1.2</code> genera en segundo plano la cuenta por cobrar y el devengo presupuestal (Matriz CONAC B.1).</li>
       <li><strong>Nivel 3: Selección de Banco, Registro de Comprobante y Recaudación (Paso 2 — Principio KISS):</strong> Al acreditarse los fondos, el analista elige en el sistema la institución bancaria receptora (ej. <code>BBVA México</code>) y su cuenta institucional, registra los datos del comprobante y adjunta el documento digital probatorio. El sistema liquida el saldo pendiente a $0.00 y detona de forma 100% subyacente la recaudación (Matriz CONAC B.2) sin intervención contable del usuario.</li>
     </ol>
   </div>
@@ -160,22 +166,29 @@
       <h4 style="margin:0 0 8px; color:var(--pjev-verde-oscuro); font-size:12px;">Paso a Paso Operativo con Documentación Oficial PJEV</h4>
       <ol style="font-size:13px; line-height:1.7; margin:0; padding-left:20px; color:#1e293b;">
         <li><strong>Paso 0 — Asistente de Clasificación (Wizard Modal):</strong> El analista pulsa <code>[+ Nuevo Ingreso]</code>. Elige la macro-familia <em>1. Ministraciones de Gobierno</em> y el procedimiento <code>MIN_ESTATAL_ORD · Ministración Ordinaria Estatal</code>.</li>
-        <li><strong>Evidencia Documental de Origen (Oficio SEFIPLAN):</strong> El sistema solicita el documento macro de solicitud firmado por la Dirección General de Administración (ej. <code>Of. DGA/0367/2026</code> del 28 de mayo de 2026, amparando $192,785,075.00 con sello de Oficialía de Partes de SEFIPLAN). Este documento se carga como archivo digital probatorio en PDF.</li>
-        <li><strong>Paso 1 — Captura Administrativa de la Orden de Ministración:</strong>
-          Se captura la orden operativa específica contenida en el oficio (ej. Formato <em>Solicitud / Comprobación de Recursos</em>, Clave <code>01-06-2026</code>, Trámite SEFIPLAN <code>2026-011</code>):
+        <li><strong>Paso 1 — Captura del Formulario Compuesto (Encabezado, 2 Archivos Físicos y Grid PJEV-UI):</strong>
+          El analista ingresa a la pantalla de captura estructurada bajo el patrón de Formulario Compuesto:
           <ul style="margin-top:4px;">
-            <li><strong>Denominación y Concepto:</strong> <em>1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE NÓMINA</em>.</li>
-            <li><strong>Instrucción de Abono Bancario:</strong> Cuenta <code>0126144101</code> en BBVA Bancomer (Alias: <em>MINISTRACION 2026</em>).</li>
-            <li><strong>RFC del Ente Solicitante:</strong> <code>PJE970419FZ2</code> (Poder Judicial del Estado de Veracruz).</li>
-            <li><strong>Importe Total de la Orden:</strong> <code>$ 51,958,628.00 MXN</code>.</li>
-            <li><strong>Desglose Presupuestal por Órgano Judicial Beneficiario:</strong>
+            <li><strong>Encabezado Maestro:</strong> Se capturan los datos de la orden: Clave de orden (ej. <code>01-06-2026</code>), Trámite SEFIPLAN (<code>2026-011</code>), Denominación (ej. <em>1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE OPERACIÓN</em>), Cuenta de Abono (<code>0126144101 BBVA "MINISTRACION 2026"</code>), RFC institucional (<code>PJE970419FZ2</code>) y el <strong>Importe Total de la Ministración</strong> (ej. <code>$ 21,157,862.50 MXN</code>).</li>
+            <li><strong>Carga de los 2 Archivos Físicos Digitalizados por Firmas:</strong> El sistema provee dos zonas de carga para sustentar la legalidad del trámite:
+              <ol style="margin-top:2px;">
+                <li><em>Archivo 1 (Oficio de Solicitud DGA con acuse):</em> PDF firmado por el Director General de Administración con sello oficial de recepción de Oficialía de Partes de SEFIPLAN (ej. <code>Of. DGA/0367/2026</code>).</li>
+                <li><em>Archivo 2 (Formato Orden de Cobro firmada):</em> PDF del formato oficial de Solicitud de Recursos con las firmas autógrafas colegiadas (Elaboró, Solicitante DGA, Vo. Bo. Egresos, Directora General de Programación y Presupuesto, Jefa de Ordenes de Pago y Tesorera).</li>
+              </ol>
+            </li>
+            <li><strong>Sección de Movimientos Presupuestales (Grid PJEV-UI):</strong>
+              En lugar de teclear a mano cadenas complejas, el usuario pulsa <code>[+ Agregar Partida / Movimiento]</code>, abriendo el <strong>Modal de la PJEV-UI</strong>:
               <ul>
-                <li>Partida 1: Clave <code>413002...</code> / Ref. <code>1 NOM-1</code> → <strong>Tribunal Superior de Justicia</strong>: $10,458,826.50</li>
-                <li>Partida 2: Clave <code>413002...</code> / Ref. <code>1 NOM-2</code> → <strong>Tribunal de Conciliación y Arbitraje</strong>: $2,472,084.50</li>
-                <li>Partida 3: Clave <code>413002...</code> / Ref. <code>1 NOM-7</code> → <strong>Tribunal de Disciplina Judicial</strong>: $1,588,324.00</li>
-                <li>Partida 4: Clave <code>413002...</code> / Ref. <code>1 NOM-8</code> → <strong>Órgano de Administración Judicial</strong>: $37,439,393.00</li>
+                <li>Selecciona el <strong>Órgano Jurisdiccional</strong> (TSJ, TCA, TDJ, OAJ).</li>
+                <li>Selecciona el <strong>Capítulo de Gasto</strong> (2000 Materiales, 3000 Servicios Generales, 6000 Inversión Pública, o 1000 Nómina).</li>
+                <li>El sistema autocompleta la clave programática de SEFIPLAN (ej. <code>413004.211130010010000...</code>) y el nemotécnico de Caja (ej. <code>1 OPE-1</code>).</li>
+                <li>El capturista únicamente digita el <strong>Importe Específico ($)</strong>.</li>
               </ul>
-              <em>Suma distribuida:</em> <strong>$ 51,958,628.00 MXN</strong> (Cuadre 100% exacto).
+            </li>
+            <li><strong>Barra de Cuadre Financiero en Tiempo Real:</strong>
+              El grid totaliza automáticamente:
+              <code>Total Encabezado: $ 21,157,862.50</code> | <code>Suma Movimientos: $ 21,157,862.50</code> | <code>Diferencia: $ 0.00 (Cuadre 100%)</code>.
+              Si existe una diferencia (mayor o menor a cero), el sistema alerta visualmente y bloquea el botón <code>[Formalizar y Devengar]</code>.
             </li>
           </ul>
         </li>
@@ -211,37 +224,42 @@
         <tr><td><code>ingreso_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí</td><td>Identificador único interno del registro de ingreso en el SIAF-PJEV.</td></tr>
         <tr><td><code>folio_interno</code></td><td><code>VARCHAR(25)</code></td><td>Sí (Sistema)</td><td>Folio correlativo institucional (ej. <code>ING-2026-0045</code>). Null en borrador inicial.</td></tr>
         <tr><td><code>subtipo_tramite_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al catálogo <code>04.1.1</code> (ej. <code>MIN_ESTATAL_ORD</code>, determina la Matriz CONAC).</td></tr>
-        <tr><td><code>clave_orden</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Clave identificadora de la orden de pago asentada en el formato (ej. <code>01-06-2026</code>).</td></tr>
+        <tr><td><code>clave_orden</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Clave identificadora de la orden de pago asentada en el formato (ej. <code>01-06-2026</code> o <code>02-06-2026</code>).</td></tr>
         <tr><td><code>tramite_sefiplan</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Número de trámite oficial asignado por SEFIPLAN (ej. <code>2026-011</code> para 1a Ministración).</td></tr>
-        <tr><td><code>oficio_soporte</code></td><td><code>VARCHAR(80)</code></td><td>Sí</td><td>Número de oficio institucional enviado a SEFIPLAN que sirve de <strong>evidencia digital</strong> (ej. <code>Of. DGA/0367/2026</code>).</td></tr>
-        <tr><td><code>archivo_evidencia_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al repositorio documental del PDF digitalizado con acuse de recibo de SEFIPLAN.</td></tr>
+        <tr><td><code>oficio_soporte</code></td><td><code>VARCHAR(80)</code></td><td>Sí</td><td>Número de oficio institucional enviado a SEFIPLAN que ampara la solicitud (ej. <code>Of. DGA/0367/2026</code>).</td></tr>
+        <tr><td><code>archivo_oficio_solicitud_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td><strong>Archivo Físico 1:</strong> Referencia al repositorio documental del PDF digitalizado del Oficio DGA a SEFIPLAN con sello de acuse de recepción oficial de Oficialía de Partes.</td></tr>
+        <tr><td><code>nombre_archivo_oficio</code></td><td><code>VARCHAR(255)</code></td><td>Sí</td><td>Nombre del archivo cargado del oficio con acuse (ej. <code>Oficio_DGA_0367_2026_Acuse.pdf</code>).</td></tr>
+        <tr><td><code>archivo_orden_firmada_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td><strong>Archivo Físico 2:</strong> Referencia al PDF digitalizado del Formato Oficial de Solicitud de Recursos / Orden de Cobro debidamente signada con firmas autógrafas colegiadas (Elaboró, Solicitante DGA, Vo. Bo. Egresos, Directora General de Programación y Presupuesto, Jefa de Ordenes de Pago y Tesorera).</td></tr>
+        <tr><td><code>nombre_archivo_orden</code></td><td><code>VARCHAR(255)</code></td><td>Sí</td><td>Nombre del archivo cargado de la orden firmada (ej. <code>Orden_Cobro_02_06_2026_Firmas_Colegiadas.pdf</code>).</td></tr>
         <tr><td><code>ejercicio_fiscal</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Año presupuestal activo (ej. <code>2026</code>).</td></tr>
         <tr><td><code>periodo</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Mes presupuestal de afectación (1 a 12, ej. <code>6</code> para Junio).</td></tr>
         <tr><td><code>fecha_elaboracion</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha de emisión de la orden de pago (ej. <code>28/05/2026</code>).</td></tr>
         <tr><td><code>fecha_esperada</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha límite requerida para el depósito bancario (ej. <code>05/06/2026</code> según oficio).</td></tr>
         <tr><td><code>tipo_solicitud</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Modalidad oficial: <code>SUJETO_A_COMPROBAR</code> | <code>PAGO_DIRECTO</code> | <code>FONDO_REVOLVENTE</code>.</td></tr>
-        <tr><td><code>denominacion_concepto</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Descripción formal del trámite (ej. <em>1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE NÓMINA</em>).</td></tr>
+        <tr><td><code>denominacion_concepto</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Descripción formal del trámite (ej. <em>1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE OPERACIÓN</em>).</td></tr>
         <tr><td><code>rfc_ente</code></td><td><code>VARCHAR(13)</code></td><td>Sí</td><td>Registro Federal de Contribuyentes institucional (<code>PJE970419FZ2</code> - Poder Judicial).</td></tr>
         <tr><td><code>instruccion_abono_cuenta</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Cuenta bancaria estipulada para recibir el abono (<code>0126144101</code> BBVA "MINISTRACION 2026").</td></tr>
         <tr><td><code>origen_depositante</code></td><td><code>VARCHAR(200)</code></td><td>Sí</td><td>Ente pagador responsable (<code>Secretaría de Finanzas y Planeación - SEFIPLAN</code>).</td></tr>
-        <tr><td><code>importe_total</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Importe total de la orden a recibir (ej. <code>$ 51,958,628.00</code> para nómina).</td></tr>
+        <tr><td><code>importe_total</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td><strong>Importe Total Maestro:</strong> Techo total de la ministración (ej. <code>$ 21,157,862.50</code>). Debe coincidir exactamente con la sumatoria de las partidas de movimientos.</td></tr>
         <tr><td><code>saldo_pendiente</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto pendiente por recaudar. Se extingue al conciliar con extracto bancario.</td></tr>
         <tr><td><code>estatus</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>ENVIADO</code> | <code>OBSERVADO</code> | <code>DEVENGADO</code> | <code>PARCIAL</code> | <code>RECAUDADO</code> | <code>CANCELADO</code>.</td></tr>
       </tbody>
     </table>
 
-    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.2 Distribución Presupuestaria Multilínea (<code>ingresos.ingresos_distribucion</code>)</h3>
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.2 Distribución Presupuestaria Multilínea — Movimientos PJEV-UI (<code>ingresos.ingresos_distribucion</code>)</h3>
     <table class="props-table" style="margin-bottom: 20px;">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Mapeo con Orden Oficial</th></tr></thead>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Mapeo con Modal PJEV-UI</th></tr></thead>
       <tbody>
         <tr><td><code>distribucion_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí</td><td>Identificador único del renglón presupuestal.</td></tr>
         <tr><td><code>ingreso_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia a la orden de ingreso padre en <code>ingresos_encabezado</code>.</td></tr>
-        <tr><td><code>clave_presupuestal</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Estructura programática completa de gasto (ej. <code>413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184001</code>).</td></tr>
-        <tr><td><code>referencia_interna</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td>Clave nemotécnica interna manuscrita en formato (ej. <code>1 NOM-1</code>, <code>1 NOM-2</code>, <code>1 NOM-7</code>, <code>1 NOM-8</code>).</td></tr>
-        <tr><td><code>organo_beneficiario</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Órgano o tribunal destinatario del techo (Tribunal Superior de Justicia, Tribunal de Conciliación, etc.).</td></tr>
-        <tr><td><code>capitulo_gasto</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Capítulo de gasto (<code>1000 Servicios Personales</code> en nómina; <code>2000</code>/<code>3000</code> en operación).</td></tr>
-        <tr><td><code>fuente_financiamiento_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Fuente oficial de financiamiento (ej. <code>1114 / 111 Recursos Fiscales</code>).</td></tr>
-        <tr><td><code>importe_distribuido</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto asignado al órgano beneficiario. La suma de partidas debe igualar exactamente a <code>importe_total</code>.</td></tr>
+        <tr><td><code>organo_beneficiario_id</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Identificador del Órgano Judicial Beneficiario (1: TSJ, 2: TCA, 3: TDJ, 4: OAJ). Seleccionado en Modal PJEV-UI.</td></tr>
+        <tr><td><code>organo_beneficiario</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Denominación oficial del órgano (Tribunal Superior de Justicia, Tribunal de Conciliación y Arbitraje, etc.).</td></tr>
+        <tr><td><code>capitulo_gasto</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Capítulo de gasto (<code>1000</code> Servicios Personales, <code>2000</code> Materiales y Suministros, <code>3000</code> Servicios Generales, <code>6000</code> Inversión Pública). Seleccionado en Modal PJEV-UI.</td></tr>
+        <tr><td><code>descripcion_capitulo</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Nombre formal del capítulo presupuestal.</td></tr>
+        <tr><td><code>clave_presupuestal_sefiplan</code></td><td><code>VARCHAR(120)</code></td><td>Sí</td><td><strong>Estructura Programática Estatal (11 Segmentos):</strong> Clave SEFIPLAN generada paramétricamente de forma automática por el sistema al seleccionar Órgano y Capítulo (ej. <code>413004.211130010010000121.GZR.5.U.430.Y.1502126.1.000184001</code>).</td></tr>
+        <tr><td><code>referencia_caja</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td><strong>Nemotécnico Interno de Caja:</strong> Código abreviado autocompletado para control de Tesorería (ej. <code>1 OPE-1</code>, <code>1 OPE-2</code>, <code>1 NOM-1</code>, etc.).</td></tr>
+        <tr><td><code>fuente_financiamiento_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Fuente oficial de financiamiento (ej. <code>1114 / 111 Recursos Fiscales Ordinarios</code>).</td></tr>
+        <tr><td><code>importe_distribuido</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto asignado al renglón presupuestal. La sumatoria de todos los renglones (<code>Σ importe_distribuido</code>) debe cuadrar al centavo contra <code>importe_total</code> para habilitar la formalización.</td></tr>
       </tbody>
     </table>
 
@@ -324,7 +342,10 @@ BEGIN
             'clave_orden', i.clave_orden,
             'tramite_sefiplan', i.tramite_sefiplan,
             'oficio_soporte', i.oficio_soporte,
-            'archivo_evidencia_id', i.archivo_evidencia_id,
+            'archivo_oficio_solicitud_id', i.archivo_oficio_solicitud_id,
+            'nombre_archivo_oficio', i.nombre_archivo_oficio,
+            'archivo_orden_firmada_id', i.archivo_orden_firmada_id,
+            'nombre_archivo_orden', i.nombre_archivo_orden,
             'tipo_solicitud', i.tipo_solicitud,
             'denominacion_concepto', i.denominacion_concepto,
             'rfc_ente', i.rfc_ente,
@@ -347,14 +368,15 @@ BEGIN
                 SELECT jsonb_agg(
                     jsonb_build_object(
                         'distribucion_id', id.distribucion_id,
-                        'clave_presupuestal', id.clave_presupuestal,
-                        'referencia_interna', id.referencia_interna,
+                        'organo_beneficiario_id', id.organo_beneficiario_id,
                         'organo_beneficiario', id.organo_beneficiario,
                         'capitulo_gasto', id.capitulo_gasto,
+                        'descripcion_capitulo', id.descripcion_capitulo,
+                        'clave_presupuestal_sefiplan', id.clave_presupuestal_sefiplan,
+                        'referencia_caja', id.referencia_caja,
                         'fuente_financiamiento_id', id.fuente_financiamiento_id,
-                        'unidad_administrativa_id', id.unidad_administrativa_id,
                         'importe_distribuido', id.importe_distribuido
-                    )
+                    ) ORDER BY id.organo_beneficiario_id, id.capitulo_gasto
                 ) FROM ingresos.ingresos_distribucion id WHERE id.ingreso_id = i.ingreso_id
             ), '[]'::jsonb),
             'prepoliza_detalles', COALESCE((
@@ -419,8 +441,10 @@ DECLARE
     v_id BIGINT;
     v_folio VARCHAR(25);
     v_subtipo RECORD;
+    v_enc RECORD;
     v_prepoliza JSONB;
     v_asiento RECORD;
+    v_suma_distribuida DECIMAL(18,2);
 BEGIN
     IF p_accion = 'GUARDAR_BORRADOR' THEN
         -- 1. Obtener subtipo
@@ -428,10 +452,12 @@ BEGIN
         FROM ingresos.cat_subtipos_tramite_ingreso 
         WHERE subtipo_tramite_id = (p_payload->>'subtipo_tramite_id')::BIGINT;
 
-        -- 2. Insertar encabezado en BORRADOR (Orden de Solicitud de Recursos)
+        -- 2. Insertar encabezado en BORRADOR (Formulario Maestro)
         INSERT INTO ingresos.ingresos_encabezado (
             subtipo_tramite_id, clave_orden, tramite_sefiplan, oficio_soporte,
-            archivo_evidencia_id, ejercicio_fiscal, periodo, fecha_elaboracion,
+            archivo_oficio_solicitud_id, nombre_archivo_oficio,
+            archivo_orden_firmada_id, nombre_archivo_orden,
+            ejercicio_fiscal, periodo, fecha_elaboracion,
             fecha_esperada, fecha_operacion_bancaria, tipo_solicitud,
             denominacion_concepto, rfc_ente, instruccion_abono_cuenta,
             referencia_externa, referencia_bancaria, origen_depositante,
@@ -442,7 +468,10 @@ BEGIN
             p_payload->>'clave_orden',
             p_payload->>'tramite_sefiplan',
             p_payload->>'oficio_soporte',
-            (p_payload->>'archivo_evidencia_id')::BIGINT,
+            (p_payload->>'archivo_oficio_solicitud_id')::BIGINT,
+            p_payload->>'nombre_archivo_oficio',
+            (p_payload->>'archivo_orden_firmada_id')::BIGINT,
+            p_payload->>'nombre_archivo_orden',
             (p_payload->>'ejercicio_fiscal')::INTEGER,
             (p_payload->>'periodo')::SMALLINT,
             COALESCE((p_payload->>'fecha_elaboracion')::DATE, CURRENT_DATE),
@@ -463,20 +492,22 @@ BEGIN
             p_usuario, CURRENT_TIMESTAMP
         ) RETURNING ingreso_id INTO v_id;
 
-        -- 3. Insertar partidas presupuestales por órgano judicial beneficiario
+        -- 3. Insertar partidas de movimientos por órgano y capítulo (Grid PJEV-UI)
         IF p_payload ? 'distribucion' AND jsonb_typeof(p_payload->'distribucion') = 'array' THEN
             INSERT INTO ingresos.ingresos_distribucion (
-                ingreso_id, clave_presupuestal, referencia_interna, organo_beneficiario,
-                capitulo_gasto, fuente_financiamiento_id, unidad_administrativa_id, importe_distribuido
+                ingreso_id, organo_beneficiario_id, organo_beneficiario,
+                capitulo_gasto, descripcion_capitulo, clave_presupuestal_sefiplan,
+                referencia_caja, fuente_financiamiento_id, importe_distribuido
             )
             SELECT 
                 v_id,
-                x->>'clave_presupuestal',
-                x->>'referencia_interna',
+                (x->>'organo_beneficiario_id')::INTEGER,
                 x->>'organo_beneficiario',
                 COALESCE((x->>'capitulo_gasto')::INTEGER, 1000),
-                (x->>'fuente_financiamiento_id')::BIGINT,
-                (x->>'unidad_administrativa_id')::BIGINT,
+                x->>'descripcion_capitulo',
+                x->>'clave_presupuestal_sefiplan',
+                x->>'referencia_caja',
+                COALESCE((x->>'fuente_financiamiento_id')::BIGINT, 1),
                 (x->>'importe_distribuido')::DECIMAL(18,2)
             FROM jsonb_array_elements(p_payload->'distribucion') AS x;
         END IF;
@@ -506,27 +537,88 @@ BEGIN
 
         RETURN jsonb_build_object(
             'error', 0,
-            'mensaje', 'Ingreso guardado exitosamente en Modo Borrador con Pre-póliza resuelta.',
+            'mensaje', 'Ingreso guardado en Modo Borrador con partidas y Pre-póliza resuelta.',
             'data', jsonb_build_object('ingreso_id', v_id, 'estatus', 'BORRADOR')
         );
 
     ELSIF p_accion = 'FORMALIZAR' THEN
         v_id := (p_payload->>'ingreso_id')::BIGINT;
+
+        -- 1. Validar existencia del registro
+        SELECT * INTO v_enc FROM ingresos.ingresos_encabezado WHERE ingreso_id = v_id;
+        IF v_enc.ingreso_id IS NULL THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'El trámite de ingreso no existe.');
+        END IF;
+
+        -- 2. Validar carga obligatoria de los dos archivos físicos firmados
+        IF v_enc.archivo_oficio_solicitud_id IS NULL OR v_enc.archivo_orden_firmada_id IS NULL THEN
+            RETURN jsonb_build_object(
+                'error', -1,
+                'mensaje', 'No se puede formalizar: Es obligatorio adjuntar tanto el Oficio DGA con sello de acuse SEFIPLAN como el Formato Oficial con firmas autógrafas colegiadas.'
+            );
+        END IF;
+
+        -- 3. Validar cuadre financiero estricto al centavo (Σ Movimientos = Importe Total)
+        SELECT COALESCE(SUM(importe_distribuido), 0) INTO v_suma_distribuida
+        FROM ingresos.ingresos_distribucion WHERE ingreso_id = v_id;
+
+        IF v_suma_distribuida <> v_enc.importe_total THEN
+            RETURN jsonb_build_object(
+                'error', -1,
+                'mensaje', 'Discrepancia de cuadre presupuestal: La suma de movimientos ($' || TO_CHAR(v_suma_distribuida, 'FM999,999,999.00') || 
+                           ') no coincide con el total del encabezado ($' || TO_CHAR(v_enc.importe_total, 'FM999,999,999.00') || 
+                           '). Diferencia: $' || TO_CHAR(v_enc.importe_total - v_suma_distribuida, 'FM999,999,999.00')
+            );
+        END IF;
+
+        -- 4. Asignar folio definitivo inmutable y transitar estado a DEVENGADO
         v_folio := 'ING-' || TO_CHAR(CURRENT_DATE, 'YYYY') || '-' || LPAD(v_id::text, 4, '0');
 
         UPDATE ingresos.ingresos_encabezado SET
             folio_interno = v_folio,
             estatus = CASE 
-                WHEN (SELECT momento_inicial FROM ingresos.cat_subtipos_tramite_ingreso st JOIN ingresos.ingresos_encabezado i ON i.subtipo_tramite_id = st.subtipo_tramite_id WHERE i.ingreso_id = v_id) = 'SIMULTANEO' THEN 'RECAUDADO'
+                WHEN (SELECT momento_inicial FROM ingresos.cat_subtipos_tramite_ingreso st WHERE st.subtipo_tramite_id = v_enc.subtipo_tramite_id) = 'SIMULTANEO' THEN 'RECAUDADO'
                 ELSE 'DEVENGADO'
             END,
             usuario_m = p_usuario,
             fecha_m = CURRENT_TIMESTAMP
         WHERE ingreso_id = v_id;
 
+        -- 5. Póliza en firme (Matriz B.1 ejecutada de forma subyacente)
         UPDATE ingresos.ingreso_prepoliza_detalles SET es_borrador = false WHERE ingreso_id = v_id;
 
-        RETURN jsonb_build_object('error', 0, 'mensaje', 'Ingreso formalizado con folio ' || v_folio, 'data', jsonb_build_object('ingreso_id', v_id, 'folio', v_folio));
+        RETURN jsonb_build_object(
+            'error', 0,
+            'mensaje', 'Ingreso formalizado y devengado exitosamente con folio ' || v_folio,
+            'data', jsonb_build_object('ingreso_id', v_id, 'folio', v_folio)
+        );
+
+    ELSIF p_accion = 'AGREGAR_MOVIMIENTO' THEN
+        v_id := (p_payload->>'ingreso_id')::BIGINT;
+
+        INSERT INTO ingresos.ingresos_distribucion (
+            ingreso_id, organo_beneficiario_id, organo_beneficiario,
+            capitulo_gasto, descripcion_capitulo, clave_presupuestal_sefiplan,
+            referencia_caja, fuente_financiamiento_id, importe_distribuido
+        ) VALUES (
+            v_id,
+            (p_payload->>'organo_beneficiario_id')::INTEGER,
+            p_payload->>'organo_beneficiario',
+            (p_payload->>'capitulo_gasto')::INTEGER,
+            p_payload->>'descripcion_capitulo',
+            p_payload->>'clave_presupuestal_sefiplan',
+            p_payload->>'referencia_caja',
+            COALESCE((p_payload->>'fuente_financiamiento_id')::BIGINT, 1),
+            (p_payload->>'importe_distribuido')::DECIMAL(18,2)
+        );
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Partida presupuestal agregada correctamente al grid.', 'data', jsonb_build_object('ingreso_id', v_id));
+
+    ELSIF p_accion = 'ELIMINAR_MOVIMIENTO' THEN
+        DELETE FROM ingresos.ingresos_distribucion 
+        WHERE distribucion_id = (p_payload->>'distribucion_id')::BIGINT;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Partida presupuestal eliminada del grid.', 'data', NULL);
 
     ELSIF p_accion = 'REGISTRAR_DEPOSITO' THEN
         v_id := (p_payload->>'ingreso_id')::BIGINT;
@@ -637,9 +729,14 @@ DECLARE
     v_estado_nue VARCHAR(25);
     v_folio VARCHAR(25);
     v_momento VARCHAR(20);
+    v_total_enc DECIMAL(18,2);
+    v_arch_oficio BIGINT;
+    v_arch_orden BIGINT;
+    v_suma_distribuida DECIMAL(18,2);
 BEGIN
     -- 1. Validar existencia del trámite
-    SELECT estatus, folio_interno INTO v_estado_ant, v_folio
+    SELECT estatus, folio_interno, importe_total, archivo_oficio_solicitud_id, archivo_orden_firmada_id 
+    INTO v_estado_ant, v_folio, v_total_enc, v_arch_oficio, v_arch_orden
     FROM ingresos.ingresos_encabezado WHERE ingreso_id = p_ingreso_id;
 
     IF v_estado_ant IS NULL THEN
@@ -667,6 +764,27 @@ BEGIN
     ELSIF p_accion = 'FORMALIZAR' THEN
         IF v_estado_ant NOT IN ('BORRADOR', 'ENVIADO') THEN
             RETURN jsonb_build_object('error', -1, 'mensaje', 'El trámite no se encuentra en estado apto para formalización.');
+        END IF;
+
+        -- Validar carga de los dos archivos físicos probatorios
+        IF v_arch_oficio IS NULL OR v_arch_orden IS NULL THEN
+            RETURN jsonb_build_object(
+                'error', -1,
+                'mensaje', 'No se puede formalizar: Es obligatorio adjuntar el Oficio DGA con acuse de SEFIPLAN y la Orden de Cobro debidamente firmada.'
+            );
+        END IF;
+
+        -- Validar cuadre financiero estricto de movimientos (Σ = Total)
+        SELECT COALESCE(SUM(importe_distribuido), 0) INTO v_suma_distribuida
+        FROM ingresos.ingresos_distribucion WHERE ingreso_id = p_ingreso_id;
+
+        IF v_suma_distribuida <> v_total_enc THEN
+            RETURN jsonb_build_object(
+                'error', -1,
+                'mensaje', 'Cuadre estricto fallido: La sumatoria de movimientos ($' || TO_CHAR(v_suma_distribuida, 'FM999,999,999.00') || 
+                           ') no cuadra con el encabezado ($' || TO_CHAR(v_total_enc, 'FM999,999,999.00') || 
+                           '). Diferencia: $' || TO_CHAR(v_total_enc - v_suma_distribuida, 'FM999,999,999.00')
+            );
         END IF;
 
         SELECT st.momento_inicial INTO v_momento
@@ -730,19 +848,43 @@ $$;</code></pre>
           <td><code class="method get">GET</code></td>
           <td><code>/api/v1/ingresos</code></td>
           <td>Query: <code>?ejercicio=2026&periodo=2</code></td>
-          <td>Listado paginado de ingresos con pre-pólizas y líneas.</td>
+          <td>Listado paginado de ingresos con pre-pólizas, documentos probatorios y partidas presupuestales.</td>
         </tr>
         <tr>
           <td><code class="method post">POST</code></td>
           <td><code>/api/v1/ingresos/borrador</code></td>
           <td>Body: <code>CreateIngresoBorradorDto</code></td>
-          <td>Guarda un registro en modo borrador y genera su pre-póliza en vivo.</td>
+          <td>Guarda un registro en modo borrador (encabezado maestro) y genera su pre-póliza en vivo.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/:id/movimientos</code></td>
+          <td>Body: <code>CreateMovimientoPresupuestalDto</code></td>
+          <td>Agrega una partida presupuestal al grid PJEV-UI (Órgano, Capítulo, clave SEFIPLAN calculada, nemotécnico e importe).</td>
+        </tr>
+        <tr>
+          <td><code class="method delete">DELETE</code></td>
+          <td><code>/api/v1/ingresos/:id/movimientos/:movimientoId</code></td>
+          <td>Path: <code>:id, :movimientoId</code></td>
+          <td>Elimina un renglón presupuestal del grid de movimientos.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/:id/adjuntos/oficio</code></td>
+          <td>FormData: <code>file, numeroOficio</code></td>
+          <td><strong>Archivo 1:</strong> Carga el PDF digitalizado del Oficio DGA enviado a SEFIPLAN con sello oficial de recepción (acuse).</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/:id/adjuntos/orden-firmada</code></td>
+          <td>FormData: <code>file, claveOrden</code></td>
+          <td><strong>Archivo 2:</strong> Carga el PDF digitalizado del Formato Oficial de Orden de Cobro debidamente signado por funcionarios colegiados.</td>
         </tr>
         <tr>
           <td><code class="method post">POST</code></td>
           <td><code>/api/v1/ingresos/:id/formalizar</code></td>
           <td>Path: <code>:id</code></td>
-          <td>Transita de borrador a devengado/recaudado en firme con folio oficial.</td>
+          <td>Transita de borrador a devengado en firme previa verificación obligatoria de los dos archivos físicos y cuadre financiero al centavo (Σ Movimientos = Total).</td>
         </tr>
         <tr>
           <td><code class="method post">POST</code></td>
@@ -766,7 +908,7 @@ $$;</code></pre>
           <td><code class="method get">GET</code></td>
           <td><code>/api/v1/ingresos/:id/reporte-orden-pago</code></td>
           <td>Path: <code>:id</code></td>
-          <td>Genera el Formato Oficial imprimible en PDF de la Solicitud / Orden de Pago con los bloques de firmas institucionales (Elaboró, Revisó, Vo. Bo.).</td>
+          <td>Genera el Formato Oficial imprimible en PDF de la Solicitud / Orden de Cobro con los bloques de firmas institucionales (Elaboró, Revisó, Vo. Bo.).</td>
         </tr>
       </tbody>
     </table>
@@ -780,19 +922,61 @@ export class IngresosController {
   constructor(private readonly service: IngresosService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Listar registros de ingreso' })
+  @ApiOperation({ summary: 'Listar registros de ingreso con movimientos y pre-pólizas' })
   async listar(@CurrentUser() user: UserSession, @Query() query: FiltrosIngresoDto) {
     return this.service.leer(user, query);
   }
 
   @Post('borrador')
-  @ApiOperation({ summary: 'Guardar ingreso en Modo Borrador (con Pre-póliza en vivo)' })
+  @ApiOperation({ summary: 'Guardar encabezado maestro en Modo Borrador' })
   async guardarBorrador(@CurrentUser() user: UserSession, @Body() dto: CreateIngresoDto) {
     return this.service.guardarBorrador(user, dto);
   }
 
+  @Post(':id/movimientos')
+  @ApiOperation({ summary: 'Agregar partida presupuestal al grid PJEV-UI con clave paramétrica SEFIPLAN' })
+  async agregarMovimiento(
+    @Param('id') id: string,
+    @CurrentUser() user: UserSession,
+    @Body() dto: CreateMovimientoPresupuestalDto
+  ) {
+    return this.service.agregarMovimiento(user, BigInt(id), dto);
+  }
+
+  @Delete(':id/movimientos/:movimientoId')
+  @ApiOperation({ summary: 'Eliminar partida presupuestal del grid' })
+  async eliminarMovimiento(
+    @Param('id') id: string,
+    @Param('movimientoId') movimientoId: string,
+    @CurrentUser() user: UserSession
+  ) {
+    return this.service.eliminarMovimiento(user, BigInt(id), BigInt(movimientoId));
+  }
+
+  @Post(':id/adjuntos/oficio')
+  @ApiOperation({ summary: 'Cargar Archivo 1: Oficio DGA a SEFIPLAN con acuse de recibido oficial' })
+  @UseInterceptors(FileInterceptor('file'))
+  async subirOficioAcuse(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: UserSession
+  ) {
+    return this.service.adjuntarOficioAcuse(user, BigInt(id), file);
+  }
+
+  @Post(':id/adjuntos/orden-firmada')
+  @ApiOperation({ summary: 'Cargar Archivo 2: Formato Oficial / Orden de Cobro debidamente firmada' })
+  @UseInterceptors(FileInterceptor('file'))
+  async subirOrdenFirmada(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: UserSession
+  ) {
+    return this.service.adjuntarOrdenFirmada(user, BigInt(id), file);
+  }
+
   @Post(':id/formalizar')
-  @ApiOperation({ summary: 'Formalizar borrador a folio definitivo e inmutable' })
+  @ApiOperation({ summary: 'Formalizar borrador (Valida estricto cuadre Σ = Total y doble archivo firmado)' })
   async formalizar(@Param('id') id: string, @CurrentUser() user: UserSession) {
     return this.service.formalizar(user, BigInt(id));
   }
@@ -824,7 +1008,7 @@ export class IngresosController {
   }
 
   @Get(':id/reporte-orden-pago')
-  @ApiOperation({ summary: 'Descargar reporte oficial de Orden de Pago con Firmas Institucionales (PDF)' })
+  @ApiOperation({ summary: 'Descargar reporte oficial de Orden de Cobro con Firmas Institucionales (PDF)' })
   async descargarReporteOrdenPago(@Param('id') id: string, @Res() res: Response) {
     return this.service.generarReporteOrdenPago(BigInt(id), res);
   }
@@ -873,15 +1057,29 @@ export class IngresosController {
         </p>
       </div>
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-07 · Captura Transaccional por Solicitud / Orden de Recursos con Órganos Jurisdiccionales</strong>
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-07 · Formulario Compuesto (Maestro-Detalle) y Cuadre Obligatorio Estricto (Oficio vs Orden de Cobro)</strong>
         <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          Lo que se captura formalmente en el sistema es la <strong>Orden de Pago / Solicitud de Recursos individual</strong> (ej. clave <code>01-06-2026</code> por $51,958,628.00 para Nómina o <code>02-06-2026</code> por $21,157,862.50 para Gastos de Operación). El formulario exige el desglose estricto por <strong>Órgano Judicial Beneficiario</strong> (Tribunal Superior de Justicia, Tribunal de Conciliación y Arbitraje, Tribunal de Disciplina Judicial y Órgano de Administración Judicial), cuya sumatoria de techos debe cuadrar al centavo (<code>Σ importe_distribuido = importe_total</code>) para habilitar su formalización y devengo subyacente.
+          Bajo el estándar de Formulario Compuesto institucional (homologado con Egresos <code>05.2.1</code>), la captura se organiza en un <strong>Encabezado Maestro</strong> (donde se registra el importe total de la ministración solicitada según el oficio) y una sección de <strong>Movimientos Presupuestales en Grid PJEV-UI</strong> (donde se desglosan las partidas por órgano y capítulo). Es precondición indispensable para habilitar el botón <code>[Formalizar y Devengar]</code> que la sumatoria de las partidas de movimientos sea matemáticamente idéntica al importe total del encabezado (<code>Σ importe_distribuido = importe_total</code>, Diferencia = $0.00). Cualquier discrepancia al centavo bloquea la formalización en UI y es rechazada por el Stored Procedure en base de datos.
         </p>
       </div>
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
         <strong style="color:var(--pjev-verde-oscuro);">RN-ING-08 · Registro Simple de Comprobante Bancario y Recaudación Subyacente (Principio KISS)</strong>
         <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
           El sistema descarta la simulación compleja de portales bancarios externos y aplica el principio KISS (<em>Keep It Simple</em>): el analista únicamente selecciona el banco receptor (ej. <em>BBVA México</em>) y la cuenta institucional PJEV (<code>0126144101 "MINISTRACION 2026"</code>), registra los datos del abono (fecha, clave de rastreo SPEI / referencia e importe) y <strong>registra el documento comprobatorio</strong> (adjuntando el PDF o imagen). Al registrar el depósito, el sistema liquida el saldo pendiente a $0.00 y de forma 100% subyacente e invisible detona la recaudación (Matriz CONAC 03.1.2 B.2: cargo a Bancos 1.1.1.2 vs abono a Cuentas por Cobrar 1.1.2.2 y Ley Devengada 8.1.4 a Ley Recaudada 8.1.5) sin intervención ni asientos manuales de contabilidad.
+        </p>
+      </div>
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-09 · Carga Obligatoria de los Dos Archivos Físicos Digitalizados con Firmas y Acuses</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Para satisfacer las auditorías del Órgano de Fiscalización Superior (ORFIS) y la Contraloría Interna, el encabezado maestro exige la carga digital de los dos documentos probatorios que amparan el trámite:
+          (1) <em>Archivo 1 (Oficio DGA con Acuse):</em> PDF del oficio dirigido al Secretario de Finanzas con el sello formal de acuse de recepción de Oficialía de Partes de SEFIPLAN; y
+          (2) <em>Archivo 2 (Orden de Cobro Firmada):</em> PDF del formato oficial de Solicitud de Recursos con las firmas autógrafas colegiadas de los 6 servidores públicos autorizadores (Elaboró, Solicitante DGA, Vo. Bo. Egresos, Directora General de Programación y Presupuesto, Jefa de Órdenes de Pago y Tesorera). Sin ambos archivos cargados, el sistema no permite formalizar el ingreso.
+        </p>
+      </div>
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-10 · Generación Paramétrica de la Clave Programática SEFIPLAN (11 Segmentos) y Nemotécnico de Caja en Modal PJEV-UI</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Para eliminar el riesgo de captura errónea de cadenas alfanuméricas complejas de más de 50 caracteres, el usuario jamás teclea la clave presupuestal a mano. Al pulsar <code>[+ Agregar Partida / Movimiento]</code>, se abre el <strong>Modal de la PJEV-UI</strong> donde el capturista únicamente selecciona el <strong>Órgano Judicial Beneficiario</strong> (TSJ, TCA, TDJ, OAJ) y el <strong>Capítulo de Gasto</strong> (1000 Nómina, 2000 Materiales, 3000 Servicios, 6000 Inversión). El sistema resuelve de forma inmediata la estructura estatal de 11 segmentos (<code>41300X.2111300100X...</code>) y el nemotécnico de Caja (ej. <code>1 OPE-1</code>, <code>1 OPE-8</code>, <code>1 NOM-1</code>), requiriendo del usuario únicamente el importe numérico asignado.
         </p>
       </div>
     </div>
@@ -894,9 +1092,10 @@ export class IngresosController {
     <div class="wf-tabs">
       <button class="wf-tab active" onclick="showWF('wf1',this)">1. Bandeja Principal de Ingresos</button>
       <button class="wf-tab" onclick="showWF('wf2',this)">2. Modal Asistente (Paso 0: Selección de Trámite)</button>
-      <button class="wf-tab" onclick="showWF('wf3',this)">3. Captura Administrativa (Paso 1: Oficio y Techo)</button>
-      <button class="wf-tab" onclick="showWF('wf4',this)">4. Registro de Depósito Bancario y Recaudación (Paso 2: Elección de Banco y Comprobante)</button>
-      <button class="wf-tab" onclick="showWF('wf5',this)">5. Tablero de Mensajes e Historial (Modales)</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Formulario Compuesto (Paso 1: Encabezado, 2 Archivos y Grid)</button>
+      <button class="wf-tab" onclick="showWF('wf4',this)">4. Modal Captura de Partida PJEV-UI (Autocompletado Clave SEFIPLAN)</button>
+      <button class="wf-tab" onclick="showWF('wf5',this)">5. Registro de Depósito Bancario y Recaudación (Paso 2: Principio KISS)</button>
+      <button class="wf-tab" onclick="showWF('wf6',this)">6. Tablero de Mensajes e Historial (Modales)</button>
     </div>
 
     <!-- WF1: BANDEJA -->
@@ -1104,187 +1303,328 @@ export class IngresosController {
       </div>
     </div>
 
-    <!-- WF3: FORMULARIO ADMINISTRATIVO (PASO 1: ORDEN DE SOLICITUD DE RECURSOS) -->
+        <!-- WF3: FORMULARIO COMPUESTO (PASO 1: ENCABEZADO, 2 ARCHIVOS FÍSICOS Y GRID MOVIMIENTOS) -->
     <div id="wf-wf3" class="wf-panel">
       <div class="wf-box">
         <div class="wf-bar">
-          <span class="wf-bar-label">Formulario de Captura Sustantiva: Solicitud / Comprobación de Recursos (Paso 1)</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Formato Oficial Clave 01-06-2026 · Evidencia PDF Of. DGA/0367/2026 · Contabilidad Subyacente B.1</span>
+          <span class="wf-bar-label">Formulario Compuesto: Solicitud / Orden de Cobro · Doble Archivo Físico Firmado y Grid PJEV-UI (Paso 1)</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Clave 02-06-2026 · Oficio DGA/0367/2026 + Orden Firmada · Cuadre $21,157,862.50 · Matriz B.1</span>
         </div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="960" height="640" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
-            
-            <!-- Encabezado de la Ventana -->
-            <rect x="0" y="0" width="960" height="38" fill="#183125"/>
-            <text x="25" y="24" font-size="12" font-weight="bold" fill="#ffffff">SOLICITUD / COMPROBACIÓN DE RECURSOS (ORDEN DE PAGO) · CLAVE 01-06-2026</text>
-            <rect x="740" y="8" width="175" height="22" fill="#2d4a3b" rx="3"/>
-            <text x="827" y="23" font-size="9" font-weight="bold" fill="#a7f3d0" text-anchor="middle">Contabilidad Subyacente (B.1)</text>
-            <text x="935" y="24" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+          <svg viewBox="0 0 960 720" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <rect width="960" height="720" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+  
+  <!-- Encabezado de la Ventana -->
+  <rect x="0" y="0" width="960" height="38" fill="#183125"/>
+  <text x="25" y="24" font-size="12" font-weight="bold" fill="#ffffff">SOLICITUD / COMPROBACIÓN DE RECURSOS (ORDEN DE COBRO) · CLAVE 02-06-2026</text>
+  <rect x="735" y="8" width="180" height="22" fill="#2d4a3b" rx="3"/>
+  <text x="825" y="23" font-size="9" font-weight="bold" fill="#a7f3d0" text-anchor="middle">Contabilidad Subyacente (B.1)</text>
+  <text x="935" y="24" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
 
-            <!-- 1. ENCABEZADO INSTITUCIONAL DE LA ORDEN (Fiel a Formato Oficial) -->
-            <rect x="20" y="48" width="920" height="152" fill="#fdfbf7" stroke="#cbd5e1" rx="4"/>
-            <rect x="20" y="48" width="920" height="22" fill="#f1f5f9" rx="4 4 0 0"/>
-            <text x="30" y="63" font-size="9.5" font-weight="bold" fill="#183125">1. DATOS DE LA SOLICITUD DE RECURSOS Y EVIDENCIA DIGITAL (OFICIO SEFIPLAN)</text>
-            <text x="930" y="63" font-size="8.5" fill="#64748b" text-anchor="end">Ente: PODER JUDICIAL DEL ESTADO DE VERACRUZ (RFC: PJE970419FZ2)</text>
+  <!-- 1. ENCABEZADO INSTITUCIONAL DE LA ORDEN (Formulario Maestro) -->
+  <rect x="20" y="46" width="920" height="142" fill="#fdfbf7" stroke="#cbd5e1" rx="4"/>
+  <rect x="20" y="46" width="920" height="22" fill="#f1f5f9" rx="4 4 0 0"/>
+  <text x="30" y="61" font-size="9.5" font-weight="bold" fill="#183125">1. DATOS DE LA SOLICITUD DE RECURSOS Y EXPEDIENTE DIGITAL FIRMADO (OFICIO Y ORDEN)</text>
+  <text x="930" y="61" font-size="8.5" fill="#64748b" text-anchor="end">Ente: PODER JUDICIAL DEL ESTADO DE VERACRUZ (RFC: PJE970419FZ2)</text>
 
-            <!-- Fila 1: Clave, Trámite, Lugar y Fecha, Tipo de Solicitud -->
-            <text x="30" y="86" font-size="8" font-weight="bold" fill="#475569">CLAVE DE ORDEN *</text>
-            <rect x="30" y="91" width="120" height="22" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="3"/>
-            <text x="40" y="106" font-size="9.5" font-weight="bold" fill="#183125">01-06-2026</text>
+  <!-- Fila 1: Clave, Trámite, Lugar y Fecha, Tipo de Solicitud, Total -->
+  <text x="30" y="83" font-size="8" font-weight="bold" fill="#475569">CLAVE DE ORDEN *</text>
+  <rect x="30" y="87" width="115" height="22" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="3"/>
+  <text x="40" y="102" font-size="9.5" font-weight="bold" fill="#183125">02-06-2026</text>
 
-            <text x="165" y="86" font-size="8" font-weight="bold" fill="#475569">TRÁMITE SEFIPLAN *</text>
-            <rect x="165" y="91" width="120" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="175" y="106" font-size="9.5" font-weight="bold" fill="#1e293b">2026-011</text>
+  <text x="160" y="83" font-size="8" font-weight="bold" fill="#475569">TRÁMITE SEFIPLAN *</text>
+  <rect x="160" y="87" width="115" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+  <text x="170" y="102" font-size="9.5" font-weight="bold" fill="#1e293b">2026-011</text>
 
-            <text x="300" y="86" font-size="8" font-weight="bold" fill="#475569">LUGAR Y FECHA DE EMISIÓN *</text>
-            <rect x="300" y="91" width="200" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="310" y="106" font-size="9" fill="#1e293b">Xalapa, Ver., a 28 de mayo de 2026</text>
+  <text x="290" y="83" font-size="8" font-weight="bold" fill="#475569">LUGAR Y FECHA DE EMISIÓN *</text>
+  <rect x="290" y="87" width="195" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+  <text x="300" y="102" font-size="9" fill="#1e293b">Xalapa, Ver., a 28 de mayo de 2026</text>
 
-            <text x="515" y="86" font-size="8" font-weight="bold" fill="#475569">MODALIDAD DE SOLICITUD *</text>
-            <rect x="515" y="91" width="210" height="22" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
-            <text x="525" y="106" font-size="8.5" font-weight="bold" fill="#065f46">● SUJETO A COMPROBAR</text>
-            <text x="645" y="106" font-size="8" fill="#64748b">○ PAGO DIRECTO</text>
+  <text x="500" y="83" font-size="8" font-weight="bold" fill="#475569">MODALIDAD DE SOLICITUD *</text>
+  <rect x="500" y="87" width="200" height="22" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
+  <text x="510" y="102" font-size="8.5" font-weight="bold" fill="#065f46">● SUJETO A COMPROBAR</text>
+  <text x="625" y="102" font-size="8" fill="#64748b">○ PAGO DIRECTO</text>
 
-            <text x="740" y="86" font-size="8" font-weight="bold" fill="#475569">TOTAL DE LA ORDEN ($) *</text>
-            <rect x="740" y="91" width="185" height="22" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="3"/>
-            <text x="915" y="107" font-size="10.5" font-weight="bold" fill="#183125" text-anchor="end">$ 51,958,628.00</text>
+  <text x="715" y="83" font-size="8" font-weight="bold" fill="#475569">TOTAL DE LA MINISTRACIÓN ($) *</text>
+  <rect x="715" y="87" width="215" height="22" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="3"/>
+  <text x="920" y="103" font-size="10.5" font-weight="bold" fill="#183125" text-anchor="end">$ 21,157,862.50 MXN</text>
 
-            <!-- Fila 2: Concepto Formal y Abono en Cuenta -->
-            <text x="30" y="127" font-size="8" font-weight="bold" fill="#475569">CONCEPTO INSTITUCIONAL DEL TRÁMITE *</text>
-            <rect x="30" y="132" width="470" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="40" y="147" font-size="8.5" font-weight="bold" fill="#1e293b">1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE NÓMINA</text>
+  <!-- Fila 2: Concepto y Abono en Cuenta -->
+  <text x="30" y="122" font-size="8" font-weight="bold" fill="#475569">CONCEPTO INSTITUCIONAL DEL TRÁMITE *</text>
+  <rect x="30" y="126" width="455" height="20" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+  <text x="40" y="140" font-size="8" font-weight="bold" fill="#1e293b">1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE OPERACIÓN</text>
 
-            <text x="515" y="127" font-size="8" font-weight="bold" fill="#475569">INSTRUCCIÓN DE ABONO EN CUENTA BANCARIA *</text>
-            <rect x="515" y="132" width="410" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="525" y="147" font-size="8.5" fill="#1e293b">Abono en la cuenta No. <tspan font-weight="bold">0126144101 BBVA Bancomer</tspan> ("MINISTRACION 2026")</text>
+  <text x="500" y="122" font-size="8" font-weight="bold" fill="#475569">INSTRUCCIÓN DE ABONO EN CUENTA BANCARIA *</text>
+  <rect x="500" y="126" width="430" height="20" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+  <text x="510" y="140" font-size="8" fill="#1e293b">Abono en cuenta No. <tspan font-weight="bold">0126144101 BBVA Bancomer</tspan> ("MINISTRACION 2026")</text>
 
-            <!-- Fila 3: Importe con Letra y Expediente PDF Adjunto -->
-            <text x="30" y="167" font-size="8" font-weight="bold" fill="#475569">IMPORTE EN LETRA:</text>
-            <rect x="30" y="171" width="470" height="20" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
-            <text x="40" y="184" font-size="8" font-style="italic" fill="#334155">(Cincuenta y un millones novecientos cincuenta y ocho mil seiscientos veintiocho pesos 00/100 M.N.)</text>
+  <!-- Fila 3: Carga de los 2 Archivos Físicos Digitalizados por Firmas y Acuses -->
+  <rect x="30" y="152" width="435" height="28" fill="#f0fdf4" stroke="#86efac" stroke-width="1.2" rx="3"/>
+  <text x="40" y="165" font-size="7.5" font-weight="bold" fill="#166534">ARCHIVO FÍSICO 1: OFICIO DGA A SEFIPLAN (ACUSE DE RECIBIDO) *</text>
+  <text x="40" y="175" font-size="7.5" fill="#065f46">📎 <tspan font-weight="bold">Oficio_DGA_0367_2026_Acuse.pdf</tspan> (2.4 MB) — Sello Oficial Verificado ✓</text>
+  <text x="455" y="170" font-size="7.5" fill="#0284c7" text-anchor="end" cursor="pointer">[Ver PDF]</text>
 
-            <text x="515" y="167" font-size="8" font-weight="bold" fill="#475569">EXPEDIENTE DIGITAL (OFICIO SOPORTE A SEFIPLAN) *</text>
-            <rect x="515" y="171" width="410" height="20" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
-            <text x="525" y="184" font-size="8" font-weight="bold" fill="#065f46">📎 Oficio_DGA_0367_2026_SEFIPLAN.pdf (2.4 MB) — Verificado ✓</text>
-            <text x="915" y="184" font-size="7.5" fill="#0284c7" text-anchor="end">[Ver PDF]</text>
+  <rect x="480" y="152" width="450" height="28" fill="#f0fdf4" stroke="#86efac" stroke-width="1.2" rx="3"/>
+  <text x="490" y="165" font-size="7.5" font-weight="bold" fill="#166534">ARCHIVO FÍSICO 2: FORMATO ORDEN DE COBRO (FIRMAS AUTÓGRAFAS) *</text>
+  <text x="490" y="175" font-size="7.5" fill="#065f46">📎 <tspan font-weight="bold">Orden_Cobro_02_06_2026_Firmas_Colegiadas.pdf</tspan> (1.8 MB) — 6 Firmas Verificadas ✓</text>
+  <text x="920" y="170" font-size="7.5" fill="#0284c7" text-anchor="end" cursor="pointer">[Ver PDF]</text>
 
-            <!-- 2. DESGLOSE PRESUPUESTAL POR ÓRGANO JUDICIAL BENEFICIARIO (Las 4 Partidas Oficiales) -->
-            <text x="20" y="217" font-size="9.5" font-weight="bold" fill="#183125">2. DESGLOSE PRESUPUESTAL POR ÓRGANO JUDICIAL BENEFICIARIO</text>
-            <text x="940" y="217" font-size="8" fill="#64748b" text-anchor="end">4 Partidas Oficiales PJEV</text>
-            <line x1="20" y1="222" x2="940" y2="222" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- 2. SECCIÓN DE MOVIMIENTOS PRESUPUESTALES (GRID PJEV-UI) -->
+  <rect x="20" y="196" width="920" height="258" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+  <rect x="20" y="196" width="920" height="26" fill="#f8fafc" rx="4 4 0 0"/>
+  <text x="32" y="213" font-size="9.5" font-weight="bold" fill="#183125">2. MOVIMIENTOS PRESUPUESTALES (GRID PJEV-UI · 9 PARTIDAS DE OPERACIÓN)</text>
+  
+  <!-- Botón [+ Agregar Partida] que despliega el Modal -->
+  <rect x="745" y="200" width="185" height="19" fill="#183125" rx="3" cursor="pointer"/>
+  <text x="837" y="213" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Agregar Partida / Movimiento</text>
 
-            <!-- Encabezado de la Tabla de Partidas -->
-            <rect x="20" y="228" width="920" height="20" fill="#183125"/>
-            <text x="30" y="241" font-size="8" font-weight="bold" fill="#ffffff">CLAVE PRESUPUESTAL</text>
-            <text x="440" y="241" font-size="8" font-weight="bold" fill="#ffffff">REF.</text>
-            <text x="500" y="241" font-size="8" font-weight="bold" fill="#ffffff">ÓRGANO JUDICIAL BENEFICIARIO</text>
-            <text x="730" y="241" font-size="8" font-weight="bold" fill="#ffffff">CAPÍTULO</text>
-            <text x="800" y="241" font-size="8" font-weight="bold" fill="#ffffff">FUENTE</text>
-            <text x="930" y="241" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="end">IMPORTE ($)</text>
+  <!-- Encabezado de la Tabla de Partidas -->
+  <rect x="25" y="226" width="910" height="18" fill="#183125"/>
+  <text x="32" y="238" font-size="7.5" font-weight="bold" fill="#ffffff">CLAVE PROGRAMÁTICA SEFIPLAN (11 SEG.)</text>
+  <text x="375" y="238" font-size="7.5" font-weight="bold" fill="#ffffff">REF.</text>
+  <text x="430" y="238" font-size="7.5" font-weight="bold" fill="#ffffff">ÓRGANO JUDICIAL BENEFICIARIO</text>
+  <text x="645" y="238" font-size="7.5" font-weight="bold" fill="#ffffff">CAPÍTULO DE GASTO</text>
+  <text x="770" y="238" font-size="7.5" font-weight="bold" fill="#ffffff">FUENTE</text>
+  <text x="870" y="238" font-size="7.5" font-weight="bold" fill="#ffffff" text-anchor="end">IMPORTE ($)</text>
+  <text x="915" y="238" font-size="7.5" font-weight="bold" fill="#ffffff" text-anchor="middle">ACC.</text>
 
-            <!-- Partida 1: Tribunal Superior de Justicia -->
-            <rect x="20" y="249" width="920" height="24" fill="#ffffff" stroke="#f1f5f9"/>
-            <text x="30" y="264" font-size="8" font-family="monospace" fill="#334155">413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184001</text>
-            <text x="440" y="264" font-size="8.5" font-weight="bold" fill="#0284c7">1 NOM-1</text>
-            <text x="500" y="264" font-size="8.5" font-weight="bold" fill="#1e293b">Tribunal Superior de Justicia</text>
-            <text x="730" y="264" font-size="8" fill="#475569">1000 Servicios P.</text>
-            <text x="800" y="264" font-size="8" fill="#475569">1114 Rec. Fisc.</text>
-            <text x="930" y="264" font-size="8.5" font-weight="bold" fill="#1e293b" text-anchor="end">10,458,826.50</text>
+  <!-- Fila 1: TSJ - Cap 2000 -->
+  <rect x="25" y="246" width="910" height="18" fill="#ffffff" stroke="#f1f5f9"/>
+  <text x="32" y="258" font-size="7" font-family="monospace" fill="#334155">413004.211130010010000121.GZR.5.U.430.Y.1502126.1.000184001</text>
+  <text x="375" y="258" font-size="7.5" font-weight="bold" fill="#0284c7">1 OPE-1</text>
+  <text x="430" y="258" font-size="7.5" fill="#1e293b">Tribunal Superior de Justicia</text>
+  <text x="645" y="258" font-size="7.5" fill="#475569">2000 Materiales y Suministros</text>
+  <text x="770" y="258" font-size="7" fill="#64748b">1114 Rec. Fisc.</text>
+  <text x="870" y="258" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="end">571,333.00</text>
+  <text x="915" y="258" font-size="8" fill="#0284c7" text-anchor="middle" cursor="pointer">✏️ 🗑️</text>
 
-            <!-- Partida 2: Tribunal de Conciliación y Arbitraje -->
-            <rect x="20" y="274" width="920" height="24" fill="#f8fafc" stroke="#f1f5f9"/>
-            <text x="30" y="289" font-size="8" font-family="monospace" fill="#334155">413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184002</text>
-            <text x="440" y="289" font-size="8.5" font-weight="bold" fill="#0284c7">1 NOM-2</text>
-            <text x="500" y="289" font-size="8.5" font-weight="bold" fill="#1e293b">Tribunal de Conciliación y Arbitraje</text>
-            <text x="730" y="289" font-size="8" fill="#475569">1000 Servicios P.</text>
-            <text x="800" y="289" font-size="8" fill="#475569">1114 Rec. Fisc.</text>
-            <text x="930" y="289" font-size="8.5" font-weight="bold" fill="#1e293b" text-anchor="end">2,472,084.50</text>
+  <!-- Fila 2: TSJ - Cap 3000 -->
+  <rect x="25" y="265" width="910" height="18" fill="#f8fafc" stroke="#f1f5f9"/>
+  <text x="32" y="277" font-size="7" font-family="monospace" fill="#334155">413005.211130010010000121.GZR.5.U.430.Y.1502126.1.000184001</text>
+  <text x="375" y="277" font-size="7.5" font-weight="bold" fill="#0284c7">1 OPE-1</text>
+  <text x="430" y="277" font-size="7.5" fill="#1e293b">Tribunal Superior de Justicia</text>
+  <text x="645" y="277" font-size="7.5" fill="#475569">3000 Servicios Generales</text>
+  <text x="770" y="277" font-size="7" fill="#64748b">1114 Rec. Fisc.</text>
+  <text x="870" y="277" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="end">1,771,982.00</text>
+  <text x="915" y="277" font-size="8" fill="#0284c7" text-anchor="middle" cursor="pointer">✏️ 🗑️</text>
 
-            <!-- Partida 3: Tribunal de Disciplina Judicial -->
-            <rect x="20" y="299" width="920" height="24" fill="#ffffff" stroke="#f1f5f9"/>
-            <text x="30" y="314" font-size="8" font-family="monospace" fill="#334155">413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184007</text>
-            <text x="440" y="314" font-size="8.5" font-weight="bold" fill="#0284c7">1 NOM-7</text>
-            <text x="500" y="314" font-size="8.5" font-weight="bold" fill="#1e293b">Tribunal de Disciplina Judicial</text>
-            <text x="730" y="314" font-size="8" fill="#475569">1000 Servicios P.</text>
-            <text x="800" y="314" font-size="8" fill="#475569">1114 Rec. Fisc.</text>
-            <text x="930" y="314" font-size="8.5" font-weight="bold" fill="#1e293b" text-anchor="end">1,588,324.00</text>
+  <!-- Fila 3: TSJ - Cap 6000 -->
+  <rect x="25" y="284" width="910" height="18" fill="#ffffff" stroke="#f1f5f9"/>
+  <text x="32" y="296" font-size="7" font-family="monospace" fill="#334155">413008.211130010010000121.GZR.5.U.430.Y.1502126.1.000184001</text>
+  <text x="375" y="296" font-size="7.5" font-weight="bold" fill="#0284c7">1 OPE-1</text>
+  <text x="430" y="296" font-size="7.5" fill="#1e293b">Tribunal Superior de Justicia</text>
+  <text x="645" y="296" font-size="7.5" fill="#475569">6000 Inversión Pública</text>
+  <text x="770" y="296" font-size="7" fill="#64748b">1114 Rec. Fisc.</text>
+  <text x="870" y="296" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="end">1,850,000.00</text>
+  <text x="915" y="296" font-size="8" fill="#0284c7" text-anchor="middle" cursor="pointer">✏️ 🗑️</text>
 
-            <!-- Partida 4: Órgano de Administración Judicial -->
-            <rect x="20" y="324" width="920" height="24" fill="#f8fafc" stroke="#f1f5f9"/>
-            <text x="30" y="339" font-size="8" font-family="monospace" fill="#334155">413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184008</text>
-            <text x="440" y="339" font-size="8.5" font-weight="bold" fill="#0284c7">1 NOM-8</text>
-            <text x="500" y="339" font-size="8.5" font-weight="bold" fill="#1e293b">Órgano de Administración Judicial</text>
-            <text x="730" y="339" font-size="8" fill="#475569">1000 Servicios P.</text>
-            <text x="800" y="339" font-size="8" fill="#475569">1114 Rec. Fisc.</text>
-            <text x="930" y="339" font-size="8.5" font-weight="bold" fill="#1e293b" text-anchor="end">37,439,393.00</text>
+  <!-- Fila 4: TCA - Cap 2000 -->
+  <rect x="25" y="303" width="910" height="18" fill="#f8fafc" stroke="#f1f5f9"/>
+  <text x="32" y="315" font-size="7" font-family="monospace" fill="#334155">413004.211130010030000121.GZR.5.U.430.Y.1502126.1.000186001</text>
+  <text x="375" y="315" font-size="7.5" font-weight="bold" fill="#0284c7">1 OPE-2</text>
+  <text x="430" y="315" font-size="7.5" fill="#1e293b">Tribunal de Conciliación y Arbitraje</text>
+  <text x="645" y="315" font-size="7.5" fill="#475569">2000 Materiales y Suministros</text>
+  <text x="770" y="315" font-size="7" fill="#64748b">1114 Rec. Fisc.</text>
+  <text x="870" y="315" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="end">133,500.50</text>
+  <text x="915" y="315" font-size="8" fill="#0284c7" text-anchor="middle" cursor="pointer">✏️ 🗑️</text>
 
-            <!-- Barra de Cuadre Estricto -->
-            <rect x="20" y="352" width="920" height="24" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
-            <text x="30" y="367" font-size="8.5" font-weight="bold" fill="#065f46">Σ Desglose por Órganos: $ 51,958,628.00 MXN</text>
-            <text x="450" y="367" font-size="8.5" fill="#065f46">Total Orden 01-06-2026: $ 51,958,628.00 MXN</text>
-            <text x="930" y="367" font-size="8.5" font-weight="bold" fill="#047857" text-anchor="end">✓ Cuadre 100% Exacto (Diferencia: $0.00)</text>
+  <!-- Fila 5: TCA - Cap 3000 -->
+  <rect x="25" y="322" width="910" height="18" fill="#ffffff" stroke="#f1f5f9"/>
+  <text x="32" y="334" font-size="7" font-family="monospace" fill="#334155">413005.211130010030000121.GZR.5.U.430.Y.1502126.1.000186001</text>
+  <text x="375" y="334" font-size="7.5" font-weight="bold" fill="#0284c7">1 OPE-2</text>
+  <text x="430" y="334" font-size="7.5" fill="#1e293b">Tribunal de Conciliación y Arbitraje</text>
+  <text x="645" y="334" font-size="7.5" fill="#475569">3000 Servicios Generales</text>
+  <text x="770" y="334" font-size="7" fill="#64748b">1114 Rec. Fisc.</text>
+  <text x="870" y="334" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="end">877,378.50</text>
+  <text x="915" y="334" font-size="8" fill="#0284c7" text-anchor="middle" cursor="pointer">✏️ 🗑️</text>
 
-            <!-- 3. BLOQUE AFECTACIÓN CONTABLE SUBYACENTE (EN SEGUNDO PLANO) -->
-            <rect x="20" y="386" width="920" height="74" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <rect x="20" y="386" width="920" height="22" fill="#f1f5f9" rx="4 4 0 0"/>
-            <text x="32" y="401" font-size="8.5" font-weight="bold" fill="#334155">⚙️ AFECTACIÓN CONTABLE SUBYACENTE (MOTOR CONAC 03.1.2 · MATRIZ B.1 DEVENGADO DE INGRESOS EN SEGUNDO PLANO)</text>
-            <rect x="760" y="389" width="168" height="16" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="844" y="400" font-size="7.5" font-weight="bold" fill="#0284c7" text-anchor="middle">👁 Ver Pre-póliza Subyacente</text>
+  <!-- Fila 6: TDJ - Cap 2000 -->
+  <rect x="25" y="341" width="910" height="18" fill="#f8fafc" stroke="#f1f5f9"/>
+  <text x="32" y="353" font-size="7" font-family="monospace" fill="#334155">413004.211130010060000121.GZR.5.U.430.Y.1502126.1.000618001</text>
+  <text x="375" y="353" font-size="7.5" font-weight="bold" fill="#0284c7">1 OPE-7</text>
+  <text x="430" y="353" font-size="7.5" fill="#1e293b">Tribunal de Disciplina Judicial</text>
+  <text x="645" y="353" font-size="7.5" fill="#475569">2000 Materiales y Suministros</text>
+  <text x="770" y="353" font-size="7" fill="#64748b">1114 Rec. Fisc.</text>
+  <text x="870" y="353" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="end">130,767.50</text>
+  <text x="915" y="353" font-size="8" fill="#0284c7" text-anchor="middle" cursor="pointer">✏️ 🗑️</text>
 
-            <text x="32" y="420" font-size="8" fill="#475569">El capturista de ingresos no captura asientos contables. Al formalizar esta orden 01-06-2026, el motor contable del SIAF-PJEV genera de forma automática:</text>
-            <text x="32" y="433" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Patrimonial:</tspan> Cargo a Cuentas por Cobrar a Corto Plazo (1.1.2.2.0001 SEFIPLAN) vs Abono a Transferencias del Poder Ejecutivo (4.1.5.1.0001) por $51,958,628.00</text>
-            <text x="32" y="446" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Presupuestal:</tspan> Cargo a Ley de Ingresos por Ejecutar (8.1.2 CRI 9.1.1.1) vs Abono a Ley de Ingresos Devengada (8.1.4 CRI 9.1.1.1) por $51,958,628.00</text>
+  <!-- Fila 7: TDJ - Cap 3000 -->
+  <rect x="25" y="360" width="910" height="18" fill="#ffffff" stroke="#f1f5f9"/>
+  <text x="32" y="372" font-size="7" font-family="monospace" fill="#334155">413005.211130010060000121.GZR.5.U.430.Y.1502126.1.000618001</text>
+  <text x="375" y="372" font-size="7.5" font-weight="bold" fill="#0284c7">1 OPE-7</text>
+  <text x="430" y="372" font-size="7.5" fill="#1e293b">Tribunal de Disciplina Judicial</text>
+  <text x="645" y="372" font-size="7.5" fill="#475569">3000 Servicios Generales</text>
+  <text x="770" y="372" font-size="7" fill="#64748b">1114 Rec. Fisc.</text>
+  <text x="870" y="372" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="end">357,493.00</text>
+  <text x="915" y="372" font-size="8" fill="#0284c7" text-anchor="middle" cursor="pointer">✏️ 🗑️</text>
 
-            <!-- 4. HISTORIAL DE WORKFLOW Y MENSAJES INSTITUCIONALES -->
-            <rect x="20" y="470" width="920" height="88" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <rect x="20" y="470" width="920" height="18" fill="#f8fafc" rx="4 4 0 0"/>
-            <text x="32" y="483" font-size="8" font-weight="bold" fill="#1e293b">💬 HISTORIAL DE TRAZABILIDAD Y MENSAJES (IngresoHistorialTimeline · 2 registros)</text>
-            <text x="930" y="483" font-size="7.5" fill="#64748b" text-anchor="end">Bitácora forense inviolable</text>
+  <!-- Fila 8: OAJ - Cap 2000 -->
+  <rect x="25" y="379" width="910" height="18" fill="#f8fafc" stroke="#f1f5f9"/>
+  <text x="32" y="391" font-size="7" font-family="monospace" fill="#334155">413004.211130010070000121.GZR.5.U.430.Y.1502126.1.000619001</text>
+  <text x="375" y="391" font-size="7.5" font-weight="bold" fill="#0284c7">1 OPE-8</text>
+  <text x="430" y="391" font-size="7.5" fill="#1e293b">Órgano de Administración Judicial</text>
+  <text x="645" y="391" font-size="7.5" fill="#475569">2000 Materiales y Suministros</text>
+  <text x="770" y="391" font-size="7" fill="#64748b">1114 Rec. Fisc.</text>
+  <text x="870" y="391" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="end">1,519,831.00</text>
+  <text x="915" y="391" font-size="8" fill="#0284c7" text-anchor="middle" cursor="pointer">✏️ 🗑️</text>
 
-            <!-- Mensaje 1 -->
-            <rect x="28" y="492" width="904" height="28" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
-            <rect x="34" y="496" width="44" height="11" fill="#dbeafe" rx="2"/>
-            <text x="56" y="504" font-size="6.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
-            <text x="84" y="504" font-size="7.5" font-weight="bold" fill="#1e293b">BORRADOR → ENVIADO</text>
-            <text x="450" y="504" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 11:15:20 • Por: C.P. Eunice Hernández Valdés</text>
-            <text x="36" y="515" font-size="7" font-style="italic" fill="#334155">"Se remite orden 01-06-2026 (Nómina 1a Qna Junio) desglosada en los 4 órganos y amparada en Oficio DGA/0367/2026 en PDF."</text>
+  <!-- Fila 9: OAJ - Cap 3000 -->
+  <rect x="25" y="398" width="910" height="18" fill="#ffffff" stroke="#f1f5f9"/>
+  <text x="32" y="410" font-size="7" font-family="monospace" fill="#334155">413005.211130010070000121.GZR.5.U.430.Y.1502126.1.000619001</text>
+  <text x="375" y="410" font-size="7.5" font-weight="bold" fill="#0284c7">1 OPE-8</text>
+  <text x="430" y="410" font-size="7.5" fill="#1e293b">Órgano de Administración Judicial</text>
+  <text x="645" y="410" font-size="7.5" fill="#475569">3000 Servicios Generales</text>
+  <text x="770" y="410" font-size="7" fill="#64748b">1114 Rec. Fisc.</text>
+  <text x="870" y="410" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="end">13,945,557.00</text>
+  <text x="915" y="410" font-size="8" fill="#0284c7" text-anchor="middle" cursor="pointer">✏️ 🗑️</text>
 
-            <!-- Mensaje 2 -->
-            <rect x="28" y="523" width="904" height="28" fill="#f0fdf4" stroke="#bbf7d0" rx="3"/>
-            <rect x="34" y="527" width="58" height="11" fill="#dcfce7" rx="2"/>
-            <text x="63" y="535" font-size="6.5" font-weight="bold" fill="#15803d" text-anchor="middle">FORMALIZAR</text>
-            <text x="98" y="535" font-size="7.5" font-weight="bold" fill="#166534">ENVIADO → DEVENGADO</text>
-            <text x="450" y="535" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 12:40:15 • Por: Mtra. Karla Alejandra de la Cruz Pérez</text>
-            <text x="36" y="546" font-size="7" font-style="italic" fill="#166534">"Revisado el techo presupuestal de los 4 órganos judiciales. Aprobado para formalización y devengo contable subyacente."</text>
+  <!-- Barra de Cuadre Financiero en Tiempo Real -->
+  <rect x="25" y="420" width="910" height="26" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.2" rx="3"/>
+  <text x="35" y="437" font-size="8.5" font-weight="bold" fill="#065f46">Total Encabezado: $ 21,157,862.50 MXN</text>
+  <text x="320" y="437" font-size="8.5" font-weight="bold" fill="#065f46">Suma Movimientos (9 partidas): $ 21,157,862.50 MXN</text>
+  <text x="925" y="437" font-size="8.5" font-weight="bold" fill="#047857" text-anchor="end">✓ Cuadre 100% Exacto (Diferencia: $0.00 · Formalización Habilitada)</text>
 
-            <!-- Banner Informativo: Enlace al Reporte Oficial con Firmas -->
-            <rect x="20" y="566" width="920" height="24" fill="#eff6ff" stroke="#bfdbfe" rx="3"/>
-            <text x="32" y="582" font-size="8" font-weight="bold" fill="#1e40af">📄 Reporte Oficial con Firmas:</text>
-            <text x="175" y="582" font-size="8" fill="#1e3a8a">Las firmas institucionales de autorización (<tspan font-weight="bold">Elaboró:</tspan> C.P. Eunice Hernández, <tspan font-weight="bold">Revisó:</tspan> Lic. Daryl Ramos, <tspan font-weight="bold">Vo. Bo.:</tspan> Mtra. Karla de la Cruz) <tspan font-weight="bold">no se capturan en pantalla</tspan>; se plasman en el Formato Oficial imprimible (PDF) mediante el botón <tspan font-weight="bold">[🖨️ Imprimir Formato Oficial]</tspan>.</text>
+  <!-- 3. AFECTACIÓN CONTABLE SUBYACENTE (MATRIZ B.1 EN SEGUNDO PLANO) -->
+  <rect x="20" y="462" width="920" height="66" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+  <rect x="20" y="462" width="920" height="20" fill="#f1f5f9" rx="4 4 0 0"/>
+  <text x="32" y="476" font-size="8.5" font-weight="bold" fill="#334155">⚙️ AFECTACIÓN CONTABLE SUBYACENTE (MOTOR CONAC 03.1.2 · MATRIZ B.1 DEVENGADO EN SEGUNDO PLANO)</text>
+  <rect x="760" y="464" width="168" height="16" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+  <text x="844" y="475" font-size="7.5" font-weight="bold" fill="#0284c7" text-anchor="middle">👁 Ver Pre-póliza Subyacente</text>
 
-            <!-- Acciones Finales al Pie -->
-            <rect x="20" y="598" width="90" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
-            <text x="65" y="616" font-size="8" fill="#64748b" text-anchor="middle">Cancelar</text>
+  <text x="32" y="495" font-size="8" fill="#475569">El capturista no elabora pólizas contables. Al formalizar esta orden 02-06-2026, el motor contable genera de forma 100% subyacente:</text>
+  <text x="32" y="508" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Patrimonial:</tspan> Cargo a Cuentas por Cobrar a Corto Plazo (1.1.2.2.0001 SEFIPLAN) vs Abono a Transferencias del Poder Ejecutivo (4.1.5.1.0001) por $21,157,862.50</text>
+  <text x="32" y="520" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Presupuestal:</tspan> Cargo a Ley de Ingresos por Ejecutar (8.1.2 CRI 9.1.1.1) vs Abono a Ley de Ingresos Devengada (8.1.4 CRI 9.1.1.1) por $21,157,862.50</text>
 
-            <rect x="330" y="598" width="110" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
-            <text x="385" y="616" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">🕒 Historial (2)</text>
+  <!-- 4. HISTORIAL DE WORKFLOW Y MENSAJES INSTITUCIONALES -->
+  <rect x="20" y="536" width="920" height="88" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+  <rect x="20" y="536" width="920" height="18" fill="#f8fafc" rx="4 4 0 0"/>
+  <text x="32" y="549" font-size="8" font-weight="bold" fill="#1e293b">💬 HISTORIAL DE TRAZABILIDAD Y MENSAJES (IngresoHistorialTimeline · 2 registros)</text>
+  <text x="930" y="549" font-size="7.5" fill="#64748b" text-anchor="end">Bitácora forense inviolable</text>
 
-            <rect x="450" y="598" width="130" height="28" fill="#f8fafc" stroke="#94a3b8" rx="4" cursor="pointer"/>
-            <text x="515" y="616" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">💾 Guardar Borrador</text>
+  <!-- Mensaje 1 -->
+  <rect x="28" y="558" width="904" height="28" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
+  <rect x="34" y="562" width="44" height="11" fill="#dbeafe" rx="2"/>
+  <text x="56" y="570" font-size="6.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
+  <text x="84" y="570" font-size="7.5" font-weight="bold" fill="#1e293b">BORRADOR → ENVIADO</text>
+  <text x="450" y="570" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 11:20:10 • Por: C.P. Eunice Hernández Valdés</text>
+  <text x="36" y="581" font-size="7" font-style="italic" fill="#334155">"Se remite orden 02-06-2026 (Gastos de Operación) desglosada en las 9 partidas presupuestales con ambos archivos físicos adjuntos."</text>
 
-            <rect x="590" y="598" width="185" height="28" fill="#eff6ff" stroke="#0284c7" rx="4" cursor="pointer"/>
-            <text x="682" y="616" font-size="8" font-weight="bold" fill="#0284c7" text-anchor="middle">🖨️ Imprimir Formato Oficial (PDF)</text>
+  <!-- Mensaje 2 -->
+  <rect x="28" y="589" width="904" height="28" fill="#f0fdf4" stroke="#bbf7d0" rx="3"/>
+  <rect x="34" y="593" width="58" height="11" fill="#dcfce7" rx="2"/>
+  <text x="63" y="601" font-size="6.5" font-weight="bold" fill="#15803d" text-anchor="middle">FORMALIZAR</text>
+  <text x="98" y="601" font-size="7.5" font-weight="bold" fill="#166534">ENVIADO → DEVENGADO</text>
+  <text x="450" y="601" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 12:45:30 • Por: Mtra. Karla Alejandra de la Cruz Pérez</text>
+  <text x="36" y="612" font-size="7" font-style="italic" fill="#166534">"Verificado el cuadre exacto de los $21,157,862.50 entre los 4 órganos judiciales y las firmas institucionales. Aprobado para devengo."</text>
 
-            <rect x="785" y="598" width="155" height="28" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="862" y="616" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Formalizar y Devengar</text>
-          </svg>
+  <!-- Banner Informativo: Enlace al Reporte Oficial con Firmas -->
+  <rect x="20" y="632" width="920" height="24" fill="#eff6ff" stroke="#bfdbfe" rx="3"/>
+  <text x="32" y="648" font-size="8" font-weight="bold" fill="#1e40af">📄 Reporte Oficial con Firmas Colegiadas:</text>
+  <text x="215" y="648" font-size="8" fill="#1e3a8a">Las 6 firmas institucionales colegiadas (Elaboró, Solicitó, Vo. Bo., DGA, DGPyP y Tesorería) <tspan font-weight="bold">no se capturan en pantalla</tspan>; se plasman en el Formato Oficial imprimible mediante el botón <tspan font-weight="bold">[🖨️ Imprimir Formato Oficial]</tspan>.</text>
+
+  <!-- Acciones Finales al Pie -->
+  <rect x="20" y="666" width="90" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+  <text x="65" y="685" font-size="8.5" fill="#64748b" text-anchor="middle">Cancelar</text>
+
+  <rect x="320" y="666" width="110" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+  <text x="375" y="685" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="middle">🕒 Historial (2)</text>
+
+  <rect x="440" y="666" width="130" height="30" fill="#f8fafc" stroke="#94a3b8" rx="4" cursor="pointer"/>
+  <text x="505" y="685" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="middle">💾 Guardar Borrador</text>
+
+  <rect x="580" y="666" width="185" height="30" fill="#eff6ff" stroke="#0284c7" rx="4" cursor="pointer"/>
+  <text x="672" y="685" font-size="8.5" font-weight="bold" fill="#0284c7" text-anchor="middle">🖨️ Imprimir Formato Oficial (PDF)</text>
+
+  <rect x="775" y="666" width="165" height="30" fill="#183125" rx="4" cursor="pointer"/>
+  <text x="857" y="685" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Formalizar y Devengar</text>
+</svg>
         </div>
       </div>
     </div>
 
-    <!-- WF4: SEGUIMIENTO Y REGISTRO DE DEPOSITO BANCARIO (PASO 2) -->
+    <!-- WF4: MODAL DE CAPTURA DE PARTIDAS PRESPUESTALES PJEV-UI (MOVIMIENTOS) -->
     <div id="wf-wf4" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Modal de Captura de Partida Presupuestal · PJEV-UI (Movimientos del Formulario Compuesto)</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Autocompletado Paramétrico de Clave SEFIPLAN (11 Segmentos) y Nemotécnico de Caja</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 550" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <!-- Backdrop Window -->
+  <rect width="960" height="550" fill="#0f172a" fill-opacity="0.5" rx="6"/>
+
+  <!-- Modal Dialog Container -->
+  <rect x="130" y="25" width="700" height="500" fill="#ffffff" rx="8" stroke="#cbd5e1" filter="drop-shadow(0 10px 15px rgba(0,0,0,0.15))"/>
+
+  <!-- Modal Header -->
+  <rect x="130" y="25" width="700" height="46" fill="#183125" rx="8 8 0 0"/>
+  <text x="155" y="53" font-size="13" font-weight="bold" fill="#ffffff">➕ Agregar Partida Presupuestal (Movimiento PJEV-UI)</text>
+  <text x="535" y="53" font-size="10" fill="#cbd5e1">— Orden de Cobro 02-06-2026</text>
+  <rect x="795" y="37" width="22" height="22" fill="#2d4a3b" rx="4"/>
+  <text x="806" y="52" font-size="12" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
+
+  <!-- Subtítulo Explicativo -->
+  <rect x="155" y="83" width="650" height="24" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+  <text x="165" y="99" font-size="8.5" fill="#475569">💡 Seleccione únicamente el Órgano y el Capítulo; el sistema resuelve automáticamente la clave estatal y la referencia de Caja.</text>
+
+  <!-- Campo 1: Órgano Judicial Beneficiario -->
+  <text x="155" y="125" font-size="8.5" font-weight="bold" fill="#334155">1. ÓRGANO JUDICIAL BENEFICIARIO *</text>
+  <rect x="155" y="132" width="650" height="30" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="4"/>
+  <text x="170" y="151" font-size="9.5" font-weight="bold" fill="#183125">🏛️ Tribunal Superior de Justicia (TSJ / Cartera 184)</text>
+  <text x="785" y="151" font-size="10" fill="#64748b">▼</text>
+
+  <!-- Campo 2: Capítulo de Gasto -->
+  <text x="155" y="180" font-size="8.5" font-weight="bold" fill="#334155">2. CAPÍTULO DE GASTO PRESUPUESTAL *</text>
+  <rect x="155" y="187" width="650" height="30" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="4"/>
+  <text x="170" y="206" font-size="9.5" font-weight="bold" fill="#183125">📦 Capítulo 2000 · Materiales y Suministros (CRI Clave: 413004)</text>
+  <text x="785" y="206" font-size="10" fill="#64748b">▼</text>
+
+  <!-- Recuadro de Autocompletado del Sistema -->
+  <rect x="155" y="232" width="650" height="96" fill="#fdfbf7" stroke="#d4af37" stroke-width="1.2" rx="5"/>
+  <rect x="155" y="232" width="650" height="22" fill="#fef3c7" rx="5 5 0 0"/>
+  <text x="168" y="247" font-size="8.5" font-weight="bold" fill="#92400e">⚙️ CONFIGURACIÓN PROGRAMÁTICA RESUELTA AUTOMÁTICAMENTE POR PJEV-UI</text>
+  <rect x="705" y="235" width="90" height="15" fill="#15803d" rx="3"/>
+  <text x="750" y="246" font-size="7.5" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Autocompletado</text>
+
+  <text x="168" y="270" font-size="7.5" font-weight="bold" fill="#475569">CLAVE PROGRAMÁTICA ESTATAL SEFIPLAN (11 SEGMENTOS):</text>
+  <text x="168" y="284" font-size="9" font-family="monospace" font-weight="bold" fill="#0284c7">413004.211130010010000121.GZR.5.U.430.Y.1502126.1.000184001</text>
+
+  <text x="168" y="306" font-size="7.5" font-weight="bold" fill="#475569">REFERENCIA DE CAJA:</text>
+  <rect x="275" y="295" width="65" height="16" fill="#e0f2fe" rx="3"/>
+  <text x="307" y="307" font-size="8" font-family="monospace" font-weight="bold" fill="#0369a1" text-anchor="middle">1 OPE-1</text>
+
+  <text x="370" y="306" font-size="7.5" font-weight="bold" fill="#475569">FUENTE FINANCIAMIENTO:</text>
+  <text x="500" y="306" font-size="8" fill="#1e293b">1114 / 111 Recursos Fiscales Ordinarios (Subsidio Estatal)</text>
+
+  <!-- Campo 3: Importe Monetario -->
+  <text x="155" y="347" font-size="8.5" font-weight="bold" fill="#334155">3. IMPORTE ASIGNADO A LA PARTIDA ($) *</text>
+  <rect x="155" y="354" width="315" height="30" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5" rx="4"/>
+  <text x="170" y="373" font-size="11" font-weight="bold" fill="#0369a1">$ 571,333.00 MXN</text>
+
+  <!-- Campo 4: Justificación Operativa -->
+  <text x="490" y="347" font-size="8.5" font-weight="bold" fill="#334155">4. JUSTIFICACIÓN O DESTINO ESPECÍFICO (OPCIONAL)</text>
+  <rect x="490" y="354" width="315" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+  <text x="502" y="373" font-size="8.5" fill="#334155">Papelería, tóner y consumibles de oficina.</text>
+
+  <!-- Banner de Cuadre en Vivo -->
+  <rect x="155" y="400" width="650" height="42" fill="#ecfdf5" stroke="#86efac" rx="4"/>
+  <text x="168" y="416" font-size="8" font-weight="bold" fill="#065f46">📊 Control de Techo Financiero en Vivo:</text>
+  <text x="168" y="432" font-size="8" fill="#166534">Partidas previas: $ 20,586,529.50 + Esta partida: <tspan font-weight="bold">$ 571,333.00</tspan> = <tspan font-weight="bold">$ 21,157,862.50 MXN (100% Cuadrado ✓)</tspan></text>
+
+  <!-- Botones Footer -->
+  <rect x="155" y="460" width="110" height="34" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+  <text x="210" y="481" font-size="9.5" fill="#64748b" text-anchor="middle">Cancelar</text>
+
+  <rect x="575" y="460" width="230" height="34" fill="#183125" rx="4" cursor="pointer"/>
+  <text x="690" y="481" font-size="9.5" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Agregar Partida al Grid</text>
+</svg>
+        </div>
+      </div>
+    </div>
+
+<!-- WF5: SEGUIMIENTO Y REGISTRO DE DEPOSITO BANCARIO (PASO 2) -->
+    <div id="wf-wf5" class="wf-panel">
       <div class="wf-box">
         <div class="wf-bar">
           <span class="wf-bar-label">Registro de Depósito Bancario y Recaudación Posterior (Paso 2) · Principio KISS</span>
@@ -1405,8 +1745,8 @@ export class IngresosController {
       </div>
     </div>
 
-    <!-- WF5: MODAL HISTORIAL Y WORKFLOW DIALOG -->
-    <div id="wf-wf5" class="wf-panel">
+    <!-- WF6: MODAL HISTORIAL Y WORKFLOW DIALOG -->
+    <div id="wf-wf6" class="wf-panel">
       <div class="wf-box">
         <div class="wf-bar">
           <span class="wf-bar-label">Tablero de Mensajes e Historial de Workflow (Modales Interactivos)</span>
@@ -1502,27 +1842,39 @@ export class IngresosController {
       <tbody>
         <tr>
           <td><code>CP-ING-01</code></td>
-          <td>Guardado de Orden en Modo Borrador</td>
-          <td>Capturar Solicitud de Recursos clave <code>01-06-2026</code> (Trámite <code>2026-011</code>), adjuntar PDF del <code>Of. DGA/0367/2026</code> y registrar desglose presupuestal en borrador. Clic en <code>[Guardar Borrador]</code>.</td>
-          <td>Inserta en <code>ingresos.ingresos_encabezado</code> con <code>estatus = 'BORRADOR'</code>, guarda las 4 partidas de órganos judiciales en <code>ingresos_distribucion</code> y genera la pre-póliza en vivo sin afectar saldos contables definitivos.</td>
+          <td>Guardado de Formulario Compuesto en Modo Borrador</td>
+          <td>Capturar encabezado maestro (Clave <code>02-06-2026</code>, Trámite <code>2026-011</code>, Total <code>$ 21,157,862.50</code>), adjuntar los 2 archivos físicos digitalizados y agregar partidas al grid PJEV-UI. Clic en <code>[Guardar Borrador]</code>.</td>
+          <td>Inserta en <code>ingresos.ingresos_encabezado</code> con <code>estatus = 'BORRADOR'</code>, guarda las partidas presupuestales en <code>ingresos_distribucion</code> y genera la pre-póliza en vivo sin afectar saldos contables definitivos.</td>
         </tr>
         <tr>
           <td><code>CP-ING-02</code></td>
           <td>Formalización y Devengo Subyacente (B.1)</td>
-          <td>Dar clic en <code>[Formalizar y Devengar]</code> sobre la orden <code>01-06-2026</code> por $51,958,628.00 con cuadre exacto de partidas entre TSJ, TCA, TDJ y OAJ.</td>
-          <td>Transita estatus a <code>DEVENGADO</code>, asigna folio definitivo inmutable y detona de forma invisible la Matriz B.1 CONAC: Cargo a Cuentas por Cobrar (1.1.2.2.0001) y Cargo a Ley por Ejecutar (8.1.2) vs Abono a Transferencias del Ejecutivo (4.1.5.1.0001) y Ley Devengada (8.1.4).</td>
+          <td>Dar clic en <code>[Formalizar y Devengar]</code> sobre la orden <code>02-06-2026</code> por $21,157,862.50 con cuadre exacto de las 9 partidas entre TSJ, TCA, TDJ y OAJ (Diferencia = $0.00) y ambos archivos físicos cargados.</td>
+          <td>Transita estatus a <code>DEVENGADO</code>, asigna folio correlativo definitivo (<code>ING-2026-XXXX</code>) y detona de forma invisible la Matriz B.1 CONAC: Cargo a Cuentas por Cobrar (1.1.2.2.0001) y Cargo a Ley por Ejecutar (8.1.2) vs Abono a Transferencias del Ejecutivo (4.1.5.1.0001) y Ley Devengada (8.1.4).</td>
         </tr>
         <tr>
           <td><code>CP-ING-03</code></td>
           <td>Registro Simple de Depósito Bancario y Recaudación Subyacente (B.2) — Principio KISS</td>
-          <td>Seleccionar la institución bancaria receptora (<code>BBVA México</code>), la cuenta PJEV (<code>0126144101</code>), capturar fecha (<code>09/06/2026</code>), referencia de rastreo SPEI (<code>REFBNTC00316148</code>), importe (<code>$ 21,157,862.50</code>) y adjuntar el comprobante digital PDF. Clic en <code>[Registrar Documento y Aplicar]</code>.</td>
+          <td>Seleccionar la institución bancaria receptora (<code>BBVA México</code>), la cuenta institucional PJEV (<code>0126144101</code>), capturar fecha (<code>09/06/2026</code>), referencia de rastreo SPEI (<code>REFBNTC00316148</code>), importe (<code>$ 21,157,862.50</code>) y adjuntar el comprobante digital PDF. Clic en <code>[Registrar Documento y Aplicar]</code>.</td>
           <td>Inserta el registro en <code>ingresos.ingresos_depositos</code>, extingue el saldo pendiente a $0.00, transita la orden a <code>RECAUDADO</code>, y de forma 100% subyacente dispara la Matriz B.2 CONAC: Cargo a Bancos (1.1.1.2) vs Abono a Cuentas por Cobrar (1.1.2.2) y Cargo a Ley Devengada (8.1.4) vs Abono a Ley Recaudada (8.1.5).</td>
         </tr>
         <tr>
           <td><code>CP-ING-04</code></td>
-          <td>Validación de Evidencia Probatoria en PDF</td>
-          <td>Intentar formalizar una orden de ministración sin adjuntar el documento probatorio (PDF con acuse SEFIPLAN).</td>
-          <td>El sistema bloquea la formalización indicando: <em>"Debe adjuntar la evidencia digital probatoria (archivo PDF del oficio con acuse) en el expediente electrónico del trámite."</em></td>
+          <td>Validación de Carga Obligatoria de los Dos Archivos Físicos Digitalizados con Firmas</td>
+          <td>Intentar formalizar una orden de ministración teniendo cargado únicamente el oficio o la orden, o faltando alguno de los dos archivos físicos.</td>
+          <td>El sistema bloquea la formalización en UI y el SP <code>fn_crud_ingreso</code> retorna error -1: <em>"No se puede formalizar: Es obligatorio adjuntar tanto el Oficio DGA con sello de acuse SEFIPLAN como el Formato Oficial con firmas autógrafas colegiadas."</em></td>
+        </tr>
+        <tr>
+          <td><code>CP-ING-05</code></td>
+          <td>Bloqueo por Discrepancia en Barra de Cuadre Financiero (Σ Movimientos ≠ Total Encabezado)</td>
+          <td>Capturar un total de encabezado por $21,157,862.50 pero registrar movimientos en el grid por $20,586,529.50 (Diferencia = $571,333.00 faltante).</td>
+          <td>La barra de cuadre se tiñe de color de advertencia mostrando la discrepancia, el botón <code>[Formalizar y Devengar]</code> permanece bloqueado y si se invoca el SP por backend, este rechaza la transacción informando la diferencia exacta.</td>
+        </tr>
+        <tr>
+          <td><code>CP-ING-06</code></td>
+          <td>Autocompletado Paramétrico de Clave SEFIPLAN y Nemotécnico de Caja en Modal PJEV-UI</td>
+          <td>En el modal de agregar partida, seleccionar Órgano: <code>Tribunal Superior de Justicia</code> y Capítulo: <code>2000 Materiales y Suministros</code>.</td>
+          <td>El sistema genera de forma automática y de sólo lectura la clave de 11 segmentos <code>413004.211130010010000121.GZR.5.U.430.Y.1502126.1.000184001</code> y la referencia <code>1 OPE-1</code>, permitiendo al usuario ingresar únicamente el importe monetario sin teclear cadenas complejas.</td>
         </tr>
       </tbody>
     </table>
@@ -1534,6 +1886,12 @@ export class IngresosController {
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción del Cambio</th></tr></thead>
       <tbody>
+        <tr>
+          <td><code>v2.5.0</code></td>
+          <td>08/09/2026</td>
+          <td>Julio César / Eunice</td>
+          <td><strong>Reestructuración a Formulario Compuesto (Maestro-Detalle), Doble Archivo Físico Firmado y Grid PJEV-UI con Barra de Cuadre en Vivo:</strong> Homologación total con el estándar de Egresos 05.2.1. (1) Organización en Encabezado Maestro e interfaz de Movimientos en Grid interactivo PJEV-UI; (2) Requerimiento estricto de los dos archivos físicos digitalizados probatorios con firmas y acuses (Archivo 1: Oficio DGA a SEFIPLAN con sello de acuse oficial de Oficialía de Partes; Archivo 2: Formato Solicitud / Orden de Cobro debidamente signada por las 6 autoridades colegiadas); (3) Modal emergente de captura de partidas PJEV-UI que resuelve paramétricamente la clave estatal de 11 segmentos y nemotécnico de Caja; (4) Barra de cuadre financiero en tiempo real (Σ Movimientos = Total Encabezado, Diferencia = $0.00) como candado estricto de formalización; (5) Stored Procedures <code>fn_leer_ingreso</code> y <code>fn_crud_ingreso</code> actualizados con validación matemática de balance e inserción de ambos archivos físicos; (6) Endpoints NestJS para gestión multilínea de movimientos presupuestales y carga de ambos documentos adjuntos; (7) Incorporación de 6 wireframes interactivos SVG nativos.</td>
+        </tr>
         <tr>
           <td><code>v2.4.0</code></td>
           <td>07/09/2026</td>

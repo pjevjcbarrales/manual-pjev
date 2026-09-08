@@ -303,20 +303,20 @@
   ing('04.2.1','04.2 Registro','Registro de ingresos',{
     responsable:'Eunice',
     estado:'Pendiente de desarrollo',
-    documentacion:'Análisis funcional inicial',
+    documentacion:'Análisis funcional completo',
     documento:'04_ingresos/04.2.1-registro-ingresos.html',
     opciones:[
       'Wizard Modal de selección de Trámite (Paso 0: 4 macro-familias / 12 subtipos)',
-      'Captura administrativa sustantiva (Oficio SEFIPLAN, fechas y documentación soporte)',
-      'Apertura y desglose de techo presupuestal por Capítulos (1000 a 5000) y Fuentes',
+      'Formulario Compuesto (Maestro-Detalle): Encabezado de ministración con importe total',
+      'Carga obligatoria de 2 Archivos Físicos Digitalizados (Oficio con acuse + Orden debidamente firmada)',
+      'Sección de Movimientos Presupuestales en Grid PJEV-UI con botón [+ Agregar Partida]',
+      'Modal PJEV-UI con autocompletado paramétrico de clave SEFIPLAN (11 segmentos) y nemotécnico de Caja',
+      'Barra de cuadre financiero obligatorio en tiempo real (Σ Movimientos = Total Encabezado, Dif: $0.00)',
       'Afectación contable subyacente en segundo plano (Matriz CONAC 03.1.2 B.1 Devengado)',
-      'Conciliación bancaria posterior y asociación de depósitos SPEI (Paso 2)',
-      'Disminución automática de saldo por cobrar y recaudación subyacente (Matriz B.2)',
-      'Tablero de mensajes y bitácora de trazabilidad (IngresoHistorialTimeline)',
-      'Modal de historial completo y diálogo de workflow (IngresoWorkflowModal)',
-      'Formalización inmutable con folio oficial e integración transversal'
+      'Registro simple de comprobante bancario y recaudación subyacente (Paso 2: Principio KISS)',
+      'Tablero de mensajes y bitácora de trazabilidad forense (IngresoHistorialTimeline y Modales)'
     ],
-    evidencia:'Módulo central unificado con experiencia Wizard idéntica a Egresos 05.2.1, captura administrativa limpia de asientos manuales, contabilidad subyacente y tablero de mensajes de workflow.'
+    evidencia:'Módulo central transaccional con Formulario Compuesto homologado con Egresos 05.2.1, soporte estricto de doble archivo físico firmado, grid interactivo PJEV-UI con barra de cuadre en vivo y contabilidad subyacente.'
   });
   ing('04.3.1','04.3 Procesos','Conciliación de ingresos',{
     perfil:'conta',
