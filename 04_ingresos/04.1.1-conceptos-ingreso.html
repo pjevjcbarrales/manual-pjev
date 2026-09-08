@@ -57,7 +57,7 @@
       <div class="mod-header-badges">
         <span class="mod-badge badge-a">Pendiente de desarrollo</span>
         <span class="mod-badge badge-s">Análisis funcional canónico (DOC-08)</span>
-        <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Eunice</span>
+        <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Daryl</span>
         <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Alineado con Egresos (05.2.1)</span>
       </div>
     </div>
@@ -184,7 +184,7 @@
           <td><code>ARRENDAMIENTOS_ESP</code><br><strong>Arrendamiento de Espacios</strong></td>
           <td>Cobro periódico de rentas por concesión de espacios en juzgados y ciudades judiciales (cafeterías, fotocopiadoras).</td>
           <td><span class="mod-badge badge-s">ARRENDATARIO</span><br><small>Persona Física / Moral</small></td>
-          <td><span class="mod-badge badge-a">Devengado / Simultáneo</span><br><small>Ficha bancaria de renta</small></td>
+          <td><span class="mod-badge" style="background:#dcfce7; color:#15803d;">Simultáneo (B.3)</span> / <span class="mod-badge badge-a">Devengado (B.1)</span><br><small>Por defecto simultáneo (con ficha bancaria); devengado si existe aviso/factura de cobro previa</small></td>
         </tr>
         <tr>
           <td><code>DERECHOS_PRODUCTOS</code><br><strong>Derechos y Servicios Admin.</strong></td>
@@ -204,24 +204,24 @@
           <td rowspan="3">
             <strong>3. Reintegros y Recuperaciones</strong><br>
             <code style="font-size:10px;">REINTEGROS</code><br>
-            <small style="color:var(--pjev-texto-muted);">Devoluciones que disminuyen gasto o pasivo</small>
+            <small style="color:var(--pjev-texto-muted);">Devoluciones que disminuyen gasto o pasivo (sin CRI)</small>
           </td>
           <td><code>REINTEGRO_VIATICOS</code><br><strong>Reintegro de Viáticos</strong></td>
           <td>Devolución de recursos no devengados en comisiones oficiales. Cancela saldo de deudores diversos (1.1.2.3) y enlaza con Egresos 05.2.3.</td>
           <td><span class="mod-badge badge-s">EMPLEADO</span><br><small>Servidor Comisionado</small></td>
-          <td><span class="mod-badge" style="background:#e0f2fe; color:#0369a1;">Disminución de Deudor</span><br><small>Ficha depósito bancario</small></td>
+          <td><span class="mod-badge" style="background:#e0f2fe; color:#0369a1;">Disminución de Deudor</span><br><small>Simultáneo (Guía Contabilizadora Reversión, afecta_presupuesto = false)</small></td>
         </tr>
         <tr style="background:#fdfbf7;">
           <td><code>REINTEGRO_NOMINA</code><br><strong>Reintegro de Nómina</strong></td>
           <td>Devolución de pagos indebidos por bajas extemporáneas, permisos no devengados o incapacidades no reportadas a tiempo.</td>
           <td><span class="mod-badge badge-s">EMPLEADO</span><br><small>Personal Judicial</small></td>
-          <td><span class="mod-badge" style="background:#e0f2fe; color:#0369a1;">Reverso Cap. 1000</span><br><small>Acreditación a cuenta</small></td>
+          <td><span class="mod-badge" style="background:#e0f2fe; color:#0369a1;">Reverso Cap. 1000</span><br><small>Simultáneo (Guía Contabilizadora Reversión, afecta_presupuesto = false)</small></td>
         </tr>
         <tr style="background:#fdfbf7;">
           <td><code>DEVOLUCION_ANTICIPO</code><br><strong>Devolución de Anticipos</strong></td>
           <td>Retorno de anticipos no amortizados por rescisión o finiquito de contratos de adquisiciones u obra pública.</td>
           <td><span class="mod-badge badge-s">PROVEEDOR</span><br><small>Contratista</small></td>
-          <td><span class="mod-badge" style="background:#e0f2fe; color:#0369a1;">Cancelación Anticipo</span><br><small>Cuenta 1.1.3 vs Banco</small></td>
+          <td><span class="mod-badge" style="background:#e0f2fe; color:#0369a1;">Cancelación Anticipo</span><br><small>Simultáneo (Cuenta 1.1.3 vs Banco, afecta_presupuesto = false)</small></td>
         </tr>
 
         <!-- GRUPO 4: EXTRAPRESUPUESTAL -->
@@ -234,13 +234,13 @@
           <td><code>DEPOSITO_NO_ID</code><br><strong>Depósito No Identificado</strong></td>
           <td>Depósito en firme reflejado en el estado de cuenta bancario sin depositante ni concepto aclarado. Permite conciliar bancos.</td>
           <td><span class="mod-badge badge-w">BANCO</span><br><small>En aclaración</small></td>
-          <td><span class="mod-badge" style="background:#fee2e2; color:#991b1b;">Pasivo en Custodia (2.1.9)</span><br><small>Sin afectación presupuestal</small></td>
+          <td><span class="mod-badge" style="background:#fee2e2; color:#991b1b;">Pasivo en Custodia (2.1.9)</span><br><small>Sin afectación presupuestal (afecta_presupuesto = false)</small></td>
         </tr>
         <tr style="background:#f0fdf4;">
           <td><code>ACLARACION_DEPOSITO</code><br><strong>Aclaración y Reclasificación</strong></td>
           <td>Reclasificación formal de un depósito previamente guardado en custodia hacia su subtipo definitivo una vez aclarado.</td>
-          <td><span class="mod-badge badge-w">VARIABLE</span><br><small>Según trámite real</small></td>
-          <td><span class="mod-badge" style="background:#fee2e2; color:#991b1b;">Reclasificación Pasiva</span><br><small>Cancela 2.1.9 y activa matriz</small></td>
+          <td><span class="mod-badge badge-w">VARIABLE</span><br><small>Se hereda del trámite definitivo</small></td>
+          <td><span class="mod-badge" style="background:#fee2e2; color:#991b1b;">Reclasificación Pasiva</span><br><small>Cancela 2.1.9 y hereda momento/matriz del trámite de destino</small></td>
         </tr>
       </tbody>
     </table>
@@ -258,15 +258,15 @@
         <tr><td><code>nombre_subtipo</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Nombre oficial desplegado en el Wizard (ej. <em>Ministración Ordinaria Estatal</em>).</td></tr>
         <tr><td><code>descripcion_card</code></td><td><code>TEXT</code></td><td>Sí</td><td>Texto conciso para la tarjeta visual del asistente que guía al capturista.</td></tr>
         <tr><td><code>icono_svg</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Identificador de icono visual en el frontend (ej. <code>building</code>, <code>coins</code>, <code>refresh-cw</code>, <code>help-circle</code>).</td></tr>
-        <tr><td><code>tipo_contraparte</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>ENTE_PUBLICO</code> | <code>BANCO</code> | <code>EMPLEADO</code> | <code>PROVEEDOR</code> | <code>ARRENDATARIO</code> | <code>CIUDADANO</code>.</td></tr>
-        <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>Sí</td><td><code>true</code> para Ley de Ingresos (8.1.x); <code>false</code> para operaciones de balance en pasivo (2.1.9).</td></tr>
-        <tr><td><code>momento_inicial</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td><code>DEVENGADO_PREVIO</code> (esperado) | <code>SIMULTANEO</code> (directo en firme) | <code>PASIVO_CUSTODIA</code>.</td></tr>
+        <tr><td><code>tipo_contraparte</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>ENTE_PUBLICO</code> | <code>BANCO</code> | <code>EMPLEADO</code> | <code>PROVEEDOR</code> | <code>ARRENDATARIO</code> | <code>CIUDADANO</code> | <code>VARIABLE</code> (para aclaraciones).</td></tr>
+        <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>Sí</td><td><code>true</code> para Ley de Ingresos (8.1.x); <code>false</code> para operaciones extrapresupuestales de balance (2.1.9) y reintegros/reversos de activo/gasto.</td></tr>
+        <tr><td><code>momento_inicial</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td><code>DEVENGADO_PREVIO</code> (esperado) | <code>SIMULTANEO</code> (directo en firme) | <code>PASIVO_CUSTODIA</code> (tránsito y aclaración).</td></tr>
         <tr><td><code>requiere_oficio</code></td><td><code>BOOLEAN</code></td><td>Sí</td><td><code>true</code> si la pantalla exige capturar el oficio de origen (obligatorio en ministraciones).</td></tr>
         <tr><td><code>requiere_capitulo</code></td><td><code>BOOLEAN</code></td><td>Sí</td><td><code>true</code> si el ingreso debe desglosarse presupuestariamente en Capítulos 1000 a 5000.</td></tr>
         <tr><td><code>requiere_cuenta_bancaria</code></td><td><code>BOOLEAN</code></td><td>Sí</td><td><code>true</code> si es forzoso asociar la cuenta recaudadora desde la captura inicial.</td></tr>
-        <tr><td><code>cri_id_default</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>Clave predeterminada del Clasificador por Rubros de Ingreso (<code>01.2.7</code>).</td></tr>
+        <tr><td><code>cri_id_default</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>Clave predeterminada del Clasificador por Rubros de Ingreso (<code>01.2.7</code>). <code>NULL</code> para reintegros y depósitos no identificados.</td></tr>
         <tr><td><code>fuente_id_default</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>Fuente predeterminada (<code>01.2.4</code>, ej. 111 Fiscales o 113 Propios).</td></tr>
-        <tr><td><code>mcr_matriz_id</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>ID de la matriz en <code>contabilidad.matriz_conversion</code> (14: B.1, 15: B.2, 16: B.3).</td></tr>
+        <tr><td><code>mcr_matriz_id</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>ID de la matriz en <code>contabilidad.matriz_conversion</code> (14: B.1, 15: B.2, 16: B.3). <code>NULL</code> para reintegros y fondos en custodia pasiva (operan bajo Guías Contabilizadoras).</td></tr>
         <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Inactivo (Baja lógica).</td></tr>
         <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR / TIMESTAMPTZ</code></td><td>Sí</td><td>Auditoría de creación institucional.</td></tr>
         <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR / TIMESTAMPTZ</code></td><td>No</td><td>Auditoría de última modificación.</td></tr>
@@ -506,9 +506,9 @@ export class SubtiposTramiteIngresoController {
     <div class="section-title"><span class="section-num">7</span> Reglas de Negocio del Catálogo</div>
     <div style="display:flex; flex-direction:column; gap:10px;">
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-SUB-01 · Obligatoriedad de Matriz CONAC para Subtipos Presupuestarios</strong>
+        <strong style="color:var(--pjev-verde-oscuro);">RN-SUB-01 · Parametrización Contable de Trámites Presupuestarios vs Extrapresupuestarios / Reintegros</strong>
         <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          Todo subtipo con <code>afecta_presupuesto = true</code> debe contar obligatoriamente con un <code>mcr_matriz_id</code> válido y activo en <code>contabilidad.matriz_conversion</code> (14, 15 o 16). Esto garantiza que la Pre-póliza en Borrador pueda generarse sin excepciones.
+          Todo subtipo con <code>afecta_presupuesto = true</code> debe contar obligatoriamente con un <code>mcr_matriz_id</code> válido y activo en <code>contabilidad.matriz_conversion</code> (14: B.1 Devengado, 15: B.2 Recaudado, 16: B.3 Simultáneo). Por el contrario, los procedimientos de las familias <code>REINTEGROS</code> y <code>NO_PRESUPUESTARIO</code> se configuran con <code>afecta_presupuesto = false</code> y <code>mcr_matriz_id = NULL</code>, operando bajo Guías Contabilizadoras de Reversión y Pasivos en Custodia (2.1.9) sin afectar cuentas de orden presupuestarias de Ley de Ingresos (Clase 8.1).
         </p>
       </div>
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
@@ -772,15 +772,21 @@ export class SubtiposTramiteIngresoController {
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción del Cambio</th></tr></thead>
       <tbody>
         <tr>
+          <td><code>v2.1.0</code></td>
+          <td>08/09/2026</td>
+          <td>Daryl / Julio César</td>
+          <td><strong>Clarificación operativa de trámites:</strong> Se define tratamiento de arrendamientos (simultáneo B.3 por defecto / devengado B.1 opcional), reintegros extrapresupuestarios (sin afectación a Ley de Ingresos, sin CRI, matriz NULL, reversión en balance) y aclaración de depósitos (herencia de contraparte variable y momento definitivo). Asignación técnica formalizada a Daryl.</td>
+        </tr>
+        <tr>
           <td><code>v2.0.0</code></td>
           <td>07/09/2026</td>
-          <td>Julio César / Eunice</td>
+          <td>Julio César / Daryl</td>
           <td><strong>Reestructuración canónica completa:</strong> Transición de conceptos planos a <strong>Tipos y Subtipos de Trámite de Ingreso</strong> (4 familias, 12 procedimientos canónicos), en espejo con Egresos <code>05.2.1</code> y con soporte para el Wizard Asistente y Pre-pólizas en Borrador.</td>
         </tr>
         <tr>
           <td><code>v1.0.0</code></td>
           <td>02/09/2026</td>
-          <td>Eunice</td>
+          <td>Daryl</td>
           <td>Catálogo inicial de 17 conceptos económicos planos.</td>
         </tr>
       </tbody>

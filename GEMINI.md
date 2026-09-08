@@ -30,7 +30,8 @@ Cuando se documente un nuevo módulo, se deben respetar las siguientes reglas t�
 ## 4. Estado Actual del Proyecto
 * **Logros Fundacionales**: Paleta de colores institucional PJEV (`shared.css`), plantilla canónica de análisis funcional (estándar DOC-08), módulos de Configuración (`01.1.1 Entidad`, `01.1.2 Ejercicios`, `01.1.3 Periodos`) y documentos de estándares de arquitectura (`inicio/`).
 * **Logros Recientes (04 · Ingresos - Completo)**:
-  * Documentado funcional y técnicamente el subsistema completo de **04 · Ingresos** (7 módulos):
+  * Responsable técnico de desarrollo: **Daryl**.
+  * Documentado funcional y técnicamente el subsistema completo de **04 · Ingresos** (9 módulos canónicos):
     * `04.1.1 Conceptos de ingreso` (17 conceptos institucionales, CRI y 10 banderas).
     * `04.1.2 Tipos de movimiento de ingreso` (devengado, recaudado, simultáneo, ajuste).
     * `04.1.3 Motivos de ajuste o cancelación` (catálogo tipificado obligatorio para bajas).

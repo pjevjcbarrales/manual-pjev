@@ -64,6 +64,7 @@
       <div class="mod-header-badges">
         <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Maestro-Detalle 1:N)</span>
         <span class="mod-badge badge-s">Fase 1: Ejecución del Ingreso</span>
+        <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Daryl</span>
         <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Contabilidad Subyacente (Matriz CONAC 03.1.2)</span>
         <span class="mod-badge" style="background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe;">Wizard Modal (Paso 0)</span>
         <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/ingresos</code></span>
@@ -1868,43 +1869,43 @@ export class IngresosController {
         <tr>
           <td><code>v2.5.0</code></td>
           <td>08/09/2026</td>
-          <td>Julio César / Eunice</td>
+          <td>Julio César / Daryl</td>
           <td><strong>Reestructuración a Formulario Compuesto (Maestro-Detalle), Doble Archivo Físico Firmado y Grid PJEV-UI con Barra de Cuadre en Vivo:</strong> Homologación total con el estándar de Egresos 05.2.1. (1) Organización en Encabezado Maestro e interfaz de Movimientos en Grid interactivo PJEV-UI; (2) Requerimiento estricto de los dos archivos físicos digitalizados probatorios con firmas y acuses (Archivo 1: Oficio DGA a SEFIPLAN con sello de acuse oficial de Oficialía de Partes; Archivo 2: Formato Solicitud / Orden de Cobro debidamente signada por las 6 autoridades colegiadas); (3) Modal emergente de captura de partidas PJEV-UI que resuelve paramétricamente la clave estatal de 11 segmentos y nemotécnico de Caja; (4) Barra de cuadre financiero en tiempo real (Σ Movimientos = Total Encabezado, Diferencia = $0.00) como candado estricto de formalización; (5) Stored Procedures <code>fn_leer_ingreso</code> y <code>fn_crud_ingreso</code> actualizados con validación matemática de balance e inserción de ambos archivos físicos; (6) Endpoints NestJS para gestión multilínea de movimientos presupuestales y carga de ambos documentos adjuntos; (7) Incorporación de 6 wireframes interactivos SVG nativos.</td>
         </tr>
         <tr>
           <td><code>v2.4.0</code></td>
           <td>07/09/2026</td>
-          <td>Julio César / Eunice</td>
+          <td>Julio César / Daryl</td>
           <td><strong>Simplificación de Conciliación Bancaria bajo Principio KISS (Keep It Simple):</strong> Eliminación de interfaces y recuadros que simulaban portales bancarios externos propietarios (como BBVA Net Cash), estableciendo un flujo nativo, directo y sencillo en el SIAF: (1) Selector de institución bancaria (ej. <em>BBVA México</em>) y cuenta institucional PJEV; (2) Despliegue de campos claros para registrar el comprobante de depósito (fecha de operación, clave de rastreo SPEI / referencia e importe) y registrar el documento digital probatorio en PDF o imagen; (3) Incorporación formal de la tabla <code>ingresos.ingresos_depositos</code>, acción <code>REGISTRAR_DEPOSITO</code> en <code>fn_crud_ingreso</code> y endpoint <code>POST /api/v1/ingresos/:id/registrar-deposito</code>; (4) Liquidación inmediata del saldo pendiente a $0.00 y detonación 100% subyacente de la Matriz CONAC B.2 (Recaudado) sin intervención contable del usuario.</td>
         </tr>
         <tr>
           <td><code>v2.3.0</code></td>
           <td>07/09/2026</td>
-          <td>Julio César / Eunice</td>
+          <td>Julio César / Daryl</td>
           <td><strong>Alineación con Documentación Institucional Real (Oficio DGA/0367/2026, Orden 01-06-2026 y BBVA Net Cash):</strong> Reestructuración operativa e iconográfica total basándose fielmente en los tres documentos institucionales: (1) Delimitación del oficio macro remitido a SEFIPLAN como evidencia digital probatoria (PDF con acuse) no contable; (2) Captura transaccional mediante el formato oficial <em>Solicitud / Comprobación de Recursos (Orden de Pago)</em> desglosando las partidas presupuestales por Órgano Judicial Beneficiario (Tribunal Superior de Justicia, Tribunal de Conciliación y Arbitraje, Tribunal de Disciplina Judicial y Órgano de Administración Judicial), detonando el devengo subyacente (B.1); y (3) Conciliación bancaria directa con el extracto en línea de BBVA Net Cash (cuenta <code>0126144101</code> "MINISTRACION 2026", depósito <code>REFBNTC00316148</code> por $21,157,862.50), detonando la recaudación subyacente (B.2) con cero intervención contable manual.</td>
         </tr>
         <tr>
           <td><code>v2.2.0</code></td>
           <td>07/09/2026</td>
-          <td>Julio César / Eunice</td>
+          <td>Julio César / Daryl</td>
           <td><strong>Modal Asistente (Paso 0) y Contabilidad Subyacente:</strong> Incorporación visual interactiva del Wizard Modal (Paso 0: Clasificación entre 4 macro-familias y 12 procedimientos), eliminación de tablas contables invasivas en el formulario del capturista (el analista registra información administrativa sustantiva del oficio y techos presupuestales por capítulo), y delegación de la afectación contable a un motor en segundo plano (Matriz CONAC 03.1.2 B.1/B.2) que se devenga al formalizar y se recauda al conciliar con el extracto bancario.</td>
         </tr>
         <tr>
           <td><code>v2.1.0</code></td>
           <td>07/09/2026</td>
-          <td>Julio César / Eunice</td>
+          <td>Julio César / Daryl</td>
           <td><strong>Integración de Tablero de Mensajes y Trazabilidad (Workflow):</strong> Incorporación del componente <code>IngresoHistorialTimeline</code>, modales <code>IngresoHistorialModal</code> e <code>IngresoWorkflowModal</code>, tabla <code>ingresos.ingreso_historial</code>, SPs <code>fn_leer_ingreso_historial</code> y <code>fn_workflow_ingreso</code>, y endpoints NestJS, homologando al 100% el esquema de comunicación y auditoría implementado en Egresos 05.2.1.</td>
         </tr>
         <tr>
           <td><code>v2.0.0</code></td>
           <td>07/09/2026</td>
-          <td>Julio César / Eunice</td>
+          <td>Julio César / Daryl</td>
           <td><strong>Reestructuración y Homologación con Egresos:</strong> Incorporación del Wizard Modal de clasificación de trámites, autoconfiguración del formulario por subtipo, y componente interactivo de <strong>Pre-póliza evaluada desde el Modo Borrador</strong> con base en la Matriz Oficial CONAC 03.1.2.</td>
         </tr>
         <tr>
           <td><code>v1.0.0</code></td>
           <td>02/09/2026</td>
-          <td>Eunice</td>
+          <td>Daryl</td>
           <td>Registro de ingresos maestro-detalle con modalidades genéricas Esperado y Recibido.</td>
         </tr>
       </tbody>
