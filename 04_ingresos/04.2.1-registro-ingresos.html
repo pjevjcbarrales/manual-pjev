@@ -698,6 +698,12 @@ $$;</code></pre>
           <td>Body: <code>WorkflowIngresoDto</code></td>
           <td>Ejecuta transición de estado con registro de mensaje u observación obligatoria.</td>
         </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/:id/reporte-orden-pago</code></td>
+          <td>Path: <code>:id</code></td>
+          <td>Genera el Formato Oficial imprimible en PDF de la Solicitud / Orden de Pago con los bloques de firmas institucionales (Elaboró, Revisó, Vo. Bo.).</td>
+        </tr>
       </tbody>
     </table>
 
@@ -747,6 +753,12 @@ export class IngresosController {
     @Body() dto: WorkflowIngresoDto
   ) {
     return this.service.ejecutarWorkflow(user, BigInt(id), dto);
+  }
+
+  @Get(':id/reporte-orden-pago')
+  @ApiOperation({ summary: 'Descargar reporte oficial de Orden de Pago con Firmas Institucionales (PDF)' })
+  async descargarReporteOrdenPago(@Param('id') id: string, @Res() res: Response) {
+    return this.service.generarReporteOrdenPago(BigInt(id), res);
   }
 }</code></pre>
     </div>
@@ -1032,8 +1044,8 @@ export class IngresosController {
           <span style="font-size:10px; color:#15803d; font-weight:bold;">Formato Oficial Clave 01-06-2026 · Evidencia PDF Of. DGA/0367/2026 · Contabilidad Subyacente B.1</span>
         </div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 960 740" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="960" height="740" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+          <svg viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="640" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
             
             <!-- Encabezado de la Ventana -->
             <rect x="0" y="0" width="960" height="38" fill="#183125"/>
@@ -1156,71 +1168,48 @@ export class IngresosController {
             <text x="32" y="433" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Patrimonial:</tspan> Cargo a Cuentas por Cobrar a Corto Plazo (1.1.2.2.0001 SEFIPLAN) vs Abono a Transferencias del Poder Ejecutivo (4.1.5.1.0001) por $51,958,628.00</text>
             <text x="32" y="446" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Presupuestal:</tspan> Cargo a Ley de Ingresos por Ejecutar (8.1.2 CRI 9.1.1.1) vs Abono a Ley de Ingresos Devengada (8.1.4 CRI 9.1.1.1) por $51,958,628.00</text>
 
-            <!-- 4. CUADRO OFICIAL DE FIRMAS INSTITUCIONALES (Fiel a Imagen 2) -->
-            <text x="20" y="475" font-size="9" font-weight="bold" fill="#183125">3. FIRMAS INSTITUCIONALES DE AUTORIZACIÓN (ORDEN DE PAGO)</text>
-            <line x1="20" y1="480" x2="940" y2="480" stroke="#e2e8f0" stroke-width="1"/>
-
-            <!-- Firma 1: Elaboró -->
-            <rect x="20" y="488" width="295" height="78" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <rect x="20" y="488" width="295" height="18" fill="#f8fafc" rx="4 4 0 0"/>
-            <text x="167" y="500" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">ELABORÓ</text>
-            <text x="167" y="525" font-size="8" font-family="cursive" fill="#0284c7" text-anchor="middle">Eunice Hernández V.</text>
-            <line x1="45" y1="535" x2="290" y2="535" stroke="#cbd5e1" stroke-width="1"/>
-            <text x="167" y="546" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="middle">C.P. Eunice Hernández Valdés</text>
-            <text x="167" y="556" font-size="7" fill="#64748b" text-anchor="middle">Analista de Presupuesto e Ingresos</text>
-
-            <!-- Firma 2: Revisó -->
-            <rect x="332" y="488" width="295" height="78" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <rect x="332" y="488" width="295" height="18" fill="#f8fafc" rx="4 4 0 0"/>
-            <text x="479" y="500" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">REVISÓ</text>
-            <text x="479" y="525" font-size="8" font-family="cursive" fill="#0284c7" text-anchor="middle">Daryl Ramos S.</text>
-            <line x1="357" y1="535" x2="602" y2="535" stroke="#cbd5e1" stroke-width="1"/>
-            <text x="479" y="546" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="middle">Lic. Daryl Ramos Sánchez</text>
-            <text x="479" y="556" font-size="7" fill="#64748b" text-anchor="middle">Jefe del Depto. de Recursos Financieros</text>
-
-            <!-- Firma 3: Vo. Bo. -->
-            <rect x="645" y="488" width="295" height="78" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <rect x="645" y="488" width="295" height="18" fill="#f8fafc" rx="4 4 0 0"/>
-            <text x="792" y="500" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">VO. BO.</text>
-            <text x="792" y="525" font-size="8" font-family="cursive" fill="#0284c7" text-anchor="middle">Karla A. de la Cruz P.</text>
-            <line x1="670" y1="535" x2="915" y2="535" stroke="#cbd5e1" stroke-width="1"/>
-            <text x="792" y="546" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="middle">Mtra. Karla Alejandra de la Cruz Pérez</text>
-            <text x="792" y="556" font-size="7" fill="#64748b" text-anchor="middle">Directora General de Administración</text>
-
-            <!-- 5. HISTORIAL DE WORKFLOW Y MENSAJES INSTITUCIONALES -->
-            <rect x="20" y="578" width="920" height="108" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <rect x="20" y="578" width="920" height="20" fill="#f8fafc" rx="4 4 0 0"/>
-            <text x="32" y="592" font-size="8.5" font-weight="bold" fill="#1e293b">💬 HISTORIAL DE TRAZABILIDAD Y MENSAJES (IngresoHistorialTimeline · 2 registros)</text>
-            <text x="930" y="592" font-size="7.5" fill="#64748b" text-anchor="end">Bitácora forense inviolable</text>
+            <!-- 4. HISTORIAL DE WORKFLOW Y MENSAJES INSTITUCIONALES -->
+            <rect x="20" y="470" width="920" height="88" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <rect x="20" y="470" width="920" height="18" fill="#f8fafc" rx="4 4 0 0"/>
+            <text x="32" y="483" font-size="8" font-weight="bold" fill="#1e293b">💬 HISTORIAL DE TRAZABILIDAD Y MENSAJES (IngresoHistorialTimeline · 2 registros)</text>
+            <text x="930" y="483" font-size="7.5" fill="#64748b" text-anchor="end">Bitácora forense inviolable</text>
 
             <!-- Mensaje 1 -->
-            <rect x="30" y="604" width="900" height="34" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
-            <rect x="36" y="609" width="46" height="12" fill="#dbeafe" rx="2"/>
-            <text x="59" y="618" font-size="7" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
-            <text x="88" y="618" font-size="8" font-weight="bold" fill="#1e293b">BORRADOR → ENVIADO</text>
-            <text x="450" y="618" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 11:15:20 • Por: C.P. Eunice Hernández Valdés</text>
-            <text x="38" y="632" font-size="7.5" font-style="italic" fill="#334155">"Se remite orden de pago 01-06-2026 (Nómina 1a Qna Junio) desglosada por órganos y amparada en Oficio DGA/0367/2026 en PDF."</text>
+            <rect x="28" y="492" width="904" height="28" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
+            <rect x="34" y="496" width="44" height="11" fill="#dbeafe" rx="2"/>
+            <text x="56" y="504" font-size="6.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
+            <text x="84" y="504" font-size="7.5" font-weight="bold" fill="#1e293b">BORRADOR → ENVIADO</text>
+            <text x="450" y="504" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 11:15:20 • Por: C.P. Eunice Hernández Valdés</text>
+            <text x="36" y="515" font-size="7" font-style="italic" fill="#334155">"Se remite orden 01-06-2026 (Nómina 1a Qna Junio) desglosada en los 4 órganos y amparada en Oficio DGA/0367/2026 en PDF."</text>
 
             <!-- Mensaje 2 -->
-            <rect x="30" y="643" width="900" height="34" fill="#f0fdf4" stroke="#bbf7d0" rx="3"/>
-            <rect x="36" y="648" width="60" height="12" fill="#dcfce7" rx="2"/>
-            <text x="66" y="657" font-size="7" font-weight="bold" fill="#15803d" text-anchor="middle">FORMALIZAR</text>
-            <text x="102" y="657" font-size="8" font-weight="bold" fill="#166534">ENVIADO → DEVENGADO</text>
-            <text x="450" y="657" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 12:40:15 • Por: Mtra. Karla Alejandra de la Cruz Pérez</text>
-            <text x="38" y="671" font-size="7.5" font-style="italic" fill="#166534">"Revisado el techo presupuestal de los 4 órganos judiciales. Aprobado para emisión oficial y devengo contable subyacente."</text>
+            <rect x="28" y="523" width="904" height="28" fill="#f0fdf4" stroke="#bbf7d0" rx="3"/>
+            <rect x="34" y="527" width="58" height="11" fill="#dcfce7" rx="2"/>
+            <text x="63" y="535" font-size="6.5" font-weight="bold" fill="#15803d" text-anchor="middle">FORMALIZAR</text>
+            <text x="98" y="535" font-size="7.5" font-weight="bold" fill="#166534">ENVIADO → DEVENGADO</text>
+            <text x="450" y="535" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 12:40:15 • Por: Mtra. Karla Alejandra de la Cruz Pérez</text>
+            <text x="36" y="546" font-size="7" font-style="italic" fill="#166534">"Revisado el techo presupuestal de los 4 órganos judiciales. Aprobado para formalización y devengo contable subyacente."</text>
+
+            <!-- Banner Informativo: Enlace al Reporte Oficial con Firmas -->
+            <rect x="20" y="566" width="920" height="24" fill="#eff6ff" stroke="#bfdbfe" rx="3"/>
+            <text x="32" y="582" font-size="8" font-weight="bold" fill="#1e40af">📄 Reporte Oficial con Firmas:</text>
+            <text x="175" y="582" font-size="8" fill="#1e3a8a">Las firmas institucionales de autorización (<tspan font-weight="bold">Elaboró:</tspan> C.P. Eunice Hernández, <tspan font-weight="bold">Revisó:</tspan> Lic. Daryl Ramos, <tspan font-weight="bold">Vo. Bo.:</tspan> Mtra. Karla de la Cruz) <tspan font-weight="bold">no se capturan en pantalla</tspan>; se plasman en el Formato Oficial imprimible (PDF) mediante el botón <tspan font-weight="bold">[🖨️ Imprimir Formato Oficial]</tspan>.</text>
 
             <!-- Acciones Finales al Pie -->
-            <rect x="20" y="698" width="110" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
-            <text x="75" y="717" font-size="8.5" fill="#64748b" text-anchor="middle">Cancelar</text>
+            <rect x="20" y="598" width="90" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+            <text x="65" y="616" font-size="8" fill="#64748b" text-anchor="middle">Cancelar</text>
 
-            <rect x="470" y="698" width="130" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
-            <text x="535" y="717" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="middle">🕒 Historial (2)</text>
+            <rect x="330" y="598" width="110" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+            <text x="385" y="616" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">🕒 Historial (2)</text>
 
-            <rect x="610" y="698" width="145" height="30" fill="#f8fafc" stroke="#94a3b8" rx="4" cursor="pointer"/>
-            <text x="682" y="717" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="middle">💾 Guardar Borrador</text>
+            <rect x="450" y="598" width="130" height="28" fill="#f8fafc" stroke="#94a3b8" rx="4" cursor="pointer"/>
+            <text x="515" y="616" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">💾 Guardar Borrador</text>
 
-            <rect x="765" y="698" width="175" height="30" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="852" y="717" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Formalizar Orden y Devengar</text>
+            <rect x="590" y="598" width="185" height="28" fill="#eff6ff" stroke="#0284c7" rx="4" cursor="pointer"/>
+            <text x="682" y="616" font-size="8" font-weight="bold" fill="#0284c7" text-anchor="middle">🖨️ Imprimir Formato Oficial (PDF)</text>
+
+            <rect x="785" y="598" width="155" height="28" fill="#183125" rx="4" cursor="pointer"/>
+            <text x="862" y="616" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Formalizar y Devengar</text>
           </svg>
         </div>
       </div>
