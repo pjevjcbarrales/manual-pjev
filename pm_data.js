@@ -691,12 +691,13 @@ const pmData = {
             "nombre": "Matriz de Conversión",
             "sistema": "Contabilidad",
             "tipo_formulario": "C",
-            "analisis_funcional": 0,
-            "iteracion_desarrollo": 1,
-            "avance_desarrollo": 0,
+            "analisis_funcional": 1,
+            "iteracion_desarrollo": 2,
+            "avance_desarrollo": 1,
             "visitas": [],
             "desarrollador_asignado": "Cristian",
             "subsistema": "Catálogo",
+            "estado": "Terminado",
             "analista_asignado": "Julio César"
         },
         {

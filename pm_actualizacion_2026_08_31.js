@@ -95,7 +95,7 @@
     '02.2.1':[80,'/ppto/inf/calendarizacion'], '02.2.2':[80,'/ppto/inf/recalendarizacion'],
     '02.2.3':[62,'/ppto/reg/transferencias'], '02.2.4':[55,'/ppto/reg/ampliaciones-reducciones'],
     '02.2.5':[55,'/ppto/reg/arrendamientos'], '02.2.6':[75,'/ppto/pro/operaciones-especiales'],
-    '03.1.1':[90,'/conta/reg/catalogocuentas'], '03.1.2':[55,'/conta/cat/matrices'],
+    '03.1.1':[90,'/conta/reg/catalogocuentas'], '03.1.2':[100,'/conta/cat/matrices'],
     '03.2.1':[60,'/conta/reg/polizas'], '03.2.2':[65,'/conta/reg/polaut'],
     '03.3.1':[80,'/conta/proc/descarga'], '03.3.2':[60,'/conta/proc/conciliacion-bancaria'],
     '03.3.3':[90,'/conta/proc/conciliacion-ministraciones'], '03.3.4':[80,'/conta/proc/conciliacion-presupuesto-contable'],
