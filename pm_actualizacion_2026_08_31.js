@@ -336,7 +336,7 @@
     ],
     evidencia:'Catálogo institucional de tesorería que administra las cuentas bancarias receptoras de recursos, validando CLABEs de 18 dígitos y enlazando obligatoriamente a la cuenta 1.1.1.2 del COA.'
   });
-  ing('04.2.1','04.2 Registro','Registro de ingresos',{
+  ing('04.2.1','04.2 Registro','Registro y devengo de ingresos',{
     responsable:'Eunice',
     estado:'Pendiente de desarrollo',
     documentacion:'Análisis funcional completo',
@@ -349,10 +349,29 @@
       'Modal PJEV-UI con autocompletado paramétrico de clave SEFIPLAN (11 segmentos) y nemotécnico de Caja',
       'Barra de cuadre financiero obligatorio en tiempo real (Σ Movimientos = Total Encabezado, Dif: $0.00)',
       'Afectación contable subyacente en segundo plano (Matriz CONAC 03.1.2 B.1 Devengado)',
-      'Registro simple de comprobante bancario y recaudación subyacente (Paso 2: Principio KISS)',
+      'Formalización y remisión automática a bandeja de validación 04.2.2',
       'Tablero de mensajes y bitácora de trazabilidad forense (IngresoHistorialTimeline y Modales)'
     ],
-    evidencia:'Módulo central transaccional con Formulario Compuesto homologado con Egresos 05.2.1, soporte estricto de doble archivo físico firmado, grid interactivo PJEV-UI con barra de cuadre en vivo y contabilidad subyacente.'
+    evidencia:'Módulo central transaccional con Formulario Compuesto homologado con Egresos 05.2.1, soporte estricto de doble archivo físico firmado, grid interactivo PJEV-UI con barra de cuadre en vivo y devengo contable subyacente.'
+  });
+  ing('04.2.2','04.2 Registro','Validación de depósitos y recaudación',{
+    perfil:'ing',
+    f2:90,
+    rutas:['/ing/depositos-recaudacion'],
+    responsable:'Eunice',
+    documentacion:'Análisis funcional canónico',
+    documento:'04_ingresos/04.2.2-validacion-depositos.html',
+    nombre:'Validación de depósitos y recaudación',
+    opciones:[
+      '1. Bandeja de entrada de ingresos devengados pendientes de cobro',
+      '2. Filtros dinámicos por banco, ejercicio y texto de búsqueda',
+      '3. Precarga automática inmutable de datos maestros y expedientes firmados',
+      '4. Registro simplificado de comprobante bancario (BBVA Net Cash, Banorte, etc.)',
+      '5. Validación de folios de operación bancaria y fecha valor acreditada',
+      '6. Carga de comprobante oficial digitalizado (PDF)',
+      '7. Póliza de recaudación subyacente (Matriz CONAC 03.1.2 B.2: Bancos 1.1.1.2 vs CxC 1.1.2.2)'
+    ],
+    evidencia:'Módulo de Tesorería y Caja para validar depósitos bancarios de órdenes devengadas, con precarga automática de la solicitud y aplicación en un solo paso del momento Recaudado.'
   });
   ing('04.3.1','04.3 Procesos','Conciliación de ingresos',{
     perfil:'conta',
@@ -470,6 +489,7 @@
     '04.1.3': 'Eunice',
     '04.1.4': 'Eunice',
     '04.2.1': 'Eunice',
+    '04.2.2': 'Eunice',
     '04.3.1': 'Eunice',
     '04.3.2': 'Eunice',
     '04.4.1': 'Eunice',
