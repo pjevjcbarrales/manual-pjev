@@ -1,550 +1,1128 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>03.1.2-matriz-conversion.html</title>
-<link rel="stylesheet" href="../shared.css">
-<style>
-  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
-  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
-  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
-  
-  .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
-  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
-  .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
-  .wf-panel { display:none; }
-  .wf-panel.active { display:block; }
-  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
-  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
-  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.8px; }
-  .wf-svg-area { background:#f9f9f9; padding:16px; overflow-x:auto; text-align:center; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>03.1.2 Matriz de Conversión Automática — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+    .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+    .badge-a { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+    .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+    .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+    .badge-ok { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+    .callout-box { border-left: 4px solid var(--pjev-dorado); background: #ffffff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .callout-title { font-size: 13px; font-weight: bold; color: var(--pjev-verde-oscuro); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+    .wf-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+    .wf-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .wf-tab:hover { color: var(--pjev-verde-oscuro); }
+    .wf-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+    .wf-panel { display: none; }
+    .wf-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; margin-bottom: 20px; background: #fff; }
+    .wf-bar { background: var(--pjev-crema); padding: 8px 16px; border-bottom: 1px solid var(--pjev-borde); font-size: 11px; font-weight: bold; color: var(--pjev-texto-muted); display:flex; justify-content:space-between; align-items:center; }
+    .wf-svg-area { padding: 16px; background: #ffffff; overflow-x: auto; text-align:center; }
+    .code-wrap { background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; padding: 16px; overflow-x: auto; line-height: 1.6; margin-bottom: 16px; }
+    .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; font-family: var(--font-mono); }
+    .method.get    { background: #e8f5e9; color: #1b5e20; }
+    .method.post   { background: #e3f2fd; color: #0d47a1; }
+    .method.patch  { background: #fff8e1; color: #795548; }
+    .method.put    { background: #fff3e0; color: #e65100; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
 </head>
 <body>
 <div class="doc-main-inner">
 
-    <div class="elem-breadcrumb">
-      <a href="../index.html">Inicio</a> ›
-      <span>Análisis Funcional</span> ›
-      <span>03.1.2 Matriz de Conversión Automática</span>
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Manual Dev</a> ›
+    <span>03 · Contabilidad</span> ›
+    <span>03.1 · Catálogos</span> ›
+    <span>03.1.2 Matriz de Conversión Automática</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <div class="elem-id">03.1.2</div>
+      <h1 class="elem-title">Matriz de Conversión (Ingresos y Egresos)</h1>
+      <p class="elem-desc">Motor central de derivación contable-presupuestaria bajo el estándar oficial DOC-08 del SIAF-PJEV. Implementa el principio de Registro Único de la LGCG, traduciendo eventos presupuestarios (COG / CRI) a pólizas automáticas de partida doble patrimoniales y de orden (Clase 8), con simulador interactivo de cuadre en vivo.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-ok">Operativo en Sistema</span>
+        <span class="mod-badge badge-s">Análisis Funcional y Técnico Canónico (DOC-08)</span>
+        <span class="mod-badge badge-c">Ruta UI: /conta/cat/matrices</span>
+        <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Alineado con CxP (05.2.1), OP (05.2.2) e Ingresos (04.2.1)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT DE HOMOLOGACIÓN DEL SISTEMA REAL -->
+  <div class="callout-box">
+    <div class="callout-title">📌 Estado de Homologación con el Sistema Real (SIAF-PJEV)</div>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      <strong>1. Desacoplamiento del Esquema Antiguo:</strong> Se abandonó la tabla monolítica <code>config.matriz_conversion_3</code> en favor del modelo robusto normalizado en <code>contabilidad.matriz_conversion</code>, <code>matriz_conversion_regla</code>, <code>matriz_conversion_movimiento</code> y <code>matriz_conversion_aplicacion</code> (Migraciones 141, 144, 148, 149, 158, 168, 179 y 180).
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      <strong>2. Ciclo de Vida de 4 Estados e Inmutabilidad:</strong> Toda versión opera bajo la máquina de estados <code>BORRADOR ➔ VALIDADA ➔ ACTIVA ➔ CERRADA</code>. Mediante el trigger <code>fn_matriz_conversion_proteger_version</code> y la restricción GiST de exclusión temporal sin solapamiento, las matrices fuera de borrador son inmutables para auditoría forense del ORFIS.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
+      <strong>3. Innovaciones Institucionales PJEV:</strong> 
+      a) <em>Capítulo 1000 Nómina:</em> Abona a la cuenta puente <code>2.1.1.9.1000.0001 (Nómina por Liquidar)</code> en la Matriz A.1 (Migración 179).
+      b) <em>Matriz A0 de Reclasificación de OP:</em> Formalizada para el momento Ejercido (<code>mc_id = 5</code>), traspasa de <code>2.1.1.9</code> a <code>2.1.1.1.xxxx (Remuneraciones por Pagar)</code> al autorizar la Orden de Pago (Migración 180).
+      c) <em>Simulador en Vivo:</em> Frontend y Backend integran simulación con aritmética escalada <code>BigInt</code> ($10^6$) para validar cuadre exacto a centavos antes de activación.
+    </p>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>La <strong>Matriz de Conversión</strong> es el núcleo de cálculo automático del principio de <strong>"Registro Único"</strong> mandateado por la Ley General de Contabilidad Gubernamental. Traduce de forma determinista y en tiempo real cada transacción presupuestaria capturada en los módulos operativos (Clasificador por Objeto del Gasto en Egresos y Clasificador por Rubro de Ingreso en Ingresos) a sus respectivos asientos contables patrimoniales (Cargos y Abonos) y de orden presupuestario (Cuentas Clase 8), eliminando la captura manual de cuentas contables por parte de los operadores.</p>
+    
+    <p>El subsistema no opera como una simple tabla de equivalencias fija, sino como un <strong>motor de derivación en dos niveles</strong>:</p>
+    <ul style="font-size:13px; line-height:1.6; padding-left:20px; margin-bottom:12px;">
+      <li><strong>Nivel Cabecera y Vigencia:</strong> Controla el ámbito (<code>E</code> Egresos, <code>I</code> Ingresos), la familia oficial CONAC (A.1, A.2, B.1, B.2, B.3) o Guía Contabilizadora, el momento contable asociado, el ejercicio fiscal, la versión y la vigencia con bloqueo GiST sin traslape.</li>
+      <li><strong>Nivel Reglas y Movimientos:</strong> Evalúa condiciones de negocio (Tipo de Operación, Nivel de Afectación, Tipo de Proveedor por rango de COG, Tipo de Gasto Corriente/Capital, o Tipo/Concepto de Ingreso) y genera una lista ordenada de movimientos con origen de cuenta fijo o dinámico (por CRI/COG o momento 8.x) y fórmulas de importe (Total, Subtotal, IVA, Retenciones o Neto a Pagar).</li>
+    </ul>
+  </div>
+
+  <!-- 2. MARCO NORMATIVO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
+    <table class="props-table">
+      <thead><tr><th style="width:25%;">Norma / Emisor</th><th style="width:25%;">Artículo / Numeral</th><th>Obligación que genera en el SIAF-PJEV</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>LGCG</strong></td>
+          <td>Art. 40</td>
+          <td>Obliga a que las transacciones presupuestarias generen registros contables en tiempo real y de forma automática a través de la matriz de conversión.</td>
+        </tr>
+        <tr>
+          <td><strong>LGCG</strong></td>
+          <td>Art. 41</td>
+          <td>Establece las etapas presupuestarias obligatorias para el registro: Aprobado, Modificado, Comprometido, Devengado, Ejercido y Pagado (Egresos); Estimado, Modificado, Devengado y Recaudado (Ingresos).</td>
+        </tr>
+        <tr>
+          <td><strong>LGCG</strong></td>
+          <td>Art. 38, 42 y 43</td>
+          <td>Principio de Registro Único: prohibición expresa de captura doble. El operador captura el clasificador presupuestario y el sistema deriva la contabilidad.</td>
+        </tr>
+        <tr>
+          <td><strong>CONAC</strong></td>
+          <td>Anexo I — Matrices de Conversión</td>
+          <td>Define la relación técnica entre clasificadores (COG/CRI) y las cuentas de activo, pasivo, gasto e ingreso, así como las cuentas de orden presupuestario Clase 8.</td>
+        </tr>
+        <tr>
+          <td><strong>CONAC</strong></td>
+          <td>Capítulo VI — Guías Contabilizadoras (DOF 10-12-2025)</td>
+          <td>Estandariza los modelos de asientos para transacciones especiales que requieren reglas de excepción (arrendamientos, viáticos sujetos a comprobar, fondos rotatorios, anticipos).</td>
+        </tr>
+        <tr>
+          <td><strong>Reglamento Interior PJEV</strong></td>
+          <td>Atribuciones DGA / SRF</td>
+          <td>Faculta a la Dirección de Contabilidad para parametrizar, validar y publicar las versiones activas de las matrices de conversión para cada ejercicio fiscal.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. ROLES QUE INTERVIENEN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Roles que Intervienen</div>
+    <table class="props-table">
+      <thead><tr><th style="width:22%;">Rol Institucional</th><th style="width:15%;">Nivel Sistema</th><th style="width:30%;">Acciones Permitidas</th><th>Restricciones y Responsabilidad</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Jefe de Contabilidad</strong></td>
+          <td><code>MinRol(2)</code></td>
+          <td>Validar, activar, cerrar matrices; autorizar retroceso a borrador con justificación auditada; simular con transacciones de prueba.</td>
+          <td>Responsabilidad directa ante auditorías de fiscalización (ORFIS). No puede activar matrices que no cuadren en bloque contable y presupuestario.</td>
+        </tr>
+        <tr>
+          <td><strong>Analista de Contabilidad</strong></td>
+          <td><code>MinRol(3)</code></td>
+          <td>Crear versiones en borrador; dar de alta, editar y borrar reglas y movimientos; ejecutar el simulador interactivo de cálculo.</td>
+          <td>Solo puede modificar registros mientras la matriz se encuentre en estado <code>BORRADOR</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Operador de Gasto / Ingreso</strong></td>
+          <td><code>MinRol(4)</code></td>
+          <td>Consulta pasiva de matrices activas. Consumo transparente mediante los módulos de Afectación de Gastos (05.2.1) e Ingresos (04.2.1).</td>
+          <td>No interactúa directamente con la configuración ni puede elegir o alterar cuentas contables.</td>
+        </tr>
+        <tr>
+          <td><strong>Auditor Interno (ORFIS)</strong></td>
+          <td><code>MinRol(4)</code></td>
+          <td>Consulta histórica, inspección de snapshots inmutables (<code>matriz_conversion_aplicacion</code>) y exportación de la matriz vigente en PDF/Excel.</td>
+          <td>Acceso de solo lectura estricto a bitácoras de auditoría y versiones cerradas.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. ESTRUCTURA INSTITUCIONAL DE MATRICES (CONAC + PJEV) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Catálogo Oficial de Matrices de Conversión PJEV (Ejercicio 2026)</div>
+    <p>El SIAF-PJEV administra tanto las matrices oficiales CONAC de devengado, ejercido y pagado, como la matriz institucional de reclasificación pasiva desarrollada para resolver la dispersión bancaria y la nómina:</p>
+
+    <table class="props-table" style="font-size:11px;">
+      <thead>
+        <tr>
+          <th style="width:8%;">ID BD</th>
+          <th style="width:20%;">Clave Matriz</th>
+          <th style="width:12%;">Ámbito / Momento</th>
+          <th style="width:25%;">Nombre Institucional</th>
+          <th>Tratamiento Contable y Presupuestario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:#fdfbf7;">
+          <td><code>12</code></td>
+          <td><code>A1_DEVENGADO_GASTOS</code></td>
+          <td><span class="mod-badge badge-a">E · Devengado (DEV)</span></td>
+          <td><strong>A.1 Devengado de Gastos — Adquisiciones y Servicios</strong></td>
+          <td>Reconoce gasto (5.x) o activo (1.2.x) al Debe vs Pasivo al Haber. <em>Capítulo 1000:</em> abona a la cuenta puente <code>2.1.1.9.1000.0001 (Nómina por Liquidar)</code>. Presupuesto: <code>8.2.5 DEV</code> al Haber vs <code>8.2.4 COM</code> al Debe.</td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>22</code></td>
+          <td><code>A0_RECLASIFICA_ORDEN_PAGO</code></td>
+          <td><span class="mod-badge badge-s">E · Ejercido (EJE)</span></td>
+          <td><strong>Reclasificación Pasiva de Órdenes de Pago (Institucional PJEV)</strong></td>
+          <td>Al autorizar la Orden de Pago (05.2.2), disminuye la bolsa puente concentradora (Cargo a <code>2.1.1.9.1000.0001</code>) y acredita el pasivo líquido exigible (Abono a <code>2.1.1.1.xxxx Remuneraciones por Pagar</code>). Presupuesto: <code>8.2.6 EJE</code> al Haber vs <code>8.2.5 DEV</code> al Debe.</td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>13</code></td>
+          <td><code>A2_PAGADO_GASTOS</code></td>
+          <td><span class="mod-badge badge-ok">E · Pagado (PAG)</span></td>
+          <td><strong>A.2 Pagado de Gastos — Desembolso a Proveedores</strong></td>
+          <td>Al liquidar en Tesorería (06.2.1), cancela el pasivo líquido (Cargo a <code>2.1.1.1</code> o <code>2.1.1.2</code>) y acredita la cuenta bancaria de salida (Abono a <code>1.1.1.2.xxxx Bancos</code>). Presupuesto: <code>8.2.7 PAG</code> al Haber vs <code>8.2.6 EJE</code> al Debe.</td>
+        </tr>
+        <tr>
+          <td><code>14</code></td>
+          <td><code>B1_INGRESO_DEVENGADO</code></td>
+          <td><span class="mod-badge badge-a">I · Devengado (DEV)</span></td>
+          <td><strong>B.1 Ingreso Devengado — Ministraciones y Derechos</strong></td>
+          <td>Reconoce cuentas por cobrar (Cargo a <code>1.1.2.x</code>) contra ingresos de gestión o transferencias de SEFIPLAN (Abono a <code>4.x</code>). Presupuesto: <code>8.1.4 Ley de Ingresos Devengada</code>.</td>
+        </tr>
+        <tr>
+          <td><code>15</code></td>
+          <td><code>B2_INGRESO_RECAUDADO</code></td>
+          <td><span class="mod-badge badge-ok">I · Recaudado (REC)</span></td>
+          <td><strong>B.2 Ingreso Recaudado — Percepción Efectiva</strong></td>
+          <td>Entrada efectiva al banco receptor (Cargo a <code>1.1.1.2.xxxx</code>) contra cancelación de cuentas por cobrar (Abono a <code>1.1.2.x</code>). Presupuesto: <code>8.1.5 Ley de Ingresos Recaudada</code>.</td>
+        </tr>
+        <tr>
+          <td><code>16</code></td>
+          <td><code>B3_INGRESO_SIMULTANEO</code></td>
+          <td><span class="mod-badge badge-c">I · Simultáneo (DEV+REC)</span></td>
+          <td><strong>B.3 Ingreso Simultáneo — Percepción en Caja Directa</strong></td>
+          <td>Entrada inmediata al banco (Cargo a <code>1.1.1.2.xxxx</code>) contra ingreso de gestión (Abono a <code>4.x</code>), registrando al mismo tiempo los momentos presupuestarios <code>8.1.4</code> y <code>8.1.5</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Modelo de Datos y Diccionario de Campos</div>
+    <p>El esquema <code>contabilidad</code> estructura las tablas de parametrización, reglas y evidencia:</p>
+
+    <!-- 5.1 MATRIZ_CONVERSION -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">5.1. Cabecera de Matriz (<code>contabilidad.matriz_conversion</code>)</h4>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mcv_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único institucional de la matriz.</td></tr>
+        <tr><td><code>mcv_clave</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Clave nemotécnica única por ejercicio y versión (ej. <code>A1_DEVENGADO_GASTOS</code>).</td></tr>
+        <tr><td><code>mcv_nombre</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Nombre descriptivo visible en catálogo.</td></tr>
+        <tr><td><code>mcv_tipo_registro</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>MATRIZ_CONVERSION_CONAC</code> o <code>GUIA_CONTABILIZADORA</code>.</td></tr>
+        <tr><td><code>mcv_familia_conac</code></td><td><code>VARCHAR(5)</code></td><td>No</td><td><code>A1</code> | <code>A2</code> (Egresos); <code>B1</code> | <code>B2</code> | <code>B3</code> (Ingresos); <code>NULL</code> para guías.</td></tr>
+        <tr><td><code>mcv_area_pjev</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Área responsable de la emisión normativa dentro del PJEV.</td></tr>
+        <tr><td><code>mcv_procedimiento_pjev</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Procedimiento operativo asociado (ej. <code>RECEPCION_Y_REVISION_DE_GASTOS</code>).</td></tr>
+        <tr><td><code>mcv_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>E</code> (Egresos) o <code>I</code> (Ingresos).</td></tr>
+        <tr><td><code>mcv_momento_id</code></td><td><code>INTEGER (FK)</code></td><td>Sí</td><td>FK a <code>config.catalogo_momentos(mc_id)</code>.</td></tr>
+        <tr><td><code>mcv_ejercicio</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Año fiscal de aplicación (ej. 2026).</td></tr>
+        <tr><td><code>mcv_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Número secuencial de versión (> 0).</td></tr>
+        <tr><td><code>mcv_vigencia_inicio</code> / <code>_fin</code></td><td><code>DATE</code></td><td>Sí</td><td>Rango temporal de vigencia dentro del ejercicio fiscal.</td></tr>
+        <tr><td><code>mcv_estado</code></td><td><code>VARCHAR(15)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>VALIDADA</code> | <code>ACTIVA</code> | <code>CERRADA</code>.</td></tr>
+        <tr><td><code>mcv_lock_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Control de concurrencia optimista (incrementa en cada actualización).</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Baja lógica (Soft delete).</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 5.2 MATRIZ_CONVERSION_REGLA -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">5.2. Reglas Condicionales (<code>contabilidad.matriz_conversion_regla</code>)</h4>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mcr_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único de la regla.</td></tr>
+        <tr><td><code>mcr_matriz_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion(mcv_id)</code>.</td></tr>
+        <tr><td><code>mcr_clave</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Clave única dentro de la matriz (ej. <code>R_A1_11301_01</code>).</td></tr>
+        <tr><td><code>mcr_perfil</code></td><td><code>VARCHAR(10)</code></td><td>Sí</td><td><code>EGRESO</code> o <code>INGRESO</code> (debe coincidir con el ámbito).</td></tr>
+        <tr><td><code>mcr_tipo_operacion</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Operación homologada (<code>COMPRA_DIRECTA</code>, <code>NOMINA</code>, <code>ARRENDAMIENTO</code>, etc.).</td></tr>
+        <tr><td><code>mcr_nivel_afectacion</code></td><td><code>VARCHAR(30)</code></td><td>Cond.</td><td>En Egresos: <code>PROVEEDOR</code> | <code>EMPLEADO</code> | <code>TERCERO_INSTITUCIONAL</code> | <code>BIEN_INMUEBLE</code>.</td></tr>
+        <tr><td><code>mcr_tipo_proveedor_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_subtipo_proveedor</code> (>0 para Proveedor, 0 otros).</td></tr>
+        <tr><td><code>mcr_tipo_gasto</code></td><td><code>SMALLINT</code></td><td>Cond.</td><td>1 = Gasto Corriente, 2 = Gasto de Capital.</td></tr>
+        <tr><td><code>mcr_cog_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cog</code> (Clasificador por Objeto del Gasto).</td></tr>
+        <tr><td><code>mcr_tipo_ingreso</code></td><td><code>VARCHAR(40)</code></td><td>Cond.</td><td>En Ingresos: Familia de trámite (ej. <code>MINISTRACIONES</code>).</td></tr>
+        <tr><td><code>mcr_concepto_ingreso</code></td><td><code>VARCHAR(80)</code></td><td>Cond.</td><td>Subtipo específico (ej. <code>MIN_ESTATAL_ORD</code>).</td></tr>
+        <tr><td><code>mcr_cri_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cri</code> (Clasificador por Rubros de Ingresos).</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 5.3 MATRIZ_CONVERSION_MOVIMIENTO -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">5.3. Movimientos y Asientos (<code>contabilidad.matriz_conversion_movimiento</code>)</h4>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mcm_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del movimiento.</td></tr>
+        <tr><td><code>mcm_regla_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion_regla(mcr_id)</code>.</td></tr>
+        <tr><td><code>mcm_orden</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Secuencia de asiento dentro de la regla (1, 2, 3, etc.).</td></tr>
+        <tr><td><code>mcm_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>C</code> = Asiento Contable Patrimonial; <code>P</code> = Asiento Presupuestario Clase 8.</td></tr>
+        <tr><td><code>mcm_naturaleza</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>D</code> = Debe (Cargo); <code>H</code> = Haber (Abono).</td></tr>
+        <tr><td><code>mcm_origen_cuenta</code></td><td><code>VARCHAR(35)</code></td><td>Sí</td><td><code>FIJA</code> | <code>CUENTA_CONTABLE_POR_CRI_COG</code> | <code>CUENTA_PRESUPUESTARIA_POR_MOMENTO</code>.</td></tr>
+        <tr><td><code>mcm_cuenta_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>contabilidad.catalogo_cuentas</code> (obligatorio solo si origen es <code>FIJA</code>).</td></tr>
+        <tr><td><code>mcm_momento_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_momentos</code> (obligatorio solo si es por momento).</td></tr>
+        <tr><td><code>mcm_formula_importe</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>TOTAL</code> | <code>DETALLE</code> | <code>SUBTOTAL</code> | <code>IVA</code> | <code>RETENCIONES</code> | <code>NETO_PAGAR</code>.</td></tr>
+        <tr><td><code>mcm_es_obligatorio</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Asiento obligatorio; 0 = Omitible si el importe evaluado es cero.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. PROCEDIMIENTOS ALMACENADOS (LEER Y ABC) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Gobernanza transaccional en PostgreSQL bajo convención <code>SECURITY DEFINER</code>, <code>SET search_path</code> y retorno estándar JSONB <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>.
+    </p>
+
+    <!-- 6.1 LEER -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.1. Procedimiento LEER (<code>contabilidad.fn_leer_matrices_conversion</code>)</h4>
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION contabilidad.fn_leer_matrices_conversion(
+    p_usuario VARCHAR,
+    p_ejercicio INTEGER DEFAULT NULL,
+    p_estado VARCHAR DEFAULT NULL,
+    p_buscar VARCHAR DEFAULT NULL,
+    p_page INTEGER DEFAULT 1,
+    p_limit INTEGER DEFAULT 20
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = contabilidad, config, public
+AS $$
+DECLARE
+    v_offset INTEGER;
+    v_total INTEGER;
+    v_registros JSONB;
+BEGIN
+    v_offset := (GREATEST(p_page, 1) - 1) * p_limit;
+
+    SELECT count(*)
+      INTO v_total
+      FROM contabilidad.matriz_conversion m
+     WHERE m.estatus_registro = 1
+       AND (p_ejercicio IS NULL OR m.mcv_ejercicio = p_ejercicio)
+       AND (p_estado IS NULL OR m.mcv_estado = p_estado)
+       AND (p_buscar IS NULL OR (
+            m.mcv_clave ILIKE '%' || p_buscar || '%' OR
+            m.mcv_nombre ILIKE '%' || p_buscar || '%'
+       ));
+
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'mcv_id', m.mcv_id,
+            'mcv_clave', m.mcv_clave,
+            'mcv_nombre', m.mcv_nombre,
+            'mcv_tipo_registro', m.mcv_tipo_registro,
+            'mcv_familia_conac', m.mcv_familia_conac,
+            'mcv_area_pjev', m.mcv_area_pjev,
+            'mcv_procedimiento_pjev', m.mcv_procedimiento_pjev,
+            'mcv_ambito', m.mcv_ambito,
+            'mcv_ejercicio', m.mcv_ejercicio,
+            'mcv_version', m.mcv_version,
+            'mcv_estado', m.mcv_estado,
+            'mcv_lock_version', m.mcv_lock_version,
+            'mcv_vigencia_inicio', m.mcv_vigencia_inicio,
+            'mcv_vigencia_fin', m.mcv_vigencia_fin,
+            'total_reglas', (SELECT count(*) FROM contabilidad.matriz_conversion_regla r WHERE r.mcr_matriz_id = m.mcv_id AND r.estatus_registro = 1)
+        ) ORDER BY m.mcv_ejercicio DESC, m.mcv_clave ASC, m.mcv_version DESC
+    )
+    INTO v_registros
+    FROM (
+        SELECT * FROM contabilidad.matriz_conversion m
+         WHERE m.estatus_registro = 1
+           AND (p_ejercicio IS NULL OR m.mcv_ejercicio = p_ejercicio)
+           AND (p_estado IS NULL OR m.mcv_estado = p_estado)
+           AND (p_buscar IS NULL OR (
+                m.mcv_clave ILIKE '%' || p_buscar || '%' OR
+                m.mcv_nombre ILIKE '%' || p_buscar || '%'
+           ))
+         ORDER BY m.mcv_ejercicio DESC, m.mcv_clave ASC, m.mcv_version DESC
+         OFFSET v_offset LIMIT p_limit
+    ) m;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'Matrices de conversión recuperadas exitosamente.',
+        'data', jsonb_build_object(
+            'registros', COALESCE(v_registros, '[]'::jsonb),
+            'meta', jsonb_build_object('total', v_total, 'page', p_page, 'limit', p_limit, 'totalPages', CEIL(v_total::NUMERIC / p_limit))
+        )
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error al consultar matrices: ' || SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
     </div>
 
-    <div class="elem-header">
-      <div>
-        <div class="elem-id">03.1.2</div>
-        <h1 class="elem-title">Matriz de Conversión (Ingresos y Egresos)</h1>
-        <p class="elem-desc">Análisis Funcional bajo el Estándar Oficial DOC-08 del SIAF-PJEV.</p>
-        <div class="mod-header-badges">
-          <span class="mod-badge badge-c">Tipo: Catálogo Base Configurable</span>
+    <!-- 6.2 ABC -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.2. Procedimiento CRUD Cabecera (<code>contabilidad.fn_crud_matriz_conversion</code>)</h4>
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION contabilidad.fn_crud_matriz_conversion(
+    p_accion VARCHAR,
+    p_usuario VARCHAR,
+    p_payload JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = contabilidad, config, public
+AS $$
+DECLARE
+    v_id BIGINT;
+    v_lock INTEGER;
+    v_count INTEGER;
+BEGIN
+    IF p_accion = 'CREAR' THEN
+        INSERT INTO contabilidad.matriz_conversion (
+            mcv_clave, mcv_nombre, mcv_descripcion, mcv_tipo_registro, mcv_familia_conac,
+            mcv_area_pjev, mcv_procedimiento_pjev, mcv_ambito, mcv_momento_id, mcv_ejercicio,
+            mcv_version, mcv_vigencia_inicio, mcv_vigencia_fin, mcv_estado, usuario_c
+        ) VALUES (
+            UPPER(TRIM(p_payload->>'clave')),
+            TRIM(p_payload->>'nombre'),
+            TRIM(p_payload->>'descripcion'),
+            p_payload->>'tipo_registro',
+            p_payload->>'familia_conac',
+            TRIM(p_payload->>'area_pjev'),
+            TRIM(p_payload->>'procedimiento_pjev'),
+            p_payload->>'ambito',
+            (p_payload->>'momento_id')::INTEGER,
+            (p_payload->>'ejercicio')::INTEGER,
+            COALESCE((p_payload->>'version')::INTEGER, 1),
+            (p_payload->>'vigencia_inicio')::DATE,
+            (p_payload->>'vigencia_fin')::DATE,
+            'BORRADOR',
+            p_usuario
+        ) RETURNING mcv_id INTO v_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Matriz creada en borrador.', 'data', jsonb_build_object('mcv_id', v_id));
+
+    ELSIF p_accion = 'EDITAR' THEN
+        v_id := (p_payload->>'mcv_id')::BIGINT;
+        v_lock := (p_payload->>'lock_version')::INTEGER;
+
+        UPDATE contabilidad.matriz_conversion SET
+            mcv_nombre           = TRIM(p_payload->>'nombre'),
+            mcv_descripcion      = TRIM(p_payload->>'descripcion'),
+            mcv_area_pjev        = TRIM(p_payload->>'area_pjev'),
+            mcv_procedimiento_pjev = TRIM(p_payload->>'procedimiento_pjev'),
+            mcv_vigencia_inicio  = (p_payload->>'vigencia_inicio')::DATE,
+            mcv_vigencia_fin     = (p_payload->>'vigencia_fin')::DATE,
+            usuario_m            = p_usuario,
+            fecha_m              = CURRENT_TIMESTAMP
+        WHERE mcv_id = v_id AND mcv_estado = 'BORRADOR' AND mcv_lock_version = v_lock AND estatus_registro = 1;
+
+        GET DIAGNOSTICS v_count = ROW_COUNT;
+        IF v_count = 0 THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'La matriz no está en borrador o la versión es obsoleta (concurrencia).', 'data', NULL);
+        END IF;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Matriz actualizada exitosamente.', 'data', jsonb_build_object('mcv_id', v_id));
+
+    ELSIF p_accion = 'BAJA_LOGICA' THEN
+        v_id := (p_payload->>'mcv_id')::BIGINT;
+        v_lock := (p_payload->>'lock_version')::INTEGER;
+
+        IF EXISTS (SELECT 1 FROM contabilidad.matriz_conversion_aplicacion WHERE mca_matriz_id = v_id) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'No puede eliminarse una matriz que cuenta con aplicaciones históricas.', 'data', NULL);
+        END IF;
+
+        UPDATE contabilidad.matriz_conversion SET
+            estatus_registro = 0,
+            usuario_m = p_usuario,
+            fecha_m = CURRENT_TIMESTAMP
+        WHERE mcv_id = v_id AND mcv_estado = 'BORRADOR' AND mcv_lock_version = v_lock;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Matriz dada de baja lógicamente.', 'data', jsonb_build_object('mcv_id', v_id));
+    END IF;
+
+    RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no reconocida.', 'data', NULL);
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 6.3 SIMULADOR -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.3. Motor de Simulación y Cuadre (<code>contabilidad.fn_simular_matriz_conversion</code>)</h4>
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION contabilidad.fn_simular_matriz_conversion(
+    p_matriz_id BIGINT,
+    p_payload JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = contabilidad, config, public
+AS $$
+DECLARE
+    v_matriz record;
+    v_regla record;
+    v_mov record;
+    v_importe NUMERIC(18,6);
+    v_lineas JSONB := '[]'::jsonb;
+    v_debe_c NUMERIC(18,2) := 0;
+    v_haber_c NUMERIC(18,2) := 0;
+    v_debe_p NUMERIC(18,2) := 0;
+    v_haber_p NUMERIC(18,2) := 0;
+BEGIN
+    SELECT * INTO v_matriz FROM contabilidad.matriz_conversion WHERE mcv_id = p_matriz_id AND estatus_registro = 1;
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'La matriz no existe.', 'data', NULL);
+    END IF;
+
+    -- Localizar la regla que coincide unívocamente con la entrada
+    SELECT * INTO v_regla
+      FROM contabilidad.matriz_conversion_regla
+     WHERE mcr_matriz_id = p_matriz_id
+       AND mcr_perfil = p_payload->>'perfil'
+       AND mcr_tipo_operacion = p_payload->>'tipo_operacion'
+       AND (
+         (mcr_perfil = 'EGRESO' AND mcr_cog_id = (p_payload->>'cog_id')::INTEGER AND mcr_tipo_gasto = (p_payload->>'tipo_gasto')::INTEGER)
+         OR
+         (mcr_perfil = 'INGRESO' AND mcr_cri_id = (p_payload->>'cri_id')::INTEGER)
+       )
+       AND estatus_registro = 1
+     LIMIT 1;
+
+    IF v_regla.mcr_id IS NULL THEN
+        RETURN jsonb_build_object('error', 1, 'mensaje', 'No existe regla aplicable para los parámetros indicados.', 'data', jsonb_build_object('valida', false, 'movimientos', '[]'::jsonb));
+    END IF;
+
+    -- Iterar movimientos y calcular importes exactos y redondeados
+    FOR v_mov IN
+        SELECT * FROM contabilidad.matriz_conversion_movimiento
+         WHERE mcm_regla_id = v_regla.mcr_id AND estatus_registro = 1
+         ORDER BY mcm_orden
+    LOOP
+        v_importe := (p_payload->>'importe')::NUMERIC;
+        IF v_mov.mcm_ambito = 'C' THEN
+            IF v_mov.mcm_naturaleza = 'D' THEN v_debe_c := v_debe_c + ROUND(v_importe, 2); ELSE v_haber_c := v_haber_c + ROUND(v_importe, 2); END IF;
+        ELSE
+            IF v_mov.mcm_naturaleza = 'D' THEN v_debe_p := v_debe_p + ROUND(v_importe, 2); ELSE v_haber_p := v_haber_p + ROUND(v_importe, 2); END IF;
+        END IF;
+
+        v_lineas := v_lineas || jsonb_build_object(
+            'orden', v_mov.mcm_orden,
+            'ambito', v_mov.mcm_ambito,
+            'naturaleza', v_mov.mcm_naturaleza,
+            'origen_cuenta', v_mov.mcm_origen_cuenta,
+            'importe', ROUND(v_importe, 2)
+        );
+    END LOOP;
+
+    -- Comprobar cuadre dual patrimonial y presupuestal
+    IF v_debe_c <> v_haber_c OR v_debe_p <> v_haber_p THEN
+        RETURN jsonb_build_object(
+            'error', -1,
+            'mensaje', format('Descuadre: Contable (D: %s, H: %s), Presupuestal (D: %s, H: %s)', v_debe_c, v_haber_c, v_debe_p, v_haber_p),
+            'data', jsonb_build_object('valida', false, 'movimientos', v_lineas)
+        );
+    END IF;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'Simulación exitosa: Asientos cuadrados perfectamente.',
+        'data', jsonb_build_object('valida', true, 'regla_id', v_regla.mcr_id, 'movimientos', v_lineas)
+    );
+END;
+$$;</code></pre>
+    </div>
+  </div>
+
+  <!-- 7. SERVICIOS REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Servicios API REST (Controlador NestJS)</div>
+    <table class="props-table" style="margin-bottom:12px;">
+      <thead><tr><th>Método</th><th>Ruta del Endpoint</th><th>Permiso</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/contabilidad/matriz-conversion</code></td>
+          <td><code>@MinRol(4)</code></td>
+          <td>Consulta paginada con filtros por ejercicio, estado y búsqueda.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/contabilidad/matriz-conversion/catalogos/todos</code></td>
+          <td><code>@MinRol(4)</code></td>
+          <td>Retorna listas de momentos, COG, CRI y subtipos de proveedor.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/contabilidad/matriz-conversion/:id</code></td>
+          <td><code>@MinRol(4)</code></td>
+          <td>Detalle completo de la matriz, reglas y submovimientos ordenados.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/contabilidad/matriz-conversion</code></td>
+          <td><code>@MinRol(3)</code></td>
+          <td>Crea una nueva matriz en estado <code>BORRADOR</code>.</td>
+        </tr>
+        <tr>
+          <td><code class="method patch">PATCH</code></td>
+          <td><code>/contabilidad/matriz-conversion/:id</code></td>
+          <td><code>@MinRol(3)</code></td>
+          <td>Actualiza cabecera verificando <code>lock_version</code> y borrador.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/contabilidad/matriz-conversion/:id/reglas</code></td>
+          <td><code>@MinRol(3)</code></td>
+          <td>Agrega una regla condicionada por perfil EGRESO o INGRESO.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/contabilidad/matriz-conversion/:id/reglas/:rId/movimientos</code></td>
+          <td><code>@MinRol(3)</code></td>
+          <td>Agrega un movimiento contable (C) o presupuestario (P) a la regla.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/contabilidad/matriz-conversion/:id/simular</code></td>
+          <td><code>@MinRol(3)</code></td>
+          <td>Ejecuta el motor de simulación con datos sintéticos y valida cuadre.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/contabilidad/matriz-conversion/:id/validar</code></td>
+          <td><code>@MinRol(2)</code></td>
+          <td>Transiciona de <code>BORRADOR</code> a <code>VALIDADA</code> (ejecuta <code>validarEstructura</code>).</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/contabilidad/matriz-conversion/:id/activar</code></td>
+          <td><code>@MinRol(2)</code></td>
+          <td>Transiciona a <code>ACTIVA</code> (valida no traslape GiST en fechas).</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/contabilidad/matriz-conversion/:id/regresar-borrador</code></td>
+          <td><code>@MinRol(2)</code></td>
+          <td>Retrocede a <code>BORRADOR</code> registrando motivo obligatorio en bitácora.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/contabilidad/matriz-conversion/:id/cerrar</code></td>
+          <td><code>@MinRol(2)</code></td>
+          <td>Cierra la matriz al término de su vigencia anual.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">Controlador NestJS Oficial (<code>matriz-conversion.controller.ts</code>)</h4>
+    <div class="code-wrap">
+<pre><code>import { Controller, Get, Post, Patch, Delete, Param, Body, Query, Req, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../configuracion/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../configuracion/auth/guards/roles.guard';
+import { MinRol } from '../../configuracion/auth/decorators/min-rol.decorator';
+import { MatrizConversionService } from './matriz-conversion.service';
+import { MatrizConversionSimuladorService } from './matriz-conversion-simulador.service';
+
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiTags('Contabilidad / Matriz de conversión')
+@Controller(['contabilidad/matriz-conversion', 'contabilidad/matrices'])
+export class MatrizConversionController {
+  constructor(
+    private readonly service: MatrizConversionService,
+    private readonly simulador: MatrizConversionSimuladorService,
+  ) {}
+
+  @Get()
+  @MinRol(4)
+  @ApiOperation({ summary: 'Listar matrices con paginación y filtros' })
+  findAll(@Query() query: any, @Req() req: any) {
+    return this.service.findAll(query, { usuario: req.user.login, rolNivel: req.user.rolNivel });
+  }
+
+  @Get(':id')
+  @MinRol(4)
+  @ApiOperation({ summary: 'Obtener detalle íntegro de la matriz, reglas y movimientos' })
+  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.service.findOne(id, { usuario: req.user.login, rolNivel: req.user.rolNivel });
+  }
+
+  @Post(':id/simular')
+  @MinRol(3)
+  @ApiOperation({ summary: 'Simular cálculo en vivo y validar cuadre a centavos' })
+  simular(@Param('id', ParseIntPipe) id: number, @Body() dto: any, @Req() req: any) {
+    return this.simulador.simular(id, dto, { usuario: req.user.login, rolNivel: req.user.rolNivel });
+  }
+
+  @Post(':id/validar')
+  @MinRol(2)
+  @ApiOperation({ summary: 'Validar consistencia estructural y balance dual de la matriz' })
+  validar(@Param('id', ParseIntPipe) id: number, @Body() dto: any, @Req() req: any) {
+    return this.service.cambiarEstado(id, 'BORRADOR', 'VALIDADA', dto, { usuario: req.user.login, rolNivel: req.user.rolNivel });
+  }
+
+  @Post(':id/activar')
+  @MinRol(2)
+  @ApiOperation({ summary: 'Activar matriz para consumo en tiempo real por el motor de pólizas' })
+  activar(@Param('id', ParseIntPipe) id: number, @Body() dto: any, @Req() req: any) {
+    return this.service.cambiarEstado(id, 'VALIDADA', 'ACTIVA', dto, { usuario: req.user.login, rolNivel: req.user.rolNivel });
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. ACCIONES DEL MÓDULO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Acciones del Módulo</div>
+    <ul style="font-size:13px; line-height:1.7; padding-left:20px;">
+      <li><strong>Parametrización en Borrador:</strong> Permite configurar las reglas condicionales y sus renglones contables y presupuestarios antes de que afecten el sistema operativo.</li>
+      <li><strong>Simulación Interactiva en Vivo (Test Bench):</strong> El contador introduce un caso de prueba (ej. Factura por $1,160.00 con COG 21101) y la interfaz renderiza los asientos calculados, verificando que los saldos cuadren a centavos tanto en contabilidad como en presupuesto.</li>
+      <li><strong>Validación Estructural Automática:</strong> El sistema analiza que todas las cuentas asociadas sean de registro (último nivel), estén activas, permitan póliza y que no existan reglas con condiciones duplicadas.</li>
+      <li><strong>Activación con Protección GiST:</strong> Al activarse, la base de datos certifica mediante exclusión GiST que no se solape con otra versión activa para el mismo ejercicio y ámbito.</li>
+      <li><strong>Reversión Segura a Borrador:</strong> Si se detecta un error normativo, el Jefe de Contabilidad puede devolver una matriz validada a borrador ingresando un motivo formal que se registra en la bitácora de auditoría.</li>
+    </ul>
+  </div>
+
+  <!-- 9. DISEÑO DE INTERFACES (UI / WIREFRAMES) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Diseño de Interfaces (UI / Wireframes SVG)</div>
+    
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showTab('tab-grid-esq', this)">Grid Consulta (Esqueleto)</button>
+      <button class="wf-tab" onclick="showTab('tab-grid-val', this)">Grid Consulta (Valores)</button>
+      <button class="wf-tab" onclick="showTab('tab-detalle', this)">Detalle y Reglas (Maestro-Detalle)</button>
+      <button class="wf-tab" onclick="showTab('tab-simulador', this)">Modal Simulador en Vivo</button>
+    </div>
+
+    <!-- TAB 1: Grid Esqueleto -->
+    <div id="tab-grid-esq" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar"><span>Vista de Catálogo de Matrices / Parámetros</span><span>Ruta: /conta/cat/matrices</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1000px;">
+            <rect width="1000" height="320" fill="#fcfcfc" stroke="#e2e8f0" rx="6"/>
+            <rect x="20" y="15" width="220" height="32" fill="#fff" stroke="#cbd5e1" rx="4"/>
+            <text x="35" y="36" font-size="11" fill="#94a3b8">Buscar por clave o nombre...</text>
+            <rect x="250" y="15" width="120" height="32" fill="#fff" stroke="#cbd5e1" rx="4"/>
+            <text x="265" y="36" font-size="11" fill="#64748b">Ejercicio: 2026</text>
+            <rect x="380" y="15" width="140" height="32" fill="#fff" stroke="#cbd5e1" rx="4"/>
+            <text x="395" y="36" font-size="11" fill="#64748b">Estado: [TODOS]</text>
+            
+            <rect x="840" y="15" width="140" height="32" fill="#1B3A2D" rx="4"/>
+            <text x="910" y="36" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">+ NUEVA MATRIZ</text>
+            
+            <rect x="20" y="65" width="960" height="36" fill="#1B3A2D" rx="3"/>
+            <text x="35" y="88" fill="#fff" font-size="11" font-weight="bold">CLAVE MATRIZ</text>
+            <text x="250" y="88" fill="#fff" font-size="11" font-weight="bold">NOMBRE INSTITUCIONAL</text>
+            <text x="540" y="88" fill="#fff" font-size="11" font-weight="bold">CLASIFICACIÓN CONAC</text>
+            <text x="700" y="88" fill="#fff" font-size="11" font-weight="bold">ÁMBITO</text>
+            <text x="790" y="88" fill="#fff" font-size="11" font-weight="bold">ESTADO</text>
+            <text x="900" y="88" fill="#fff" font-size="11" font-weight="bold">ACCIONES</text>
+
+            <rect x="20" y="105" width="960" height="42" fill="#fff" stroke="#f1f5f9"/>
+            <text x="35" y="131" font-size="11" font-family="monospace" fill="#0f172a">{mcv_clave}</text>
+            <text x="250" y="131" font-size="11" fill="#334155">{mcv_nombre}</text>
+            <text x="540" y="131" font-size="11" fill="#64748b">{mcv_familia_conac}</text>
+            <text x="700" y="131" font-size="11" fill="#334155">{mcv_ambito_str}</text>
+            <rect x="790" y="117" width="70" height="20" fill="#fef3c7" stroke="#fde68a" rx="10"/>
+            <text x="825" y="131" font-size="9" font-weight="bold" fill="#92400e" text-anchor="middle">{ESTADO}</text>
+            <rect x="895" y="115" width="65" height="24" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="927" y="131" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">ABRIR</text>
+          </svg>
         </div>
       </div>
     </div>
 
-    <!-- 1. Descripción General -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-      <p>La Matriz de Conversión es el motor de cálculo automático del principio de <strong>"Registro Único"</strong> mandateado por la Ley General de Contabilidad Gubernamental. Traduce de forma determinista y en tiempo real cada momento presupuestal (COG en Egresos, CRI en Ingresos) a sus respectivos asientos contables patrimoniales (Cargos y Abonos), eliminando la captura manual de cuentas contables por parte de los operadores.</p>
-      
-      <p>En el SIAF-PJEV, la administración de matrices opera bajo el esquema <code>contabilidad.matriz_conversion</code>, <code>contabilidad.matriz_conversion_regla</code> y <code>contabilidad.matriz_conversion_movimiento</code>, permitiendo al Jefe de Contabilidad parametrizar las siguientes matrices oficiales del ejercicio 2026:</p>
+    <!-- TAB 2: Grid Valores -->
+    <div id="tab-grid-val" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span>Vista de Catálogo de Matrices / Datos Reales</span><span>Ruta: /conta/cat/matrices</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1000px;">
+            <rect width="1000" height="320" fill="#fcfcfc" stroke="#e2e8f0" rx="6"/>
+            <rect x="20" y="20" width="960" height="36" fill="#1B3A2D" rx="3"/>
+            <text x="35" y="43" fill="#fff" font-size="11" font-weight="bold">CLAVE MATRIZ</text>
+            <text x="260" y="43" fill="#fff" font-size="11" font-weight="bold">NOMBRE INSTITUCIONAL</text>
+            <text x="560" y="43" fill="#fff" font-size="11" font-weight="bold">CLASIFICACIÓN CONAC</text>
+            <text x="720" y="43" fill="#fff" font-size="11" font-weight="bold">ÁMBITO</text>
+            <text x="810" y="43" fill="#fff" font-size="11" font-weight="bold">ESTADO</text>
+            <text x="910" y="43" fill="#fff" font-size="11" font-weight="bold">ACCIONES</text>
 
-      <table class="props-table" style="font-size:12px; margin-top:10px;">
-        <thead><tr><th>ID</th><th>Clave Matriz</th><th>Ámbito / Momento CONAC</th><th>Nombre Institucional</th><th>Propósito y Tratamiento Contable</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>12</code></td>
-            <td><code>A1_DEVENGADO_GASTOS</code></td>
-            <td><span class="badge-w" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">E · Devengado (DEV)</span></td>
-            <td>A.1 Devengado de Gastos</td>
-            <td>Reconoce el gasto (5.x) y el pasivo. En el Capítulo 1000 (103 reglas), abona homogéneamente a la cuenta puente <code>2.1.1.9.1000.0001 (Nómina por Liquidar)</code>.</td>
-          </tr>
-          <tr>
-            <td><code>22</code></td>
-            <td><code>A0_RECLASIFICA_ORDEN_PAGO</code></td>
-            <td><span class="badge-s" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">E · Ejercido (EJE)</span></td>
-            <td>Reclasificación Pasiva de Órdenes de Pago</td>
-            <td><strong>Nueva Matriz Institucional:</strong> Al autorizar la Orden de Pago (05.2.2), disminuye la bolsa puente (Cargo a <code>2.1.1.9.1000.0001</code>) y acredita el pasivo líquido exigible (Abono a <code>2.1.1.1.xxxx</code>).</td>
-          </tr>
-          <tr>
-            <td><code>13</code></td>
-            <td><code>A2_PAGADO_GASTOS</code></td>
-            <td><span class="badge-a" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">E · Pagado (PAG)</span></td>
-            <td>A.2 Pagado de Gastos</td>
-            <td>Al liquidar en Tesorería (06.2.1), cancela el pasivo líquido (Cargo a <code>2.1.1.1.xxxx</code>) y acredita la cuenta bancaria de salida (Abono a <code>1.1.1.2.xxxx</code>).</td>
-          </tr>
-          <tr>
-            <td><code>14</code></td>
-            <td><code>B1_INGRESO_DEVENGADO</code></td>
-            <td><span class="badge-w" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">I · Devengado (DEV)</span></td>
-            <td>B.1 Ingreso Devengado</td>
-            <td>Cuentas por cobrar (1.1.2.x) vs Ingresos de gestión (4.x).</td>
-          </tr>
-          <tr>
-            <td><code>15</code></td>
-            <td><code>B2_INGRESO_RECAUDADO</code></td>
-            <td><span class="badge-a" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">I · Recaudado (REC)</span></td>
-            <td>B.2 Ingreso Recaudado</td>
-            <td>Entrada a Bancos (1.1.1.2) vs Cancelación de Cuentas por cobrar (1.1.2.x).</td>
-          </tr>
-          <tr>
-            <td><code>16</code></td>
-            <td><code>B3_INGRESO_SIMULTANEO</code></td>
-            <td><span class="badge-a" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">I · Simultáneo (DEV+REC)</span></td>
-            <td>B.3 Ingreso Devengado y Recaudado Simultáneo</td>
-            <td>Entrada directa a Bancos (1.1.1.2) vs Ingresos de gestión (4.x) en caja directa.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            <rect x="20" y="60" width="960" height="42" fill="#fff" stroke="#f1f5f9"/>
+            <text x="35" y="86" font-size="11" font-family="monospace" font-weight="bold" fill="#0f172a">A1_DEVENGADO_GASTOS</text>
+            <text x="260" y="86" font-size="11" fill="#334155">A.1 Devengado de Gastos (Cap. 1000 a Puente)</text>
+            <text x="560" y="86" font-size="11" font-weight="bold" fill="#0369a1">CONAC A.1</text>
+            <text x="720" y="86" font-size="11" fill="#334155">Egreso</text>
+            <rect x="805" y="72" width="65" height="20" fill="#dcfce7" stroke="#bbf7d0" rx="10"/>
+            <text x="837" y="86" font-size="9" font-weight="bold" fill="#166534" text-anchor="middle">ACTIVA</text>
+            <rect x="900" y="70" width="65" height="24" fill="#1B3A2D" rx="4"/>
+            <text x="932" y="86" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">Abrir</text>
 
-    <!-- 2. Marco Normativo -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
-      <table class="props-table">
-        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
-        <tbody>
-          <tr><td>LGCG (CONAC)</td><td>Art. 40 y Documento de Matriz de Conversión</td><td>Todas las transacciones presupuestarias deben generar automáticamente y en tiempo real el registro contable asociado usando la Matriz Oficial.</td></tr>
-          <tr><td>Acuerdo CONAC</td><td>Relación COG-CRI a Cuentas</td><td>Obliga a mantener la relación 1:1 o 1:N entre el Clasificador por Objeto del Gasto y las Cuentas de Activo/Gasto.</td></tr>
-        </tbody>
-      </table>
-    </div>
+            <rect x="20" y="105" width="960" height="42" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="35" y="131" font-size="11" font-family="monospace" font-weight="bold" fill="#0f172a">A0_RECLASIFICA_ORDEN_PAGO</text>
+            <text x="260" y="131" font-size="11" fill="#334155">Reclasificación Pasiva de Órdenes de Pago</text>
+            <text x="560" y="131" font-size="11" font-weight="bold" fill="#b45309">EJE (PJEV)</text>
+            <text x="720" y="131" font-size="11" fill="#334155">Egreso</text>
+            <rect x="805" y="117" width="65" height="20" fill="#dcfce7" stroke="#bbf7d0" rx="10"/>
+            <text x="837" y="131" font-size="9" font-weight="bold" fill="#166534" text-anchor="middle">ACTIVA</text>
+            <rect x="900" y="115" width="65" height="24" fill="#1B3A2D" rx="4"/>
+            <text x="932" y="131" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">Abrir</text>
 
-    <!-- 3. Roles que intervienen -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
-      <table class="props-table">
-        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
-        <tbody>
-          <tr><td>Jefe de Contabilidad</td><td>Crear o actualizar mapeos de cuentas, imprimir matriz.</td><td>No puede crear combinaciones matemáticamente descuadradas para la automatización.</td></tr>
-          <tr><td>Analista de Egresos</td><td>Solo vista pasiva.</td><td>No interviene en este módulo, solo se beneficia de él.</td></tr>
-        </tbody>
-      </table>
-    </div>
+            <rect x="20" y="150" width="960" height="42" fill="#fff" stroke="#f1f5f9"/>
+            <text x="35" y="176" font-size="11" font-family="monospace" font-weight="bold" fill="#0f172a">A2_PAGADO_GASTOS</text>
+            <text x="260" y="176" font-size="11" fill="#334155">A.2 Pagado de Gastos — Bancos y Desembolso</text>
+            <text x="560" y="176" font-size="11" font-weight="bold" fill="#0369a1">CONAC A.2</text>
+            <text x="720" y="176" font-size="11" fill="#334155">Egreso</text>
+            <rect x="805" y="162" width="65" height="20" fill="#dcfce7" stroke="#bbf7d0" rx="10"/>
+            <text x="837" y="176" font-size="9" font-weight="bold" fill="#166534" text-anchor="middle">ACTIVA</text>
+            <rect x="900" y="160" width="65" height="24" fill="#1B3A2D" rx="4"/>
+            <text x="932" y="176" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">Abrir</text>
 
-    <!-- 4. Modelo de Datos -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
-      <table class="props-table">
-        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
-        <tbody>
-        <tr><td><code>MTRZ_ID</code></td><td><code>BIGINT (PK)</code></td><td>Identificador único de la regla de conversión.</td></tr>
-        <tr><td><code>CLASIFICADOR_ID</code></td><td><code>BIGINT (FK)</code></td><td>Referencia a la partida COG (Egresos) o CRI (Ingresos).</td></tr>
-        <tr><td><code>TIPO_MOVIMIENTO</code></td><td><code>VARCHAR(20)</code></td><td>'DEVENGADO', 'RECAUDADO', 'PAGADO'.</td></tr>
-        <tr><td><code>CTA_CARGO</code></td><td><code>BIGINT (FK)</code></td><td>ID de la cuenta contable donde se aplicará el cargo.</td></tr>
-        <tr><td><code>CTA_ABONO</code></td><td><code>BIGINT (FK)</code></td><td>ID de la cuenta contable donde se aplicará el abono.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 5. Stored Procedures -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">5</span> Stored Procedures (SPs)</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">Todas las interacciones de base de datos se encapsulan en las siguientes funciones de PostgreSQL:</p>
-      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong><code>fn_leer_matriz_conversion</code></strong>
-          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@tipo_clasificador</code>, <code>@page</code>, <code>@limit</code>
-          <br><span style="color:#666">OUT:</span> Recordset con los mapeos actuales COG->Cuentas.
-        </li>
-        <li><strong><code>fn_crud_matriz_conversion</code></strong>
-          <br><span style="color:#666">IN:</span> <code>@usuario</code>, <code>@accion</code>, <code>@mtrz_id</code>, <code>@clasificador_id</code>, <code>@tipo_movimiento</code>, <code>@cta_cargo</code>, <code>@cta_abono</code>
-          <br><span style="color:#666">OUT:</span> <code>{status}</code>, <code>{message}</code>
-        </li>
-      </ul>
-    </div>
-
-    <!-- 6. Servicios REST -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
-      <table class="props-table">
-        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/matriz/leer</code></td><td>JSON con <code>{ tipo_clasificador... }</code></td><td>Devuelve las reglas activas.</td></tr>
-          <tr><td><span class="method post">POST</span></td><td><code>/contabilidad/matriz/abc</code></td><td>JSON con la regla Cargo/Abono</td><td>Configura una nueva regla para el motor de pólizas.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 7. Acciones del Módulo -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">7</span> Acciones del Módulo</div>
-      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:10px;">El sistema expone las siguientes acciones operativas:</p>
-      <ul style="font-size: 13px; color: var(--pjev-texto); padding-left: 20px;">
-        <li><strong>Mapeo Rápido:</strong> Permite seleccionar una partida presupuestal y mediante un formulario asignar la cuenta de cargo y abono para los momentos contables.</li>
-        <li><strong>Clonación de Reglas:</strong> Permite copiar la configuración de un Ejercicio Fiscal anterior al actual para evitar recapturas masivas en Enero.</li>
-        <li><strong>Impresión / Exportación:</strong> Acción obligatoria para exportar a PDF/Excel la "Matriz de Conversión Vigente", comúnmente solicitada en auditorías de sistemas.</li>
-      </ul>
-    </div>
-
-    <!-- 8. Diseño de Interfaces (UI) -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (UI / Wireframes)</div>
-      
-      <div class="wireframe-tabs">
-        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer (Esqueleto)</button>
-        <button class="wf-tab" onclick="showWF('p2',this)">pantalla_leer (Valores)</button>
-        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc (Esqueleto)</button>
-        <button class="wf-tab" onclick="showWF('p4',this)">pantalla_abc (Valores)</button>
-      </div>
-
-      <!-- TAB 1: Grid Parametros -->
-      <div id="wf-p1" class="wf-panel active">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Grid View (Esqueleto / Parametrizado)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
-              <!-- Filtros -->
-              <rect x="20" y="20" width="200" height="25" fill="#eee" rx="3"/> <text x="25" y="35" font-size="10">@tipo_matriz (Ingresos/Egresos)</text>
-              <rect x="230" y="20" width="200" height="25" fill="#eee" rx="3"/> <text x="235" y="35" font-size="10">@buscar_partida</text>
-              
-              <!-- Action Bar -->
-              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
-              
-              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Registro:</text>
-              <rect x="90" y="62" width="110" height="21" fill="#1B3A2D" rx="3"/> <text x="145" y="76" fill="#fff" font-size="9" text-anchor="middle">+ CONFIGURAR REGLA</text>
-              <line x1="220" y1="60" x2="220" y2="85" stroke="#ccc" />
-
-              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
-              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 IMPRIMIR MATRIZ</text>
-              
-              <!-- Grid Header -->
-              <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
-              <text x="30" y="121" fill="#fff" font-size="10">{clasificador_id}</text>
-              <text x="200" y="121" fill="#fff" font-size="10">{tipo_movimiento}</text>
-              <text x="400" y="121" fill="#fff" font-size="10">{cta_cargo_nombre}</text>
-              <text x="650" y="121" fill="#fff" font-size="10">{cta_abono_nombre}</text>
-              <text x="880" y="121" fill="#fff" font-size="10">ACCIONES</text>
-
-              <!-- Grid Row -->
-              <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
-              <text x="30" y="150" font-size="11">{val.partida_str}</text>
-              <text x="200" y="150" font-size="11">{val.movimiento}</text>
-              <text x="400" y="150" font-size="11">{val.cuenta_cargo}</text>
-              <text x="650" y="150" font-size="11">{val.cuenta_abono}</text>
-              <text x="880" y="150" font-size="10" fill="blue">[EDIT]</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: Grid Valores -->
-      <div id="wf-p2" class="wf-panel">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Grid View (Datos de Ejemplo)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1000" height="300" fill="#fcfcfc" rx="4" stroke="#ddd"/>
-              <!-- Filtros -->
-              <rect x="20" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="25" y="37" font-size="10">Egresos (COG)</text>
-              <rect x="230" y="20" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/> <text x="235" y="37" font-size="10">Buscar: "21101"</text>
-              
-              <!-- Action Bar -->
-              <rect x="20" y="55" width="960" height="35" fill="#f4f6f5" stroke="#ccc" rx="4"/>
-              
-              <text x="30" y="77" font-size="10" font-weight="bold" fill="#666">Registro:</text>
-              <rect x="90" y="62" width="110" height="21" fill="#1B3A2D" rx="3"/> <text x="145" y="76" fill="#fff" font-size="9" text-anchor="middle">+ Configurar Regla</text>
-              <line x1="220" y1="60" x2="220" y2="85" stroke="#ccc" />
-
-              <text x="780" y="77" font-size="10" font-weight="bold" fill="#666">Reportes:</text>
-              <rect x="840" y="62" width="130" height="21" fill="#fff" stroke="#1B3A2D" rx="3"/> <text x="905" y="76" fill="#1B3A2D" font-size="9" text-anchor="middle">🖨 Imprimir Matriz</text>
-              
-              <!-- Grid Header -->
-              <rect x="20" y="105" width="960" height="25" fill="#1B3A2D"/>
-              <text x="30" y="121" fill="#fff" font-size="10">COG / PARTIDA</text>
-              <text x="200" y="121" fill="#fff" font-size="10">TIPO MOV.</text>
-              <text x="400" y="121" fill="#fff" font-size="10">CONTABILIDAD: CARGO</text>
-              <text x="650" y="121" fill="#fff" font-size="10">CONTABILIDAD: ABONO</text>
-              <text x="880" y="121" fill="#fff" font-size="10">ACCIONES</text>
-
-              <!-- Row 1 -->
-              <rect x="20" y="130" width="960" height="30" fill="#fff" stroke="#eee"/>
-              <text x="30" y="150" font-size="11">21101 Materiales de Ofic</text>
-              <text x="200" y="150" font-size="11" fill="#166534" font-weight="bold">DEVENGADO</text>
-              <text x="400" y="150" font-size="11">5121 Materiales (Gasto)</text>
-              <text x="650" y="150" font-size="11">2112 Proveedores (Pasivo)</text>
-              <text x="880" y="150" font-size="10" fill="blue">Editar</text>
-
-              <!-- Row 2 -->
-              <rect x="20" y="160" width="960" height="30" fill="#fafafa" stroke="#eee"/>
-              <text x="30" y="180" font-size="11">21101 Materiales de Ofic</text>
-              <text x="200" y="180" font-size="11" fill="#0369a1" font-weight="bold">PAGADO</text>
-              <text x="400" y="180" font-size="11">2112 Proveedores (Pasivo)</text>
-              <text x="650" y="180" font-size="11">1112 Bancos (Activo)</text>
-              <text x="880" y="180" font-size="10" fill="blue">Editar</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: ABC Parametros -->
-      <div id="wf-p3" class="wf-panel">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Esqueleto / Parametrizado)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
-              <rect width="600" height="250" fill="#fff" stroke="#ddd"/>
-              <text x="30" y="40" font-size="16" font-weight="bold">Configuración de Regla</text>
-              
-              <text x="30" y="80" font-size="12">Partida Presupuestal:</text>
-              <rect x="180" y="65" width="200" height="25" fill="#eee" rx="3"/>
-              <text x="190" y="82" font-size="11" fill="#666">@clasificador_id</text>
-              
-              <text x="30" y="115" font-size="12">Momento / Tipo Mov:</text>
-              <rect x="180" y="100" width="200" height="25" fill="#eee" rx="3"/>
-              <text x="190" y="117" font-size="11">@tipo_movimiento (Select)</text>
-
-              <text x="30" y="150" font-size="12">Cuenta de Cargo:</text>
-              <rect x="180" y="135" width="250" height="25" fill="#eee" rx="3"/>
-              <text x="190" y="152" font-size="11">@cta_cargo (Buscador)</text>
-
-              <text x="30" y="185" font-size="12">Cuenta de Abono:</text>
-              <rect x="180" y="170" width="250" height="25" fill="#eee" rx="3"/>
-              <text x="190" y="187" font-size="11">@cta_abono (Buscador)</text>
-
-              <rect x="450" y="200" width="100" height="30" fill="#1B3A2D" rx="4"/>
-              <text x="500" y="220" fill="#fff" font-size="12" text-anchor="middle">[ GUARDAR ]</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 4: ABC Valores -->
-      <div id="wf-p4" class="wf-panel">
-        <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Formulario ABC (Datos de Ejemplo)</span></div>
-          <div class="wf-svg-area">
-            <svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
-              <rect width="600" height="280" fill="#fff" stroke="#ddd"/>
-              <text x="30" y="40" font-size="16" font-weight="bold">Regla: Partida de Viáticos</text>
-              
-              <text x="30" y="80" font-size="12">Partida Presupuestal:</text>
-              <rect x="180" y="65" width="250" height="25" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="190" y="82" font-size="11" fill="#333">37501 Viáticos en el País</text>
-              
-              <text x="30" y="115" font-size="12">Momento / Tipo Mov:</text>
-              <rect x="180" y="100" width="200" height="25" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="190" y="117" font-size="11">PAGADO</text>
-
-              <text x="30" y="150" font-size="12">Cuenta de Cargo (Debe):</text>
-              <rect x="180" y="135" width="250" height="25" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="190" y="152" font-size="11">2112 - Proveedores por Pagar a CP</text>
-
-              <text x="30" y="185" font-size="12">Cuenta de Abono (Haber):</text>
-              <rect x="180" y="170" width="250" height="25" fill="#fff" stroke="#ccc" rx="3"/>
-              <text x="190" y="187" font-size="11">1112 - Bancos / Tesorería</text>
-
-              <rect x="450" y="230" width="100" height="30" fill="#1B3A2D" rx="4"/>
-              <text x="500" y="250" fill="#fff" font-size="12" text-anchor="middle">Guardar Regla</text>
-            </svg>
-          </div>
+            <rect x="20" y="195" width="960" height="42" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="35" y="221" font-size="11" font-family="monospace" font-weight="bold" fill="#0f172a">B1_INGRESO_DEVENGADO</text>
+            <text x="260" y="221" font-size="11" fill="#334155">B.1 Ingreso Devengado — Ministraciones SEFIPLAN</text>
+            <text x="560" y="221" font-size="11" font-weight="bold" fill="#6b21a8">CONAC B.1</text>
+            <text x="720" y="221" font-size="11" fill="#334155">Ingreso</text>
+            <rect x="805" y="207" width="65" height="20" fill="#dcfce7" stroke="#bbf7d0" rx="10"/>
+            <text x="837" y="221" font-size="9" font-weight="bold" fill="#166534" text-anchor="middle">ACTIVA</text>
+            <rect x="900" y="205" width="65" height="24" fill="#1B3A2D" rx="4"/>
+            <text x="932" y="221" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">Abrir</text>
+          </svg>
         </div>
       </div>
     </div>
 
-    <!-- 9. Reglas de Negocio Críticas -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Críticas</div>
-      <table class="props-table">
-        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa/Técnica)</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><strong>RN-MT-01</strong></td>
-            <td>Cuentas de Último Nivel: Solo se pueden mapear cuentas contables de nivel 5 o 6 en la matriz.</td>
-            <td>Error: "No puede vincular a una cuenta acumulativa".</td>
-            <td>SP (<code>fn_crud</code>) y UI</td>
-            <td>Manual CONAC</td>
-          </tr>
-          <tr>
-            <td><strong>RN-MT-02</strong></td>
-            <td>Momentos Estrictos: COG permite Devengado, Ejercido y Pagado. CRI permite Estimado a Recaudado.</td>
-            <td>Restringe las opciones del combobox al tipo de clasificador.</td>
-            <td>Frontend</td>
-            <td>Lógica LGCG</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- TAB 3: Detalle y Reglas -->
+    <div id="tab-detalle" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span>Detalle de Matriz, Reglas y Subasientos</span><span>Ruta: /conta/cat/matrices/[id]</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 360" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1000px;">
+            <rect width="1000" height="360" fill="#fff" stroke="#cbd5e1" rx="6"/>
+            <rect x="20" y="15" width="960" height="70" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="35" y="38" font-size="15" font-weight="bold" fill="#1B3A2D">A1_DEVENGADO_GASTOS (Versión 1 · Ejercicio 2026)</text>
+            <text x="35" y="58" font-size="11" fill="#64748b">Ámbito: Egreso | Momento: DEV (mc_id: 4) | Área: Tesorería / Contabilidad | Estado: ACTIVA</text>
+            
+            <rect x="740" y="25" width="110" height="28" fill="#0284c7" rx="4"/>
+            <text x="795" y="43" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">⚙ SIMULAR</text>
+            <rect x="860" y="25" width="105" height="28" fill="#166534" rx="4"/>
+            <text x="912" y="43" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">✓ ACTIVA</text>
+
+            <rect x="20" y="95" width="960" height="35" fill="#f1f5f9" rx="3"/>
+            <text x="35" y="117" font-size="11" font-weight="bold" fill="#334155">Reglas Configuradas (103)</text>
+            <rect x="220" y="100" width="140" height="25" fill="#fff" stroke="#cbd5e1" rx="3"/>
+            <text x="230" y="116" font-size="10" fill="#64748b">Capítulo: Cap 1000</text>
+            <rect x="370" y="100" width="150" height="25" fill="#fff" stroke="#cbd5e1" rx="3"/>
+            <text x="380" y="116" font-size="10" fill="#64748b">Operación: NOMINA</text>
+
+            <!-- Acordeón Regla 1 (Cap 1000 Nómina) -->
+            <rect x="20" y="140" width="960" height="85" fill="#fdfbf7" stroke="#e2e8f0" rx="4"/>
+            <text x="35" y="160" font-size="11" font-family="monospace" font-weight="bold" fill="#1e293b">REGLA: R_A1_11301_01 — Sueldos Base al Personal Permanente</text>
+            <text x="35" y="176" font-size="10" fill="#64748b">Condición: COG: 11301 | Tipo Gasto: 1 (Corriente) | Nivel Afectación: EMPLEADO</text>
+            
+            <rect x="35" y="185" width="930" height="32" fill="#fff" stroke="#cbd5e1" rx="2"/>
+            <text x="45" y="202" font-size="10" font-weight="bold" fill="#15803d">CARGO (C): 5.1.1.1.1130.0001 (Sueldos Base)</text>
+            <text x="380" y="202" font-size="10" font-weight="bold" fill="#b91c1c">ABONO (C): 2.1.1.9.1000.0001 (Nómina por Liquidar - PUENTE)</text>
+            <text x="750" y="202" font-size="10" fill="#0369a1">P: 8.2.5 DEV vs 8.2.4 COM</text>
+
+            <!-- Acordeón Regla 2 (Cap 2000 Materiales) -->
+            <rect x="20" y="235" width="960" height="85" fill="#fff" stroke="#e2e8f0" rx="4"/>
+            <text x="35" y="255" font-size="11" font-family="monospace" font-weight="bold" fill="#1e293b">REGLA: R_A1_21101_01 — Materiales, Útiles y Equipos Menores de Oficina</text>
+            <text x="35" y="271" font-size="10" fill="#64748b">Condición: COG: 21101 | Tipo Gasto: 1 (Corriente) | Nivel Afectación: PROVEEDOR (Subtipo 1)</text>
+            
+            <rect x="35" y="280" width="930" height="32" fill="#f8fafc" stroke="#cbd5e1" rx="2"/>
+            <text x="45" y="297" font-size="10" font-weight="bold" fill="#15803d">CARGO (C): 5.1.2.1.2110.0001 (Materiales)</text>
+            <text x="380" y="297" font-size="10" font-weight="bold" fill="#b91c1c">ABONO (C): 2.1.1.2.xxxx (Proveedores por Pagar CP)</text>
+            <text x="750" y="297" font-size="10" fill="#0369a1">P: 8.2.5 DEV vs 8.2.4 COM</text>
+          </svg>
+        </div>
+      </div>
     </div>
 
-    <!-- 10. Flujos de Integración -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">10</span> Flujos de Integración</div>
-      <p>La Matriz interactúa masivamente de forma invisible en el backend. Cuando el Módulo de Control de Gastos (Tesorería) emite una orden de pago y aprueba el egreso, el sistema de pólizas lee las partidas presupuestales de esa orden de pago y hace un <code>JOIN</code> con esta matriz para generar instantáneamente los renglones de la póliza de diario con las cuentas <code>CTA_CARGO</code> y <code>CTA_ABONO</code> configuradas aquí.</p>
-    </div>
+    <!-- TAB 4: Modal Simulador -->
+    <div id="tab-simulador" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span>Modal de Simulación Interactiva en Vivo (Test Bench)</span><span>Validación de Cuadre</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 750 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:750px;">
+            <rect width="750" height="320" fill="#fff" stroke="#cbd5e1" rx="8"/>
+            <rect x="0" y="0" width="750" height="42" fill="#1B3A2D" rx="8 8 0 0"/>
+            <text x="25" y="26" fill="#fff" font-size="13" font-weight="bold">Simulador de Conversión Contable-Presupuestaria</text>
 
-    <!-- 11. Afectación Contable -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">11</span> Afectación Contable (Reglas CONAC)</div>
-      <table class="props-table">
-        <thead><tr><th>Aplica</th><th>Descripción Contable</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><strong>NO</strong></td>
-            <td>
-              Al ser la matriz configurativa, no genera registros por sí misma. Sin embargo, determina las reglas para todas las afectaciones posteriores del sistema transaccional.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            <rect x="25" y="55" width="220" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="35" y="74" font-size="10" fill="#334155">COG: 21101 (Materiales)</text>
+            <rect x="260" y="55" width="220" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="270" y="74" font-size="10" fill="#334155">Operación: COMPRA_DIRECTA</text>
+            <rect x="495" y="55" width="230" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
+            <text x="505" y="74" font-size="10" fill="#334155">Importe: $11,600.00 (IVA Inc.)</text>
 
-    <!-- 12. Historial de Cambios -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">12</span> Historial de Cambios</div>
-      <table class="props-table">
-        <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>2026-06-07</td>
-            <td>2.0</td>
-            <td>Alineación al estándar DOC-08, reestructuración a 12 secciones, inclusión de matriz de procesos y flujograma de carriles.</td>
-            <td>Julio César Barrales Flores</td>
-          </tr>
-        </tbody>
-      </table>
+            <rect x="25" y="100" width="700" height="150" fill="#f0fdf4" stroke="#86efac" rx="4"/>
+            <text x="40" y="122" font-size="11" font-weight="bold" fill="#166534">✓ SIMULACIÓN EXITOSA — PÓLIZA DE PARTIDA DOBLE CUADRADA</text>
+
+            <text x="40" y="148" font-size="10" font-family="monospace">CARGO (C)  5.1.2.1.2110.0001 Materiales de Oficina .............. $10,000.00 (SUBTOTAL)</text>
+            <text x="40" y="166" font-size="10" font-family="monospace">CARGO (C)  1.1.9.1.0001.0001 IVA Acreditable .................... $ 1,600.00 (IVA)</text>
+            <text x="40" y="184" font-size="10" font-family="monospace">ABONO (C)  2.1.1.2.0001.0001 Proveedores por Pagar CP ........... $11,600.00 (TOTAL)</text>
+            <line x1="40" y1="194" x2="710" y2="194" stroke="#86efac"/>
+            <text x="40" y="210" font-size="10" font-family="monospace">CARGO (P)  8.2.4.1 Presupuesto Comprometido ..................... $11,600.00</text>
+            <text x="40" y="226" font-size="10" font-family="monospace">ABONO (P)  8.2.5.1 Presupuesto Devengado ........................ $11,600.00</text>
+
+            <rect x="580" y="265" width="145" height="32" fill="#1B3A2D" rx="4"/>
+            <text x="652" y="285" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">CERRAR TEST</text>
+          </svg>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- 10. REGLAS DE NEGOCIO CRÍTICAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Reglas de Negocio Críticas</div>
+    <table class="props-table">
+      <thead><tr><th>Código</th><th>Nombre de la Regla</th><th>Descripción Operativa</th><th>Dónde se valida</th><th>Acción ante fallo</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>RN-MT-01</strong></td>
+          <td>Cuentas de Último Nivel Afectables</td>
+          <td>Toda cuenta asignada como origen <code>FIJA</code> debe ser de nivel 5 o 6, tener atributo de registro (<code>cc_tipocuenta = 'R'</code>) y tener permitida la afectación en pólizas (<code>cc_permite_poliza = 1</code>).</td>
+          <td>Backend / SP <code>fn_crud</code></td>
+          <td>Error bloqueante: <em>"La cuenta contable debe ser afectable de último nivel"</em>.</td>
+        </tr>
+        <tr>
+          <td><strong>RN-MT-02</strong></td>
+          <td>Balance Dual Obligatorio (C y P)</td>
+          <td>Toda regla debe generar asiento balanceado tanto en el bloque contable patrimonial (<code>C</code>: Debe = Haber) como en el bloque presupuestario (<code>P</code>: Cuentas Clase 8 Debe = Haber).</td>
+          <td>Servicio <code>validarEstructura</code> y Simulador</td>
+          <td>Rechaza la validación de la matriz impidiendo transicionar a <code>VALIDADA</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>RN-MT-03</strong></td>
+          <td>Inmutabilidad Fuera de Borrador</td>
+          <td>Una matriz en estado <code>VALIDADA</code>, <code>ACTIVA</code> o <code>CERRADA</code> es estrictamente de solo lectura. No se pueden alterar cabeceras, reglas ni submovimientos.</td>
+          <td>Trigger PG <code>fn_matriz_conversion_proteger_version</code></td>
+          <td>Excepción SQL de base de datos impidiendo el <code>UPDATE</code> o <code>DELETE</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>RN-MT-04</strong></td>
+          <td>No Solapamiento de Matrices Activas</td>
+          <td>No pueden existir dos versiones activas de la misma matriz para el mismo ejercicio y ámbito en rangos de fechas vigentes superpuestos.</td>
+          <td>Restricción GiST <code>ex_mcv_activa_sin_traslape</code></td>
+          <td>Rechazo inmediato de base de datos ante intento de activación concurrente.</td>
+        </tr>
+        <tr>
+          <td><strong>RN-MT-05</strong></td>
+          <td>Abono Desacoplado de Nómina (Cap. 1000)</td>
+          <td>En la Matriz A.1 de Devengado, las 103 reglas del Capítulo 1000 abonan exclusivamente a la cuenta puente concentradora <code>2.1.1.9.1000.0001 (Nómina por Liquidar)</code>.</td>
+          <td>Migración 179 / Reglas Matriz 12</td>
+          <td>Garantiza que la dispersión neta se gestione mediante la Orden de Pago (05.2.2).</td>
+        </tr>
+        <tr>
+          <td><strong>RN-MT-06</strong></td>
+          <td>Reclasificación Pasiva en Orden de Pago</td>
+          <td>Al autorizar la Orden de Pago en <code>05.2.2</code>, la Matriz Institucional A0 (Momento Ejercido / <code>mc_id = 5</code>) cancela la cuenta puente <code>2.1.1.9</code> y acredita el pasivo exigible <code>2.1.1.1.xxxx</code>.</td>
+          <td>Migración 180 / Matriz 22</td>
+          <td>Asiento automatizado sin captura manual de cuentas por el analista de CxP.</td>
+        </tr>
+        <tr>
+          <td><strong>RN-MT-07</strong></td>
+          <td>Resolución Unívoca por CRI/COG</td>
+          <td>Cuando el movimiento indica origen <code>CUENTA_CONTABLE_POR_CRI_COG</code>, el catálogo de cuentas debe resolver exactamente una sola cuenta activa para dicho clasificador.</td>
+          <td>Servicio <code>validarResolucionMovimiento</code></td>
+          <td>Error al validar: <em>"La regla no resuelve unívocamente una cuenta en el catálogo"</em>.</td>
+        </tr>
+        <tr>
+          <td><strong>RN-MT-08</strong></td>
+          <td>Reversión Auditada a Borrador</td>
+          <td>Para devolver una matriz de <code>VALIDADA</code> a <code>BORRADOR</code>, el usuario con rol de Jefe de Contabilidad debe ingresar obligatoriamente el motivo de reversión.</td>
+          <td>Endpoint <code>/regresar-borrador</code></td>
+          <td>Guarda registro en <code>bitacoraAuditoria</code> con usuario, fecha y motivo.</td>
+        </tr>
+        <tr>
+          <td><strong>RN-MT-09</strong></td>
+          <td>Aritmética Entera en Simulación</td>
+          <td>El simulador opera importes escalados a 10^6 (BigInt) para evitar discrepancias de punto flotante en cálculos porcentuales (IVA y retenciones).</td>
+          <td><code>MatrizConversionSimuladorService</code></td>
+          <td>Garantiza cuadre a centavos exactos en cualquier volumen de cálculo.</td>
+        </tr>
+        <tr>
+          <td><strong>RN-MT-10</strong></td>
+          <td>Protección contra Baja con Aplicaciones</td>
+          <td>No se puede dar de baja una matriz si existen registros vinculados en <code>contabilidad.matriz_conversion_aplicacion</code>.</td>
+          <td>Servicio <code>remove</code> y SP <code>fn_crud</code></td>
+          <td>Conflicto HTTP 409 / Error: <em>"No puede eliminarse una matriz con pólizas asociadas"</em>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 11. FLUJOS DE INTEGRACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Flujos de Integración</div>
+    <p>La Matriz de Conversión opera como un <strong>servicio central en segundo plano</strong> consumido por múltiples subsistemas del SIAF-PJEV:</p>
+    <ul style="font-size:13px; line-height:1.7; padding-left:20px;">
+      <li><strong>05.2.1 Afectación del Gasto (CxP):</strong> Al registrar y comprometer un gasto, la función <code>cxp.fn_generar_poliza_afectacion</code> consulta la Matriz A.1 (Devengado) en <code>contabilidad.matriz_conversion</code> y asienta los renglones correspondientes en <code>cxp.poliza_movtos</code> y <code>contabilidad.poliza</code>.</li>
+      <li><strong>05.2.2 Órdenes de Pago (CxP):</strong> Al autorizar la dispersión, el motor ejecuta la Matriz Institucional A0 para reclasificar el pasivo de nómina desde la cuenta concentradora <code>2.1.1.9</code> a la cuenta líquida <code>2.1.1.1</code>.</li>
+      <li><strong>06.2.1 Emisión de Pagos (Tesorería):</strong> Al emitir transferencias bancarias o cheques, el sistema ejecuta la Matriz A.2 (Pagado), cancelando el pasivo contra la chequera institucional <code>1.1.1.2.xxxx</code> y afectando el momento presupuestario 8.2.7.</li>
+      <li><strong>04.2.1 Registro y Devengo de Ingresos:</strong> Al registrarse ministraciones de SEFIPLAN o percepciones bancarias, el sistema ejecuta las Matrices B.1, B.2 o B.3 según el tipo de trámite seleccionado en el Asistente Visual.</li>
+    </ul>
+  </div>
+
+  <!-- 12. AFECTACIÓN CONTABLE -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Afectación Contable (Esquema T Típico)</div>
+    <p>A continuación se ilustra el esquema de partida doble derivado por las matrices de Egresos:</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:12px;">
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:14px;">
+        <h5 style="color:var(--pjev-verde-oscuro); margin:0 0 8px; font-size:12px; font-weight:bold;">1. Afectación Patrimonial (Contabilidad)</h5>
+        <table class="props-table" style="font-size:11px;">
+          <thead><tr><th>Momento / Matriz</th><th>Cargo (Debe)</th><th>Abono (Haber)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Devengado (A.1)</strong><br><small>Reconocimiento Gasto</small></td>
+              <td><code>5.x Gastos de Funcionamiento</code><br>ó <code>1.2.x Activo Fijo</code></td>
+              <td><code>2.1.1.2 Proveedores por Pagar</code><br>ó <code>2.1.1.9.1000 Nómina Puente</code></td>
+            </tr>
+            <tr>
+              <td><strong>Reclasificación (A0)</strong><br><small>Orden de Pago</small></td>
+              <td><code>2.1.1.9.1000 Nómina Puente</code></td>
+              <td><code>2.1.1.1 Remuneraciones por Pagar</code></td>
+            </tr>
+            <tr>
+              <td><strong>Pagado (A.2)</strong><br><small>Salida Bancaria</small></td>
+              <td><code>2.1.1.1 / 2.1.1.2 Pasivo Líquido</code></td>
+              <td><code>1.1.1.2 Bancos / Tesorería</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:14px;">
+        <h5 style="color:var(--pjev-verde-oscuro); margin:0 0 8px; font-size:12px; font-weight:bold;">2. Cuentas de Orden Presupuestario (Clase 8)</h5>
+        <table class="props-table" style="font-size:11px;">
+          <thead><tr><th>Momento / Matriz</th><th>Cargo (Debe)</th><th>Abono (Haber)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Devengado (A.1)</strong></td>
+              <td><code>8.2.4 Presupuesto Comprometido</code></td>
+              <td><code>8.2.5 Presupuesto Devengado</code></td>
+            </tr>
+            <tr>
+              <td><strong>Ejercido (A0)</strong></td>
+              <td><code>8.2.5 Presupuesto Devengado</code></td>
+              <td><code>8.2.6 Presupuesto Ejercido</code></td>
+            </tr>
+            <tr>
+              <td><strong>Pagado (A.2)</strong></td>
+              <td><code>8.2.6 Presupuesto Ejercido</code></td>
+              <td><code>8.2.7 Presupuesto Pagado</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">13</span> Casos de Prueba (QA / Verificación)</div>
+    <table class="props-table">
+      <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Acción y Parámetros</th><th>Resultado Esperado</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CP-MT-01</strong></td>
+          <td>Creación en Borrador</td>
+          <td><code>POST /contabilidad/matriz-conversion</code> con datos válidos para ejercicio 2026.</td>
+          <td>Crea la cabecera en estado <code>BORRADOR</code> y asigna <code>lock_version = 1</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-MT-02</strong></td>
+          <td>Simulación con Cuadre Exacto</td>
+          <td>Ejecutar <code>/simular</code> con COG 21101, importe $11,600.00 (subtotal $10,000 + IVA $1,600).</td>
+          <td>Genera 3 renglones contables y 2 presupuestarios con balance en cero; <code>valida: true</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-MT-03</strong></td>
+          <td>Validación Estructural con Regla Desbalanceada</td>
+          <td>Intentar transicionar a <code>VALIDADA</code> una matriz que carece de abono en el bloque presupuestal.</td>
+          <td>Lanza error HTTP 400: <em>"La regla R_xxx requiere cargo y abono en el bloque P"</em>.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-MT-04</strong></td>
+          <td>Activación Exitosa</td>
+          <td>Ejecutar <code>/activar</code> sobre una matriz validada sin traslapes temporales.</td>
+          <td>Pasa a estado <code>ACTIVA</code>; el trigger bloquea cualquier modificación posterior.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-MT-05</strong></td>
+          <td>Intento de Edición en Matriz Activa</td>
+          <td>Ejecutar <code>PATCH /contabilidad/matriz-conversion/:id</code> sobre matriz en estado <code>ACTIVA</code>.</td>
+          <td>Falla con excepción de trigger: <em>"La configuración de una matriz fuera de BORRADOR es inmutable"</em>.</td>
+        </tr>
+        <tr>
+          <td><strong>CP-MT-06</strong></td>
+          <td>Reversión con Justificación Auditada</td>
+          <td>Ejecutar <code>/regresar-borrador</code> con motivo <em>"Corrección de cuenta en partida 37501"</em>.</td>
+          <td>La matriz regresa a <code>BORRADOR</code> y se inserta el evento en <code>bitacoraAuditoria</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 14. HISTORIAL DE CAMBIOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">14</span> Historial de Cambios</div>
+    <table class="props-table">
+      <thead><tr><th>Fecha</th><th>Versión</th><th>Descripción del Cambio</th><th>Autor</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>2026-06-07</td>
+          <td>1.0</td>
+          <td>Estructura inicial en DOC-08 orientada a modelo antiguo.</td>
+          <td>Julio César Barrales Flores</td>
+        </tr>
+        <tr>
+          <td>2026-09-08</td>
+          <td>2.0</td>
+          <td>Homologación completa con el sistema real SIAF-PJEV: migración al esquema <code>contabilidad.matriz_conversion</code>, incorporación de SPs oficiales LEER/CRUD, integración de controlador NestJS Swagger, inclusión de Matriz A0 de reclasificación de OP (Migración 180), desacoplamiento de nómina a cuenta puente 2.1.1.9 (Migración 179) y motor de simulación interactiva con aritmética BigInt.</td>
+          <td>Julio César Barrales Flores</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
 </div>
 
-<!-- ==========================================
-     DIAGRAMA DE FLUJO (OCULTO POR DEFECTO)
-=========================================== -->
-<div id="module-flowchart" style="display:none;">
-<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; background:#fff;">
-  <defs>
-    <style>
-      .header-area { fill: #1B3A2D; }
-      .header-proceso { fill: #DEAC50; }
-      .header-siaf { fill: #1B3A2D; }
-      .header-text { fill: #fff; font-family: sans-serif; font-weight: bold; font-size: 12px; text-anchor: middle; }
-      .lane-line { stroke: #D4C9B5; stroke-width: 1.5; stroke-dasharray: 4 4; }
-      
-      .node-term { fill: #1B3A2D; stroke: #1B3A2D; stroke-width: 2; rx: 15; ry: 15; }
-      .node-term-text { font-family: sans-serif; fill: #fff; font-size: 10px; font-weight: bold; text-anchor: middle; }
-      
-      .node { fill: #fff; stroke: #1B3A2D; stroke-width: 2; rx: 4; }
-      .node-siaf { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 4; }
-      .poliza { fill: #fce7f3; stroke: #db2777; stroke-width: 2; rx: 4; }
-      
-      .node-rombo { fill: #FFF3CD; stroke: #DEAC50; stroke-width: 2; }
-      .node-data { fill: #fff; stroke: #1B3A2D; stroke-width: 2; }
-      .node-db { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; }
-      .node-doc { fill: #fdf6e3; stroke: #b58900; stroke-width: 2; }
-
-      .node-text { fill: #1B3A2D; font-family: sans-serif; font-size: 11px; font-weight: bold; text-anchor: middle; }
-      .node-sub { fill: #666; font-family: sans-serif; font-size: 9px; text-anchor: middle; }
-      
-      .path-line { stroke: #1B3A2D; stroke-width: 2; fill: none; marker-end: url(#arrow); }
-      .path-green { stroke: #166534; stroke-width: 2; fill: none; marker-end: url(#arrow-green); }
-      .path-red { stroke: #991B1B; stroke-width: 2; fill: none; marker-end: url(#arrow-red); }
-    </style>
-    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B3A2D"/>
-    </marker>
-  </defs>
-
-  <!-- Cabeceras de Columna -->
-  <rect x="50" y="20" width="200" height="40" class="header-area"/>
-  <text x="150" y="45" class="header-text">ÁREA</text>
-  
-  <rect x="250" y="20" width="350" height="40" class="header-proceso"/>
-  <text x="425" y="45" class="header-text" fill="#1B3A2D">PROCESOS OPERATIVOS</text>
-  
-  <rect x="600" y="20" width="350" height="40" class="header-siaf"/>
-  <text x="775" y="45" class="header-text">SIAF-PJEV</text>
-
-  <!-- Líneas Divisorias -->
-  <line x1="50" y1="60" x2="50" y2="600" class="lane-line" stroke-dasharray="none"/>
-  <line x1="250" y1="60" x2="250" y2="600" class="lane-line"/>
-  <line x1="600" y1="60" x2="600" y2="600" class="lane-line"/>
-  <line x1="950" y1="60" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
-  <line x1="50" y1="600" x2="950" y2="600" class="lane-line" stroke-dasharray="none"/>
-
-  <!-- Títulos del Carril Área -->
-  <text x="150" y="300" transform="rotate(-90 150 300)" font-weight="bold" font-size="20" fill="#ccc" text-anchor="middle" letter-spacing="4">CONTABILIDAD</text>
-
-  <!-- Inicio -->
-  <rect x="385" y="90" width="80" height="25" class="node-term" />
-  <text x="425" y="106" class="node-term-text">INICIO</text>
-  
-  <path d="M 425 115 L 425 140" class="path-line"/>
-
-  <!-- Proceso: Captura Regla -->
-  <polygon points="340,140 525,140 510,190 325,190" class="node-data"/>
-  <text x="425" y="160" class="node-text">Ingreso de Nueva Regla</text>
-  <text x="425" y="175" class="node-sub">Partida + Momento + Cargo/Abono</text>
-
-  <path d="M 515 165 L 650 165" class="path-line"/>
-
-  <!-- SIAF: Inserta BD -->
-  <path d="M 650 140 C 650 130, 900 130, 900 140 L 900 180 C 900 190, 650 190, 650 180 Z" class="node-db" />
-  <path d="M 650 140 C 650 150, 900 150, 900 140" fill="none" stroke="#0284c7" stroke-width="2"/>
-  <text x="775" y="162" class="node-text">Almacena Matriz</text>
-  <text x="775" y="175" class="node-sub">Regla disponible para pólizas auto.</text>
-
-  <path d="M 775 190 L 775 230" class="path-line"/>
-
-  <!-- SIAF -> Regresa a Proceso -->
-  <line x1="775" y1="230" x2="425" y2="230" class="path-line"/>
-
-  <!-- Proceso: Impresión -->
-  <path d="M 325 230 L 525 230 L 525 280 C 475 300, 375 260, 325 280 Z" class="node-doc"/>
-  <text x="425" y="255" class="node-text">Matriz Oficial de Conversión</text>
-  <text x="425" y="270" class="node-sub">Exporta PDF para Auditoría</text>
-
-  <path d="M 425 290 L 425 330" class="path-line"/>
-
-  <!-- Fin -->
-  <rect x="385" y="330" width="80" height="30" class="node-term" />
-  <text x="425" y="349" class="node-term-text">FIN</text>
-
-</svg>
-</div>
-
-<!-- ==========================================
-     MATRIZ DE PROCESO FUNCIONAL (OCULTO)
-=========================================== -->
-<div id="module-process-table" style="display:none;">
-  <table class="props-table">
-    <thead>
-      <tr>
-        <th>PROCESO / ÁREA</th>
-        <th>CONTABILIDAD</th>
-        <th>SIAF-PJEV</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1. IDENTIFICACIÓN</td>
-        <td>Al emitirse un nuevo clasificador COG, identifica las cuentas contables patrimoniales correspondientes a cargar y abonar.</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>2. CONFIGURACIÓN</td>
-        <td>Carga las reglas en el módulo de Matriz.</td>
-        <td>Valida que las cuentas ingresadas sean afectables (nivel mínimo 5) y las guarda.</td>
-      </tr>
-      <tr>
-        <td>3. OPERACIÓN AUTOMÁTICA</td>
-        <td></td>
-        <td>Cuando Presupuestos ejerce un pago, el Motor de Pólizas consulta silenciosamente la matriz y genera la póliza cuadrada sin intervención humana.</td>
-      </tr>
-      <tr>
-        <td>4. AUDITORÍA</td>
-        <td>Presiona el botón de imprimir para descargar la Matriz de Conversión Vigente.</td>
-        <td>Construye el archivo PDF/Excel con la relación COG-Cuentas.</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-<script src="../shared.js"></script>
+<!-- SCRIPT PARA GESTIÓN DE TABS -->
 <script>
-function showWF(id, btn) {
+function showTab(tabId, btn) {
   document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.wf-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('wf-' + id).classList.add('active');
-  btn.classList.add('active');
+  const target = document.getElementById(tabId);
+  if (target) target.classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 </script>
+<script src="../shared.js"></script>
 </body>
 </html>
