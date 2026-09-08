@@ -265,7 +265,7 @@
     perfil:'ing',
     f2:90,
     rutas:['/ing/conceptos'],
-    responsable:'Eunice',
+    responsable:'Daryl',
     documentacion:'Análisis funcional canónico',
     documento:'04_ingresos/04.1.1-conceptos-ingreso.html',
     nombre:'Tipos y subtipos de trámite de ingreso',
@@ -281,7 +281,7 @@
     perfil:'ing',
     f2:90,
     rutas:['/ing/motivos-ajuste'],
-    responsable:'Eunice',
+    responsable:'Daryl',
     documentacion:'Análisis funcional canónico',
     documento:'04_ingresos/04.1.2-motivos-ajuste-cancelacion.html',
     opciones:[
@@ -304,7 +304,7 @@
     perfil:'ing',
     f2:90,
     rutas:['/ing/claves-sefiplan'],
-    responsable:'Eunice',
+    responsable:'Daryl',
     documentacion:'Análisis funcional canónico',
     documento:'04_ingresos/04.1.3-claves-sefiplan.html',
     nombre:'Claves presupuestales y carteras SEFIPLAN',
@@ -322,7 +322,7 @@
     perfil:'ing',
     f2:90,
     rutas:['/ing/cuentas-recaudadoras'],
-    responsable:'Eunice',
+    responsable:'Daryl',
     documentacion:'Análisis funcional canónico',
     documento:'04_ingresos/04.1.4-cuentas-recaudadoras.html',
     nombre:'Cuentas bancarias recaudadoras',
@@ -337,7 +337,7 @@
     evidencia:'Catálogo institucional de tesorería que administra las cuentas bancarias receptoras de recursos, validando CLABEs de 18 dígitos y enlazando obligatoriamente a la cuenta 1.1.1.2 del COA.'
   });
   ing('04.2.1','04.2 Registro','Registro y devengo de ingresos',{
-    responsable:'Eunice',
+    responsable:'Daryl',
     estado:'Pendiente de desarrollo',
     documentacion:'Análisis funcional completo',
     documento:'04_ingresos/04.2.1-registro-ingresos.html',
@@ -358,7 +358,7 @@
     perfil:'ing',
     f2:90,
     rutas:['/ing/depositos-recaudacion'],
-    responsable:'Eunice',
+    responsable:'Daryl',
     documentacion:'Análisis funcional canónico',
     documento:'04_ingresos/04.2.2-validacion-depositos.html',
     nombre:'Validación de depósitos y recaudación',
@@ -377,7 +377,7 @@
     perfil:'conta',
     f2:70,
     rutas:['/conta/proc/conciliacion-ministraciones'],
-    responsable:'Eunice',
+    responsable:'Daryl',
     estado:'Disponible parcialmente; requiere completar y validar',
     documentacion:'Análisis funcional inicial',
     documento:'04_ingresos/04.3.1-conciliacion-ingresos.html',
@@ -395,7 +395,7 @@
     evidencia:'Existe implementación previa orientada a ministraciones (/conta/proc/conciliacion-ministraciones); se documenta su ampliación integral para conciliar todos los conceptos de ingreso, parcialidades y depósitos no identificados.'
   });
   ing('04.3.2','04.3 Procesos','Cierre mensual de ingresos',{
-    responsable:'Eunice',
+    responsable:'Daryl',
     estado:'Pendiente de desarrollo',
     documentacion:'Análisis funcional inicial',
     documento:'04_ingresos/04.3.2-cierre-mensual-ingresos.html',
@@ -412,7 +412,7 @@
     evidencia:'Consola de certificación de 13 validaciones de integridad financiera, congelamiento transaccional y coordinación con Contabilidad y Presupuesto.'
   });
   ing('04.4.1','04.4 Informes','Informes y control de ingresos',{
-    responsable:'Eunice',
+    responsable:'Daryl',
     estado:'Pendiente de desarrollo',
     documentacion:'Análisis funcional inicial',
     documento:'04_ingresos/04.4.1-informes-control-ingresos.html',
@@ -484,15 +484,15 @@
     '07 Repositorio CFDI': 'Cristian'
   };
   const responsablesPorModulo = {
-    '04.1.1': 'Eunice',
-    '04.1.2': 'Eunice',
-    '04.1.3': 'Eunice',
-    '04.1.4': 'Eunice',
-    '04.2.1': 'Eunice',
-    '04.2.2': 'Eunice',
-    '04.3.1': 'Eunice',
-    '04.3.2': 'Eunice',
-    '04.4.1': 'Eunice',
+    '04.1.1': 'Daryl',
+    '04.1.2': 'Daryl',
+    '04.1.3': 'Daryl',
+    '04.1.4': 'Daryl',
+    '04.2.1': 'Daryl',
+    '04.2.2': 'Daryl',
+    '04.3.1': 'Daryl',
+    '04.3.2': 'Daryl',
+    '04.4.1': 'Daryl',
     '05.2.1': 'Julio Cesar'
   };
 

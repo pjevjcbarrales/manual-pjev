@@ -229,66 +229,346 @@
   <!-- 5. MODELO DE DATOS -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">5</span> Modelo de Datos y Diccionario de Campos</div>
-    <p>El esquema <code>contabilidad</code> estructura las tablas de parametrización, reglas y evidencia:</p>
+    <p>
+      El esquema <code>contabilidad</code> (con enlaces directos a <code>config</code> y <code>cxp</code>) estructura el ecosistema de matrices de conversión contable-presupuestaria a través de <strong>10 tablas interconectadas</strong>, organizadas en cuatro capas de arquitectura operativa y forense:
+    </p>
+
+    <!-- MAPA RESUMEN DE LAS 10 TABLAS -->
+    <div style="background:var(--pjev-gris-fondo); border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px; margin-bottom:18px;">
+      <div style="font-weight:700; color:var(--pjev-verde-oscuro); margin-bottom:8px; font-size:13px;">Ecosistema Relacional de Matrices en PostgreSQL (10 Tablas)</div>
+      <table class="props-table" style="font-size:11.5px; margin:0;">
+        <thead>
+          <tr>
+            <th style="width:28%;">Capa Arquitectónica</th>
+            <th style="width:32%;">Tabla en PostgreSQL</th>
+            <th>Rol y Responsabilidad Funcional</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="3" style="font-weight:600; background:#fff;">1. Parametrización y Reglas Operativas</td>
+            <td><code>contabilidad.matriz_conversion</code></td>
+            <td>Cabecera de matriz, momentos contables, vigencias, versión y control de concurrencia.</td>
+          </tr>
+          <tr>
+            <td><code>contabilidad.matriz_conversion_regla</code></td>
+            <td>Condiciones de activación por perfil (Egreso/Ingreso), COG, CRI, tipo de gasto y clasificaciones.</td>
+          </tr>
+          <tr>
+            <td><code>contabilidad.matriz_conversion_movimiento</code></td>
+            <td>Líneas contables patrimoniales (C) y presupuestarias (P), Debe/Haber y fórmulas de cálculo.</td>
+          </tr>
+          <tr style="background:#fcfdfc;">
+            <td rowspan="2" style="font-weight:600; background:#fcfdfc;">2. Evidencia Forense de Aplicación</td>
+            <td><code>contabilidad.matriz_conversion_aplicacion</code></td>
+            <td>Evidencia inmutable de ejecución automática, snapshot de insumos y fotografía de la regla.</td>
+          </tr>
+          <tr style="background:#fcfdfc;">
+            <td><code>contabilidad.matriz_conversion_aplicacion_movimiento</code></td>
+            <td>Partidas individuales calculadas con alta precisión financiera (<code>NUMERIC(24,6)</code>).</td>
+          </tr>
+          <tr>
+            <td rowspan="2" style="font-weight:600; background:#fff;">3. Gobernanza y Candidatos</td>
+            <td><code>contabilidad.matriz_conversion_configuracion</code></td>
+            <td>Parámetros globales anuales, cuenta contable de cuadre por redondeo y tolerancia de centavos.</td>
+          </tr>
+          <tr>
+            <td><code>contabilidad.matriz_conversion_candidato</code></td>
+            <td>Buffer inteligente para detectar y promover cuentas contables reales desde catálogos sin inventar datos.</td>
+          </tr>
+          <tr style="background:#fcfdfc;">
+            <td rowspan="3" style="font-weight:600; background:#fcfdfc;">4. Homologación CxP y Auditoría</td>
+            <td><code>contabilidad.mapeo_procedimiento_operacion</code></td>
+            <td>Enlace unívoco entre los 12 procedimientos de CxP y los eventos de matriz contable.</td>
+          </tr>
+          <tr style="background:#fcfdfc;">
+            <td><code>contabilidad.matriz_regla_clasificacion_candidato</code></td>
+            <td>Resolución de ambigüedades cuando múltiples trámites administrativos comparten el mismo COG.</td>
+          </tr>
+          <tr style="background:#fcfdfc;">
+            <td><code>contabilidad.matriz_clasificacion_ejecucion</code></td>
+            <td>Bitácora inmutable de migración con hash criptográfico MD5 que certifica reglas validadas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- 5.1 MATRIZ_CONVERSION -->
     <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">5.1. Cabecera de Matriz (<code>contabilidad.matriz_conversion</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Define la identidad funcional de cada matriz, su momento contable-presupuestario asociado, ejercicio y rango de vigencia temporal. Controlada por restricción GiST para evitar traslapes.
+    </p>
     <table class="props-table">
       <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
       <tbody>
-        <tr><td><code>mcv_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único institucional de la matriz.</td></tr>
-        <tr><td><code>mcv_clave</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Clave nemotécnica única por ejercicio y versión (ej. <code>A1_DEVENGADO_GASTOS</code>).</td></tr>
-        <tr><td><code>mcv_nombre</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Nombre descriptivo visible en catálogo.</td></tr>
+        <tr><td><code>mcv_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único secuencial de la matriz en base de datos.</td></tr>
+        <tr><td><code>mcv_clave</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Clave nemotécnica única por ejercicio y versión (ej. <code>A1_DEVENGADO_GASTOS</code>, <code>A0_RECLASIFICA_ORDEN_PAGO</code>).</td></tr>
+        <tr><td><code>mcv_nombre</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Nombre formal visible en el catálogo institucional.</td></tr>
+        <tr><td><code>mcv_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>No</td><td>Descripción del alcance operativo y criterios contables aplicables.</td></tr>
         <tr><td><code>mcv_tipo_registro</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>MATRIZ_CONVERSION_CONAC</code> o <code>GUIA_CONTABILIZADORA</code>.</td></tr>
-        <tr><td><code>mcv_familia_conac</code></td><td><code>VARCHAR(5)</code></td><td>No</td><td><code>A1</code> | <code>A2</code> (Egresos); <code>B1</code> | <code>B2</code> | <code>B3</code> (Ingresos); <code>NULL</code> para guías.</td></tr>
-        <tr><td><code>mcv_area_pjev</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Área responsable de la emisión normativa dentro del PJEV.</td></tr>
-        <tr><td><code>mcv_procedimiento_pjev</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Procedimiento operativo asociado (ej. <code>RECEPCION_Y_REVISION_DE_GASTOS</code>).</td></tr>
-        <tr><td><code>mcv_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>E</code> (Egresos) o <code>I</code> (Ingresos).</td></tr>
-        <tr><td><code>mcv_momento_id</code></td><td><code>INTEGER (FK)</code></td><td>Sí</td><td>FK a <code>config.catalogo_momentos(mc_id)</code>.</td></tr>
-        <tr><td><code>mcv_ejercicio</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Año fiscal de aplicación (ej. 2026).</td></tr>
-        <tr><td><code>mcv_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Número secuencial de versión (> 0).</td></tr>
-        <tr><td><code>mcv_vigencia_inicio</code> / <code>_fin</code></td><td><code>DATE</code></td><td>Sí</td><td>Rango temporal de vigencia dentro del ejercicio fiscal.</td></tr>
-        <tr><td><code>mcv_estado</code></td><td><code>VARCHAR(15)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>VALIDADA</code> | <code>ACTIVA</code> | <code>CERRADA</code>.</td></tr>
-        <tr><td><code>mcv_lock_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Control de concurrencia optimista (incrementa en cada actualización).</td></tr>
+        <tr><td><code>mcv_familia_conac</code></td><td><code>VARCHAR(5)</code></td><td>No</td><td>Familia CONAC: <code>A1</code> | <code>A2</code> (Egresos), <code>B1</code> | <code>B2</code> | <code>B3</code> (Ingresos), <code>NULL</code> si es guía o institucional.</td></tr>
+        <tr><td><code>mcv_area_pjev</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Área responsable del Poder Judicial de la emisión de la matriz.</td></tr>
+        <tr><td><code>mcv_procedimiento_pjev</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Procedimiento administrativo asociado (ej. <code>RECEPCION_Y_REVISION_DE_GASTOS</code>, <code>DISPERSION_DE_NOMINA</code>).</td></tr>
+        <tr><td><code>mcv_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td>Ámbito presupuestal: <code>E</code> (Egresos) o <code>I</code> (Ingresos). Check <code>ck_mcv_ambito</code>.</td></tr>
+        <tr><td><code>mcv_momento_id</code></td><td><code>INTEGER (FK)</code></td><td>Sí</td><td>FK a <code>config.catalogo_momentos(mc_id)</code> (DEV, EJE, PAG, REC).</td></tr>
+        <tr><td><code>mcv_ejercicio</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Ejercicio fiscal (2000 a 2100). Check <code>ck_mcv_ejercicio</code>.</td></tr>
+        <tr><td><code>mcv_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Versión secuencial de la matriz (> 0). Default 1.</td></tr>
+        <tr><td><code>mcv_vigencia_inicio</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha de inicio de vigencia dentro del ejercicio fiscal.</td></tr>
+        <tr><td><code>mcv_vigencia_fin</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha de término de vigencia dentro del ejercicio fiscal (>= inicio).</td></tr>
+        <tr><td><code>mcv_estado</code></td><td><code>VARCHAR(15)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>VALIDADA</code> | <code>ACTIVA</code> | <code>CERRADA</code>. Check <code>ck_mcv_estado</code>.</td></tr>
+        <tr><td><code>mcv_lock_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Control de concurrencia optimista (incrementa con cada UPDATE vía trigger). Check > 0.</td></tr>
         <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Baja lógica (Soft delete).</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de creación institucional.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de última modificación.</td></tr>
       </tbody>
     </table>
+    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
+      <em>Restricciones clave:</em> <code>uq_mcv_clave_version</code> (clave, ejercicio, versión), <code>ex_mcv_activa_sin_traslape</code> (exclusión GiST temporal que impide dos versiones activas traslapadas para la misma clave, ejercicio, momento y ámbito), y trigger <code>trg_matriz_conversion_proteger_version</code> (inmutabilidad estricta fuera de BORRADOR).
+    </div>
 
     <!-- 5.2 MATRIZ_CONVERSION_REGLA -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">5.2. Reglas Condicionales (<code>contabilidad.matriz_conversion_regla</code>)</h4>
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.2. Reglas Condicionales y Enlace a Procedimientos (<code>contabilidad.matriz_conversion_regla</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Alberga cada criterio de selección que determina qué regla disparar con base en el perfil, operación, COG, tipo de gasto y su homologación con los procedimientos de CxP (Migraciones 145, 148, 158 y 159).
+    </p>
     <table class="props-table">
       <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
       <tbody>
-        <tr><td><code>mcr_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único de la regla.</td></tr>
+        <tr><td><code>mcr_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único de la regla contable.</td></tr>
         <tr><td><code>mcr_matriz_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion(mcv_id)</code>.</td></tr>
-        <tr><td><code>mcr_clave</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Clave única dentro de la matriz (ej. <code>R_A1_11301_01</code>).</td></tr>
-        <tr><td><code>mcr_perfil</code></td><td><code>VARCHAR(10)</code></td><td>Sí</td><td><code>EGRESO</code> o <code>INGRESO</code> (debe coincidir con el ámbito).</td></tr>
+        <tr><td><code>mcr_clave</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Clave única dentro de la matriz (ej. <code>R_A1_11301_01</code>). Unique <code>uq_mcr_clave</code>.</td></tr>
+        <tr><td><code>mcr_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>No</td><td>Descripción funcional del hecho económico evaluado.</td></tr>
         <tr><td><code>mcr_tipo_operacion</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Operación homologada (<code>COMPRA_DIRECTA</code>, <code>NOMINA</code>, <code>ARRENDAMIENTO</code>, etc.).</td></tr>
-        <tr><td><code>mcr_nivel_afectacion</code></td><td><code>VARCHAR(30)</code></td><td>Cond.</td><td>En Egresos: <code>PROVEEDOR</code> | <code>EMPLEADO</code> | <code>TERCERO_INSTITUCIONAL</code> | <code>BIEN_INMUEBLE</code>.</td></tr>
-        <tr><td><code>mcr_tipo_proveedor_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_subtipo_proveedor</code> (>0 para Proveedor, 0 otros).</td></tr>
-        <tr><td><code>mcr_tipo_gasto</code></td><td><code>SMALLINT</code></td><td>Cond.</td><td>1 = Gasto Corriente, 2 = Gasto de Capital.</td></tr>
-        <tr><td><code>mcr_cog_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cog</code> (Clasificador por Objeto del Gasto).</td></tr>
+        <tr><td><code>mcr_procedimiento_codigo</code></td><td><code>VARCHAR(40) (FK)</code></td><td>No</td><td>FK a <code>cxp.catalogo_procedimientos_afectacion(cpa_codigo)</code> (Migración 158/159).</td></tr>
+        <tr><td><code>mcr_evento_codigo</code></td><td><code>VARCHAR(50) (FK)</code></td><td>No</td><td>FK a <code>contabilidad.catalogo_eventos_matriz(cem_codigo)</code> (ej. <code>OBLIGACION_RECONOCIDA</code>, <code>PAGO_PASIVO</code>).</td></tr>
+        <tr><td><code>mcr_clasificacion_estado</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td><code>DETERMINADA</code> | <code>AMBIGUA</code> | <code>FUERA_ALCANCE</code>. Check <code>ck_mcr_clasificacion_estado</code>.</td></tr>
+        <tr><td><code>mcr_clasificacion_motivo</code></td><td><code>VARCHAR(1000)</code></td><td>No</td><td>Justificación técnica del dictamen de clasificación o desempate.</td></tr>
+        <tr><td><code>mcr_perfil</code></td><td><code>VARCHAR(10)</code></td><td>Sí</td><td><code>EGRESO</code> o <code>INGRESO</code>. Default <code>EGRESO</code>.</td></tr>
+        <tr><td><code>mcr_nivel_afectacion</code></td><td><code>VARCHAR(40)</code></td><td>Cond.</td><td>En Egresos: <code>PROVEEDOR</code> | <code>EMPLEADO</code> | <code>BENEFICIARIO_PENSION_ALIMENTICIA</code> | <code>TERCERO_INSTITUCIONAL</code> | <code>BIEN_INMUEBLE</code>.</td></tr>
+        <tr><td><code>mcr_tipo_proveedor_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_subtipo_proveedor(psp_id)</code> (>0 si PROVEEDOR, 0 si otro nivel).</td></tr>
+        <tr><td><code>mcr_cog_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cog(cog_id)</code> (Requerido en egresos).</td></tr>
+        <tr><td><code>mcr_tipo_gasto</code></td><td><code>SMALLINT</code></td><td>Cond.</td><td>1 = Gasto Corriente, 2 = Gasto de Capital (Requerido en egresos).</td></tr>
         <tr><td><code>mcr_tipo_ingreso</code></td><td><code>VARCHAR(40)</code></td><td>Cond.</td><td>En Ingresos: Familia de trámite (ej. <code>MINISTRACIONES</code>).</td></tr>
-        <tr><td><code>mcr_concepto_ingreso</code></td><td><code>VARCHAR(80)</code></td><td>Cond.</td><td>Subtipo específico (ej. <code>MIN_ESTATAL_ORD</code>).</td></tr>
-        <tr><td><code>mcr_cri_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cri</code> (Clasificador por Rubros de Ingresos).</td></tr>
+        <tr><td><code>mcr_concepto_ingreso</code></td><td><code>VARCHAR(80)</code></td><td>Cond.</td><td>En Ingresos: Concepto institucional (ej. <code>MIN_ESTATAL_ORD</code>).</td></tr>
+        <tr><td><code>mcr_cri_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cri(cri_id)</code> (Requerido en ingresos).</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Baja lógica (Soft delete).</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de alta de la regla.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de actualización.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
+      <em>Gobernanza:</em> Restricción de unicidad compuesta <code>uq_mcr_id_matriz (mcr_id, mcr_matriz_id)</code> y trigger <code>trg_mcr_exigir_borrador</code> que prohíbe modificaciones si la matriz no está en estado <code>BORRADOR</code>.
+    </div>
+
+    <!-- 5.3 MATRIZ_CONVERSION_MOVIMIENTO -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.3. Movimientos y Asientos (<code>contabilidad.matriz_conversion_movimiento</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Estructura las partidas individuales del asiento contable y presupuestario que se deben generar al dispararse la regla.
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mcm_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del renglón de movimiento.</td></tr>
+        <tr><td><code>mcm_regla_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion_regla(mcr_id)</code>.</td></tr>
+        <tr><td><code>mcm_orden</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Secuencia de asiento dentro de la regla (1, 2, 3...). Unique <code>uq_mcm_orden (mcm_regla_id, mcm_orden)</code>.</td></tr>
+        <tr><td><code>mcm_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>C</code> = Asiento Contable Patrimonial; <code>P</code> = Asiento Presupuestario (Clase 8). Check <code>ck_mcm_ambito</code>.</td></tr>
+        <tr><td><code>mcm_naturaleza</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>D</code> = Debe (Cargo); <code>H</code> = Haber (Abono). Check <code>ck_mcm_naturaleza</code>.</td></tr>
+        <tr><td><code>mcm_origen_cuenta</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Origen dinámico: <code>FIJA</code> | <code>CUENTA_PRESUPUESTARIA_POR_MOMENTO</code> | <code>TERCERO_INSTITUCIONAL</code> | <code>CHEQUERA</code> | <code>CUENTA_CONTABLE_POR_CRI_COG</code>.</td></tr>
+        <tr><td><code>mcm_cuenta_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>contabilidad.catalogo_cuentas(cc_id)</code> (Obligatorio únicamente si origen es <code>FIJA</code>).</td></tr>
+        <tr><td><code>mcm_momento_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_momentos(mc_id)</code> (Obligatorio si origen es presupuestario por momento).</td></tr>
+        <tr><td><code>mcm_formula_importe</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Fórmula aritmética: <code>TOTAL</code> | <code>DETALLE</code> | <code>SUBTOTAL</code> | <code>IVA</code> | <code>RETENCIONES</code> | <code>NETO_PAGAR</code>.</td></tr>
+        <tr><td><code>mcm_descripcion</code></td><td><code>VARCHAR(300)</code></td><td>No</td><td>Leyenda explicativa del cargo o abono contable.</td></tr>
+        <tr><td><code>mcm_es_obligatorio</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Asiento estricto; 0 = Omitible si el resultado aritmético del componente evaluado es cero (ej. IVA en exentos).</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Inactivo.</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de creación.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de última modificación.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
+      <em>Seguridad:</em> Gobernado por el trigger <code>trg_mcm_exigir_borrador</code>, que rechaza cualquier adición o cambio de movimiento si la matriz cabecera no se encuentra en estado <code>BORRADOR</code>.
+    </div>
+
+    <!-- 5.4 MATRIZ_CONVERSION_APLICACION -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.4. Evidencia Forense de Aplicación (<code>contabilidad.matriz_conversion_aplicacion</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Tabla de evidencia transaccional e inmutable. Registra cada ejecución automática de conversión efectuada por el motor, preservando la fotografía exacta de los datos procesados y la regla utilizada para trazabilidad de auditoría interna y ORFIS.
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mca_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único institucional de la ejecución de conversión.</td></tr>
+        <tr><td><code>mca_matriz_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion(mcv_id)</code>.</td></tr>
+        <tr><td><code>mca_regla_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK compuesta <code>(mca_regla_id, mca_matriz_id)</code> a <code>matriz_conversion_regla</code> (garantiza coincidencia de matriz).</td></tr>
+        <tr><td><code>mca_ejercicio</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Ejercicio fiscal en el cual se ejecutó la contabilización.</td></tr>
+        <tr><td><code>mca_documento_tipo</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Tipo de documento origen (<code>AFECTACION_GASTO</code>, <code>ORDEN_PAGO</code>, <code>INGRESO</code>, <code>COMPROBACION_GASTO</code>).</td></tr>
+        <tr><td><code>mca_documento_id</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Identificador alfanumérico unívoco del documento disparador.</td></tr>
+        <tr><td><code>mca_evento</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Evento contable ejecutado (ej. <code>DEVENGADO_AFECTACION</code>, <code>PAGO_PASIVO</code>, <code>INGRESO_RECAUDADO</code>).</td></tr>
+        <tr><td><code>mca_documento_partida_id</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Partida específica del documento (default <code>GENERAL</code> para cabeceras o ID de línea para desglose multilínea).</td></tr>
+        <tr><td><code>mca_poliza_id</code></td><td><code>INTEGER (FK)</code></td><td>No</td><td>FK compuesta <code>(mca_poliza_id, mca_ejercicio)</code> a <code>contabilidad.poliza(p_id, p_ejercicio)</code> generada.</td></tr>
+        <tr><td><code>mca_datos_entrada</code></td><td><code>JSONB</code></td><td>Sí</td><td>Snapshot íntegro de la carga útil (payload) suministrada por el subsistema origen al invocar la conversión.</td></tr>
+        <tr><td><code>mca_regla_snapshot</code></td><td><code>JSONB</code></td><td>Sí</td><td>Fotografía forense completa de la regla y sus movimientos en el milisegundo exacto de ejecución.</td></tr>
+        <tr><td><code>mca_estatus</code></td><td><code>VARCHAR(15)</code></td><td>Sí</td><td><code>GENERADA</code> | <code>APLICADA</code> | <code>CANCELADA</code>. Check <code>ck_mca_estatus</code>.</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Identidad de la sesión o servicio invocador y timestamp exacto de la aplicación.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
+      <em>Idempotencia:</em> La restricción única <code>uq_mca_documento_evento_partida (mca_ejercicio, mca_documento_tipo, mca_documento_id, mca_evento, mca_documento_partida_id)</code> impide la doble contabilización del mismo evento sobre un documento.
+    </div>
+
+    <!-- 5.5 MATRIZ_CONVERSION_APLICACION_MOVIMIENTO -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.5. Partidas Calculadas de Alta Precisión (<code>contabilidad.matriz_conversion_aplicacion_movimiento</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Almacena el detalle renglón por renglón de los importes contables y presupuestarios calculados tras evaluar las fórmulas de la regla sobre los datos de entrada, utilizando precisión extendida de 6 decimales para evitar desfasamientos por redondeo intermedio.
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mcam_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del movimiento aplicado.</td></tr>
+        <tr><td><code>mcam_aplicacion_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion_aplicacion(mca_id)</code>.</td></tr>
+        <tr><td><code>mcam_orden</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Secuencia del asiento (1, 2, 3...). Unique <code>uq_mcam_orden (mcam_aplicacion_id, mcam_orden)</code>.</td></tr>
+        <tr><td><code>mcam_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>C</code> = Contable Patrimonial; <code>P</code> = Presupuestario de Orden. Check <code>ck_mcam_ambito</code>.</td></tr>
+        <tr><td><code>mcam_naturaleza</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>D</code> = Debe (Cargo); <code>H</code> = Haber (Abono). Check <code>ck_mcam_naturaleza</code>.</td></tr>
+        <tr><td><code>mcam_cuenta_id</code></td><td><code>INTEGER (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.catalogo_cuentas(cc_id)</code> (Cuenta final resuelta unívocamente).</td></tr>
+        <tr><td><code>mcam_importe</code></td><td><code>NUMERIC(24,6)</code></td><td>Sí</td><td>Importe calculado con alta precisión financiera. Restricción <code>ck_mcam_importe (mcam_importe > 0)</code>.</td></tr>
+        <tr><td><code>mcam_descripcion</code></td><td><code>VARCHAR(300)</code></td><td>No</td><td>Leyenda de partida generada para el cuerpo de la póliza contable.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
+      <em>Precisión:</em> La precisión <code>NUMERIC(24,6)</code> garantiza que al distribuir importes multilínea o prorrateos de nómina no se pierda fracción de centavo antes de la consolidación final en la póliza.
+    </div>
+
+    <!-- 5.6 MATRIZ_CONVERSION_CONFIGURACION -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.6. Gobernanza Anual y Tolerancia de Redondeo (<code>contabilidad.matriz_conversion_configuracion</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Define los parámetros institucionales por ejercicio fiscal para el comportamiento del motor contable, estableciendo la cuenta de ajuste para descuadres ínfimos y el umbral máximo de tolerancia en pesos (Migración 145).
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mccf_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del registro de configuración.</td></tr>
+        <tr><td><code>mccf_ejercicio</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Ejercicio fiscal al cual aplica la directiva de cuadre (ej. 2026).</td></tr>
+        <tr><td><code>mccf_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Versión secuencial de la directriz anual. Unique <code>uq_mccf_version (mccf_ejercicio, mccf_version)</code>.</td></tr>
+        <tr><td><code>mccf_base_obligacion</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td>Base de cálculo para el devengado: <code>TOTAL</code> o <code>NETO_PAGAR</code>. Check <code>ck_mccf_base</code>.</td></tr>
+        <tr><td><code>mccf_cuenta_redondeo_id</code></td><td><code>INTEGER (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.catalogo_cuentas(cc_id)</code> utilizada para absorber diferencias de centavos.</td></tr>
+        <tr><td><code>mccf_tolerancia_redondeo</code></td><td><code>NUMERIC(12,2)</code></td><td>Sí</td><td>Tolerancia máxima permitida en pesos (0.00 a 10.00 MXN). Check <code>ck_mccf_tolerancia</code>.</td></tr>
+        <tr><td><code>mccf_vigencia_inicio</code> / <code>_fin</code></td><td><code>DATE</code></td><td>Sí</td><td>Periodo de vigencia dentro del ejercicio fiscal. Check <code>ck_mccf_vigencia</code>.</td></tr>
+        <tr><td><code>mccf_estado</code></td><td><code>VARCHAR(15)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>ACTIVA</code> | <code>CERRADA</code>. Check <code>ck_mccf_estado</code>.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Inactivo.</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de configuración institucional.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de última modificación.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
+      <em>Integridad Temporal:</em> Restricción <code>ex_mccf_activa_sin_traslape</code> EXCLUDE USING gist que impide tener dos configuraciones activas simultáneas con rangos de fechas sobrepuestos en el mismo año.
+    </div>
+
+    <!-- 5.7 MATRIZ_CONVERSION_CANDIDATO -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.7. Buffer Inteligente de Cuentas y Candidatos (<code>contabilidad.matriz_conversion_candidato</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Inventario inteligente de correlaciones reales detectadas automáticamente entre los catálogos del SIAF-PJEV (subtipos de proveedores, terceros institucionales de retención, chequeras y bancos) y las cuentas de mayor del Plan de Cuentas (SCG). Sirve para auditar y promover reglas sin inventar información contable (Migración 141).
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mcc_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del candidato detectado.</td></tr>
+        <tr><td><code>mcc_tipo_origen</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>SUBTIPO_PROVEEDOR</code> | <code>TERCERO_INSTITUCIONAL</code> | <code>CHEQUERA</code> | <code>CUENTA_BANCARIA_CONTABLE</code>.</td></tr>
+        <tr><td><code>mcc_origen_id</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Identificador primario en la tabla origen correspondiente del catálogo.</td></tr>
+        <tr><td><code>mcc_cuenta_id</code></td><td><code>INTEGER (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.catalogo_cuentas(cc_id)</code> asociada al origen.</td></tr>
+        <tr><td><code>mcc_datos_origen</code></td><td><code>JSONB</code></td><td>Sí</td><td>Atributos capturados del registro fuente (clave, descripción, rangos COG, concepto). Check <code>ck_mcc_datos</code>.</td></tr>
+        <tr><td><code>mcc_estado</code></td><td><code>VARCHAR(15)</code></td><td>Sí</td><td><code>PENDIENTE</code> | <code>VALIDADO</code> | <code>DESCARTADO</code>. Check <code>ck_mcc_estado</code>.</td></tr>
+        <tr><td><code>mcc_observacion</code></td><td><code>VARCHAR(500)</code></td><td>No</td><td>Notas del analista contable sobre la pertinencia del candidato para conformar una regla.</td></tr>
+        <tr><td><code>fecha_deteccion</code></td><td><code>TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Timestamp en el que la rutina automática detectó la relación en catálogos.</td></tr>
+        <tr><td><code>usuario_revision</code> / <code>fecha_revision</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de revisión humana por parte del área de contabilidad.</td></tr>
+        <tr><td><code>mcc_chequera_id</code></td><td><code>INTEGER</code></td><td>No</td><td>Identificador de chequera cuando el origen corresponde a dispersión bancaria. Unique <code>uq_mcc_chequera</code>.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
+      <em>Alimentación:</em> Poblada periódicamente mediante el Stored Procedure <code>contabilidad.fn_refrescar_candidatos_matriz_conversion()</code> bajo criterio de idempotencia <code>uq_mcc_origen (mcc_tipo_origen, mcc_origen_id, mcc_cuenta_id)</code>.
+    </div>
+
+    <!-- 5.8 MAPEO_PROCEDIMIENTO_OPERACION -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.8. Mapeo de Procedimientos CxP a Eventos Contables (<code>contabilidad.mapeo_procedimiento_operacion</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Establece el puente estricto y desacoplado entre los 12 procedimientos administrativos de Cuentas por Pagar (<code>cxp.catalogo_procedimientos_afectacion</code>) y los eventos de matriz contable (Migración 158).
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mpo_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del mapeo normativo.</td></tr>
+        <tr><td><code>f_procedimiento_codigo</code></td><td><code>VARCHAR(40) (FK)</code></td><td>Sí</td><td>FK a <code>cxp.catalogo_procedimientos_afectacion(cpa_codigo)</code> (ej. <code>NOMINA</code>, <code>SUJETOS_COMPROBAR</code>).</td></tr>
+        <tr><td><code>f_evento_codigo</code></td><td><code>VARCHAR(50) (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.catalogo_eventos_matriz(cem_codigo)</code> (ej. <code>ENTREGA_RECURSO</code>, <code>COMPROBACION_ACEPTADA</code>).</td></tr>
+        <tr><td><code>mpo_tipo_operacion</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Tipo de operación en la matriz de conversión (ej. <code>COMPRA_DIRECTA</code>, <code>TRANSFERENCIA_OTORGADA</code>).</td></tr>
+        <tr><td><code>mpo_estado</code></td><td><code>VARCHAR(15)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>VALIDADO</code> | <code>INACTIVO</code>. Default <code>BORRADOR</code>.</td></tr>
+        <tr><td><code>mpo_observaciones</code></td><td><code>VARCHAR(1000)</code></td><td>No</td><td>Criterios normativos de aplicación (ej. distinciones entre entrega de viático vs comprobación de gasto).</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Inactivo.</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de alta del mapeo.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de actualización.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
+      <em>Unicidad Operativa:</em> Índice único parcial <code>uq_mpo_activo (f_procedimiento_codigo, f_evento_codigo, mpo_tipo_operacion) WHERE estatus_registro = 1</code>.
+    </div>
+
+    <!-- 5.9 MATRIZ_REGLA_CLASIFICACION_CANDIDATO -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.9. Candidatos de Clasificación y Desempate (<code>contabilidad.matriz_regla_clasificacion_candidato</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Registra las alternativas de clasificación cuando una regla contable basada en un COG genérico (ej. 33901 o 39901) puede pertenecer a más de un procedimiento administrativo de CxP, documentando el criterio para que un contador decida sin alterar reglas validadas (Migración 159).
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mrcc_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del candidato de clasificación.</td></tr>
+        <tr><td><code>f_regla_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion_regla(mcr_id)</code> sobre la cual existe ambigüedad.</td></tr>
+        <tr><td><code>f_procedimiento_codigo</code></td><td><code>VARCHAR(40) (FK)</code></td><td>Sí</td><td>FK a <code>cxp.catalogo_procedimientos_afectacion(cpa_codigo)</code> candidato.</td></tr>
+        <tr><td><code>f_evento_codigo</code></td><td><code>VARCHAR(50) (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.catalogo_eventos_matriz(cem_codigo)</code> candidato.</td></tr>
+        <tr><td><code>mrcc_criterio</code></td><td><code>VARCHAR(500)</code></td><td>Sí</td><td>Justificación técnica del porqué este procedimiento aplica como opción válida para la regla.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Descartado.</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de detección.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de resolución.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
+      <em>Restricción:</em> Índice único <code>uq_mrcc_activo (f_regla_id, f_procedimiento_codigo, f_evento_codigo) WHERE estatus_registro = 1</code>.
+    </div>
+
+    <!-- 5.10 MATRIZ_CLASIFICACION_EJECUCION -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.10. Bitácora Criptográfica y Auditoría de Integridad (<code>contabilidad.matriz_clasificacion_ejecucion</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Tabla de certificación forense que registra los resultados globales de las migraciones y clasificaciones de reglas. Calcula y almacena un hash criptográfico MD5 (<code>mce_huella_validadas</code>) que prueba de forma incontrovertible que ninguna matriz o regla validada sufrió alteraciones no autorizadas (Migración 159).
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>mce_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador secuencial de la corrida de auditoría / migración.</td></tr>
+        <tr><td><code>mce_migracion</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td>Identificador del proceso o script ejecutado (ej. <code>MIGRACION_159</code>).</td></tr>
+        <tr><td><code>mce_reglas_borrador</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Total de reglas en estado borrador evaluadas durante la ejecución.</td></tr>
+        <tr><td><code>mce_determinadas</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Reglas clasificadas de manera unívoca y determinista sin intervención manual.</td></tr>
+        <tr><td><code>mce_ambiguas</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Reglas con coincidencia en más de un procedimiento administrativo.</td></tr>
+        <tr><td><code>mce_fuera_alcance</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Reglas excluidas del clasificador de egresos (ej. matrices de ingreso B1/B2/B3).</td></tr>
+        <tr><td><code>mce_reglas_validadas</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Conteo de reglas preexistentes en estado VALIDADA o ACTIVA que debieron permanecer intocadas.</td></tr>
+        <tr><td><code>mce_huella_validadas</code></td><td><code>VARCHAR(32)</code></td><td>Sí</td><td>Hash criptográfico MD5 de las reglas validadas, garantizando inalterabilidad.</td></tr>
+        <tr><td><code>mce_detalle</code></td><td><code>JSONB</code></td><td>Sí</td><td>Estructura JSON completa con el desglose pormenorizado por procedimiento, evento y COG.</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Identidad ejecutora y timestamp exacto de la corrida.</td></tr>
       </tbody>
     </table>
 
-    <!-- 5.3 MATRIZ_CONVERSION_MOVIMIENTO -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:24px 0 8px;">5.3. Movimientos y Asientos (<code>contabilidad.matriz_conversion_movimiento</code>)</h4>
+    <!-- 5.11 CATÁLOGO SOPORTE: EVENTOS DE MATRIZ -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.11. Catálogo Normalizado de Eventos de Matriz (<code>contabilidad.catalogo_eventos_matriz</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Catálogo institucional de soporte que normaliza los momentos y hechos económicos que disparan afectaciones en matrices de conversión (Migración 158).
+    </p>
     <table class="props-table">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <thead><tr><th>Código (PK)</th><th>Familia CONAC</th><th>Nombre del Evento</th><th>Descripción y Alcance Contable</th></tr></thead>
       <tbody>
-        <tr><td><code>mcm_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del movimiento.</td></tr>
-        <tr><td><code>mcm_regla_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion_regla(mcr_id)</code>.</td></tr>
-        <tr><td><code>mcm_orden</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Secuencia de asiento dentro de la regla (1, 2, 3, etc.).</td></tr>
-        <tr><td><code>mcm_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>C</code> = Asiento Contable Patrimonial; <code>P</code> = Asiento Presupuestario Clase 8.</td></tr>
-        <tr><td><code>mcm_naturaleza</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>D</code> = Debe (Cargo); <code>H</code> = Haber (Abono).</td></tr>
-        <tr><td><code>mcm_origen_cuenta</code></td><td><code>VARCHAR(35)</code></td><td>Sí</td><td><code>FIJA</code> | <code>CUENTA_CONTABLE_POR_CRI_COG</code> | <code>CUENTA_PRESUPUESTARIA_POR_MOMENTO</code>.</td></tr>
-        <tr><td><code>mcm_cuenta_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>contabilidad.catalogo_cuentas</code> (obligatorio solo si origen es <code>FIJA</code>).</td></tr>
-        <tr><td><code>mcm_momento_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_momentos</code> (obligatorio solo si es por momento).</td></tr>
-        <tr><td><code>mcm_formula_importe</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>TOTAL</code> | <code>DETALLE</code> | <code>SUBTOTAL</code> | <code>IVA</code> | <code>RETENCIONES</code> | <code>NETO_PAGAR</code>.</td></tr>
-        <tr><td><code>mcm_es_obligatorio</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Asiento obligatorio; 0 = Omitible si el importe evaluado es cero.</td></tr>
+        <tr><td><code>OBLIGACION_RECONOCIDA</code></td><td><code>A1</code></td><td>Obligación reconocida</td><td>Devengado presupuestario y reconocimiento patrimonial del pasivo exigible.</td></tr>
+        <tr><td><code>PAGO_PASIVO</code></td><td><code>A2</code></td><td>Pago de pasivo reconocido</td><td>Pago presupuestario y cancelación del pasivo contra salida de bancos.</td></tr>
+        <tr><td><code>ENTREGA_RECURSO</code></td><td><code>-</code></td><td>Entrega de recurso por comprobar</td><td>Reconoce al deudor en cuenta 1.1.2.3 sin registrar gasto presupuestario definitivo.</td></tr>
+        <tr><td><code>COMPROBACION_ACEPTADA</code></td><td><code>A1</code></td><td>Comprobación aceptada</td><td>Registra el gasto presupuestario devengado con los COG reales de los comprobantes fiscales.</td></tr>
+        <tr><td><code>REINTEGRO_REMANENTE</code></td><td><code>-</code></td><td>Reintegro de remanente</td><td>Cancela el saldo del deudor contra ingreso efectivo en bancos o caja.</td></tr>
+        <tr><td><code>REPOSICION_FONDO</code></td><td><code>A1</code></td><td>Reposición de fondo revolvente</td><td>Repone exclusivamente gastos comprobados autorizados con imputación a COGs reales.</td></tr>
+        <tr><td><code>ESTIMACION_AUTORIZADA</code></td><td><code>A1</code></td><td>Estimación de obra autorizada</td><td>Devengado de obra pública con base en estimación validada por Infraestructura.</td></tr>
+        <tr><td><code>FINIQUITO_AUTORIZADO</code></td><td><code>A1</code></td><td>Finiquito de obra autorizado</td><td>Liquidación final de contrato de obra con acta de entrega-recepción formalizada.</td></tr>
+        <tr><td><code>ENTERO_RETENCION</code></td><td><code>A2</code></td><td>Entero de retención a tercero</td><td>Cancela un pasivo fiscal o institucional de terceros previamente devengado.</td></tr>
       </tbody>
     </table>
   </div>
