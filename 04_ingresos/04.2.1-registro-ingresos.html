@@ -170,7 +170,15 @@
         </li>
         <li><strong>Evaluación Automática de la Pre-póliza:</strong> En cuanto se captura el importe, se dispara la evaluación asíncrona contra la Matriz de Conversión de Contabilidad (<code>03.1.2</code>). El bloque inferior renderiza la <strong>Pre-póliza oficial CONAC</strong> con semáforo verde de balance.</li>
         <li><strong>Guardado en Borrador:</strong> El usuario puede dar clic en <code>[💾 Guardar Borrador]</code>. El registro se guarda con <code>estatus = 'BORRADOR'</code> y sus asientos de pre-póliza ya resueltos. Permite retomar la captura posteriormente.</li>
-        <li><strong>Formalización / Devengo:</strong> Al dar clic en <code>[✓ Formalizar Ingreso]</code>, el sistema genera el folio inmutable (ej. <code>ING-2026-0045</code>), emite la póliza oficial y coloca el registro en <code>DEVENGADO</code> (esperando pago) o <code>RECAUDADO</code> (si es simultáneo).</li>
+        <li><strong>Transiciones de Workflow con Captura de Mensaje (<code>IngresoWorkflowModal</code>):</strong> Al ejecutar acciones de cambio de estatus (<code>ENVIAR_REVISION</code>, <code>REGRESAR_OBSERVADO</code>, <code>CANCELAR</code> o <code>FORMALIZAR</code>), el sistema despliega una ventana modal exigiendo:
+          <ul style="margin-top:4px;">
+            <li><strong>Fecha de operación/envío:</strong> Fecha administrativa asentada por el usuario.</li>
+            <li><strong>Observaciones / Justificación de la acción *:</strong> Campo obligatorio de texto donde el capturista o revisor asienta el mensaje que justifica la decisión (ej. aclaraciones normativas, motivo de rechazo o desglose SEFIPLAN).</li>
+          </ul>
+        </li>
+        <li><strong>Tablero Embebido de Mensajes y Trazabilidad (<code>IngresoHistorialTimeline</code>):</strong> Al pie del formulario compuesto, se muestra la bitácora viva con todas las notas, fechas reales de servidor y mensajes intercambiados entre áreas, garantizando auditoría total.</li>
+        <li><strong>Visor Modal de Historial (<code>IngresoHistorialModal</code>):</strong> Accesible desde el botón <code>[🕒 Historial (N)]</code> en la barra superior y desde el icono de reloj en el listado maestro, despliega la cronología completa de auditoría del trámite.</li>
+        <li><strong>Formalización / Devengo:</strong> Al autorizarse el trámite, el sistema genera el folio inmutable (ej. <code>ING-2026-0045</code>), emite la póliza oficial y coloca el registro en <code>DEVENGADO</code> (esperando pago) o <code>RECAUDADO</code> (si es simultáneo).</li>
       </ol>
     </div>
   </div>
@@ -213,6 +221,22 @@
         <tr><td><code>fondo_especifico_id</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>Fondo específico vinculado a la fuente cuando aplique.</td></tr>
         <tr><td><code>unidad_administrativa_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Unidad o Dirección receptora del techo presupuestal (<code>01.2.1</code>).</td></tr>
         <tr><td><code>importe_distribuido</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Fracción del importe asignada a esta línea. Debe cuadrar con <code>importe_total</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.3 Bitácora de Trazabilidad y Mensajes de Workflow (<code>ingresos.ingreso_historial</code>)</h3>
+    <table class="props-table" style="margin-bottom: 20px;">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Propósito de Auditoría</th></tr></thead>
+      <tbody>
+        <tr><td><code>historial_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí (Auto)</td><td>Identificador correlativo autoincrementable del evento.</td></tr>
+        <tr><td><code>f_ingreso_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al trámite de ingreso en <code>ingresos.ingresos_encabezado</code>.</td></tr>
+        <tr><td><code>estado_anterior</code></td><td><code>VARCHAR(25)</code></td><td>Sí</td><td>Estatus en el que se encontraba el trámite antes del cambio (ej. <code>BORRADOR</code>, <code>ENVIADO</code>).</td></tr>
+        <tr><td><code>estado_nuevo</code></td><td><code>VARCHAR(25)</code></td><td>Sí</td><td>Nuevo estatus alcanzado (ej. <code>ENVIADO</code>, <code>OBSERVADO</code>, <code>DEVENGADO</code>).</td></tr>
+        <tr><td><code>accion_realizada</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Acción ejecutada: <code>ENVIAR</code>, <code>FORMALIZAR</code>, <code>REGRESAR</code>, <code>RECHAZAR</code>, <code>CANCELAR</code>, <code>AJUSTAR</code>.</td></tr>
+        <tr><td><code>observaciones</code></td><td><code>VARCHAR(1000)</code></td><td>Sí</td><td><strong>Mensaje o justificación institucional:</strong> Texto capturado obligatoriamente en el modal de workflow.</td></tr>
+        <tr><td><code>fecha_envio</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha formal de operación/envío asentada por el usuario.</td></tr>
+        <tr><td><code>usuario_accion</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Cuenta institucional del usuario que ejecutó la acción de workflow.</td></tr>
+        <tr><td><code>fecha_accion</code></td><td><code>TIMESTAMP</code></td><td>Sí (Servidor)</td><td>Fecha y hora exacta de registro en PostgreSQL (<code>clock_timestamp()</code>) para auditoría forense.</td></tr>
       </tbody>
     </table>
   </div>
@@ -424,6 +448,150 @@ BEGIN
 END;
 $$;</code></pre>
     </div>
+
+    <!-- 6.3 LEER HISTORIAL Y MENSAJES DE WORKFLOW -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.3. Procedimiento LEER HISTORIAL (<code>ingresos.fn_leer_ingreso_historial</code>)</h4>
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_ingreso_historial(
+    p_ingreso_id BIGINT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, config, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'historial_id', h.historial_id,
+            'ingreso_id', h.f_ingreso_id,
+            'accion', h.accion_realizada,
+            'estatus_anterior', h.estado_anterior,
+            'estatus_nuevo', h.estado_nuevo,
+            'observacion', h.observaciones,
+            'fecha_envio', h.fecha_envio,
+            'fecha_real', h.fecha_accion,
+            'usuario', h.usuario_accion
+        ) ORDER BY h.fecha_accion ASC
+    )
+    INTO v_data
+    FROM ingresos.ingreso_historial h
+    WHERE h.f_ingreso_id = p_ingreso_id;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'OK',
+        'data', COALESCE(v_data, '[]'::jsonb)
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error al leer historial: ' || SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 6.4 TRANSICIÓN DE WORKFLOW CON REGISTRO DE MENSAJE -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.4. Procedimiento WORKFLOW Y TRANSICIÓN CON MENSAJE (<code>ingresos.fn_workflow_ingreso</code>)</h4>
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_workflow_ingreso(
+    p_usuario VARCHAR,
+    p_ingreso_id BIGINT,
+    p_accion VARCHAR,
+    p_observaciones TEXT,
+    p_fecha_envio DATE DEFAULT CURRENT_DATE
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, contabilidad, config, public
+AS $$
+DECLARE
+    v_estado_ant VARCHAR(25);
+    v_estado_nue VARCHAR(25);
+    v_folio VARCHAR(25);
+    v_momento VARCHAR(20);
+BEGIN
+    -- 1. Validar existencia del trámite
+    SELECT estatus, folio_interno INTO v_estado_ant, v_folio
+    FROM ingresos.ingresos_encabezado WHERE ingreso_id = p_ingreso_id;
+
+    IF v_estado_ant IS NULL THEN
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'El trámite de ingreso no existe.');
+    END IF;
+
+    -- 2. Validar mensaje institucional obligatorio
+    IF p_observaciones IS NULL OR LENGTH(TRIM(p_observaciones)) < 5 THEN
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Debe capturar un mensaje u observación que justifique la acción (mínimo 5 caracteres).');
+    END IF;
+
+    -- 3. Evaluar máquina de estados
+    IF p_accion = 'ENVIAR_REVISION' THEN
+        IF v_estado_ant NOT IN ('BORRADOR', 'OBSERVADO') THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en Borrador u Observados pueden enviarse a revisión.');
+        END IF;
+        v_estado_nue := 'ENVIADO';
+
+    ELSIF p_accion = 'REGRESAR_OBSERVADO' THEN
+        IF v_estado_ant <> 'ENVIADO' THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en estado ENVIADO pueden devolverse con observaciones.');
+        END IF;
+        v_estado_nue := 'OBSERVADO';
+
+    ELSIF p_accion = 'FORMALIZAR' THEN
+        IF v_estado_ant NOT IN ('BORRADOR', 'ENVIADO') THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'El trámite no se encuentra en estado apto para formalización.');
+        END IF;
+
+        SELECT st.momento_inicial INTO v_momento
+        FROM ingresos.cat_subtipos_tramite_ingreso st
+        JOIN ingresos.ingresos_encabezado i ON i.subtipo_tramite_id = st.subtipo_tramite_id
+        WHERE i.ingreso_id = p_ingreso_id;
+
+        v_estado_nue := CASE WHEN v_momento = 'SIMULTANEO' THEN 'RECAUDADO' ELSE 'DEVENGADO' END;
+
+        IF v_folio IS NULL THEN
+            v_folio := 'ING-' || TO_CHAR(CURRENT_DATE, 'YYYY') || '-' || LPAD(p_ingreso_id::text, 4, '0');
+        END IF;
+
+        UPDATE ingresos.ingreso_prepoliza_detalles SET es_borrador = false WHERE ingreso_id = p_ingreso_id;
+
+    ELSIF p_accion = 'CANCELAR' THEN
+        IF v_estado_ant IN ('RECAUDADO', 'APLICADO') THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Un ingreso recaudado requiere procedimiento de ajuste formal (04.1.2) y no cancelación directa.');
+        END IF;
+        v_estado_nue := 'CANCELADO';
+
+    ELSE
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción de workflow no reconocida: ' || p_accion);
+    END IF;
+
+    -- 4. Actualizar encabezado del trámite
+    UPDATE ingresos.ingresos_encabezado SET
+        estatus = v_estado_nue,
+        folio_interno = COALESCE(folio_interno, v_folio),
+        usuario_m = p_usuario,
+        fecha_m = clock_timestamp()
+    WHERE ingreso_id = p_ingreso_id;
+
+    -- 5. Registrar en la bitácora de mensajes y trazabilidad
+    INSERT INTO ingresos.ingreso_historial (
+        f_ingreso_id, estado_anterior, estado_nuevo, accion_realizada,
+        observaciones, fecha_envio, usuario_accion, fecha_accion
+    ) VALUES (
+        p_ingreso_id, v_estado_ant, v_estado_nue, p_accion,
+        TRIM(p_observaciones), COALESCE(p_fecha_envio, CURRENT_DATE),
+        p_usuario, clock_timestamp()
+    );
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'Transición completada exitosamente a ' || v_estado_nue,
+        'data', jsonb_build_object('ingreso_id', p_ingreso_id, 'estado_nuevo', v_estado_nue, 'folio', v_folio)
+    );
+END;
+$$;</code></pre>
+    </div>
   </div>
 
   <!-- 7. SERVICIOS REST (SWAGGER / NESTJS) -->
@@ -455,6 +623,18 @@ $$;</code></pre>
           <td><code>/api/v1/ingresos/:id/asociar-deposito</code></td>
           <td>Body: <code>AsociarDepositoDto</code></td>
           <td>Registra cobranza en parcialidad SPEI sobre saldo pendiente.</td>
+        </tr>
+        <tr>
+          <td><code class="method get">GET</code></td>
+          <td><code>/api/v1/ingresos/:id/historial</code></td>
+          <td>Path: <code>:id</code></td>
+          <td>Consulta la bitácora cronológica de trazabilidad y mensajes de workflow.</td>
+        </tr>
+        <tr>
+          <td><code class="method post">POST</code></td>
+          <td><code>/api/v1/ingresos/:id/workflow</code></td>
+          <td>Body: <code>WorkflowIngresoDto</code></td>
+          <td>Ejecuta transición de estado con registro de mensaje u observación obligatoria.</td>
         </tr>
       </tbody>
     </table>
@@ -490,6 +670,22 @@ export class IngresosController {
   async asociarDeposito(@Param('id') id: string, @CurrentUser() user: UserSession, @Body() dto: AsociarDepositoDto) {
     return this.service.asociarDeposito(user, BigInt(id), dto);
   }
+
+  @Get(':id/historial')
+  @ApiOperation({ summary: 'Obtener historial de trazabilidad y mensajes de workflow' })
+  async obtenerHistorial(@Param('id') id: string) {
+    return this.service.leerHistorial(BigInt(id));
+  }
+
+  @Post(':id/workflow')
+  @ApiOperation({ summary: 'Ejecutar transición de workflow con mensaje institucional obligatorio' })
+  async ejecutarWorkflow(
+    @Param('id') id: string,
+    @CurrentUser() user: UserSession,
+    @Body() dto: WorkflowIngresoDto
+  ) {
+    return this.service.ejecutarWorkflow(user, BigInt(id), dto);
+  }
 }</code></pre>
     </div>
   </div>
@@ -516,6 +712,18 @@ export class IngresosController {
           La suma acumulada de depósitos bancarios asociados a un ingreso esperado jamás puede exceder el importe total devengado. Cualquier excedente bancario debe registrarse como un nuevo ingreso directo o ampliación.
         </p>
       </div>
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-04 · Mensaje Obligatorio en Transiciones de Workflow</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Toda acción de workflow (<code>ENVIAR_REVISION</code>, <code>REGRESAR_OBSERVADO</code>, <code>CANCELAR</code> o <code>FORMALIZAR</code>) exige obligatoriamente la captura de una observación o justificación institucional (mínimo 5 caracteres). Dicho mensaje se proyecta inmediatamente en el tablero <code>IngresoHistorialTimeline</code> y queda registrado de forma inmutable en <code>ingresos.ingreso_historial</code>.
+        </p>
+      </div>
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-05 · Trazabilidad Dual de Fechas (Auditoría Forense)</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Para satisfacer las revisiones del Órgano de Fiscalización Superior (ORFIS) y la Contraloría Interna, el sistema registra dos marcas temporales: la fecha administrativa asentada por el usuario (<code>fecha_envio</code>) y el sello de tiempo inviolable de base de datos (<code>fecha_accion = clock_timestamp()</code>).
+        </p>
+      </div>
     </div>
   </div>
 
@@ -528,6 +736,7 @@ export class IngresosController {
       <button class="wf-tab" onclick="showWF('wf2',this)">2. Captura: Ministración con Pre-póliza en Borrador</button>
       <button class="wf-tab" onclick="showWF('wf3',this)">3. Captura: Rendimientos Directos</button>
       <button class="wf-tab" onclick="showWF('wf4',this)">4. Seguimiento de Cobro y Parcialidades</button>
+      <button class="wf-tab" onclick="showWF('wf5',this)">5. Tablero de Mensajes e Historial (Modales)</button>
     </div>
 
     <!-- WF1: BANDEJA -->
@@ -605,8 +814,8 @@ export class IngresosController {
           <span style="font-size:10px; color:#666;">Evaluación Determinista Matriz 03.1.2</span>
         </div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 960 480" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="960" height="480" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+          <svg viewBox="0 0 960 700" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="700" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
             <rect x="0" y="0" width="960" height="40" fill="#183125"/>
             <text x="25" y="25" font-size="13" font-weight="bold" fill="#ffffff">Registrar Ingreso · Ministración Ordinaria Estatal [MODO BORRADOR]</text>
             <text x="935" y="25" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
@@ -688,15 +897,54 @@ export class IngresosController {
             <line x1="35" y1="375" x2="925" y2="375" stroke="#cbd5e1" stroke-width="1"/>
             <text x="45" y="393" font-size="9" font-weight="bold" fill="#065f46">SUMAS PRE-PÓLIZA: $ 90,000,000.00 (Debe) = $ 90,000,000.00 (Haber)</text>
 
+            <!-- 4. TABLERO DE TRAZABILIDAD Y MENSAJES DE WORKFLOW (IngresoHistorialTimeline) -->
+            <rect x="25" y="425" width="910" height="205" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" rx="5"/>
+            <rect x="25" y="425" width="910" height="28" fill="#f8fafc" rx="5 5 0 0"/>
+            <text x="40" y="443" font-size="10" font-weight="bold" fill="#1e293b">💬 HISTORIAL DE TRAZABILIDAD Y WORKFLOW (3 mensajes)</text>
+            <text x="915" y="443" font-size="9" fill="#64748b" text-anchor="end">Bitácora institucional inviolable</text>
+
+            <!-- Mensaje 1 -->
+            <rect x="35" y="460" width="890" height="48" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <rect x="45" y="467" width="55" height="16" fill="#dbeafe" rx="3"/>
+            <text x="72" y="479" font-size="8" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
+            <text x="110" y="479" font-size="9" font-weight="bold" fill="#1e293b">BORRADOR → ENVIADO</text>
+            <text x="450" y="479" font-size="8" fill="#64748b">Fecha envío: 07/03/2026 • Servidor: 07/03/2026 10:14:22</text>
+            <text x="910" y="479" font-size="8" fill="#64748b" text-anchor="end">Por: Lic. Eunice Hernández</text>
+            <rect x="45" y="487" width="870" height="16" fill="#ffffff" rx="2"/>
+            <text x="52" y="499" font-size="8.5" font-style="italic" fill="#334155">"Se remite desglose de ministración conforme a Oficio OFI-SEFIPLAN-2026-089 para validación presupuestaria y contable."</text>
+
+            <!-- Mensaje 2 -->
+            <rect x="35" y="513" width="890" height="48" fill="#fffbeb" stroke="#fef3c7" rx="4"/>
+            <rect x="45" y="520" width="65" height="16" fill="#fee2e2" rx="3"/>
+            <text x="77" y="532" font-size="8" font-weight="bold" fill="#991b1b" text-anchor="middle">REGRESAR</text>
+            <text x="120" y="532" font-size="9" font-weight="bold" fill="#92400e">ENVIADO → OBSERVADO</text>
+            <text x="450" y="532" font-size="8" fill="#64748b">Fecha envío: 07/03/2026 • Servidor: 07/03/2026 12:45:08</text>
+            <text x="910" y="532" font-size="8" fill="#64748b" text-anchor="end">Por: C.P. Gabriel Soto (Revisor)</text>
+            <rect x="45" y="540" width="870" height="16" fill="#ffffff" rx="2"/>
+            <text x="52" y="552" font-size="8.5" font-style="italic" fill="#991b1b">"Observación: Favor de anexar la circular de afectación al Capítulo 2000 emitida por Recursos Materiales antes de autorizar."</text>
+
+            <!-- Mensaje 3 -->
+            <rect x="35" y="566" width="890" height="48" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <rect x="45" y="573" width="55" height="16" fill="#dbeafe" rx="3"/>
+            <text x="72" y="585" font-size="8" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
+            <text x="110" y="585" font-size="9" font-weight="bold" fill="#1e293b">OBSERVADO → ENVIADO</text>
+            <text x="450" y="585" font-size="8" fill="#64748b">Fecha envío: 08/03/2026 • Servidor: 08/03/2026 09:30:15</text>
+            <text x="910" y="585" font-size="8" fill="#64748b" text-anchor="end">Por: Lic. Eunice Hernández</text>
+            <rect x="45" y="593" width="870" height="16" fill="#ffffff" rx="2"/>
+            <text x="52" y="605" font-size="8.5" font-style="italic" fill="#334155">"Se anexa circular complementaria y se ajusta la partida de materiales conforme a lo requerido."</text>
+
             <!-- Acciones Finales -->
-            <rect x="25" y="430" width="130" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="90" y="450" font-size="10" fill="#64748b" text-anchor="middle">Cancelar</text>
+            <rect x="25" y="645" width="120" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="85" y="665" font-size="10" fill="#64748b" text-anchor="middle">Cancelar</text>
 
-            <rect x="580" y="430" width="160" height="32" fill="#f8fafc" stroke="#94a3b8" rx="4"/>
-            <text x="660" y="450" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">💾 Guardar Borrador</text>
+            <rect x="430" y="645" width="140" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="500" y="665" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">🕒 Historial (3)</text>
 
-            <rect x="755" y="430" width="180" height="32" fill="#183125" rx="4"/>
-            <text x="845" y="450" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Formalizar y Devengar</text>
+            <rect x="580" y="645" width="160" height="32" fill="#f8fafc" stroke="#94a3b8" rx="4"/>
+            <text x="660" y="665" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">💾 Guardar Borrador</text>
+
+            <rect x="755" y="645" width="180" height="32" fill="#183125" rx="4"/>
+            <text x="845" y="665" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Formalizar y Devengar</text>
           </svg>
         </div>
       </div>
@@ -837,6 +1085,102 @@ export class IngresosController {
       </div>
     </div>
 
+    <!-- WF5: MODAL HISTORIAL Y WORKFLOW DIALOG -->
+    <div id="wf-wf5" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">Tablero de Mensajes e Historial de Workflow (Modales Interactivos)</span>
+          <span style="font-size:10px; color:#666;">IngresoHistorialModal e IngresoWorkflowModal</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 960 520" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="520" fill="#f1f5f9" rx="4"/>
+
+            <!-- MODAL 1: VISOR COMPLETO DE HISTORIAL (Izquierda) -->
+            <rect x="20" y="20" width="560" height="480" fill="#ffffff" rx="6" stroke="#cbd5e1" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.08))"/>
+            <rect x="20" y="20" width="560" height="38" fill="#183125" rx="6 6 0 0"/>
+            <text x="35" y="44" font-size="11" font-weight="bold" fill="#ffffff">🕒 Historial de Trazabilidad y Mensajes · Folio ING-2026-0045</text>
+            <text x="565" y="44" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+
+            <rect x="30" y="65" width="540" height="22" fill="#f8fafc" rx="3"/>
+            <text x="38" y="79" font-size="8" fill="#64748b">Bitácora completa de transiciones, fechas capturadas, fechas reales de servidor y mensajes intercambiados.</text>
+
+            <!-- Card Mensaje 1 -->
+            <rect x="30" y="95" width="540" height="68" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <rect x="40" y="103" width="50" height="15" fill="#dbeafe" rx="3"/>
+            <text x="65" y="114" font-size="7.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
+            <text x="98" y="114" font-size="8.5" font-weight="bold" fill="#1e293b">BORRADOR → ENVIADO</text>
+            <text x="560" y="114" font-size="7.5" fill="#64748b" text-anchor="end">Por: Lic. Eunice Hernández</text>
+            <text x="40" y="130" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 07/03/2026 • Servidor: 07/03/2026 10:14:22</text>
+            <rect x="40" y="135" width="520" height="22" fill="#f8fafc" rx="3"/>
+            <text x="48" y="150" font-size="8" font-style="italic" fill="#334155">"Se remite desglose conforme a Oficio OFI-SEFIPLAN-2026-089 para revisión presupuestaria y contable."</text>
+
+            <!-- Card Mensaje 2 -->
+            <rect x="30" y="170" width="540" height="68" fill="#fffbeb" stroke="#fef3c7" rx="4"/>
+            <rect x="40" y="178" width="58" height="15" fill="#fee2e2" rx="3"/>
+            <text x="69" y="189" font-size="7.5" font-weight="bold" fill="#991b1b" text-anchor="middle">REGRESAR</text>
+            <text x="105" y="189" font-size="8.5" font-weight="bold" fill="#92400e">ENVIADO → OBSERVADO</text>
+            <text x="560" y="189" font-size="7.5" fill="#64748b" text-anchor="end">Por: C.P. Gabriel Soto (Revisor)</text>
+            <text x="40" y="205" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 07/03/2026 • Servidor: 07/03/2026 12:45:08</text>
+            <rect x="40" y="210" width="520" height="22" fill="#ffffff" rx="3"/>
+            <text x="48" y="225" font-size="8" font-style="italic" fill="#991b1b">"Observación: Favor de anexar la circular del Capítulo 2000 emitida por Recursos Materiales."</text>
+
+            <!-- Card Mensaje 3 -->
+            <rect x="30" y="245" width="540" height="68" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <rect x="40" y="253" width="50" height="15" fill="#dbeafe" rx="3"/>
+            <text x="65" y="264" font-size="7.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
+            <text x="98" y="264" font-size="8.5" font-weight="bold" fill="#1e293b">OBSERVADO → ENVIADO</text>
+            <text x="560" y="264" font-size="7.5" fill="#64748b" text-anchor="end">Por: Lic. Eunice Hernández</text>
+            <text x="40" y="280" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 08/03/2026 • Servidor: 08/03/2026 09:30:15</text>
+            <rect x="40" y="285" width="520" height="22" fill="#f8fafc" rx="3"/>
+            <text x="48" y="300" font-size="8" font-style="italic" fill="#334155">"Se anexa circular complementaria y se ajusta la distribución presupuestal solicitada."</text>
+
+            <!-- Card Mensaje 4 -->
+            <rect x="30" y="320" width="540" height="68" fill="#f0fdf4" stroke="#bbf7d0" rx="4"/>
+            <rect x="40" y="328" width="65" height="15" fill="#dcfce7" rx="3"/>
+            <text x="72" y="339" font-size="7.5" font-weight="bold" fill="#15803d" text-anchor="middle">FORMALIZAR</text>
+            <text x="112" y="339" font-size="8.5" font-weight="bold" fill="#166534">ENVIADO → DEVENGADO</text>
+            <text x="560" y="339" font-size="7.5" fill="#64748b" text-anchor="end">Por: Dr. Julio César Barrales</text>
+            <text x="40" y="355" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 08/03/2026 • Servidor: 08/03/2026 11:20:00</text>
+            <rect x="40" y="360" width="520" height="22" fill="#ffffff" rx="3"/>
+            <text x="48" y="375" font-size="8" font-style="italic" fill="#166534">"Expediente completo y validado conforme a Matriz CONAC 03.1.2 B.1. Aprobado para devengo."</text>
+
+            <!-- Modal 1 Footer -->
+            <rect x="470" y="455" width="100" height="30" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="520" y="474" font-size="9" font-weight="bold" fill="#475569" text-anchor="middle">Cerrar</text>
+
+            <!-- MODAL 2: DIÁLOGO DE ACCIÓN DE WORKFLOW CON MENSAJE (Derecha) -->
+            <rect x="600" y="40" width="340" height="440" fill="#ffffff" rx="6" stroke="#cbd5e1" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.08))"/>
+            <rect x="600" y="40" width="340" height="36" fill="#b91c1c" rx="6 6 0 0"/>
+            <text x="615" y="63" font-size="11" font-weight="bold" fill="#ffffff">Regresar Ingreso con Observaciones</text>
+            <text x="925" y="63" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+
+            <rect x="615" y="86" width="310" height="26" fill="#fef2f2" rx="3"/>
+            <text x="622" y="98" font-size="7.5" fill="#991b1b">El trámite transitará a estado OBSERVADO y se</text>
+            <text x="622" y="108" font-size="7.5" fill="#991b1b">devolverá al capturista con su mensaje institucional.</text>
+
+            <text x="615" y="132" font-size="8.5" font-weight="bold" fill="#475569">FECHA DE OPERACIÓN / ENVÍO *</text>
+            <rect x="615" y="138" width="310" height="24" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="625" y="154" font-size="9" fill="#1e293b">07/03/2026</text>
+
+            <text x="615" y="180" font-size="8.5" font-weight="bold" fill="#475569">OBSERVACIONES / JUSTIFICACIÓN DE LA ACCIÓN *</text>
+            <rect x="615" y="186" width="310" height="150" fill="#ffffff" stroke="#fca5a5" stroke-width="1.5" rx="4"/>
+            <text x="625" y="205" font-size="8.5" fill="#1e293b">Favor de anexar la circular de</text>
+            <text x="625" y="220" font-size="8.5" fill="#1e293b">afectación al Capítulo 2000 emitida por</text>
+            <text x="625" y="235" font-size="8.5" fill="#1e293b">Recursos Materiales antes de autorizar.</text>
+
+            <text x="615" y="352" font-size="7.5" font-style="italic" fill="#64748b">* Obligatorio para bitácora forense (mín. 5 caracteres).</text>
+
+            <rect x="615" y="430" width="100" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="665" y="450" font-size="9" fill="#64748b" text-anchor="middle">Cancelar</text>
+
+            <rect x="730" y="430" width="195" height="32" fill="#dc2626" rx="4"/>
+            <text x="827" y="450" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">Confirmar Devolución</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- 10. CASOS DE PRUEBA -->
@@ -873,6 +1217,12 @@ export class IngresosController {
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción del Cambio</th></tr></thead>
       <tbody>
+        <tr>
+          <td><code>v2.1.0</code></td>
+          <td>07/09/2026</td>
+          <td>Julio César / Eunice</td>
+          <td><strong>Integración de Tablero de Mensajes y Trazabilidad (Workflow):</strong> Incorporación del componente <code>IngresoHistorialTimeline</code>, modales <code>IngresoHistorialModal</code> e <code>IngresoWorkflowModal</code>, tabla <code>ingresos.ingreso_historial</code>, SPs <code>fn_leer_ingreso_historial</code> y <code>fn_workflow_ingreso</code>, y endpoints NestJS, homologando al 100% el esquema de comunicación y auditoría implementado en Egresos 05.2.1.</td>
+        </tr>
         <tr>
           <td><code>v2.0.0</code></td>
           <td>07/09/2026</td>

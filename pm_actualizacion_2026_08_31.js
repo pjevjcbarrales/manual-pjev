@@ -312,9 +312,11 @@
       'Desglose presupuestario por Capítulos (1000 a 5000) y Fuentes',
       'Gestión de depósitos bancarios y parcialidades 1:N',
       'Control de saldos pendientes por percibir',
+      'Tablero de mensajes y bitácora de trazabilidad (IngresoHistorialTimeline)',
+      'Modal de historial completo y diálogo de workflow (IngresoWorkflowModal)',
       'Formalización inmutable con folio oficial'
     ],
-    evidencia:'Módulo central unificado con experiencia Wizard idéntica a Egresos 05.2.1 y pre-póliza oficial evaluada desde el borrador.'
+    evidencia:'Módulo central unificado con experiencia Wizard idéntica a Egresos 05.2.1, pre-póliza oficial evaluada desde el borrador y tablero de mensajes de workflow.'
   });
   ing('04.3.1','04.3 Procesos','Conciliación de ingresos',{
     perfil:'conta',
