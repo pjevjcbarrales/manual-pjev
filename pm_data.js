@@ -930,7 +930,7 @@ const pmData = {
         },
         {
             "id": "04.1.1",
-            "nombre": "Conceptos de Ingreso",
+            "nombre": "Trámites y Subtipos de Ingreso",
             "sistema": "Ingresos",
             "tipo_formulario": "A",
             "analisis_funcional": 1,
@@ -944,7 +944,7 @@ const pmData = {
         },
         {
             "id": "04.1.2",
-            "nombre": "Cuentas Recaudadoras",
+            "nombre": "Motivos de Ajuste o Cancelación",
             "sistema": "Ingresos",
             "tipo_formulario": "A",
             "analisis_funcional": 1,
@@ -1434,15 +1434,6 @@ const pmData = {
             "estado": "Pendiente",
             "programador": "Backend Developer",
             "progreso": 0
-        },
-        {
-            "id": "07.1.7",
-            "nombre": "Catálogo de Firmas",
-            "desarrollador_asignado": "Sin asignar",
-            "avance_desarrollo": 0,
-            "iteracion_desarrollo": 0,
-            "tipo_formulario": "Simple",
-            "visitas": []
         },
         {
             "id": "07.2.1",

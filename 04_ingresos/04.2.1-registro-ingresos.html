@@ -91,7 +91,7 @@
     <p>La operación se articula en tres fases sincronizadas:</p>
     <ol style="font-size:13px; color:var(--pjev-texto); margin-left:20px; line-height:1.6;">
       <li><strong>Fase 1: Asistente Visual de Clasificación (Wizard Modal):</strong> El capturista selecciona el <strong>Tipo Principal</strong> y el <strong>Subtipo de Trámite</strong> (entre las opciones parametrizadas en <code>04.1.1</code>). Cada tarjeta muestra icono, título y descripción funcional, adaptando los campos de captura posteriores.</li>
-      <li><strong>Fase 2: Formulario Compuesto y Pre-póliza en Borrador:</strong> El analista captura datos generales, importe y desglose presupuestario por Capítulos (1000 a 5000) y Fuentes. En tiempo real, el motor <code>04.1.2</code> consulta la <strong>Matriz de Conversión Oficial (`03.1.2`)</strong> y muestra el asiento contable proyectado con semáforo de cuadre. El usuario puede guardar en <strong>Modo Borrador</strong> con su pre-póliza ya vinculada.</li>
+      <li><strong>Fase 2: Formulario Compuesto y Pre-póliza en Borrador:</strong> El analista captura datos generales, importe y desglose presupuestario por Capítulos (1000 a 5000) y Fuentes. En tiempo real, el sistema consulta la <strong>Matriz de Conversión Oficial que reside en Contabilidad (<code>03.1.2</code>)</strong> y muestra el asiento contable proyectado con semáforo de cuadre. El usuario puede guardar en <strong>Modo Borrador</strong> con su pre-póliza ya vinculada.</li>
       <li><strong>Fase 3: Recepción Bancaria y Liquidación de Saldos:</strong> Para trámites de devengo previo (Ministraciones ordinarias), el ingreso queda con saldo pendiente por recaudar. A medida que ingresan los depósitos SPEI a las cuentas bancarias (<code>01.4.2</code>), se asocian parcialidades hasta liquidar el saldo total, detonando la Matriz B.2 (Recaudado).</li>
     </ol>
   </div>
@@ -140,7 +140,7 @@
         <tr>
           <td><strong>Jefe del Departamento de Ingresos</strong></td>
           <td>Supervisión, cuadre presupuestal y autorizaciones extraordinarias.</td>
-          <td>Autorizar cancelaciones o ajustes con motivo <code>04.1.3</code> y validar cuadre presupuestal de ministraciones.</td>
+          <td>Autorizar cancelaciones o ajustes con motivo <code>04.1.2</code> y validar cuadre presupuestal de ministraciones.</td>
         </tr>
         <tr>
           <td><strong>Contabilidad Gubernamental</strong></td>
@@ -168,7 +168,7 @@
             <li>Si es <em>Depósito No Identificado</em>: solo pide cuenta bancaria, fecha y referencia SPEI (sin tocar presupuesto).</li>
           </ul>
         </li>
-        <li><strong>Evaluación Automática de la Pre-póliza:</strong> En cuanto se captura el importe, se dispara la llamada asíncrona a <code>04.1.2</code>. El bloque inferior renderiza la <strong>Pre-póliza oficial CONAC</strong> con semáforo verde de balance.</li>
+        <li><strong>Evaluación Automática de la Pre-póliza:</strong> En cuanto se captura el importe, se dispara la evaluación asíncrona contra la Matriz de Conversión de Contabilidad (<code>03.1.2</code>). El bloque inferior renderiza la <strong>Pre-póliza oficial CONAC</strong> con semáforo verde de balance.</li>
         <li><strong>Guardado en Borrador:</strong> El usuario puede dar clic en <code>[💾 Guardar Borrador]</code>. El registro se guarda con <code>estatus = 'BORRADOR'</code> y sus asientos de pre-póliza ya resueltos. Permite retomar la captura posteriormente.</li>
         <li><strong>Formalización / Devengo:</strong> Al dar clic en <code>[✓ Formalizar Ingreso]</code>, el sistema genera el folio inmutable (ej. <code>ING-2026-0045</code>), emite la póliza oficial y coloca el registro en <code>DEVENGADO</code> (esperando pago) o <code>RECAUDADO</code> (si es simultáneo).</li>
       </ol>

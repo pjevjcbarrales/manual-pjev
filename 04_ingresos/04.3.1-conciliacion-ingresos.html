@@ -442,7 +442,7 @@ $$;</code></pre>
         <tr><td><code>p_ejercicio</code></td><td><code>INTEGER</code></td><td>Ejercicio fiscal.</td></tr>
         <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1</code> = Vincular depósito parcial/total · <code>2</code> = Registrar cédula de aclaración de diferencia · <code>3</code> = Sellar conciliación de partida.</td></tr>
         <tr><td><code>p_ingreso_id</code></td><td><code>BIGINT</code></td><td>ID del ingreso esperado o base.</td></tr>
-        <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con IDs de depósitos asociados, motivos del catálogo 04.1.3 y justificación.</td></tr>
+        <tr><td><code>p_datos</code></td><td><code>JSONB</code></td><td>Payload con IDs de depósitos asociados, motivos del catálogo 04.1.2 y justificación.</td></tr>
       </tbody>
     </table>
 
@@ -495,10 +495,10 @@ BEGIN
 
         RETURN jsonb_build_object('error', 0, 'mensaje', 'Depósito vinculado exitosamente.');
 
-    -- 2 = ACLARACIÓN DE DIFERENCIA CON MOTIVO TIPIFICADO (04.1.3)
+    -- 2 = ACLARACIÓN DE DIFERENCIA CON MOTIVO TIPIFICADO (04.1.2)
     ELSIF p_accion = 2 THEN
         IF NOT (p_datos ? 'motivo_id') THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'Debe seleccionar un motivo de aclaración del catálogo 04.1.3.');
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Debe seleccionar un motivo de aclaración del catálogo 04.1.2.');
         END IF;
 
         INSERT INTO ingresos.conciliacion_aclaracion (
@@ -547,7 +547,7 @@ $$;</code></pre>
         <tr>
           <td><code class="method post">POST</code></td>
           <td><code>/api/v1/ingresos/procesos/conciliacion/aclarar-diferencia</code></td>
-          <td>Body: <code>AclararDiferenciaDto (con motivoId 04.1.3)</code></td>
+          <td>Body: <code>AclararDiferenciaDto (con motivoId 04.1.2)</code></td>
           <td>Asienta justificación y motivo formal de discrepancia o desfase.</td>
         </tr>
         <tr>
@@ -580,7 +580,7 @@ export class ConciliacionIngresosController {
   }
 
   @Post('aclarar-diferencia')
-  @ApiOperation({ summary: 'Registrar justificación de diferencia con motivo 04.1.3' })
+  @ApiOperation({ summary: 'Registrar justificación de diferencia con motivo 04.1.2' })
   async aclararDiferencia(@CurrentUser() user: UserSession, @Body() dto: AclararDiferenciaDto) {
     return this.concilService.aclararDiferencia(user, dto);
   }
@@ -660,7 +660,7 @@ export class ConciliacionIngresosController {
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
         <strong style="color:var(--pjev-verde-oscuro);">RN-CONC-02 · Justificación Obligatoria para Diferencias</strong>
         <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          Toda partida con estado <span class="tag-status st-diferencia">Con diferencia</span> requiere obligatoriamente la captura de una nota explicativa y la selección de una causal tipificada del catálogo <code>04.1.3 (Motivos de ajuste o cancelación)</code> para poder emitir la cédula formal de cierre.
+          Toda partida con estado <span class="tag-status st-diferencia">Con diferencia</span> requiere obligatoriamente la captura de una nota explicativa y la selección de una causal tipificada del catálogo <code>04.1.2 (Motivos de ajuste o cancelación)</code> para poder emitir la cédula formal de cierre.
         </p>
       </div>
 
@@ -681,7 +681,7 @@ export class ConciliacionIngresosController {
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
         <strong style="color:var(--pjev-verde-oscuro);">RN-CONC-05 · Inmutabilidad de Registros Fuente</strong>
         <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          La conciliación es un proceso analítico de cotejo; <strong>bajo ninguna circunstancia modifica directamente los importes de los registros bancarios o de ingresos originales</strong>. Cualquier corrección debe generarse a través de los procedimientos de ajuste o reclasificación (catálogo <code>04.1.3</code>).
+          La conciliación es un proceso analítico de cotejo; <strong>bajo ninguna circunstancia modifica directamente los importes de los registros bancarios o de ingresos originales</strong>. Cualquier corrección debe generarse a través de los procedimientos de ajuste o reclasificación (catálogo <code>04.1.2</code>).
         </p>
       </div>
 

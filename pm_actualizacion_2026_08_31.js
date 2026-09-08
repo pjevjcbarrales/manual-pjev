@@ -277,43 +277,28 @@
     ],
     evidencia:'Catálogo rector estructurado en 4 macro-familias y 12 procedimientos canónicos (espejo con Egresos 05.2.1) que alimenta el Wizard Modal de Registro y parametriza el enlace a CRI y Matriz CONAC.'
   });
-  ing('04.1.2','04.1 Catálogos','Pre-pólizas y reglas de conversión',{
+  ing('04.1.2','04.1 Catálogos','Motivos de ajuste o cancelación',{
     perfil:'ing',
     f2:90,
-    rutas:['/ing/prepolizas'],
+    rutas:['/ing/motivos-ajuste'],
     responsable:'Eunice',
-    documentacion:'Análisis funcional inicial',
-    documento:'04_ingresos/04.1.2-tipos-movimiento-ingreso.html',
+    documentacion:'Análisis funcional canónico',
+    documento:'04_ingresos/04.1.2-motivos-ajuste-cancelacion.html',
     opciones:[
-      'Matriz 14: B.1 Ingreso Devengado (Cuentas por cobrar 1.1.2 vs 4.1.5)',
-      'Matriz 15: B.2 Ingreso Recaudado (Bancos 1.1.1.2 vs Cuentas por cobrar)',
-      'Matriz 16: B.3 Ingreso Simultáneo (Bancos 1.1.1.2 vs 4.1.5 en firme)',
-      'Regla Extrapresupuestal de Pasivo en Custodia (Bancos vs 2.1.9.9)',
-      'Motor determinista de cálculo de Pre-póliza activa desde MODO BORRADOR',
-      'Validación de balance aritmético (Debe = Haber) con tolerancia cero'
+      '1. Error de captura',
+      '2. Registro duplicado',
+      '3. Importe incorrecto',
+      '4. Fecha incorrecta',
+      '5. Cuenta bancaria incorrecta',
+      '6. Concepto o CRI incorrecto',
+      '7. Fuente de financiamiento incorrecta',
+      '8. Fondo o capítulo incorrecto',
+      '9. Depósito no identificado',
+      '10. Corrección contable',
+      '11. Reclasificación presupuestaria',
+      '12. Otro motivo autorizado'
     ],
-    evidencia:'Motor de integración contable conectado a contabilidad.matriz_conversion (03.1.2); genera en tiempo real el pre-asiento contable y presupuestal desde el modo borrador sin alterar el Libro Diario.'
-  });
-  ing('04.1.3','04.1 Catálogos','Motivos de ajuste o cancelación',{
-    responsable:'Eunice',
-    estado:'Pendiente de desarrollo',
-    documentacion:'Análisis funcional inicial',
-    documento:'04_ingresos/04.1.3-motivos-ajuste-cancelacion.html',
-    opciones:[
-      'Error de captura',
-      'Registro duplicado',
-      'Importe incorrecto',
-      'Fecha incorrecta',
-      'Cuenta bancaria incorrecta',
-      'Concepto o CRI incorrecto',
-      'Fuente de financiamiento incorrecta',
-      'Fondo o capítulo incorrecto',
-      'Depósito no identificado',
-      'Corrección contable',
-      'Reclasificación presupuestaria',
-      'Otro motivo autorizado'
-    ],
-    evidencia:'Documentación funcional creada; desarrollo pendiente. Estandariza las causales de ajuste y cancelación con severidad y autorizaciones.'
+    evidencia:'Catálogo tipificado de causales de ajuste y cancelación con severidad (BAJA, MEDIA, ALTA) y autorizaciones requeridas, consumido por registro, conciliación y cierre.'
   });
   ing('04.2.1','04.2 Registro','Registro de ingresos',{
     responsable:'Eunice',
@@ -444,7 +429,6 @@
   const responsablesPorModulo = {
     '04.1.1': 'Eunice',
     '04.1.2': 'Eunice',
-    '04.1.3': 'Eunice',
     '04.2.1': 'Eunice',
     '04.3.1': 'Eunice',
     '04.3.2': 'Eunice',
@@ -476,9 +460,7 @@
       : (estadoAnterior === modulo.estado ? '' : estadoAnterior);
 
     if (modulo.id === '04.1.2') {
-      modulo.detalle_estado = 'Documentación funcional creada; implementación por verificar.';
-    } else if (modulo.id === '04.1.3') {
-      modulo.detalle_estado = 'Documentación funcional creada; desarrollo pendiente.';
+      modulo.detalle_estado = 'Documentación funcional canónica creada; catálogo tipificado de enmiendas y cancelaciones.';
     }
 
     if (modulo.fases && !reinicioIngresos) {

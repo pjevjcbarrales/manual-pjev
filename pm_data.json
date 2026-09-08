@@ -930,7 +930,7 @@
         },
         {
             "id": "04.1.1",
-            "nombre": "Conceptos de Ingreso",
+            "nombre": "Trámites y Subtipos de Ingreso",
             "sistema": "Ingresos",
             "tipo_formulario": "A",
             "analisis_funcional": 1,
@@ -944,7 +944,7 @@
         },
         {
             "id": "04.1.2",
-            "nombre": "Cuentas Recaudadoras",
+            "nombre": "Motivos de Ajuste o Cancelación",
             "sistema": "Ingresos",
             "tipo_formulario": "A",
             "analisis_funcional": 1,
