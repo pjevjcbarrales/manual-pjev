@@ -73,15 +73,15 @@
 
   <!-- CALLOUT DE DELIMITACIÓN ARQUITECTÓNICA -->
   <div class="callout-box">
-    <div class="callout-title">📌 Arquitectura Homologada con Egresos: Registro Sustantivo y Contabilidad Subyacente</div>
+    <div class="callout-title">📌 Flujo Oficial de Datos: Evidencia Documental, Captura de Orden y Conciliación Bancaria</div>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
-      <strong>1. Entrada por Trámite y Subtrámite (Wizard Modal):</strong> Al presionar <em>+ Nuevo Ingreso</em>, el analista no navega formularios genéricos. Se abre el <strong>Modal Asistente (Paso 0)</strong> con las 4 macro-familias y tarjetas descriptivas de los 12 subtipos de ingreso (Ministraciones, Rendimientos, Reintegros, etc.), guiando con total certeza el flujo de captura según el documento de origen.
+      <strong>1. El Oficio Institucional es Evidencia de Origen:</strong> El oficio macro dirigido a SEFIPLAN (ej. <code>Of. DGA/0367/2026</code> por $192,785,075.00) notifica el paquete global de órdenes del mes. En el sistema <strong>no se capturan pólizas ni partidas de este oficio</strong>; opera como documento digital probatorio adjunto (PDF) en el expediente del trámite.
     </p>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
-      <strong>2. Contabilidad Subyacente (En Segundo Plano):</strong> El personal del área de Ingresos <strong>no es capturista de pólizas</strong>. El usuario solo registra la información obligatoria de su competencia operativa: oficio de solicitud o notificación de ministración, fecha esperada, depositante y desglose presupuestal por capítulos/fuentes. De forma <strong>subyacente e invisible</strong>, el motor de Contabilidad (<code>03.1.2</code>) resuelve los asientos contables y presupuestales (Matriz B.1 Devengado) sin requerir captura manual de cuentas.
+      <strong>2. Lo que se Captura en el Sistema es la Orden de Pago (Solicitud de Recursos):</strong> El capturista registra en el formulario la <strong>Orden de Ministración individual</strong> amparada en el oficio (ej. Trámite <code>2026-011</code>, Clave <code>01-06-2026</code> por $51,958,628.00 para <em>Nómina</em>, o por $21,157,862.50 para <em>Gastos de Operación</em>), especificando la cuenta de abono (<code>BBVA Cta. 0126144101</code>) y desglosando las partidas presupuestales por <strong>Órgano Judicial Beneficiario</strong> (Tribunal Superior de Justicia, Tribunal de Conciliación y Arbitraje, Tribunal de Disciplina Judicial y Órgano de Administración Judicial). Al formalizar la orden, se genera de forma <strong>subyacente</strong> la cuenta por cobrar y el devengo presupuestal (Matriz B.1).
     </p>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
-      <strong>3. Conciliación y Recaudación Bancaria Posterior:</strong> Cuando el recurso financiero ingresa a la cuenta bancaria del PJEV, el capturista asocia o concilia el depósito (referencia SPEI, extracto bancario e importe). En ese momento, la contabilidad subyacente dispara automáticamente la Matriz B.2 (Recaudado) y liquida el saldo por cobrar.
+      <strong>3. La Conciliación con el Banco Dispara la Recaudación:</strong> Cuando SEFIPLAN realiza la transferencia electrónica a la cuenta concentradora BBVA (<code>0126144101</code>), el analista coteja el extracto en línea (ej. <code>BBVA Net Cash · Depósito REFBNTC00316148 por $21,157,862.50</code>). Al conciliar el depósito bancario con la orden devengada, la contabilidad <strong>subyacente</strong> liquida la cuenta por cobrar y detona la Matriz B.2 (Recaudado).
     </p>
   </div>
 
@@ -89,11 +89,11 @@
   <div class="doc-section">
     <div class="section-title"><span class="section-num">1</span> Descripción General</div>
     <p>El módulo <strong>04.2.1 Registro de Ingresos</strong> es el núcleo transaccional del Departamento de Recursos Financieros (Tesorería) del Poder Judicial del Estado de Veracruz para captar, vigilar y controlar las entradas monetarias institucionales.</p>
-    <p>La operación se articula en tres fases administrativas con contabilidad automática en segundo plano:</p>
+    <p>La operación se fundamenta en tres niveles de procesamiento con contabilidad automática en segundo plano:</p>
     <ol style="font-size:13px; color:var(--pjev-texto); margin-left:20px; line-height:1.6;">
-      <li><strong>Fase 1: Asistente Visual de Clasificación (Wizard Modal — Paso 0):</strong> El capturista selecciona la Macro-familia y el Procedimiento Operativo entre las 12 opciones parametrizadas en <code>04.1.1</code>. Cada tarjeta muestra icono, título y descripción funcional, adaptando automáticamente los campos sustantivos del formulario posterior.</li>
-      <li><strong>Fase 2: Captura del Oficio y Techo Presupuestal (Paso 1 — Devengo Subyacente):</strong> El analista captura únicamente la información sustantiva del trámite: número de oficio de solicitud o notificación (ej. SEFIPLAN), fechas, depositante y desglose en Capítulos (1000 a 5000) y Fuentes para abrir el techo presupuestal institucional. De manera <strong>subyacente</strong>, el sistema conecta con la <strong>Matriz de Conversión (03.1.2)</strong> y prepara la póliza de devengo contable y presupuestal sin saturar la pantalla con asientos contables invasivos.</li>
-      <li><strong>Fase 3: Conciliación Bancaria y Recaudación (Paso 2 — Recaudado Subyacente):</strong> Al recibirse los fondos en cuentas bancarias institucionales (<code>01.4.2</code>), se asocian los depósitos SPEI en pago total o parcialidades sucesivas (1:N), amortizando el saldo pendiente y detonando automáticamente la afectación contable y presupuestal de recaudación.</li>
+      <li><strong>Nivel 1: Selección de Trámite y Evidencia Digital (Oficio Soporte):</strong> El capturista clasifica el trámite en el <strong>Wizard Modal (Paso 0)</strong> seleccionando el procedimiento (ej. <code>MIN_ESTATAL_ORD · Ministración Ordinaria Estatal</code>) y adjunta el oficio macro de trámite enviado a SEFIPLAN (ej. <code>Of. DGA/0367/2026</code>) como respaldo digital del expediente.</li>
+      <li><strong>Nivel 2: Captura Sustantiva de la Orden de Ministración (Paso 1 — Devengo Subyacente):</strong> Se capturan los datos de la <strong>Solicitud / Orden de Recursos</strong>: clave de orden (ej. <code>01-06-2026</code>), número de trámite SEFIPLAN (ej. <code>2026-011</code>), concepto (ej. <em>1a. Ministración de Junio · Nómina</em>), instrucción de abono bancario (<code>BBVA Bancomer Cta. 0126144101</code>), y el desglose de partidas por clave presupuestal y órgano beneficiario (Tribunal Superior de Justicia, Tribunal de Conciliación, Tribunal de Disciplina y OAJ). En segundo plano, el motor <code>03.1.2</code> genera la cuenta por cobrar a SEFIPLAN (Matriz B.1).</li>
+      <li><strong>Nivel 3: Conciliación Bancaria y Recaudación (Paso 2 — Recaudado Subyacente):</strong> Al recibirse los fondos en el extracto bancario de BBVA Net Cash (<code>0126144101</code>), el analista asocia la referencia bancaria del depósito (ej. <code>REFBNTC00316148</code> por $21,157,862.50), extinguiendo el saldo pendiente y detonando la recaudación patrimonial y presupuestal sin captura contable manual.</li>
     </ol>
   </div>
 
@@ -130,18 +130,18 @@
       <tbody>
         <tr>
           <td><strong>Analista de Ingresos (Tesorería)</strong></td>
-          <td>Captura de expectativas de cobro y registro de ingresos directos.</td>
-          <td>Iniciar Wizard, seleccionar subtipo, capturar líneas de distribución, previsualizar pre-póliza y guardar borrador o formalizar.</td>
+          <td>Captura de órdenes de ministración y registro de expectativas de cobro.</td>
+          <td>Iniciar Wizard, adjuntar oficio soporte, capturar orden de pago con desglose de beneficiarios y guardar borrador o formalizar.</td>
         </tr>
         <tr>
           <td><strong>Operador Bancario / Cajero</strong></td>
-          <td>Identificación de depósitos bancarios y aplicación de cobros.</td>
-          <td>Asociar transferencias SPEI o fichas de depósito a ingresos devengados pendientes de cobro (parcialidades).</td>
+          <td>Identificación de depósitos bancarios y conciliación de extractos.</td>
+          <td>Cotejar depósitos en BBVA Net Cash (0126144101) y asociar transferencias a órdenes devengadas para liquidar saldos.</td>
         </tr>
         <tr>
           <td><strong>Jefe del Departamento de Ingresos</strong></td>
           <td>Supervisión, cuadre presupuestal y autorizaciones extraordinarias.</td>
-          <td>Autorizar cancelaciones o ajustes con motivo <code>04.1.2</code> y validar cuadre presupuestal de ministraciones.</td>
+          <td>Validar cuadre de órdenes respecto a los techos institucionales y autorizar transiciones de workflow.</td>
         </tr>
         <tr>
           <td><strong>Contabilidad Gubernamental</strong></td>
@@ -154,25 +154,47 @@
 
   <!-- 4. FLUJO DE TRABAJO DEL ASISTENTE Y REGISTRO -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">4</span> Flujo Operativo Integral (Wizard Modal, Registro Sustantivo y Contabilidad Subyacente)</div>
+    <div class="section-title"><span class="section-num">4</span> Flujo Operativo Integral (Evidencia, Captura de Orden y Conciliación Bancaria)</div>
     
     <div style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:6px; padding:16px; margin-bottom:16px;">
-      <h4 style="margin:0 0 8px; color:var(--pjev-verde-oscuro); font-size:12px;">Paso a Paso Operativo del Área de Ingresos</h4>
+      <h4 style="margin:0 0 8px; color:var(--pjev-verde-oscuro); font-size:12px;">Paso a Paso Operativo con Documentación Oficial PJEV</h4>
       <ol style="font-size:13px; line-height:1.7; margin:0; padding-left:20px; color:#1e293b;">
-        <li><strong>Paso 0 — Modal Asistente de Clasificación:</strong> El usuario presiona <code>[+ Nuevo Ingreso]</code> en la bandeja principal. Se despliega el <strong>Wizard Modal</strong> con las 4 familias y tarjetas descriptivas de los 12 subtipos de trámite. El usuario elige la tarjeta que ampara el documento origen (ej. <em>Ministración Ordinaria Estatal</em>, <em>Rendimientos</em> o <em>Reintegro</em>).</li>
-        <li><strong>Paso 1 — Captura Administrativa y Oficio Sustantivo:</strong> La pantalla se adapta al trámite seleccionado para capturar <strong>únicamente la información obligatoria de ingresos</strong>:
+        <li><strong>Paso 0 — Asistente de Clasificación (Wizard Modal):</strong> El analista pulsa <code>[+ Nuevo Ingreso]</code>. Elige la macro-familia <em>1. Ministraciones de Gobierno</em> y el procedimiento <code>MIN_ESTATAL_ORD · Ministración Ordinaria Estatal</code>.</li>
+        <li><strong>Evidencia Documental de Origen (Oficio SEFIPLAN):</strong> El sistema solicita el documento macro de solicitud firmado por la Dirección General de Administración (ej. <code>Of. DGA/0367/2026</code> del 28 de mayo de 2026, amparando $192,785,075.00 con sello de Oficialía de Partes de SEFIPLAN). Este documento se carga como archivo digital probatorio en PDF.</li>
+        <li><strong>Paso 1 — Captura Administrativa de la Orden de Ministración:</strong>
+          Se captura la orden operativa específica contenida en el oficio (ej. Formato <em>Solicitud / Comprobación de Recursos</em>, Clave <code>01-06-2026</code>, Trámite SEFIPLAN <code>2026-011</code>):
           <ul style="margin-top:4px;">
-            <li><em>Para Ministraciones:</em> Número de oficio de solicitud o notificación de SEFIPLAN (ej. <code>OFI-SEFIPLAN-2026-089</code>), fecha notificada, fecha esperada de cobro, depositante y desglose presupuestario en Capítulos 1000 a 5000 y Fuentes de financiamiento (apertura de techo presupuestal).</li>
-            <li><em>Para Rendimientos Bancarios:</em> Cuenta productiva, fecha de corte del estado de cuenta e importe bruto ganado.</li>
-            <li><em>Para Reintegros:</em> Oficio de comisión o referencia de origen, servidor público y ficha de depósito.</li>
+            <li><strong>Denominación y Concepto:</strong> <em>1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE NÓMINA</em>.</li>
+            <li><strong>Instrucción de Abono Bancario:</strong> Cuenta <code>0126144101</code> en BBVA Bancomer (Alias: <em>MINISTRACION 2026</em>).</li>
+            <li><strong>RFC del Ente Solicitante:</strong> <code>PJE970419FZ2</code> (Poder Judicial del Estado de Veracruz).</li>
+            <li><strong>Importe Total de la Orden:</strong> <code>$ 51,958,628.00 MXN</code>.</li>
+            <li><strong>Desglose Presupuestal por Órgano Judicial Beneficiario:</strong>
+              <ul>
+                <li>Partida 1: Clave <code>413002...</code> / Ref. <code>1 NOM-1</code> → <strong>Tribunal Superior de Justicia</strong>: $10,458,826.50</li>
+                <li>Partida 2: Clave <code>413002...</code> / Ref. <code>1 NOM-2</code> → <strong>Tribunal de Conciliación y Arbitraje</strong>: $2,472,084.50</li>
+                <li>Partida 3: Clave <code>413002...</code> / Ref. <code>1 NOM-7</code> → <strong>Tribunal de Disciplina Judicial</strong>: $1,588,324.00</li>
+                <li>Partida 4: Clave <code>413002...</code> / Ref. <code>1 NOM-8</code> → <strong>Órgano de Administración Judicial</strong>: $37,439,393.00</li>
+              </ul>
+              <em>Suma distribuida:</em> <strong>$ 51,958,628.00 MXN</strong> (Cuadre 100% exacto).
+            </li>
           </ul>
         </li>
-        <li><strong>Afectación Contable Subyacente (En Segundo Plano):</strong> El capturista de ingresos <strong>no manipula pólizas ni cuentas contables</strong>. El motor de Contabilidad (<code>03.1.2</code>) evalúa en segundo plano la Matriz CONAC aplicable (Matriz B.1 Devengado para ministraciones: Cuentas por Cobrar vs Transferencias y Ley Devengada). Para perfiles auditores existe una consulta colapsable <code>[👁️ Ver Póliza Subyacente]</code>, pero no interfiere en la captura diaria.</li>
-        <li><strong>Guardado en Borrador:</strong> El analista puede guardar en cualquier momento mediante <code>[💾 Guardar Borrador]</code> (<code>estatus = 'BORRADOR'</code>), permitiendo pausar la captura sin generar folios ni asientos contables en firme.</li>
-        <li><strong>Transiciones de Workflow y Diálogo de Mensajes (<code>IngresoWorkflowModal</code>):</strong> Al ejecutar acciones de control (<code>ENVIAR_REVISION</code>, <code>REGRESAR_OBSERVADO</code>, <code>CANCELAR</code> o <code>FORMALIZAR</code>), el sistema abre el diálogo modal solicitando fecha de envío y campo obligatorio de <strong>Observaciones / Justificación de la acción</strong> (mínimo 5 caracteres).</li>
-        <li><strong>Tablero Embebido de Mensajes (<code>IngresoHistorialTimeline</code>):</strong> Al pie del formulario se mantiene vivo el hilo de comentarios y revisiones entre capturista y revisor (ej. requerimiento de anexos de Recursos Materiales o aclaraciones de oficios).</li>
-        <li><strong>Formalización del Devengo:</strong> Al autorizarse, el sistema asigna el folio oficial inmutable (ej. <code>ING-2026-0045</code>), coloca el estatus en <code>DEVENGADO</code> y sienta en segundo plano la póliza contable definitiva de derecho de cobro.</li>
-        <li><strong>Paso 2 — Conciliación Bancaria y Recaudación Posterior:</strong> Cuando el dinero ingresa efectivamente a la cuenta bancaria institucional (Santander/BBVA), el usuario asocia el depósito (extracto, clave SPEI e importe). El saldo pendiente se liquida y el sistema dispara de forma <strong>subyacente</strong> la Matriz B.2 (Recaudado: Bancos vs Cuentas por Cobrar y Ley Recaudada).</li>
+        <li><strong>Afectación Contable Subyacente en el Devengo:</strong> Al guardar y formalizar la orden con estatus <code>DEVENGADO</code>, el motor de Contabilidad (<code>03.1.2</code>) resuelve en segundo plano la Matriz CONAC B.1:
+          <ul style="margin-top:4px;">
+            <li><em>Patrimonial:</em> Cargo a <code>1.1.2.2.0001 Cuentas por Cobrar SEFIPLAN</code> vs Abono a <code>4.1.5.1.0001 Transferencias y Subsidios del Ejecutivo</code> por $51,958,628.00.</li>
+            <li><em>Presupuestal:</em> Cargo a <code>8.1.2 Ley de Ingresos por Ejecutar</code> vs Abono a <code>8.1.4 Ley de Ingresos Devengada</code> por $51,958,628.00.</li>
+          </ul>
+        </li>
+        <li><strong>Tablero de Mensajes de Workflow (<code>IngresoHistorialTimeline</code>):</strong> Las revisiones y justificaciones entre el capturista (L.C. Aldo Rafael Domínguez) y los autorizadores (L.C. Gloria García Sánchez, Mtra. Yuriana Martínez Olvera, L.C. Julio César Villalba Gómez) se registran de forma inmutable.</li>
+        <li><strong>Paso 2 — Conciliación Bancaria con BBVA Net Cash y Recaudación:</strong>
+          Al transferir SEFIPLAN los fondos a la cuenta <code>0126144101</code>:
+          <ul style="margin-top:4px;">
+            <li>El operador consulta los movimientos del día en <strong>BBVA Net Cash</strong> (ej. Depósito de tercero <code>REFBNTC00316148</code> de fecha <code>09/06/2026</code> por <code>$ 21,157,862.50 MXN</code> para Gastos de Operación).</li>
+            <li>Vincula el depósito bancario con la orden devengada correspondiente.</li>
+            <li>El saldo por cobrar se liquida automáticamente ($0.00) y el estatus transita a <code>RECAUDADO</code>.</li>
+            <li>De forma <strong>subyacente</strong>, se dispara la Matriz CONAC B.2: Cargo a <code>1.1.1.2 BBVA Bancomer 0126144101</code> vs Abono a <code>1.1.2.2 Cuentas por Cobrar SEFIPLAN</code>, y afectación de <code>8.1.4 Devengada</code> a <code>8.1.5 Ley Recaudada</code>.</li>
+          </ul>
+        </li>
       </ol>
     </div>
   </div>
@@ -183,38 +205,42 @@
 
     <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.1 Encabezado del Ingreso (<code>ingresos.ingresos_encabezado</code>)</h3>
     <table class="props-table" style="margin-bottom: 20px;">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Validación</th></tr></thead>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Mapeo con Formato Oficial</th></tr></thead>
       <tbody>
-        <tr><td><code>ingreso_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí</td><td>Identificador único del registro de ingreso.</td></tr>
+        <tr><td><code>ingreso_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí</td><td>Identificador único interno del registro de ingreso en el SIAF-PJEV.</td></tr>
         <tr><td><code>folio_interno</code></td><td><code>VARCHAR(25)</code></td><td>Sí (Sistema)</td><td>Folio correlativo institucional (ej. <code>ING-2026-0045</code>). Null en borrador inicial.</td></tr>
-        <tr><td><code>subtipo_tramite_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al catálogo <code>04.1.1</code> (determina reglas y matriz contable).</td></tr>
+        <tr><td><code>subtipo_tramite_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al catálogo <code>04.1.1</code> (ej. <code>MIN_ESTATAL_ORD</code>, determina la Matriz CONAC).</td></tr>
+        <tr><td><code>clave_orden</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Clave identificadora de la orden de pago asentada en el formato (ej. <code>01-06-2026</code>).</td></tr>
+        <tr><td><code>tramite_sefiplan</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Número de trámite oficial asignado por SEFIPLAN (ej. <code>2026-011</code> para 1a Ministración).</td></tr>
+        <tr><td><code>oficio_soporte</code></td><td><code>VARCHAR(80)</code></td><td>Sí</td><td>Número de oficio institucional enviado a SEFIPLAN que sirve de <strong>evidencia digital</strong> (ej. <code>Of. DGA/0367/2026</code>).</td></tr>
+        <tr><td><code>archivo_evidencia_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al repositorio documental del PDF digitalizado con acuse de recibo de SEFIPLAN.</td></tr>
         <tr><td><code>ejercicio_fiscal</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Año presupuestal activo (ej. <code>2026</code>).</td></tr>
-        <tr><td><code>periodo</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Mes presupuestal de afectación (1 a 12).</td></tr>
-        <tr><td><code>fecha_registro</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha natural de captura del registro.</td></tr>
-        <tr><td><code>fecha_esperada</code></td><td><code>DATE</code></td><td>Condicionado</td><td>Fecha estimada de ingreso al banco (obligatorio en ministraciones).</td></tr>
-        <tr><td><code>fecha_operacion_bancaria</code></td><td><code>DATE</code></td><td>Condicionado</td><td>Fecha efectiva informada en el extracto bancario (en ingresos directos/cobros).</td></tr>
-        <tr><td><code>referencia_externa</code></td><td><code>VARCHAR(100)</code></td><td>No</td><td>Texto simple para oficio de SEFIPLAN, contrato o solicitud de reintegro.</td></tr>
-        <tr><td><code>referencia_bancaria</code></td><td><code>VARCHAR(80)</code></td><td>No</td><td>Clave de rastreo SPEI, número de autorización o folio de transacción bancaria.</td></tr>
-        <tr><td><code>origen_depositante</code></td><td><code>VARCHAR(200)</code></td><td>Sí</td><td>Nombre del ente pagador (SEFIPLAN, Banco Santander, Servidor Público).</td></tr>
-        <tr><td><code>importe_total</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Importe total del trámite (debe ser mayor a $0.00).</td></tr>
-        <tr><td><code>saldo_pendiente</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto pendiente por recaudar (disminuye con cada depósito bancario asociado).</td></tr>
-        <tr><td><code>cuenta_bancaria_id</code></td><td><code>BIGINT (FK)</code></td><td>Condicionado</td><td>Cuenta receptora en <code>01.4.2</code> (obligatorio en directos; opcional al devengar ministración).</td></tr>
-        <tr><td><code>observaciones</code></td><td><code>TEXT</code></td><td>No</td><td>Justificación administrativa de la operación.</td></tr>
-        <tr><td><code>estatus</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>DEVENGADO</code> | <code>PARCIALMENTE_RECIBIDO</code> | <code>RECAUDADO</code> | <code>APLICADO</code> | <code>CANCELADO</code>.</td></tr>
+        <tr><td><code>periodo</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Mes presupuestal de afectación (1 a 12, ej. <code>6</code> para Junio).</td></tr>
+        <tr><td><code>fecha_elaboracion</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha de emisión de la orden de pago (ej. <code>28/05/2026</code>).</td></tr>
+        <tr><td><code>fecha_esperada</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha límite requerida para el depósito bancario (ej. <code>05/06/2026</code> según oficio).</td></tr>
+        <tr><td><code>tipo_solicitud</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Modalidad oficial: <code>SUJETO_A_COMPROBAR</code> | <code>PAGO_DIRECTO</code> | <code>FONDO_REVOLVENTE</code>.</td></tr>
+        <tr><td><code>denominacion_concepto</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Descripción formal del trámite (ej. <em>1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE NÓMINA</em>).</td></tr>
+        <tr><td><code>rfc_ente</code></td><td><code>VARCHAR(13)</code></td><td>Sí</td><td>Registro Federal de Contribuyentes institucional (<code>PJE970419FZ2</code> - Poder Judicial).</td></tr>
+        <tr><td><code>instruccion_abono_cuenta</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Cuenta bancaria estipulada para recibir el abono (<code>0126144101</code> BBVA "MINISTRACION 2026").</td></tr>
+        <tr><td><code>origen_depositante</code></td><td><code>VARCHAR(200)</code></td><td>Sí</td><td>Ente pagador responsable (<code>Secretaría de Finanzas y Planeación - SEFIPLAN</code>).</td></tr>
+        <tr><td><code>importe_total</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Importe total de la orden a recibir (ej. <code>$ 51,958,628.00</code> para nómina).</td></tr>
+        <tr><td><code>saldo_pendiente</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto pendiente por recaudar. Se extingue al conciliar con extracto bancario.</td></tr>
+        <tr><td><code>estatus</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>ENVIADO</code> | <code>OBSERVADO</code> | <code>DEVENGADO</code> | <code>PARCIAL</code> | <code>RECAUDADO</code> | <code>CANCELADO</code>.</td></tr>
       </tbody>
     </table>
 
     <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.2 Distribución Presupuestaria Multilínea (<code>ingresos.ingresos_distribucion</code>)</h3>
     <table class="props-table" style="margin-bottom: 20px;">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Mapeo Normativo</th></tr></thead>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Mapeo con Orden Oficial</th></tr></thead>
       <tbody>
         <tr><td><code>distribucion_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí</td><td>Identificador único del renglón presupuestal.</td></tr>
-        <tr><td><code>ingreso_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al encabezado padre.</td></tr>
-        <tr><td><code>capitulo_gasto</code></td><td><code>INTEGER</code></td><td>Condicionado</td><td>Capítulo destino del techo presupuestal (1000, 2000, 3000, 5000).</td></tr>
-        <tr><td><code>fuente_financiamiento_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Fuente oficial de financiamiento (<code>01.2.4</code>, ej. 111 Fiscales, 113 Propios).</td></tr>
-        <tr><td><code>fondo_especifico_id</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>Fondo específico vinculado a la fuente cuando aplique.</td></tr>
-        <tr><td><code>unidad_administrativa_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Unidad o Dirección receptora del techo presupuestal (<code>01.2.1</code>).</td></tr>
-        <tr><td><code>importe_distribuido</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Fracción del importe asignada a esta línea. Debe cuadrar con <code>importe_total</code>.</td></tr>
+        <tr><td><code>ingreso_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia a la orden de ingreso padre en <code>ingresos_encabezado</code>.</td></tr>
+        <tr><td><code>clave_presupuestal</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Estructura programática completa de gasto (ej. <code>413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184001</code>).</td></tr>
+        <tr><td><code>referencia_interna</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td>Clave nemotécnica interna manuscrita en formato (ej. <code>1 NOM-1</code>, <code>1 NOM-2</code>, <code>1 NOM-7</code>, <code>1 NOM-8</code>).</td></tr>
+        <tr><td><code>organo_beneficiario</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Órgano o tribunal destinatario del techo (Tribunal Superior de Justicia, Tribunal de Conciliación, etc.).</td></tr>
+        <tr><td><code>capitulo_gasto</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Capítulo de gasto (<code>1000 Servicios Personales</code> en nómina; <code>2000</code>/<code>3000</code> en operación).</td></tr>
+        <tr><td><code>fuente_financiamiento_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Fuente oficial de financiamiento (ej. <code>1114 / 111 Recursos Fiscales</code>).</td></tr>
+        <tr><td><code>importe_distribuido</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto asignado al órgano beneficiario. La suma de partidas debe igualar exactamente a <code>importe_total</code>.</td></tr>
       </tbody>
     </table>
 
@@ -272,9 +298,17 @@ BEGIN
             'clave_subtipo', st.clave_subtipo,
             'nombre_subtipo', st.nombre_subtipo,
             'tipo_principal', st.tipo_principal,
+            'clave_orden', i.clave_orden,
+            'tramite_sefiplan', i.tramite_sefiplan,
+            'oficio_soporte', i.oficio_soporte,
+            'archivo_evidencia_id', i.archivo_evidencia_id,
+            'tipo_solicitud', i.tipo_solicitud,
+            'denominacion_concepto', i.denominacion_concepto,
+            'rfc_ente', i.rfc_ente,
+            'instruccion_abono_cuenta', i.instruccion_abono_cuenta,
             'ejercicio_fiscal', i.ejercicio_fiscal,
             'periodo', i.periodo,
-            'fecha_registro', i.fecha_registro,
+            'fecha_elaboracion', i.fecha_elaboracion,
             'fecha_esperada', i.fecha_esperada,
             'fecha_operacion_bancaria', i.fecha_operacion_bancaria,
             'referencia_externa', i.referencia_externa,
@@ -290,6 +324,9 @@ BEGIN
                 SELECT jsonb_agg(
                     jsonb_build_object(
                         'distribucion_id', id.distribucion_id,
+                        'clave_presupuestal', id.clave_presupuestal,
+                        'referencia_interna', id.referencia_interna,
+                        'organo_beneficiario', id.organo_beneficiario,
                         'capitulo_gasto', id.capitulo_gasto,
                         'fuente_financiamiento_id', id.fuente_financiamiento_id,
                         'unidad_administrativa_id', id.unidad_administrativa_id,
@@ -323,6 +360,9 @@ BEGIN
       AND (p_buscar IS NULL OR (
           i.folio_interno ILIKE '%' || p_buscar || '%' OR
           i.origen_depositante ILIKE '%' || p_buscar || '%' OR
+          i.clave_orden ILIKE '%' || p_buscar || '%' OR
+          i.tramite_sefiplan ILIKE '%' || p_buscar || '%' OR
+          i.oficio_soporte ILIKE '%' || p_buscar || '%' OR
           i.referencia_externa ILIKE '%' || p_buscar || '%'
       ))
       AND i.estatus != 'CANCELADO'
@@ -365,20 +405,30 @@ BEGIN
         FROM ingresos.cat_subtipos_tramite_ingreso 
         WHERE subtipo_tramite_id = (p_payload->>'subtipo_tramite_id')::BIGINT;
 
-        -- 2. Insertar encabezado en BORRADOR
+        -- 2. Insertar encabezado en BORRADOR (Orden de Solicitud de Recursos)
         INSERT INTO ingresos.ingresos_encabezado (
-            subtipo_tramite_id, ejercicio_fiscal, periodo, fecha_registro,
-            fecha_esperada, fecha_operacion_bancaria, referencia_externa,
-            referencia_bancaria, origen_depositante, importe_total,
-            saldo_pendiente, cuenta_bancaria_id, observaciones, estatus,
-            usuario_c, fecha_c
+            subtipo_tramite_id, clave_orden, tramite_sefiplan, oficio_soporte,
+            archivo_evidencia_id, ejercicio_fiscal, periodo, fecha_elaboracion,
+            fecha_esperada, fecha_operacion_bancaria, tipo_solicitud,
+            denominacion_concepto, rfc_ente, instruccion_abono_cuenta,
+            referencia_externa, referencia_bancaria, origen_depositante,
+            importe_total, saldo_pendiente, cuenta_bancaria_id, observaciones,
+            estatus, usuario_c, fecha_c
         ) VALUES (
             v_subtipo.subtipo_tramite_id,
+            p_payload->>'clave_orden',
+            p_payload->>'tramite_sefiplan',
+            p_payload->>'oficio_soporte',
+            (p_payload->>'archivo_evidencia_id')::BIGINT,
             (p_payload->>'ejercicio_fiscal')::INTEGER,
             (p_payload->>'periodo')::SMALLINT,
-            CURRENT_DATE,
+            COALESCE((p_payload->>'fecha_elaboracion')::DATE, CURRENT_DATE),
             (p_payload->>'fecha_esperada')::DATE,
             (p_payload->>'fecha_operacion_bancaria')::DATE,
+            COALESCE(p_payload->>'tipo_solicitud', 'SUJETO_A_COMPROBAR'),
+            p_payload->>'denominacion_concepto',
+            COALESCE(p_payload->>'rfc_ente', 'PJE970419FZ2'),
+            p_payload->>'instruccion_abono_cuenta',
             p_payload->>'referencia_externa',
             p_payload->>'referencia_bancaria',
             p_payload->>'origen_depositante',
@@ -390,7 +440,25 @@ BEGIN
             p_usuario, CURRENT_TIMESTAMP
         ) RETURNING ingreso_id INTO v_id;
 
-        -- 3. Evaluar y persistir Pre-póliza en borrador con base en Matriz Oficial (03.1.2)
+        -- 3. Insertar partidas presupuestales por órgano judicial beneficiario
+        IF p_payload ? 'distribucion' AND jsonb_typeof(p_payload->'distribucion') = 'array' THEN
+            INSERT INTO ingresos.ingresos_distribucion (
+                ingreso_id, clave_presupuestal, referencia_interna, organo_beneficiario,
+                capitulo_gasto, fuente_financiamiento_id, unidad_administrativa_id, importe_distribuido
+            )
+            SELECT 
+                v_id,
+                x->>'clave_presupuestal',
+                x->>'referencia_interna',
+                x->>'organo_beneficiario',
+                COALESCE((x->>'capitulo_gasto')::INTEGER, 1000),
+                (x->>'fuente_financiamiento_id')::BIGINT,
+                (x->>'unidad_administrativa_id')::BIGINT,
+                (x->>'importe_distribuido')::DECIMAL(18,2)
+            FROM jsonb_array_elements(p_payload->'distribucion') AS x;
+        END IF;
+
+        -- 4. Evaluar y persistir Pre-póliza en borrador con base en Matriz Oficial (03.1.2)
         v_prepoliza := ingresos.fn_calcular_prepoliza_ingreso(
             p_usuario,
             v_subtipo.subtipo_tramite_id,
@@ -718,6 +786,24 @@ export class IngresosController {
           Para satisfacer las revisiones del Órgano de Fiscalización Superior (ORFIS) y la Contraloría Interna, el sistema registra dos marcas temporales: la fecha administrativa asentada por el usuario (<code>fecha_envio</code>) y el sello de tiempo inviolable de base de datos (<code>fecha_accion = clock_timestamp()</code>).
         </p>
       </div>
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-06 · El Oficio Macro como Soporte Digital Probatorio (PDF) y no Entidad Contable</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          El oficio macro remitido a SEFIPLAN (ej. <code>Of. DGA/0367/2026</code> por $192,785,075.00) ampara el paquete consolidado mensual. En el sistema SIAF-PJEV <strong>no se capturan asientos contables ni pólizas de este oficio</strong>; funge exclusivamente como evidencia probatoria digital (archivo PDF con acuse) adjunta al expediente electrónico de los trámites que ampara.
+        </p>
+      </div>
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-07 · Captura Transaccional por Solicitud / Orden de Recursos con Órganos Jurisdiccionales</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Lo que se captura formalmente en el sistema es la <strong>Orden de Pago / Solicitud de Recursos individual</strong> (ej. clave <code>01-06-2026</code> por $51,958,628.00 para Nómina o <code>02-06-2026</code> por $21,157,862.50 para Gastos de Operación). El formulario exige el desglose estricto por <strong>Órgano Judicial Beneficiario</strong> (Tribunal Superior de Justicia, Tribunal de Conciliación y Arbitraje, Tribunal de Disciplina Judicial y Órgano de Administración Judicial), cuya sumatoria de techos debe cuadrar al centavo (<code>Σ importe_distribuido = importe_total</code>) para habilitar su formalización y devengo subyacente.
+        </p>
+      </div>
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-ING-08 · Recaudación Subyacente al Conciliar Extracto Bancario BBVA Net Cash</strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          La afectación de recaudación (Matriz CONAC 03.1.2 B.2) es 100% invisible y no requiere captura contable manual. Al verificar y conciliar el abono en el extracto en línea de BBVA Net Cash (cuenta <code>0126144101</code> "MINISTRACION 2026", depósito de tercero con referencia <code>REFBNTC00316148</code> por $21,157,862.50), el sistema extingue de forma automática la cuenta por cobrar (1.1.2.2 a 1.1.1.2) y transita la Ley de Ingresos Devengada a Recaudada (8.1.4 a 8.1.5).
+        </p>
+      </div>
     </div>
   </div>
 
@@ -753,66 +839,67 @@ export class IngresosController {
 
             <!-- Table Header -->
             <rect x="15" y="75" width="930" height="26" fill="#183125"/>
-            <text x="25" y="92" font-size="9" font-weight="bold" fill="#ffffff">FOLIO</text>
-            <text x="130" y="92" font-size="9" font-weight="bold" fill="#ffffff">TRÁMITE / PROCEDIMIENTO</text>
-            <text x="310" y="92" font-size="9" font-weight="bold" fill="#ffffff">ORIGEN / DEPOSITANTE</text>
-            <text x="490" y="92" font-size="9" font-weight="bold" fill="#ffffff">FECHA</text>
-            <text x="630" y="92" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">TOTAL ($)</text>
-            <text x="750" y="92" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">PENDIENTE ($)</text>
+            <text x="25" y="92" font-size="9" font-weight="bold" fill="#ffffff">CLAVE / FOLIO</text>
+            <text x="140" y="92" font-size="9" font-weight="bold" fill="#ffffff">TRÁMITE / PROCEDIMIENTO SEFIPLAN</text>
+            <text x="360" y="92" font-size="9" font-weight="bold" fill="#ffffff">ORIGEN / EVIDENCIA ADJUNTA</text>
+            <text x="515" y="92" font-size="9" font-weight="bold" fill="#ffffff">FECHA</text>
+            <text x="640" y="92" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">TOTAL ($)</text>
+            <text x="755" y="92" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">PENDIENTE ($)</text>
             <text x="830" y="92" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="center">ESTATUS</text>
             <text x="895" y="92" font-size="9" font-weight="bold" fill="#ffffff">ACCIONES</text>
 
-            <!-- Row 1: Borrador -->
+            <!-- Row 1: Orden 01-06-2026 Devengada (Nómina 1a Qna) -->
             <rect x="15" y="103" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
-            <text x="25" y="124" font-size="10" font-family="monospace" fill="#64748b">[BORRADOR]</text>
-            <text x="130" y="124" font-size="10" font-weight="bold" fill="#1e293b">Ministración Ordinaria</text>
-            <text x="310" y="124" font-size="10" fill="#475569">SEFIPLAN (OFI-SEF-2026-089)</text>
-            <text x="490" y="124" font-size="10" fill="#64748b">07/03/2026</text>
-            <text x="630" y="124" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">45,000,000.00</text>
-            <text x="750" y="124" font-size="10" fill="#64748b" text-anchor="end">45,000,000.00</text>
-            <rect x="795" y="111" width="70" height="18" fill="#fef3c7" rx="9"/>
-            <text x="830" y="124" font-size="8" font-weight="bold" fill="#92400e" text-anchor="middle">BORRADOR</text>
-            <text x="895" y="124" font-size="11" fill="#0284c7" cursor="pointer">✏️ 👁 💬</text>
+            <text x="25" y="124" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">01-06-2026</text>
+            <text x="140" y="124" font-size="10" font-weight="bold" fill="#1e293b">1a. Min. Junio · Nómina (Trámite 2026-011)</text>
+            <text x="360" y="124" font-size="9.5" fill="#475569">SEFIPLAN (📎 Of. DGA/0367/2026)</text>
+            <text x="515" y="124" font-size="10" fill="#64748b">28/05/2026</text>
+            <text x="640" y="124" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">51,958,628.00</text>
+            <text x="755" y="124" font-size="10" font-weight="bold" fill="#0284c7" text-anchor="end">51,958,628.00</text>
+            <rect x="795" y="111" width="70" height="18" fill="#e0f2fe" rx="9"/>
+            <text x="830" y="124" font-size="8" font-weight="bold" fill="#0369a1" text-anchor="middle">DEVENGADO</text>
+            <text x="895" y="124" font-size="11" fill="#0284c7" cursor="pointer">👁 📜 💬</text>
 
-            <!-- Row 2: Devengado con Parcial -->
+            <!-- Row 2: Orden 02-06-2026 Recaudada y Conciliada (Gastos de Operación) -->
             <rect x="15" y="139" width="930" height="34" fill="#f8fafc" stroke="#f1f5f9"/>
-            <text x="25" y="160" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">ING-2026-0044</text>
-            <text x="130" y="160" font-size="10" font-weight="bold" fill="#1e293b">Ministración Ordinaria</text>
-            <text x="310" y="160" font-size="10" fill="#475569">SEFIPLAN (OFI-SEF-2026-062)</text>
-            <text x="490" y="160" font-size="10" fill="#64748b">28/02/2026</text>
-            <text x="630" y="160" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">45,000,000.00</text>
-            <text x="750" y="160" font-size="10" font-weight="bold" fill="#9a3412" text-anchor="end">15,000,000.00</text>
-            <rect x="795" y="147" width="70" height="18" fill="#fed7aa" rx="9"/>
-            <text x="830" y="160" font-size="8" font-weight="bold" fill="#9a3412" text-anchor="middle">PARCIAL</text>
+            <text x="25" y="160" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">02-06-2026</text>
+            <text x="140" y="160" font-size="10" font-weight="bold" fill="#1e293b">1a. Min. Junio · Operación (Trámite 2026-011)</text>
+            <text x="360" y="160" font-size="9.5" fill="#475569">SEFIPLAN (📎 Of. DGA/0367/2026)</text>
+            <text x="515" y="160" font-size="10" fill="#64748b">28/05/2026</text>
+            <text x="640" y="160" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">21,157,862.50</text>
+            <text x="755" y="160" font-size="10" font-weight="bold" fill="#15803d" text-anchor="end">0.00</text>
+            <rect x="795" y="147" width="70" height="18" fill="#dcfce7" rx="9"/>
+            <text x="830" y="160" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">RECAUDADO</text>
             <text x="895" y="160" font-size="11" fill="#0284c7" cursor="pointer">👁 🏦 💬</text>
 
-            <!-- Row 3: Recaudado Total -->
+            <!-- Row 3: Orden 03-06-2026 Devengada (2a Qna Junio) -->
             <rect x="15" y="175" width="930" height="34" fill="#ffffff" stroke="#f1f5f9"/>
-            <text x="25" y="196" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">ING-2026-0043</text>
-            <text x="130" y="196" font-size="10" font-weight="bold" fill="#1e293b">Rendimientos Bancarios</text>
-            <text x="310" y="196" font-size="10" fill="#475569">Banco Santander (*4012)</text>
-            <text x="490" y="196" font-size="10" fill="#64748b">28/02/2026</text>
-            <text x="630" y="196" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">128,450.32</text>
-            <text x="750" y="196" font-size="10" fill="#15803d" text-anchor="end">0.00</text>
-            <rect x="795" y="183" width="70" height="18" fill="#dcfce7" rx="9"/>
-            <text x="830" y="196" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">RECAUDADO</text>
+            <text x="25" y="196" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">03-06-2026</text>
+            <text x="140" y="196" font-size="10" font-weight="bold" fill="#1e293b">2a. Min. Junio · Nómina (Trámite 2026-012)</text>
+            <text x="360" y="196" font-size="9.5" fill="#475569">SEFIPLAN (📎 Of. DGA/0367/2026)</text>
+            <text x="515" y="196" font-size="10" fill="#64748b">28/05/2026</text>
+            <text x="640" y="196" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">119,668,584.50</text>
+            <text x="755" y="196" font-size="10" font-weight="bold" fill="#0284c7" text-anchor="end">119,668,584.50</text>
+            <rect x="795" y="183" width="70" height="18" fill="#e0f2fe" rx="9"/>
+            <text x="830" y="196" font-size="8" font-weight="bold" fill="#0369a1" text-anchor="middle">DEVENGADO</text>
             <text x="895" y="196" font-size="11" fill="#0284c7" cursor="pointer">👁 📜 💬</text>
 
-            <!-- Row 4: Reintegro de Viáticos -->
+            <!-- Row 4: Reintegro de Viáticos CxP -->
             <rect x="15" y="211" width="930" height="34" fill="#f8fafc" stroke="#f1f5f9"/>
-            <text x="25" y="232" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">ING-2026-0042</text>
-            <text x="130" y="232" font-size="10" font-weight="bold" fill="#1e293b">Reintegro de Viáticos</text>
-            <text x="310" y="232" font-size="10" fill="#475569">Lic. Carlos Herrera (Comisión 114)</text>
-            <text x="490" y="232" font-size="10" fill="#64748b">25/02/2026</text>
-            <text x="630" y="232" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">1,850.00</text>
-            <text x="750" y="232" font-size="10" fill="#15803d" text-anchor="end">0.00</text>
-            <rect x="795" y="219" width="70" height="18" fill="#dcfce7" rx="9"/>
-            <text x="830" y="232" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">RECAUDADO</text>
-            <text x="895" y="232" font-size="11" fill="#0284c7" cursor="pointer">👁 📜 💬</text>
+            <text x="25" y="232" font-size="10" font-family="monospace" fill="#64748b">[BORRADOR]</text>
+            <text x="140" y="232" font-size="10" font-weight="bold" fill="#1e293b">Reintegro Viáticos no ejercidos (CxP 05.2.3)</text>
+            <text x="360" y="232" font-size="9.5" fill="#475569">Lic. Carlos Herrera (Comisión C-114)</text>
+            <text x="515" y="232" font-size="10" fill="#64748b">05/06/2026</text>
+            <text x="640" y="232" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="end">1,850.00</text>
+            <text x="755" y="232" font-size="10" fill="#64748b" text-anchor="end">1,850.00</text>
+            <rect x="795" y="219" width="70" height="18" fill="#fef3c7" rx="9"/>
+            <text x="830" y="232" font-size="8" font-weight="bold" fill="#92400e" text-anchor="middle">BORRADOR</text>
+            <text x="895" y="232" font-size="11" fill="#0284c7" cursor="pointer">✏️ 👁 💬</text>
 
             <!-- Bottom Note -->
-            <rect x="15" y="340" width="930" height="42" fill="#ecfdf5" stroke="#a7f3d0" rx="4"/>
-            <text x="30" y="365" font-size="10" fill="#065f46">💡 Al hacer clic en <tspan font-weight="bold">+ Nuevo Ingreso (Wizard)</tspan>, se despliega el <tspan font-weight="bold">Modal Asistente (Paso 0)</tspan> para clasificar el trámite entre las 4 macro-familias y 12 procedimientos oficiales.</text>
+            <rect x="15" y="335" width="930" height="50" fill="#ecfdf5" stroke="#a7f3d0" rx="4"/>
+            <text x="30" y="356" font-size="9.5" fill="#065f46">💡 <tspan font-weight="bold">Paquete Global vs Órdenes Individuales:</tspan> El oficio macro <tspan font-family="monospace" font-weight="bold">Of. DGA/0367/2026</tspan> ampara el total del mes de junio por $192,785,075.00 ante SEFIPLAN.</text>
+            <text x="30" y="372" font-size="9.5" fill="#065f46">En el sistema <tspan font-weight="bold">no se capturan asientos del oficio</tspan>; cada Solicitud / Orden de Recursos (<tspan font-weight="bold">01-06-2026</tspan>, <tspan font-weight="bold">02-06-2026</tspan>, <tspan font-weight="bold">03-06-2026</tspan>) se captura por separado adjuntando el oficio como respaldo en PDF.</text>
           </svg>
         </div>
       </div>
@@ -833,7 +920,7 @@ export class IngresosController {
             <!-- Modal Header -->
             <rect width="960" height="48" fill="#183125" rx="8 8 0 0"/>
             <text x="25" y="30" font-size="14" font-weight="bold" fill="#ffffff">Clasificación del Trámite de Ingreso</text>
-            <text x="290" y="30" font-size="11" fill="#cbd5e1">— Selecciona la macro-familia y el procedimiento para acceder a la captura sustantiva.</text>
+            <text x="290" y="30" font-size="11" fill="#cbd5e1">— Selecciona la macro-familia y el procedimiento para acceder a la captura de la Orden de Recursos.</text>
             <rect x="915" y="12" width="24" height="24" fill="#2d4a3b" rx="4"/>
             <text x="927" y="28" font-size="12" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
 
@@ -879,11 +966,11 @@ export class IngresosController {
             <rect x="37" y="210" width="38" height="38" fill="#ecfdf5" rx="4"/>
             <text x="56" y="235" font-size="16" text-anchor="middle">📑</text>
             <text x="86" y="222" font-size="11" font-weight="bold" fill="#183125">MIN_ESTATAL_ORD · Ministración Ordinaria Estatal</text>
-            <text x="86" y="238" font-size="9" fill="#64748b">Subsidio mensual calendarizado por SEFIPLAN para gasto corriente institucional.</text>
-            <rect x="86" y="248" width="145" height="18" fill="#e2e8f0" rx="3"/>
-            <text x="158" y="260" font-size="8" font-weight="bold" fill="#334155" text-anchor="middle">Apertura Techos (Cap. 1000 - 5000)</text>
-            <rect x="238" y="248" width="70" height="18" fill="#ecfdf5" rx="3"/>
-            <text x="273" y="260" font-size="8" font-weight="bold" fill="#065f46" text-anchor="middle">CRI 9.1.1.1</text>
+            <text x="86" y="238" font-size="9" fill="#64748b">Subsidio calendarizado SEFIPLAN. Se captura por orden de pago con desglose por órganos.</text>
+            <rect x="86" y="248" width="165" height="18" fill="#e2e8f0" rx="3"/>
+            <text x="168" y="260" font-size="8" font-weight="bold" fill="#334155" text-anchor="middle">Desglose Órganos + Oficio PDF</text>
+            <rect x="258" y="248" width="70" height="18" fill="#ecfdf5" rx="3"/>
+            <text x="293" y="260" font-size="8" font-weight="bold" fill="#065f46" text-anchor="middle">CRI 9.1.1.1</text>
             <rect x="385" y="205" width="75" height="16" fill="#183125" rx="3"/>
             <text x="422" y="216" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Seleccionado</text>
 
@@ -923,159 +1010,217 @@ export class IngresosController {
             <!-- Info Banner -->
             <rect x="25" y="390" width="910" height="60" fill="#f0fdf4" stroke="#a7f3d0" rx="5"/>
             <text x="40" y="413" font-size="10" font-weight="bold" fill="#065f46">💡 Contabilidad Subyacente e Invisible en la Captura:</text>
-            <text x="40" y="430" font-size="9" fill="#166534">Al continuar, el sistema configurará la captura sustantiva del oficio y techos presupuestales. El capturista de Ingresos no elabora pólizas contables;</text>
-            <text x="40" y="443" font-size="9" fill="#166534">la Matriz CONAC (03.1.2 B.1 Devengado) se ejecutará automáticamente en segundo plano al formalizar el documento.</text>
+            <text x="40" y="430" font-size="9" fill="#166534">Al continuar, el sistema configurará la captura sustantiva de la Solicitud / Orden de Recursos con sus partidas y evidencia digital en PDF.</text>
+            <text x="40" y="443" font-size="9" fill="#166534">El analista no elabora pólizas contables; la Matriz CONAC (03.1.2 B.1 Devengado) se ejecutará automáticamente en segundo plano al formalizar.</text>
 
             <!-- Footer Buttons -->
             <rect x="25" y="480" width="120" height="34" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
             <text x="85" y="501" font-size="10" fill="#64748b" text-anchor="middle">Cancelar</text>
 
             <rect x="690" y="480" width="245" height="34" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="812" y="501" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Continuar a Captura de Oficio (Paso 1) ▶</text>
+            <text x="812" y="501" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Continuar a Captura de Orden (Paso 1) ▶</text>
           </svg>
         </div>
       </div>
     </div>
 
-    <!-- WF3: FORMULARIO ADMINISTRATIVO (PASO 1: OFICIO Y TECHO) -->
+    <!-- WF3: FORMULARIO ADMINISTRATIVO (PASO 1: ORDEN DE SOLICITUD DE RECURSOS) -->
     <div id="wf-wf3" class="wf-panel">
       <div class="wf-box">
         <div class="wf-bar">
-          <span class="wf-bar-label">Formulario de Captura Administrativa: Ministración Ordinaria (Paso 1)</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Captura Sustantiva de Ingresos · Contabilidad Subyacente (Matriz 03.1.2 B.1)</span>
+          <span class="wf-bar-label">Formulario de Captura Sustantiva: Solicitud / Comprobación de Recursos (Paso 1)</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Formato Oficial Clave 01-06-2026 · Evidencia PDF Of. DGA/0367/2026 · Contabilidad Subyacente B.1</span>
         </div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 960 670" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="960" height="670" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
-            <rect x="0" y="0" width="960" height="40" fill="#183125"/>
-            <text x="25" y="25" font-size="13" font-weight="bold" fill="#ffffff">Registrar Ingreso · Ministración Ordinaria Estatal [PASO 1: CAPTURA SUSTANTIVA - BORRADOR]</text>
-            <text x="935" y="25" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
+          <svg viewBox="0 0 960 740" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="740" fill="#ffffff" rx="4" stroke="#cbd5e1"/>
+            
+            <!-- Encabezado de la Ventana -->
+            <rect x="0" y="0" width="960" height="38" fill="#183125"/>
+            <text x="25" y="24" font-size="12" font-weight="bold" fill="#ffffff">SOLICITUD / COMPROBACIÓN DE RECURSOS (ORDEN DE PAGO) · CLAVE 01-06-2026</text>
+            <rect x="740" y="8" width="175" height="22" fill="#2d4a3b" rx="3"/>
+            <text x="827" y="23" font-size="9" font-weight="bold" fill="#a7f3d0" text-anchor="middle">Contabilidad Subyacente (B.1)</text>
+            <text x="935" y="24" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
 
-            <!-- 1. DATOS DE NOTIFICACIÓN Y ORIGEN (OFICIO SEFIPLAN) -->
-            <text x="25" y="65" font-size="10" font-weight="bold" fill="#183125">1. DATOS DE NOTIFICACIÓN Y OFICIO SUSTANTIVO (SEFIPLAN)</text>
-            <line x1="25" y1="70" x2="935" y2="70" stroke="#e2e8f0" stroke-width="1"/>
+            <!-- 1. ENCABEZADO INSTITUCIONAL DE LA ORDEN (Fiel a Formato Oficial) -->
+            <rect x="20" y="48" width="920" height="152" fill="#fdfbf7" stroke="#cbd5e1" rx="4"/>
+            <rect x="20" y="48" width="920" height="22" fill="#f1f5f9" rx="4 4 0 0"/>
+            <text x="30" y="63" font-size="9.5" font-weight="bold" fill="#183125">1. DATOS DE LA SOLICITUD DE RECURSOS Y EVIDENCIA DIGITAL (OFICIO SEFIPLAN)</text>
+            <text x="930" y="63" font-size="8.5" fill="#64748b" text-anchor="end">Ente: PODER JUDICIAL DEL ESTADO DE VERACRUZ (RFC: PJE970419FZ2)</text>
 
-            <text x="25" y="88" font-size="8.5" font-weight="bold" fill="#475569">SUBTIPO SELECCIONADO:</text>
-            <rect x="25" y="93" width="220" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
-            <text x="35" y="108" font-size="9" font-weight="bold" fill="#183125">MIN_ESTATAL_ORD (Ordinaria)</text>
-            <text x="235" y="108" font-size="8" fill="#0284c7" text-anchor="end">[Cambiar]</text>
+            <!-- Fila 1: Clave, Trámite, Lugar y Fecha, Tipo de Solicitud -->
+            <text x="30" y="86" font-size="8" font-weight="bold" fill="#475569">CLAVE DE ORDEN *</text>
+            <rect x="30" y="91" width="120" height="22" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="3"/>
+            <text x="40" y="106" font-size="9.5" font-weight="bold" fill="#183125">01-06-2026</text>
 
-            <text x="260" y="88" font-size="8.5" font-weight="bold" fill="#475569">NÚMERO DE OFICIO / REF. EXTERNA *</text>
-            <rect x="260" y="93" width="200" height="24" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="270" y="108" font-size="9" fill="#1e293b">OFI-SEFIPLAN-2026-089</text>
+            <text x="165" y="86" font-size="8" font-weight="bold" fill="#475569">TRÁMITE SEFIPLAN *</text>
+            <rect x="165" y="91" width="120" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="175" y="106" font-size="9.5" font-weight="bold" fill="#1e293b">2026-011</text>
 
-            <text x="475" y="88" font-size="8.5" font-weight="bold" fill="#475569">FECHA NOTIFICACIÓN *</text>
-            <rect x="475" y="93" width="115" height="24" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="485" y="108" font-size="9" fill="#1e293b">07/03/2026</text>
+            <text x="300" y="86" font-size="8" font-weight="bold" fill="#475569">LUGAR Y FECHA DE EMISIÓN *</text>
+            <rect x="300" y="91" width="200" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="310" y="106" font-size="9" fill="#1e293b">Xalapa, Ver., a 28 de mayo de 2026</text>
 
-            <text x="605" y="88" font-size="8.5" font-weight="bold" fill="#475569">FECHA ESPERADA COBRO *</text>
-            <rect x="605" y="93" width="115" height="24" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="615" y="108" font-size="9" fill="#1e293b">15/03/2026</text>
+            <text x="515" y="86" font-size="8" font-weight="bold" fill="#475569">MODALIDAD DE SOLICITUD *</text>
+            <rect x="515" y="91" width="210" height="22" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
+            <text x="525" y="106" font-size="8.5" font-weight="bold" fill="#065f46">● SUJETO A COMPROBAR</text>
+            <text x="645" y="106" font-size="8" fill="#64748b">○ PAGO DIRECTO</text>
 
-            <text x="735" y="88" font-size="8.5" font-weight="bold" fill="#475569">IMPORTE DEL OFICIO ($) *</text>
-            <rect x="735" y="93" width="200" height="24" fill="#f8fafc" stroke="#183125" stroke-width="1.5" rx="3"/>
-            <text x="925" y="109" font-size="11" font-weight="bold" fill="#183125" text-anchor="end">$ 45,000,000.00</text>
+            <text x="740" y="86" font-size="8" font-weight="bold" fill="#475569">TOTAL DE LA ORDEN ($) *</text>
+            <rect x="740" y="91" width="185" height="22" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="3"/>
+            <text x="915" y="107" font-size="10.5" font-weight="bold" fill="#183125" text-anchor="end">$ 51,958,628.00</text>
 
-            <!-- Depositante y Archivo Adjunto -->
-            <text x="25" y="132" font-size="8.5" font-weight="bold" fill="#475569">ENTE DEPOSITANTE / ORIGEN *</text>
-            <rect x="25" y="137" width="435" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="3"/>
-            <text x="35" y="152" font-size="9" fill="#1e293b">Secretaría de Finanzas y Planeación del Estado de Veracruz (SEFIPLAN)</text>
+            <!-- Fila 2: Concepto Formal y Abono en Cuenta -->
+            <text x="30" y="127" font-size="8" font-weight="bold" fill="#475569">CONCEPTO INSTITUCIONAL DEL TRÁMITE *</text>
+            <rect x="30" y="132" width="470" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="40" y="147" font-size="8.5" font-weight="bold" fill="#1e293b">1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE NÓMINA</text>
 
-            <text x="475" y="132" font-size="8.5" font-weight="bold" fill="#475569">EXPEDIENTE DIGITAL / OFICIO EN PDF *</text>
-            <rect x="475" y="137" width="460" height="24" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
-            <text x="485" y="152" font-size="9" font-weight="bold" fill="#065f46">📎 oficio_sefiplan_marzo_2026.pdf (1.8 MB) — Verificado ✓</text>
-            <text x="925" y="152" font-size="8" fill="#0284c7" text-anchor="end">[Reemplazar]</text>
+            <text x="515" y="127" font-size="8" font-weight="bold" fill="#475569">INSTRUCCIÓN DE ABONO EN CUENTA BANCARIA *</text>
+            <rect x="515" y="132" width="410" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="525" y="147" font-size="8.5" fill="#1e293b">Abono en la cuenta No. <tspan font-weight="bold">0126144101 BBVA Bancomer</tspan> ("MINISTRACION 2026")</text>
 
-            <!-- 2. DISTRIBUCIÓN Y APERTURA DE TECHO PRESUPUESTAL -->
-            <text x="25" y="182" font-size="10" font-weight="bold" fill="#183125">2. APERTURA Y DISTRIBUCIÓN DE TECHO PRESUPUESTAL POR CAPÍTULOS DE GASTO</text>
-            <line x1="25" y1="187" x2="935" y2="187" stroke="#e2e8f0" stroke-width="1"/>
+            <!-- Fila 3: Importe con Letra y Expediente PDF Adjunto -->
+            <text x="30" y="167" font-size="8" font-weight="bold" fill="#475569">IMPORTE EN LETRA:</text>
+            <rect x="30" y="171" width="470" height="20" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
+            <text x="40" y="184" font-size="8" font-style="italic" fill="#334155">(Cincuenta y un millones novecientos cincuenta y ocho mil seiscientos veintiocho pesos 00/100 M.N.)</text>
 
-            <rect x="25" y="195" width="910" height="22" fill="#f1f5f9"/>
-            <text x="35" y="209" font-size="8" font-weight="bold" fill="#475569">CAPÍTULO DESTINO</text>
-            <text x="260" y="209" font-size="8" font-weight="bold" fill="#475569">FUENTE FINANCIAMIENTO</text>
-            <text x="510" y="209" font-size="8" font-weight="bold" fill="#475569">UNIDAD ADMINISTRATIVA RESPONSABLE</text>
-            <text x="820" y="209" font-size="8" font-weight="bold" fill="#475569" text-anchor="end">IMPORTE ($)</text>
+            <text x="515" y="167" font-size="8" font-weight="bold" fill="#475569">EXPEDIENTE DIGITAL (OFICIO SOPORTE A SEFIPLAN) *</text>
+            <rect x="515" y="171" width="410" height="20" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
+            <text x="525" y="184" font-size="8" font-weight="bold" fill="#065f46">📎 Oficio_DGA_0367_2026_SEFIPLAN.pdf (2.4 MB) — Verificado ✓</text>
+            <text x="915" y="184" font-size="7.5" fill="#0284c7" text-anchor="end">[Ver PDF]</text>
 
-            <rect x="25" y="219" width="910" height="24" fill="#ffffff" stroke="#f1f5f9"/>
-            <text x="35" y="234" font-size="9" fill="#1e293b">1000 Servicios Personales</text>
-            <text x="260" y="234" font-size="9" fill="#1e293b">111 Recursos Fiscales</text>
-            <text x="510" y="234" font-size="9" fill="#1e293b">Dirección General de Administración</text>
-            <text x="820" y="234" font-size="9" font-weight="bold" fill="#1e293b" text-anchor="end">35,000,000.00</text>
+            <!-- 2. DESGLOSE PRESUPUESTAL POR ÓRGANO JUDICIAL BENEFICIARIO (Las 4 Partidas Oficiales) -->
+            <text x="20" y="217" font-size="9.5" font-weight="bold" fill="#183125">2. DESGLOSE PRESUPUESTAL POR ÓRGANO JUDICIAL BENEFICIARIO</text>
+            <text x="940" y="217" font-size="8" fill="#64748b" text-anchor="end">4 Partidas Oficiales PJEV</text>
+            <line x1="20" y1="222" x2="940" y2="222" stroke="#e2e8f0" stroke-width="1"/>
 
-            <rect x="25" y="244" width="910" height="24" fill="#f8fafc" stroke="#f1f5f9"/>
-            <text x="35" y="259" font-size="9" fill="#1e293b">2000 Materiales y Suministros</text>
-            <text x="260" y="259" font-size="9" fill="#1e293b">111 Recursos Fiscales</text>
-            <text x="510" y="259" font-size="9" fill="#1e293b">Dirección de Recursos Materiales</text>
-            <text x="820" y="259" font-size="9" font-weight="bold" fill="#1e293b" text-anchor="end">7,000,000.00</text>
+            <!-- Encabezado de la Tabla de Partidas -->
+            <rect x="20" y="228" width="920" height="20" fill="#183125"/>
+            <text x="30" y="241" font-size="8" font-weight="bold" fill="#ffffff">CLAVE PRESUPUESTAL</text>
+            <text x="440" y="241" font-size="8" font-weight="bold" fill="#ffffff">REF.</text>
+            <text x="500" y="241" font-size="8" font-weight="bold" fill="#ffffff">ÓRGANO JUDICIAL BENEFICIARIO</text>
+            <text x="730" y="241" font-size="8" font-weight="bold" fill="#ffffff">CAPÍTULO</text>
+            <text x="800" y="241" font-size="8" font-weight="bold" fill="#ffffff">FUENTE</text>
+            <text x="930" y="241" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="end">IMPORTE ($)</text>
 
-            <rect x="25" y="269" width="910" height="24" fill="#ffffff" stroke="#f1f5f9"/>
-            <text x="35" y="284" font-size="9" fill="#1e293b">3000 Servicios Generales</text>
-            <text x="260" y="284" font-size="9" fill="#1e293b">111 Recursos Fiscales</text>
-            <text x="510" y="284" font-size="9" fill="#1e293b">Subdirección de Recursos Financieros</text>
-            <text x="820" y="284" font-size="9" font-weight="bold" fill="#1e293b" text-anchor="end">3,000,000.00</text>
+            <!-- Partida 1: Tribunal Superior de Justicia -->
+            <rect x="20" y="249" width="920" height="24" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="30" y="264" font-size="8" font-family="monospace" fill="#334155">413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184001</text>
+            <text x="440" y="264" font-size="8.5" font-weight="bold" fill="#0284c7">1 NOM-1</text>
+            <text x="500" y="264" font-size="8.5" font-weight="bold" fill="#1e293b">Tribunal Superior de Justicia</text>
+            <text x="730" y="264" font-size="8" fill="#475569">1000 Servicios P.</text>
+            <text x="800" y="264" font-size="8" fill="#475569">1114 Rec. Fisc.</text>
+            <text x="930" y="264" font-size="8.5" font-weight="bold" fill="#1e293b" text-anchor="end">10,458,826.50</text>
 
-            <!-- Barra de Cuadre Techo Presupuestal -->
-            <rect x="25" y="296" width="910" height="24" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
-            <text x="35" y="311" font-size="8.5" font-weight="bold" fill="#065f46">Σ Techo Presupuestal: $ 45,000,000.00 MXN</text>
-            <text x="450" y="311" font-size="8.5" fill="#065f46">Importe Oficio: $ 45,000,000.00 MXN</text>
-            <text x="925" y="311" font-size="8.5" font-weight="bold" fill="#047857" text-anchor="end">✓ Cuadre 100% Exacto (Diferencia: $0.00)</text>
+            <!-- Partida 2: Tribunal de Conciliación y Arbitraje -->
+            <rect x="20" y="274" width="920" height="24" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="30" y="289" font-size="8" font-family="monospace" fill="#334155">413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184002</text>
+            <text x="440" y="289" font-size="8.5" font-weight="bold" fill="#0284c7">1 NOM-2</text>
+            <text x="500" y="289" font-size="8.5" font-weight="bold" fill="#1e293b">Tribunal de Conciliación y Arbitraje</text>
+            <text x="730" y="289" font-size="8" fill="#475569">1000 Servicios P.</text>
+            <text x="800" y="289" font-size="8" fill="#475569">1114 Rec. Fisc.</text>
+            <text x="930" y="289" font-size="8.5" font-weight="bold" fill="#1e293b" text-anchor="end">2,472,084.50</text>
 
-            <!-- 3. BLOQUE AFECTACION CONTABLE SUBYACENTE (EN SEGUNDO PLANO) -->
-            <rect x="25" y="332" width="910" height="74" fill="#f8fafc" stroke="#cbd5e1" rx="5"/>
-            <rect x="25" y="332" width="910" height="22" fill="#f1f5f9" rx="5 5 0 0"/>
-            <text x="38" y="347" font-size="9" font-weight="bold" fill="#334155">⚙️ AFECTACIÓN CONTABLE SUBYACENTE (MOTOR CONAC 03.1.2 · MATRIZ B.1 DEVENGADO EN SEGUNDO PLANO)</text>
-            <rect x="760" y="335" width="165" height="17" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="842" y="347" font-size="8" font-weight="bold" fill="#0284c7" text-anchor="middle">👁 Ver Pre-póliza Subyacente</text>
+            <!-- Partida 3: Tribunal de Disciplina Judicial -->
+            <rect x="20" y="299" width="920" height="24" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="30" y="314" font-size="8" font-family="monospace" fill="#334155">413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184007</text>
+            <text x="440" y="314" font-size="8.5" font-weight="bold" fill="#0284c7">1 NOM-7</text>
+            <text x="500" y="314" font-size="8.5" font-weight="bold" fill="#1e293b">Tribunal de Disciplina Judicial</text>
+            <text x="730" y="314" font-size="8" fill="#475569">1000 Servicios P.</text>
+            <text x="800" y="314" font-size="8" fill="#475569">1114 Rec. Fisc.</text>
+            <text x="930" y="314" font-size="8.5" font-weight="bold" fill="#1e293b" text-anchor="end">1,588,324.00</text>
 
-            <text x="38" y="368" font-size="8.5" fill="#475569">El capturista de ingresos no manipula cuentas de débito ni crédito. Al formalizar este oficio, el motor contable del SIAF-PJEV generará automáticamente:</text>
-            <text x="38" y="382" font-size="8.5" fill="#1e293b">• <tspan font-weight="bold">Patrimonial:</tspan> Cargo a Cuentas por Cobrar (1.1.2.2.0001 SEFIPLAN) vs Abono a Transferencias del Ejecutivo (4.1.5.1.0001) por $45,000,000.00</text>
-            <text x="38" y="396" font-size="8.5" fill="#1e293b">• <tspan font-weight="bold">Presupuestal:</tspan> Cargo a Ley por Ejecutar (8.1.2 CRI 9.1.1) vs Abono a Ley Devengada (8.1.4 CRI 9.1.1) por $45,000,000.00</text>
+            <!-- Partida 4: Órgano de Administración Judicial -->
+            <rect x="20" y="324" width="920" height="24" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="30" y="339" font-size="8" font-family="monospace" fill="#334155">413002.211130010010000121 GZR.5.U.430.Y.1502126.1114.000184008</text>
+            <text x="440" y="339" font-size="8.5" font-weight="bold" fill="#0284c7">1 NOM-8</text>
+            <text x="500" y="339" font-size="8.5" font-weight="bold" fill="#1e293b">Órgano de Administración Judicial</text>
+            <text x="730" y="339" font-size="8" fill="#475569">1000 Servicios P.</text>
+            <text x="800" y="339" font-size="8" fill="#475569">1114 Rec. Fisc.</text>
+            <text x="930" y="339" font-size="8.5" font-weight="bold" fill="#1e293b" text-anchor="end">37,439,393.00</text>
 
-            <!-- 4. HISTORIAL DE TRAZABILIDAD Y MENSAJES (IngresoHistorialTimeline) -->
-            <rect x="25" y="418" width="910" height="195" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
-            <rect x="25" y="418" width="910" height="24" fill="#f8fafc" rx="5 5 0 0"/>
-            <text x="38" y="434" font-size="9" font-weight="bold" fill="#1e293b">💬 HISTORIAL DE TRAZABILIDAD Y MENSAJES DE WORKFLOW (3 registros)</text>
-            <text x="925" y="434" font-size="8" fill="#64748b" text-anchor="end">Bitácora forense inviolable</text>
+            <!-- Barra de Cuadre Estricto -->
+            <rect x="20" y="352" width="920" height="24" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
+            <text x="30" y="367" font-size="8.5" font-weight="bold" fill="#065f46">Σ Desglose por Órganos: $ 51,958,628.00 MXN</text>
+            <text x="450" y="367" font-size="8.5" fill="#065f46">Total Orden 01-06-2026: $ 51,958,628.00 MXN</text>
+            <text x="930" y="367" font-size="8.5" font-weight="bold" fill="#047857" text-anchor="end">✓ Cuadre 100% Exacto (Diferencia: $0.00)</text>
+
+            <!-- 3. BLOQUE AFECTACIÓN CONTABLE SUBYACENTE (EN SEGUNDO PLANO) -->
+            <rect x="20" y="386" width="920" height="74" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
+            <rect x="20" y="386" width="920" height="22" fill="#f1f5f9" rx="4 4 0 0"/>
+            <text x="32" y="401" font-size="8.5" font-weight="bold" fill="#334155">⚙️ AFECTACIÓN CONTABLE SUBYACENTE (MOTOR CONAC 03.1.2 · MATRIZ B.1 DEVENGADO DE INGRESOS EN SEGUNDO PLANO)</text>
+            <rect x="760" y="389" width="168" height="16" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="844" y="400" font-size="7.5" font-weight="bold" fill="#0284c7" text-anchor="middle">👁 Ver Pre-póliza Subyacente</text>
+
+            <text x="32" y="420" font-size="8" fill="#475569">El capturista de ingresos no captura asientos contables. Al formalizar esta orden 01-06-2026, el motor contable del SIAF-PJEV genera de forma automática:</text>
+            <text x="32" y="433" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Patrimonial:</tspan> Cargo a Cuentas por Cobrar a Corto Plazo (1.1.2.2.0001 SEFIPLAN) vs Abono a Transferencias del Poder Ejecutivo (4.1.5.1.0001) por $51,958,628.00</text>
+            <text x="32" y="446" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Presupuestal:</tspan> Cargo a Ley de Ingresos por Ejecutar (8.1.2 CRI 9.1.1.1) vs Abono a Ley de Ingresos Devengada (8.1.4 CRI 9.1.1.1) por $51,958,628.00</text>
+
+            <!-- 4. CUADRO OFICIAL DE FIRMAS INSTITUCIONALES (Fiel a Imagen 2) -->
+            <text x="20" y="475" font-size="9" font-weight="bold" fill="#183125">3. FIRMAS INSTITUCIONALES DE AUTORIZACIÓN (ORDEN DE PAGO)</text>
+            <line x1="20" y1="480" x2="940" y2="480" stroke="#e2e8f0" stroke-width="1"/>
+
+            <!-- Firma 1: Elaboró -->
+            <rect x="20" y="488" width="295" height="78" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <rect x="20" y="488" width="295" height="18" fill="#f8fafc" rx="4 4 0 0"/>
+            <text x="167" y="500" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">ELABORÓ</text>
+            <text x="167" y="525" font-size="8" font-family="cursive" fill="#0284c7" text-anchor="middle">Eunice Hernández V.</text>
+            <line x1="45" y1="535" x2="290" y2="535" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="167" y="546" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="middle">C.P. Eunice Hernández Valdés</text>
+            <text x="167" y="556" font-size="7" fill="#64748b" text-anchor="middle">Analista de Presupuesto e Ingresos</text>
+
+            <!-- Firma 2: Revisó -->
+            <rect x="332" y="488" width="295" height="78" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <rect x="332" y="488" width="295" height="18" fill="#f8fafc" rx="4 4 0 0"/>
+            <text x="479" y="500" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">REVISÓ</text>
+            <text x="479" y="525" font-size="8" font-family="cursive" fill="#0284c7" text-anchor="middle">Daryl Ramos S.</text>
+            <line x1="357" y1="535" x2="602" y2="535" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="479" y="546" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="middle">Lic. Daryl Ramos Sánchez</text>
+            <text x="479" y="556" font-size="7" fill="#64748b" text-anchor="middle">Jefe del Depto. de Recursos Financieros</text>
+
+            <!-- Firma 3: Vo. Bo. -->
+            <rect x="645" y="488" width="295" height="78" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <rect x="645" y="488" width="295" height="18" fill="#f8fafc" rx="4 4 0 0"/>
+            <text x="792" y="500" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">VO. BO.</text>
+            <text x="792" y="525" font-size="8" font-family="cursive" fill="#0284c7" text-anchor="middle">Karla A. de la Cruz P.</text>
+            <line x1="670" y1="535" x2="915" y2="535" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="792" y="546" font-size="7.5" font-weight="bold" fill="#1e293b" text-anchor="middle">Mtra. Karla Alejandra de la Cruz Pérez</text>
+            <text x="792" y="556" font-size="7" fill="#64748b" text-anchor="middle">Directora General de Administración</text>
+
+            <!-- 5. HISTORIAL DE WORKFLOW Y MENSAJES INSTITUCIONALES -->
+            <rect x="20" y="578" width="920" height="108" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <rect x="20" y="578" width="920" height="20" fill="#f8fafc" rx="4 4 0 0"/>
+            <text x="32" y="592" font-size="8.5" font-weight="bold" fill="#1e293b">💬 HISTORIAL DE TRAZABILIDAD Y MENSAJES (IngresoHistorialTimeline · 2 registros)</text>
+            <text x="930" y="592" font-size="7.5" fill="#64748b" text-anchor="end">Bitácora forense inviolable</text>
 
             <!-- Mensaje 1 -->
-            <rect x="35" y="448" width="890" height="44" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
-            <rect x="43" y="454" width="50" height="14" fill="#dbeafe" rx="2"/>
-            <text x="68" y="464" font-size="7.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
-            <text x="100" y="464" font-size="8.5" font-weight="bold" fill="#1e293b">BORRADOR → ENVIADO</text>
-            <text x="430" y="464" font-size="7.5" fill="#64748b">Fecha envío: 07/03/2026 • Servidor: 07/03/2026 10:14:22</text>
-            <text x="915" y="464" font-size="7.5" fill="#64748b" text-anchor="end">Por: Lic. Eunice Hernández</text>
-            <text x="45" y="482" font-size="8" font-style="italic" fill="#334155">"Se remite desglose de ministración conforme a Oficio OFI-SEFIPLAN-2026-089 para validación presupuestaria y contable."</text>
+            <rect x="30" y="604" width="900" height="34" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
+            <rect x="36" y="609" width="46" height="12" fill="#dbeafe" rx="2"/>
+            <text x="59" y="618" font-size="7" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
+            <text x="88" y="618" font-size="8" font-weight="bold" fill="#1e293b">BORRADOR → ENVIADO</text>
+            <text x="450" y="618" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 11:15:20 • Por: C.P. Eunice Hernández Valdés</text>
+            <text x="38" y="632" font-size="7.5" font-style="italic" fill="#334155">"Se remite orden de pago 01-06-2026 (Nómina 1a Qna Junio) desglosada por órganos y amparada en Oficio DGA/0367/2026 en PDF."</text>
 
             <!-- Mensaje 2 -->
-            <rect x="35" y="497" width="890" height="44" fill="#fffbeb" stroke="#fef3c7" rx="3"/>
-            <rect x="43" y="503" width="55" height="14" fill="#fee2e2" rx="2"/>
-            <text x="70" y="513" font-size="7.5" font-weight="bold" fill="#991b1b" text-anchor="middle">REGRESAR</text>
-            <text x="106" y="513" font-size="8.5" font-weight="bold" fill="#92400e">ENVIADO → OBSERVADO</text>
-            <text x="430" y="513" font-size="7.5" fill="#64748b">Fecha envío: 07/03/2026 • Servidor: 07/03/2026 12:45:08</text>
-            <text x="915" y="513" font-size="7.5" fill="#64748b" text-anchor="end">Por: C.P. Gabriel Soto (Revisor)</text>
-            <text x="45" y="531" font-size="8" font-style="italic" fill="#991b1b">"Observación: Favor de anexar la circular de afectación al Capítulo 2000 emitida por Recursos Materiales antes de autorizar."</text>
-
-            <!-- Mensaje 3 -->
-            <rect x="35" y="546" width="890" height="44" fill="#f8fafc" stroke="#e2e8f0" rx="3"/>
-            <rect x="43" y="552" width="50" height="14" fill="#dbeafe" rx="2"/>
-            <text x="68" y="562" font-size="7.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
-            <text x="100" y="562" font-size="8.5" font-weight="bold" fill="#1e293b">OBSERVADO → ENVIADO</text>
-            <text x="430" y="562" font-size="7.5" fill="#64748b">Fecha envío: 08/03/2026 • Servidor: 08/03/2026 09:30:15</text>
-            <text x="915" y="562" font-size="7.5" fill="#64748b" text-anchor="end">Por: Lic. Eunice Hernández</text>
-            <text x="45" y="580" font-size="8" font-style="italic" fill="#334155">"Se anexa circular complementaria y se ajusta la partida de materiales conforme a lo requerido."</text>
+            <rect x="30" y="643" width="900" height="34" fill="#f0fdf4" stroke="#bbf7d0" rx="3"/>
+            <rect x="36" y="648" width="60" height="12" fill="#dcfce7" rx="2"/>
+            <text x="66" y="657" font-size="7" font-weight="bold" fill="#15803d" text-anchor="middle">FORMALIZAR</text>
+            <text x="102" y="657" font-size="8" font-weight="bold" fill="#166534">ENVIADO → DEVENGADO</text>
+            <text x="450" y="657" font-size="7" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 12:40:15 • Por: Mtra. Karla Alejandra de la Cruz Pérez</text>
+            <text x="38" y="671" font-size="7.5" font-style="italic" fill="#166534">"Revisado el techo presupuestal de los 4 órganos judiciales. Aprobado para emisión oficial y devengo contable subyacente."</text>
 
             <!-- Acciones Finales al Pie -->
-            <rect x="25" y="625" width="110" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
-            <text x="80" y="645" font-size="9" fill="#64748b" text-anchor="middle">Cancelar</text>
+            <rect x="20" y="698" width="110" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+            <text x="75" y="717" font-size="8.5" fill="#64748b" text-anchor="middle">Cancelar</text>
 
-            <rect x="450" y="625" width="130" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
-            <text x="515" y="645" font-size="9" font-weight="bold" fill="#475569" text-anchor="middle">🕒 Historial (3)</text>
+            <rect x="470" y="698" width="130" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
+            <text x="535" y="717" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="middle">🕒 Historial (2)</text>
 
-            <rect x="590" y="625" width="150" height="32" fill="#f8fafc" stroke="#94a3b8" rx="4" cursor="pointer"/>
-            <text x="665" y="645" font-size="9" font-weight="bold" fill="#475569" text-anchor="middle">💾 Guardar Borrador</text>
+            <rect x="610" y="698" width="145" height="30" fill="#f8fafc" stroke="#94a3b8" rx="4" cursor="pointer"/>
+            <text x="682" y="717" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="middle">💾 Guardar Borrador</text>
 
-            <rect x="750" y="625" width="185" height="32" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="842" y="645" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Formalizar y Devengar</text>
+            <rect x="765" y="698" width="175" height="30" fill="#183125" rx="4" cursor="pointer"/>
+            <text x="852" y="717" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">✓ Formalizar Orden y Devengar</text>
           </svg>
         </div>
       </div>
@@ -1085,78 +1230,108 @@ export class IngresosController {
     <div id="wf-wf4" class="wf-panel">
       <div class="wf-box">
         <div class="wf-bar">
-          <span class="wf-bar-label">Conciliación Bancaria y Recaudación Posterior (Paso 2: Cobro y Parcialidades)</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Asociación de Depósitos SPEI · Disminución de Cuentas por Cobrar (Matriz 03.1.2 B.2)</span>
+          <span class="wf-bar-label">Conciliación Bancaria y Recaudación Posterior: Extracto BBVA Net Cash (Paso 2)</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Extracto BBVA Net Cash · Depósito REFBNTC00316148 ($21,157,862.50) · Matriz CONAC B.2</span>
         </div>
         <div class="wf-svg-area">
-          <svg viewBox="0 0 960 480" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="960" height="480" fill="#f8fafc" rx="4"/>
+          <svg viewBox="0 0 960 560" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <rect width="960" height="560" fill="#f8fafc" rx="4"/>
             
-            <!-- Header Resumen Ingreso Esperado -->
+            <!-- Header Resumen de la Orden Devengada -->
             <rect x="15" y="15" width="930" height="65" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
-            <text x="30" y="38" font-size="13" font-weight="bold" fill="#183125">ING-2026-0044 · Ministración Ordinaria Febrero 2026</text>
-            <text x="30" y="58" font-size="10" fill="#64748b">Trámite: MIN_ESTATAL_ORD | Ref. Externa: OFI-SEFIPLAN-2026-062 | Fecha Devengo: 28/02/2026 | Beneficiario: SEFIPLAN</text>
-            <rect x="795" y="24" width="135" height="24" fill="#fed7aa" rx="12"/>
-            <text x="862" y="40" font-size="9.5" font-weight="bold" fill="#9a3412" text-anchor="middle">PARCIALMENTE RECIBIDO</text>
+            <text x="30" y="38" font-size="13" font-weight="bold" fill="#183125">Orden 02-06-2026 · 1a. Ministración Junio 2026 (Gastos de Operación) · Trámite SEFIPLAN 2026-011</text>
+            <text x="30" y="58" font-size="9.5" fill="#64748b">Oficio Soporte: Of. DGA/0367/2026 | Cuenta Receptora: 0126144101 BBVA "MINISTRACION 2026" | Devengo: 28/05/2026 | Ente: SEFIPLAN</text>
+            <rect x="760" y="24" width="170" height="24" fill="#dcfce7" rx="12"/>
+            <text x="845" y="40" font-size="9.5" font-weight="bold" fill="#15803d" text-anchor="middle">✓ RECAUDADO Y CONCILIADO</text>
 
             <!-- Status de Cuadre Financiero -->
-            <rect x="15" y="90" width="300" height="55" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="25" y="107" font-size="9" fill="#64748b">MONTO DEVENGADO DEL OFICIO (B.1)</text>
-            <text x="25" y="130" font-size="14" font-weight="bold" fill="#1e293b">$ 45,000,000.00</text>
+            <rect x="15" y="88" width="300" height="52" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="25" y="105" font-size="8.5" fill="#64748b">MONTO DEVENGADO DE LA ORDEN (B.1)</text>
+            <text x="25" y="127" font-size="13" font-weight="bold" fill="#1e293b">$ 21,157,862.50 MXN</text>
 
-            <rect x="330" y="90" width="300" height="55" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="340" y="107" font-size="9" fill="#15803d">RECAUDADO EN BANCOS (B.2)</text>
-            <text x="340" y="130" font-size="14" font-weight="bold" fill="#15803d">$ 30,000,000.00 (2 depósitos)</text>
+            <rect x="330" y="88" width="300" height="52" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
+            <text x="340" y="105" font-size="8.5" fill="#15803d">RECAUDADO EN BANCOS BBVA (B.2)</text>
+            <text x="340" y="127" font-size="13" font-weight="bold" fill="#15803d">$ 21,157,862.50 MXN (1 Depósito)</text>
 
-            <rect x="645" y="90" width="300" height="55" fill="#fff7ed" stroke="#fed7aa" rx="4"/>
-            <text x="655" y="107" font-size="9" font-weight="bold" fill="#9a3412">SALDO PENDIENTE POR RECAUDAR</text>
-            <text x="655" y="130" font-size="14" font-weight="bold" fill="#c2410c">$ 15,000,000.00</text>
+            <rect x="645" y="88" width="300" height="52" fill="#f0fdf4" stroke="#a7f3d0" rx="4"/>
+            <text x="655" y="105" font-size="8.5" font-weight="bold" fill="#065f46">SALDO PENDIENTE POR RECAUDAR</text>
+            <text x="655" y="127" font-size="13" font-weight="bold" fill="#047857">$ 0.00 MXN (Liquidado 100%)</text>
 
-            <!-- Panel de Conciliación Bancaria en Línea -->
-            <rect x="15" y="155" width="930" height="60" fill="#f0fdf4" stroke="#a7f3d0" rx="5"/>
-            <text x="30" y="174" font-size="9.5" font-weight="bold" fill="#065f46">CONCILIACIÓN CON EXTRACTO BANCARIO Y ASOCIACIÓN DE DEPÓSITO SPEI</text>
-            
-            <text x="30" y="196" font-size="8.5" fill="#475569">Cuenta Receptora PJEV: <tspan font-weight="bold" fill="#1e293b">Santander *4012 (Concentradora Subsidios)</tspan></text>
-            <text x="340" y="196" font-size="8.5" fill="#475569">Depósito identificado: <tspan font-weight="bold" fill="#1e293b">15/02/2026 · SPEI SEFIPLAN · $20,000,000.00</tspan></text>
-            <rect x="740" y="170" width="190" height="30" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="835" y="189" font-size="9.5" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Conciliar Depósito y Recaudar</text>
+            <!-- Panel Oficial BBVA Net Cash (Fiel a la Imagen 3) -->
+            <rect x="15" y="150" width="930" height="185" fill="#ffffff" stroke="#004481" stroke-width="1.5" rx="5"/>
+            <rect x="15" y="150" width="930" height="26" fill="#004481" rx="5 5 0 0"/>
+            <text x="30" y="167" font-size="10" font-weight="bold" fill="#ffffff">BBVA Net Cash · Comprobante Oficial de Depósito Bancario en Línea</text>
+            <text x="930" y="167" font-size="9" fill="#bfdbfe" text-anchor="end">Consulta: 09/06/2026 15:36:16 h • Contrato: 00412852</text>
 
-            <!-- Tabla de Parcialidades -->
-            <rect x="15" y="225" width="930" height="180" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
-            <rect x="15" y="225" width="930" height="28" fill="#183125" rx="5 5 0 0"/>
-            <text x="30" y="243" font-size="10" font-weight="bold" fill="#ffffff">DEPÓSITOS BANCARIOS CONCILIADOS (MATRIZ B.2 RECAUDADO EN SEGUNDO PLANO)</text>
+            <!-- Datos BBVA Net Cash -->
+            <text x="30" y="195" font-size="8.5" font-weight="bold" fill="#475569">CUENTA DE ABONO:</text>
+            <text x="160" y="195" font-size="9.5" font-family="monospace" font-weight="bold" fill="#004481">0126144101</text>
+            <text x="260" y="195" font-size="8.5" font-weight="bold" fill="#475569">TITULAR:</text>
+            <text x="320" y="195" font-size="9.5" font-weight="bold" fill="#1e293b">PODER JUDICIAL DEL ESTADO DE VERACRUZ (MINISTRACION 2026)</text>
 
-            <rect x="25" y="260" width="910" height="20" fill="#f1f5f9"/>
-            <text x="35" y="273" font-size="8" font-weight="bold" fill="#475569">FECHA VALOR</text>
-            <text x="130" y="273" font-size="8" font-weight="bold" fill="#475569">REFERENCIA SPEI</text>
-            <text x="300" y="273" font-size="8" font-weight="bold" fill="#475569">CUENTA BANCARIA PJEV</text>
-            <text x="560" y="273" font-size="8" font-weight="bold" fill="#475569">PÓLIZA B.2 SUBYACENTE</text>
-            <text x="800" y="273" font-size="8" font-weight="bold" fill="#475569" text-anchor="end">ABONO BANCARIO ($)</text>
+            <text x="30" y="217" font-size="8.5" font-weight="bold" fill="#475569">BANCO RECEPTOR:</text>
+            <text x="160" y="217" font-size="9" fill="#1e293b">BBVA Bancomer</text>
+            <text x="260" y="217" font-size="8.5" font-weight="bold" fill="#475569">TIPO DE MOVIMIENTO:</text>
+            <text x="400" y="217" font-size="9" font-weight="bold" fill="#1e293b">Depósito de un tercero (Transferencia SPEI SEFIPLAN)</text>
 
-            <rect x="25" y="283" width="910" height="28" fill="#ffffff" stroke="#f1f5f9"/>
-            <text x="35" y="301" font-size="9" fill="#1e293b">15/02/2026</text>
-            <text x="130" y="301" font-size="9" font-family="monospace" fill="#0284c7">SPEI-BAN-SEF-88910</text>
-            <text x="300" y="301" font-size="9" fill="#1e293b">Santander *4012 Concentradora</text>
-            <text x="560" y="301" font-size="9" fill="#15803d">POL-ING-2026-0089 (Recaudado B.2)</text>
-            <text x="800" y="301" font-size="9.5" font-weight="bold" fill="#15803d" text-anchor="end">20,000,000.00</text>
+            <text x="30" y="239" font-size="8.5" font-weight="bold" fill="#475569">FECHA DE OPERACIÓN:</text>
+            <text x="160" y="239" font-size="9.5" font-family="monospace" font-weight="bold" fill="#1e293b">09/06/2026</text>
+            <text x="260" y="239" font-size="8.5" font-weight="bold" fill="#475569">REFERENCIA BANCARIA:</text>
+            <text x="400" y="239" font-size="9.5" font-family="monospace" font-weight="bold" fill="#004481">REFBNTC00316148</text>
 
-            <rect x="25" y="313" width="910" height="28" fill="#f8fafc" stroke="#f1f5f9"/>
-            <text x="35" y="331" font-size="9" fill="#1e293b">22/02/2026</text>
-            <text x="130" y="331" font-size="9" font-family="monospace" fill="#0284c7">SPEI-BAN-SEF-99231</text>
-            <text x="300" y="331" font-size="9" fill="#1e293b">Santander *4012 Concentradora</text>
-            <text x="560" y="331" font-size="9" fill="#15803d">POL-ING-2026-0104 (Recaudado B.2)</text>
-            <text x="800" y="331" font-size="9.5" font-weight="bold" fill="#15803d" text-anchor="end">10,000,000.00</text>
+            <text x="30" y="261" font-size="8.5" font-weight="bold" fill="#475569">CONCEPTO / DESCRIPCIÓN:</text>
+            <text x="160" y="261" font-size="9" fill="#1e293b">GASTOS DE OPERACION 1A QNA JUNIO 2026 (Orden 02-06-2026)</text>
 
-            <rect x="25" y="343" width="910" height="28" fill="#fffbeb" stroke="#fef3c7"/>
-            <text x="35" y="361" font-size="9" font-style="italic" fill="#b45309">Pendiente por recibir de SEFIPLAN (Tercera exhibición esperada)...</text>
-            <text x="560" y="361" font-size="8.5" fill="#9a3412">Pendiente de conciliar</text>
-            <text x="800" y="361" font-size="9.5" font-weight="bold" fill="#c2410c" text-anchor="end">15,000,000.00</text>
+            <!-- Caja Importe Recibido BBVA -->
+            <rect x="30" y="275" width="460" height="45" fill="#f0f9ff" stroke="#93c5fd" rx="4"/>
+            <text x="45" y="293" font-size="8.5" font-weight="bold" fill="#0369a1">IMPORTE RECIBIDO EN BANCOS:</text>
+            <text x="45" y="312" font-size="14" font-weight="bold" fill="#004481">$ 21,157,862.50 MXN</text>
+            <text x="230" y="311" font-size="8" fill="#64748b">(Veintiún millones ciento cincuenta y siete mil ochocientos sesenta y dos pesos 50/100 M.N.)</text>
+
+            <!-- Sello Oficial de Recepción OAJ (Fiel a Imagen 3) -->
+            <rect x="580" y="185" width="345" height="135" fill="#fffbeb" stroke="#b45309" stroke-dasharray="3 3" rx="4"/>
+            <text x="752" y="205" font-size="8.5" font-weight="bold" fill="#b45309" text-anchor="middle">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+            <text x="752" y="220" font-size="8" font-weight="bold" fill="#78350f" text-anchor="middle">ÓRGANO DE ADMINISTRACIÓN JUDICIAL</text>
+            <text x="752" y="234" font-size="7.5" fill="#92400e" text-anchor="middle">SUBDIRECCIÓN DE RECURSOS FINANCIEROS</text>
+            <text x="752" y="247" font-size="7.5" fill="#92400e" text-anchor="middle">DEPARTAMENTO DE TESORERÍA</text>
+            <rect x="660" y="255" width="185" height="24" fill="#b45309" rx="3"/>
+            <text x="752" y="271" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">09 JUN 2026 · RECIBIDO</text>
+            <text x="752" y="295" font-size="7.5" font-style="italic" fill="#78350f" text-anchor="middle">Conciliado vs Orden 02-06-2026 · Cuadre 100%</text>
+            <text x="752" y="307" font-size="7" fill="#92400e" text-anchor="middle">Sello Digital Forense de Recepción en Tesorería</text>
+
+            <!-- Tabla de Conciliación Bancaria y Póliza Subyacente -->
+            <rect x="15" y="348" width="930" height="98" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
+            <rect x="15" y="348" width="930" height="22" fill="#183125" rx="5 5 0 0"/>
+            <text x="30" y="363" font-size="9" font-weight="bold" fill="#ffffff">DEPÓSITOS BANCARIOS CONCILIADOS (MATRIZ CONAC B.2 RECAUDADO EN SEGUNDO PLANO)</text>
+
+            <rect x="25" y="375" width="910" height="18" fill="#f1f5f9"/>
+            <text x="35" y="387" font-size="7.5" font-weight="bold" fill="#475569">FECHA VALOR</text>
+            <text x="130" y="387" font-size="7.5" font-weight="bold" fill="#475569">REFERENCIA BBVA</text>
+            <text x="280" y="387" font-size="7.5" font-weight="bold" fill="#475569">CUENTA BANCARIA PJEV</text>
+            <text x="510" y="387" font-size="7.5" font-weight="bold" fill="#475569">PÓLIZA B.2 SUBYACENTE</text>
+            <text x="740" y="387" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="end">ABONO BANCARIO ($)</text>
+            <text x="850" y="387" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="center">ESTATUS</text>
+
+            <rect x="25" y="396" width="910" height="24" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="35" y="412" font-size="8.5" fill="#1e293b">09/06/2026</text>
+            <text x="130" y="412" font-size="8.5" font-family="monospace" font-weight="bold" fill="#004481">REFBNTC00316148</text>
+            <text x="280" y="412" font-size="8.5" fill="#1e293b">BBVA 0126144101 (MINISTRACION 2026)</text>
+            <text x="510" y="412" font-size="8.5" font-weight="bold" fill="#15803d">POL-ING-2026-0048 (Recaudado B.2)</text>
+            <text x="740" y="412" font-size="9" font-weight="bold" fill="#15803d" text-anchor="end">21,157,862.50</text>
+            <rect x="805" y="400" width="90" height="16" fill="#dcfce7" rx="8"/>
+            <text x="850" y="412" font-size="7.5" font-weight="bold" fill="#15803d" text-anchor="middle">✓ CONCILIADO</text>
+
+            <rect x="25" y="422" width="910" height="18" fill="#f8fafc"/>
+            <text x="35" y="434" font-size="7.5" font-weight="bold" fill="#065f46">✓ Cuadre Bancario Exacto:</text>
+            <text x="160" y="434" font-size="7.5" fill="#334155">El depósito de $21,157,862.50 cubre el 100% de la orden 02-06-2026 (Gastos de Operación). Saldo pendiente liquidado a cero.</text>
 
             <!-- Nota Explicativa Subyacente -->
-            <rect x="15" y="415" width="930" height="50" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="30" y="435" font-size="8.5" font-weight="bold" fill="#0284c7">⚙️ Contabilidad Subyacente en Recaudación:</text>
-            <text x="30" y="450" font-size="8.5" fill="#64748b">Cada conciliación bancaria genera de forma invisible la afectación patrimonial (Cargo a Bancos 1.1.1.2 vs Abono a Cuentas por Cobrar 1.1.2.2) y presupuestal</text>
-            <text x="30" y="462" font-size="8.5" fill="#64748b">(Cargo a Ley Devengada 8.1.4 vs Abono a Ley Recaudada 8.1.5), liquidando el saldo pendiente sin intervención de un capturista contable.</text>
+            <rect x="15" y="458" width="930" height="88" fill="#f0fdf4" stroke="#a7f3d0" rx="4"/>
+            <text x="30" y="476" font-size="8.5" font-weight="bold" fill="#065f46">⚙️ Contabilidad Subyacente en la Conciliación Bancaria (Matriz CONAC 03.1.2 B.2 en Segundo Plano):</text>
+            <text x="30" y="493" font-size="8" fill="#166534">Al asociar el extracto bancario de BBVA Net Cash, el motor contable genera de forma invisible las pólizas patrimonial y presupuestal sin intervención manual:</text>
+            <text x="30" y="508" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Afectación Patrimonial:</tspan> Cargo a BBVA Bancomer Concentradora (1.1.1.2.0126) vs Abono a Cuentas por Cobrar a Corto Plazo SEFIPLAN (1.1.2.2.0001) por $21,157,862.50</text>
+            <text x="30" y="522" font-size="8" fill="#1e293b">• <tspan font-weight="bold">Afectación Presupuestal:</tspan> Cargo a Ley de Ingresos Devengada (8.1.4 CRI 9.1.1.1) vs Abono a Ley de Ingresos Recaudada (8.1.5 CRI 9.1.1.1) por $21,157,862.50</text>
+            <text x="30" y="536" font-size="7.5" font-style="italic" fill="#065f46">El analista de Tesorería únicamente valida el extracto bancario y asocia la referencia; la contabilidad y el presupuesto se sincronizan en automático.</text>
           </svg>
         </div>
       </div>
@@ -1176,7 +1351,7 @@ export class IngresosController {
             <!-- MODAL 1: VISOR COMPLETO DE HISTORIAL (Izquierda) -->
             <rect x="20" y="20" width="560" height="480" fill="#ffffff" rx="6" stroke="#cbd5e1" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.08))"/>
             <rect x="20" y="20" width="560" height="38" fill="#183125" rx="6 6 0 0"/>
-            <text x="35" y="44" font-size="11" font-weight="bold" fill="#ffffff">🕒 Historial de Trazabilidad y Mensajes · Folio ING-2026-0045</text>
+            <text x="35" y="44" font-size="11" font-weight="bold" fill="#ffffff">🕒 Historial de Trazabilidad y Mensajes · Folio 01-06-2026</text>
             <text x="565" y="44" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
 
             <rect x="30" y="65" width="540" height="22" fill="#f8fafc" rx="3"/>
@@ -1187,40 +1362,30 @@ export class IngresosController {
             <rect x="40" y="103" width="50" height="15" fill="#dbeafe" rx="3"/>
             <text x="65" y="114" font-size="7.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
             <text x="98" y="114" font-size="8.5" font-weight="bold" fill="#1e293b">BORRADOR → ENVIADO</text>
-            <text x="560" y="114" font-size="7.5" fill="#64748b" text-anchor="end">Por: Lic. Eunice Hernández</text>
-            <text x="40" y="130" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 07/03/2026 • Servidor: 07/03/2026 10:14:22</text>
+            <text x="560" y="114" font-size="7.5" fill="#64748b" text-anchor="end">Por: C.P. Eunice Hernández Valdés</text>
+            <text x="40" y="130" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 11:15:20</text>
             <rect x="40" y="135" width="520" height="22" fill="#f8fafc" rx="3"/>
-            <text x="48" y="150" font-size="8" font-style="italic" fill="#334155">"Se remite desglose conforme a Oficio OFI-SEFIPLAN-2026-089 para revisión presupuestaria y contable."</text>
+            <text x="48" y="150" font-size="8" font-style="italic" fill="#334155">"Se remite orden de pago 01-06-2026 desglosada en los 4 órganos judiciales y soportada en Oficio DGA/0367/2026."</text>
 
             <!-- Card Mensaje 2 -->
-            <rect x="30" y="170" width="540" height="68" fill="#fffbeb" stroke="#fef3c7" rx="4"/>
-            <rect x="40" y="178" width="58" height="15" fill="#fee2e2" rx="3"/>
-            <text x="69" y="189" font-size="7.5" font-weight="bold" fill="#991b1b" text-anchor="middle">REGRESAR</text>
-            <text x="105" y="189" font-size="8.5" font-weight="bold" fill="#92400e">ENVIADO → OBSERVADO</text>
-            <text x="560" y="189" font-size="7.5" fill="#64748b" text-anchor="end">Por: C.P. Gabriel Soto (Revisor)</text>
-            <text x="40" y="205" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 07/03/2026 • Servidor: 07/03/2026 12:45:08</text>
+            <rect x="30" y="170" width="540" height="68" fill="#f0fdf4" stroke="#bbf7d0" rx="4"/>
+            <rect x="40" y="178" width="58" height="15" fill="#dcfce7" rx="3"/>
+            <text x="69" y="189" font-size="7.5" font-weight="bold" fill="#15803d" text-anchor="middle">REVISAR</text>
+            <text x="105" y="189" font-size="8.5" font-weight="bold" fill="#166534">ENVIADO → VALIDADO</text>
+            <text x="560" y="189" font-size="7.5" fill="#64748b" text-anchor="end">Por: Lic. Daryl Ramos Sánchez</text>
+            <text x="40" y="205" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 11:45:10</text>
             <rect x="40" y="210" width="520" height="22" fill="#ffffff" rx="3"/>
-            <text x="48" y="225" font-size="8" font-style="italic" fill="#991b1b">"Observación: Favor de anexar la circular del Capítulo 2000 emitida por Recursos Materiales."</text>
+            <text x="48" y="225" font-size="8" font-style="italic" fill="#15803d">"Validado el cuadre exacto de los $51,958,628.00 entre TSJ, TCA, TDJ y OAJ conforme a techos autorizados."</text>
 
             <!-- Card Mensaje 3 -->
-            <rect x="30" y="245" width="540" height="68" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
-            <rect x="40" y="253" width="50" height="15" fill="#dbeafe" rx="3"/>
-            <text x="65" y="264" font-size="7.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ENVIAR</text>
-            <text x="98" y="264" font-size="8.5" font-weight="bold" fill="#1e293b">OBSERVADO → ENVIADO</text>
-            <text x="560" y="264" font-size="7.5" fill="#64748b" text-anchor="end">Por: Lic. Eunice Hernández</text>
-            <text x="40" y="280" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 08/03/2026 • Servidor: 08/03/2026 09:30:15</text>
-            <rect x="40" y="285" width="520" height="22" fill="#f8fafc" rx="3"/>
-            <text x="48" y="300" font-size="8" font-style="italic" fill="#334155">"Se anexa circular complementaria y se ajusta la distribución presupuestal solicitada."</text>
-
-            <!-- Card Mensaje 4 -->
-            <rect x="30" y="320" width="540" height="68" fill="#f0fdf4" stroke="#bbf7d0" rx="4"/>
-            <rect x="40" y="328" width="65" height="15" fill="#dcfce7" rx="3"/>
-            <text x="72" y="339" font-size="7.5" font-weight="bold" fill="#15803d" text-anchor="middle">FORMALIZAR</text>
-            <text x="112" y="339" font-size="8.5" font-weight="bold" fill="#166534">ENVIADO → DEVENGADO</text>
-            <text x="560" y="339" font-size="7.5" fill="#64748b" text-anchor="end">Por: Dr. Julio César Barrales</text>
-            <text x="40" y="355" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 08/03/2026 • Servidor: 08/03/2026 11:20:00</text>
-            <rect x="40" y="360" width="520" height="22" fill="#ffffff" rx="3"/>
-            <text x="48" y="375" font-size="8" font-style="italic" fill="#166534">"Expediente completo y validado conforme a Matriz CONAC 03.1.2 B.1. Aprobado para devengo."</text>
+            <rect x="30" y="245" width="540" height="68" fill="#f0fdf4" stroke="#bbf7d0" rx="4"/>
+            <rect x="40" y="253" width="65" height="15" fill="#dcfce7" rx="3"/>
+            <text x="72" y="264" font-size="7.5" font-weight="bold" fill="#15803d" text-anchor="middle">FORMALIZAR</text>
+            <text x="112" y="264" font-size="8.5" font-weight="bold" fill="#166534">VALIDADO → DEVENGADO</text>
+            <text x="560" y="264" font-size="7.5" fill="#64748b" text-anchor="end">Por: Mtra. Karla Alejandra de la Cruz Pérez</text>
+            <text x="40" y="280" font-size="7.5" font-family="monospace" fill="#64748b">Envío: 28/05/2026 • Servidor: 28/05/2026 12:40:15</text>
+            <rect x="40" y="285" width="520" height="22" fill="#ffffff" rx="3"/>
+            <text x="48" y="300" font-size="8" font-style="italic" fill="#166534">"Aprobada la emisión oficial. Se firma orden de pago y se genera el devengo contable subyacente (B.1)."</text>
 
             <!-- Modal 1 Footer -->
             <rect x="470" y="455" width="100" height="30" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
@@ -1228,31 +1393,32 @@ export class IngresosController {
 
             <!-- MODAL 2: DIÁLOGO DE ACCIÓN DE WORKFLOW CON MENSAJE (Derecha) -->
             <rect x="600" y="40" width="340" height="440" fill="#ffffff" rx="6" stroke="#cbd5e1" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.08))"/>
-            <rect x="600" y="40" width="340" height="36" fill="#b91c1c" rx="6 6 0 0"/>
-            <text x="615" y="63" font-size="11" font-weight="bold" fill="#ffffff">Regresar Ingreso con Observaciones</text>
+            <rect x="600" y="40" width="340" height="36" fill="#183125" rx="6 6 0 0"/>
+            <text x="615" y="63" font-size="11" font-weight="bold" fill="#ffffff">Formalizar y Devengar Orden</text>
             <text x="925" y="63" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="end">✕</text>
 
-            <rect x="615" y="86" width="310" height="26" fill="#fef2f2" rx="3"/>
-            <text x="622" y="98" font-size="7.5" fill="#991b1b">El trámite transitará a estado OBSERVADO y se</text>
-            <text x="622" y="108" font-size="7.5" fill="#991b1b">devolverá al capturista con su mensaje institucional.</text>
+            <rect x="615" y="86" width="310" height="26" fill="#ecfdf5" rx="3"/>
+            <text x="622" y="98" font-size="7.5" fill="#065f46">La orden transitará a DEVENGADO, asignará folio</text>
+            <text x="622" y="108" font-size="7.5" fill="#065f46">definitivo y disparará la Matriz B.1 subyacente.</text>
 
-            <text x="615" y="132" font-size="8.5" font-weight="bold" fill="#475569">FECHA DE OPERACIÓN / ENVÍO *</text>
+            <text x="615" y="132" font-size="8.5" font-weight="bold" fill="#475569">FECHA DE OPERACIÓN / EMISIÓN *</text>
             <rect x="615" y="138" width="310" height="24" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
-            <text x="625" y="154" font-size="9" fill="#1e293b">07/03/2026</text>
+            <text x="625" y="154" font-size="9" fill="#1e293b">28/05/2026</text>
 
-            <text x="615" y="180" font-size="8.5" font-weight="bold" fill="#475569">OBSERVACIONES / JUSTIFICACIÓN DE LA ACCIÓN *</text>
-            <rect x="615" y="186" width="310" height="150" fill="#ffffff" stroke="#fca5a5" stroke-width="1.5" rx="4"/>
-            <text x="625" y="205" font-size="8.5" fill="#1e293b">Favor de anexar la circular de</text>
-            <text x="625" y="220" font-size="8.5" fill="#1e293b">afectación al Capítulo 2000 emitida por</text>
-            <text x="625" y="235" font-size="8.5" fill="#1e293b">Recursos Materiales antes de autorizar.</text>
+            <text x="615" y="180" font-size="8.5" font-weight="bold" fill="#475569">JUSTIFICACIÓN / MENSAJE INSTITUCIONAL *</text>
+            <rect x="615" y="186" width="310" height="150" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5" rx="4"/>
+            <text x="625" y="205" font-size="8.5" fill="#1e293b">Revisado el desglose presupuestal</text>
+            <text x="625" y="220" font-size="8.5" fill="#1e293b">de los 4 órganos judiciales conforme</text>
+            <text x="625" y="235" font-size="8.5" fill="#1e293b">al Oficio macro DGA/0367/2026. Aprobado</text>
+            <text x="625" y="250" font-size="8.5" fill="#1e293b">para devengo y trámite ante SEFIPLAN.</text>
 
             <text x="615" y="352" font-size="7.5" font-style="italic" fill="#64748b">* Obligatorio para bitácora forense (mín. 5 caracteres).</text>
 
             <rect x="615" y="430" width="100" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
             <text x="665" y="450" font-size="9" fill="#64748b" text-anchor="middle">Cancelar</text>
 
-            <rect x="730" y="430" width="195" height="32" fill="#dc2626" rx="4"/>
-            <text x="827" y="450" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">Confirmar Devolución</text>
+            <rect x="730" y="430" width="195" height="32" fill="#183125" rx="4"/>
+            <text x="827" y="450" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">Confirmar Formalización</text>
           </svg>
         </div>
       </div>
@@ -1268,21 +1434,27 @@ export class IngresosController {
       <tbody>
         <tr>
           <td><code>CP-ING-01</code></td>
-          <td>Guardado en Modo Borrador</td>
-          <td>Capturar ministración y dar clic en <code>[Guardar Borrador]</code></td>
-          <td>Inserta en `ingresos_encabezado` con `estatus = 'BORRADOR'` y guarda las líneas de pre-póliza resueltas.</td>
+          <td>Guardado de Orden en Modo Borrador</td>
+          <td>Capturar Solicitud de Recursos clave <code>01-06-2026</code> (Trámite <code>2026-011</code>), adjuntar PDF del <code>Of. DGA/0367/2026</code> y registrar desglose presupuestal en borrador. Clic en <code>[Guardar Borrador]</code>.</td>
+          <td>Inserta en <code>ingresos.ingresos_encabezado</code> con <code>estatus = 'BORRADOR'</code>, guarda las 4 partidas de órganos judiciales en <code>ingresos_distribucion</code> y genera la pre-póliza en vivo sin afectar saldos contables definitivos.</td>
         </tr>
         <tr>
           <td><code>CP-ING-02</code></td>
-          <td>Formalización y Póliza en Firme</td>
-          <td>Dar clic en <code>[Formalizar y Devengar]</code> sobre un borrador cuadrado</td>
-          <td>Asigna folio oficial `ING-2026-XXXX`, actualiza estatus a `DEVENGADO` y transita la pre-póliza a definitiva.</td>
+          <td>Formalización y Devengo Subyacente (B.1)</td>
+          <td>Dar clic en <code>[Formalizar y Devengar]</code> sobre la orden <code>01-06-2026</code> por $51,958,628.00 con cuadre exacto de partidas entre TSJ, TCA, TDJ y OAJ.</td>
+          <td>Transita estatus a <code>DEVENGADO</code>, asigna folio definitivo inmutable y detona de forma invisible la Matriz B.1 CONAC: Cargo a Cuentas por Cobrar (1.1.2.2.0001) y Cargo a Ley por Ejecutar (8.1.2) vs Abono a Transferencias del Ejecutivo (4.1.5.1.0001) y Ley Devengada (8.1.4).</td>
         </tr>
         <tr>
           <td><code>CP-ING-03</code></td>
-          <td>Cobranza en Parcialidad</td>
-          <td>Asociar depósito de $20,000,000 sobre un devengo de $45,000,000</td>
-          <td>El saldo pendiente se reduce a $25,000,000 y el estatus pasa a `PARCIALMENTE_RECIBIDO`.</td>
+          <td>Conciliación Bancaria BBVA Net Cash y Recaudación Subyacente (B.2)</td>
+          <td>Asociar depósito en línea del extracto BBVA Net Cash (cuenta <code>0126144101</code>, referencia <code>REFBNTC00316148</code> por $21,157,862.50) a la orden de gastos de operación <code>02-06-2026</code>.</td>
+          <td>El saldo pendiente se reduce a $0.00, estatus transita a <code>RECAUDADO</code>, y se genera automáticamente la Matriz B.2 CONAC: Cargo a Bancos BBVA (1.1.1.2.0126) vs Abono a Cuentas por Cobrar (1.1.2.2.0001) y Cargo a Ley Devengada (8.1.4) vs Abono a Ley Recaudada (8.1.5).</td>
+        </tr>
+        <tr>
+          <td><code>CP-ING-04</code></td>
+          <td>Validación de Evidencia Probatoria en PDF</td>
+          <td>Intentar formalizar una orden de ministración sin adjuntar el documento probatorio (PDF con acuse SEFIPLAN).</td>
+          <td>El sistema bloquea la formalización indicando: <em>"Debe adjuntar la evidencia digital probatoria (archivo PDF del oficio con acuse) en el expediente electrónico del trámite."</em></td>
         </tr>
       </tbody>
     </table>
@@ -1294,6 +1466,12 @@ export class IngresosController {
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción del Cambio</th></tr></thead>
       <tbody>
+        <tr>
+          <td><code>v2.3.0</code></td>
+          <td>07/09/2026</td>
+          <td>Julio César / Eunice</td>
+          <td><strong>Alineación con Documentación Institucional Real (Oficio DGA/0367/2026, Orden 01-06-2026 y BBVA Net Cash):</strong> Reestructuración operativa e iconográfica total basándose fielmente en los tres documentos institucionales: (1) Delimitación del oficio macro remitido a SEFIPLAN como evidencia digital probatoria (PDF con acuse) no contable; (2) Captura transaccional mediante el formato oficial <em>Solicitud / Comprobación de Recursos (Orden de Pago)</em> desglosando las partidas presupuestales por Órgano Judicial Beneficiario (Tribunal Superior de Justicia, Tribunal de Conciliación y Arbitraje, Tribunal de Disciplina Judicial y Órgano de Administración Judicial), detonando el devengo subyacente (B.1); y (3) Conciliación bancaria directa con el extracto en línea de BBVA Net Cash (cuenta <code>0126144101</code> "MINISTRACION 2026", depósito <code>REFBNTC00316148</code> por $21,157,862.50), detonando la recaudación subyacente (B.2) con cero intervención contable manual.</td>
+        </tr>
         <tr>
           <td><code>v2.2.0</code></td>
           <td>07/09/2026</td>
