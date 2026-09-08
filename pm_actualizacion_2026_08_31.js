@@ -306,17 +306,17 @@
     documentacion:'Análisis funcional inicial',
     documento:'04_ingresos/04.2.1-registro-ingresos.html',
     opciones:[
-      'Wizard Modal de selección de Trámite (4 familias / 12 subtipos)',
-      'Formulario adaptativo por procedimiento',
-      'Pre-póliza en tiempo real visible y validada en MODO BORRADOR',
-      'Desglose presupuestario por Capítulos (1000 a 5000) y Fuentes',
-      'Gestión de depósitos bancarios y parcialidades 1:N',
-      'Control de saldos pendientes por percibir',
+      'Wizard Modal de selección de Trámite (Paso 0: 4 macro-familias / 12 subtipos)',
+      'Captura administrativa sustantiva (Oficio SEFIPLAN, fechas y documentación soporte)',
+      'Apertura y desglose de techo presupuestal por Capítulos (1000 a 5000) y Fuentes',
+      'Afectación contable subyacente en segundo plano (Matriz CONAC 03.1.2 B.1 Devengado)',
+      'Conciliación bancaria posterior y asociación de depósitos SPEI (Paso 2)',
+      'Disminución automática de saldo por cobrar y recaudación subyacente (Matriz B.2)',
       'Tablero de mensajes y bitácora de trazabilidad (IngresoHistorialTimeline)',
       'Modal de historial completo y diálogo de workflow (IngresoWorkflowModal)',
-      'Formalización inmutable con folio oficial'
+      'Formalización inmutable con folio oficial e integración transversal'
     ],
-    evidencia:'Módulo central unificado con experiencia Wizard idéntica a Egresos 05.2.1, pre-póliza oficial evaluada desde el borrador y tablero de mensajes de workflow.'
+    evidencia:'Módulo central unificado con experiencia Wizard idéntica a Egresos 05.2.1, captura administrativa limpia de asientos manuales, contabilidad subyacente y tablero de mensajes de workflow.'
   });
   ing('04.3.1','04.3 Procesos','Conciliación de ingresos',{
     perfil:'conta',
