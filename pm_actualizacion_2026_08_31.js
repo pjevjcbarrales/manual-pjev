@@ -237,7 +237,7 @@
     opciones:['Consulta y filtros','Correlacion SAFPOJ-SIAF','Validacion para importacion de polizas'],
     evidencia:'Implementado con frontend, servicio y controlador backend, y funciones PostgreSQL de lectura e importacion.'
   });
-  const matrices=buscar('03.1.2'); if(matrices){matrices.desarrollador_asignado='Julio Cesar';matrices.opciones=['Matrices versionadas','Reglas y movimientos','Simulador','Ruta legacy por retirar'];matrices.rutas.push('/conta/reg/matriz-conversion');matrices.evidencia_actualizacion='Modulo desarrollado por Julio Cesar.';}
+  const matrices=buscar('03.1.2'); if(matrices){matrices.desarrollador_asignado='Julio Barrales';matrices.opciones=['Matrices versionadas','Reglas y movimientos','Simulador','Ruta legacy por retirar'];matrices.rutas.push('/conta/reg/matriz-conversion');matrices.evidencia_actualizacion='Modulo desarrollado por Julio Barrales.';}
   const polizas=buscar('03.2.1'); if(polizas){polizas.opciones=['Captura manual','Importacion SAFPOJ'];polizas.rutas.push('/conta/reg/polizas/importar-safpoj');}
   const cierre=buscar('03.3.7'); if(cierre){cierre.opciones=['Cuenta pólizas','Validar pólizas','Cerrar mes contable'];cierre.rutas.push('/conta/pro/cierre');cierre.estado='Pendiente de revision y validacion funcional';cierre.evidencia_actualizacion='El flujo requerido comprende Cuenta polizas, Validar polizas y Cerrar mes contable. Se conserva la evidencia tecnica, pero el modulo permanece pendiente de desarrollo.';}
   const conciliacionPresupuestaria = buscar('03.3.4');

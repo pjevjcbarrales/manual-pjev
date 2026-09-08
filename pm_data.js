@@ -695,7 +695,7 @@ const pmData = {
             "iteracion_desarrollo": 2,
             "avance_desarrollo": 1,
             "visitas": [],
-            "desarrollador_asignado": "Cristian",
+            "desarrollador_asignado": "Julio Barrales",
             "subsistema": "Catálogo",
             "estado": "Terminado",
             "analista_asignado": "Julio César"
