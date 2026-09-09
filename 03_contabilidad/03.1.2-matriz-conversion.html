@@ -1000,7 +1000,8 @@ export class MatrizConversionController {
     <div class="wf-tabs">
       <button class="wf-tab active" onclick="showTab('tab-grid-esq', this)">Grid Consulta (Esqueleto)</button>
       <button class="wf-tab" onclick="showTab('tab-grid-val', this)">Grid Consulta (Valores)</button>
-      <button class="wf-tab" onclick="showTab('tab-detalle', this)">Detalle y Reglas (Maestro-Detalle)</button>
+      <button class="wf-tab" onclick="showTab('tab-detalle', this)">Detalle: Vista Mosaico</button>
+      <button class="wf-tab" onclick="showTab('tab-detalle-tabla', this)">Detalle: Vista Detalles (Tabla)</button>
       <button class="wf-tab" onclick="showTab('tab-simulador', this)">Modal Simulador en Vivo</button>
     </div>
 
@@ -1178,8 +1179,15 @@ export class MatrizConversionController {
             <rect x="20" y="195" width="960" height="450" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
             <text x="35" y="215" font-size="12" font-weight="bold" fill="#1B3A2D">Reglas de Conversión (103)</text>
             <text x="210" y="215" font-size="10" fill="#64748b">Agrupadas por Tipo de Procedimiento, Subtipo, Beneficiario y Clasificador (COG)</text>
-            <rect x="860" y="203" width="105" height="24" fill="#1B3A2D" rx="3"/>
-            <text x="912" y="218" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">+ Añadir Regla</text>
+
+            <!-- Toggle Mosaico / Detalles (Activo: Mosaico) -->
+            <rect x="705" y="202" width="140" height="26" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <rect x="707" y="204" width="68" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="741" y="218" font-size="9" font-weight="bold" fill="#1B3A2D" text-anchor="middle">⊞ Mosaico</text>
+            <text x="810" y="218" font-size="9" fill="#64748b" text-anchor="middle">☰ Detalles</text>
+
+            <rect x="855" y="203" width="110" height="24" fill="#1B3A2D" rx="3"/>
+            <text x="910" y="218" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">+ Añadir Regla</text>
 
             <!-- BARRA DE FILTROS EN ESQUEMA [ETIQUETA : CAJA] (4 DIMENSIONES DE ORIGEN) -->
             <rect x="35" y="235" width="930" height="48" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
@@ -1315,6 +1323,140 @@ export class MatrizConversionController {
             <!-- Resumen de Cuadre Dual en la regla -->
             <rect x="45" y="577" width="910" height="24" fill="#ecfdf5" stroke="#a7f3d0" rx="3"/>
             <text x="55" y="593" font-size="8" font-weight="bold" fill="#065f46">BALANCE DUAL DE LA REGLA: CONTABILIDAD CUADRADA (Debe: $100% = Haber: $100%) | PRESUPUESTO CUADRADO (Clase 8 Debe: $100% = Haber: $100%)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3B: Detalle Vista Detalles (Tabla Resumen de Reglas) -->
+    <div id="tab-detalle-tabla" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar"><span>Detalle de Matriz — Vista Detalles (Tabla de Encabezados de Reglas)</span><span>Ruta: /conta/cat/matrices/[id]</span></div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1000px;">
+            <rect width="1000" height="400" fill="#fff" stroke="#cbd5e1" rx="6"/>
+
+            <!-- Cabecera de Matriz (PageHeader) -->
+            <rect x="20" y="12" width="960" height="40" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="35" y="36" font-size="13" font-weight="bold" fill="#1B3A2D">A1_DEVENGADO_GASTOS — Devengado de Gastos (Cap. 1000 a Puente)</text>
+            <rect x="580" y="22" width="65" height="20" fill="#dcfce7" stroke="#bbf7d0" rx="10"/>
+            <text x="612" y="35" font-size="8" font-weight="bold" fill="#166534" text-anchor="middle">ACTIVA</text>
+            
+            <rect x="655" y="20" width="95" height="24" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="702" y="35" font-size="9" font-weight="bold" fill="#334155" text-anchor="middle">✏ Encabezado</text>
+            <rect x="760" y="20" width="90" height="24" fill="#0284c7" rx="4"/>
+            <text x="805" y="35" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">▶ SIMULAR</text>
+            <rect x="860" y="20" width="110" height="24" fill="#1B3A2D" rx="4"/>
+            <text x="915" y="35" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">Actualizar Matriz</text>
+
+            <!-- Card: Reglas de Conversión en Vista Detalles -->
+            <rect x="20" y="65" width="960" height="315" fill="#ffffff" stroke="#e2e8f0" rx="4"/>
+            <text x="35" y="90" font-size="12" font-weight="bold" fill="#1B3A2D">Reglas de Conversión (103)</text>
+            <text x="210" y="90" font-size="10" fill="#64748b">Vista Detalles: Resumen tabular de encabezados y clasificadores</text>
+
+            <!-- Toggle Mosaico / Detalles (Activo: Detalles) -->
+            <rect x="705" y="75" width="140" height="26" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+            <text x="738" y="91" font-size="9" fill="#64748b" text-anchor="middle">⊞ Mosaico</text>
+            <rect x="775" y="77" width="67" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="808" y="91" font-size="9" font-weight="bold" fill="#1B3A2D" text-anchor="middle">☰ Detalles</text>
+
+            <rect x="855" y="76" width="110" height="24" fill="#1B3A2D" rx="3"/>
+            <text x="910" y="91" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">+ Añadir Regla</text>
+
+            <!-- BARRA DE FILTROS EN ESQUEMA [ETIQUETA : CAJA] -->
+            <rect x="35" y="110" width="930" height="48" fill="#f8fafc" stroke="#e2e8f0" rx="4"/>
+            <text x="45" y="123" font-size="8" font-weight="bold" fill="#1B3A2D">1. TIPO DE PROCEDIMIENTO (CXP)</text>
+            <rect x="45" y="127" width="205" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="55" y="141" font-size="9" fill="#1e293b">Todos los tipos (CxP) ▾</text>
+
+            <text x="260" y="123" font-size="8" font-weight="bold" fill="#1B3A2D">2. SUBTIPO DE PROCEDIMIENTO (CXP)</text>
+            <rect x="260" y="127" width="220" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="270" y="141" font-size="9" fill="#1e293b">Todos los subtipos (CxP) ▾</text>
+
+            <text x="490" y="123" font-size="8" font-weight="bold" fill="#1B3A2D">3. BENEFICIARIO</text>
+            <rect x="490" y="127" width="205" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="500" y="141" font-size="9" fill="#1e293b">Todos los beneficiarios ▾</text>
+
+            <text x="705" y="123" font-size="8" font-weight="bold" fill="#1B3A2D">4. CLASIFICADOR COG / BÚSQUEDA</text>
+            <rect x="705" y="127" width="250" height="22" fill="#ffffff" stroke="#cbd5e1" rx="3"/>
+            <text x="715" y="141" font-size="9" fill="#94a3b8">Ej. 11100001, Sueldos, Viáticos... 🔍</text>
+
+            <!-- TABLA VISTA DETALLES (9 COLUMNAS SOLICITADAS) -->
+            <rect x="35" y="170" width="930" height="26" fill="#1B3A2D" rx="3 3 0 0"/>
+            <text x="45" y="187" font-size="8" font-weight="bold" fill="#fff">CLAVE IDENTIFICADORA</text>
+            <text x="165" y="187" font-size="8" font-weight="bold" fill="#fff">NOMBRE DE LA REGLA</text>
+            <text x="320" y="187" font-size="8" font-weight="bold" fill="#fff">TIPO PROCEDIMIENTO</text>
+            <text x="445" y="187" font-size="8" font-weight="bold" fill="#fff">SUBTIPO PROCEDIMIENTO</text>
+            <text x="595" y="187" font-size="8" font-weight="bold" fill="#fff">BENEFICIARIO</text>
+            <text x="685" y="187" font-size="8" font-weight="bold" fill="#fff">CLASIFICADOR (COG)</text>
+            <text x="815" y="187" font-size="8" font-weight="bold" fill="#fff">TIPO GASTO</text>
+            <text x="880" y="187" font-size="8" font-weight="bold" fill="#fff">SUBTIPO PROV.</text>
+            <text x="940" y="187" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">ACCIONES</text>
+
+            <!-- Fila 1: Nómina -->
+            <rect x="35" y="196" width="930" height="30" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="45" y="215" font-size="8" font-family="monospace" font-weight="bold" fill="#1B3A2D">R_A1_11301_01</text>
+            <text x="165" y="215" font-size="8" fill="#1e293b">Sueldos Base al Personal Permanente</text>
+            <text x="320" y="215" font-size="8" fill="#475569">Gasto Directo</text>
+            <text x="445" y="215" font-size="8" fill="#475569">NOMINA - Nómina Quincenal</text>
+            <text x="595" y="215" font-size="8" fill="#1e293b">Empleado</text>
+            <text x="685" y="215" font-size="8" font-family="monospace" font-weight="bold" fill="#1B3A2D">11301 - Sueldos Base</text>
+            <text x="815" y="215" font-size="8" fill="#475569">1 - Corriente</text>
+            <text x="880" y="215" font-size="8" fill="#94a3b8">No Aplica</text>
+            <rect x="915" y="202" width="22" height="18" fill="#f1f5f9" stroke="#cbd5e1" rx="2"/>
+            <text x="926" y="214" font-size="8" fill="#334155" text-anchor="middle">✏</text>
+            <rect x="940" y="202" width="22" height="18" fill="#fef2f2" stroke="#fecaca" rx="2"/>
+            <text x="951" y="214" font-size="8" fill="#b91c1c" text-anchor="middle">🗑</text>
+
+            <!-- Fila 2: Compra Directa Materiales -->
+            <rect x="35" y="226" width="930" height="30" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="45" y="245" font-size="8" font-family="monospace" font-weight="bold" fill="#1B3A2D">R_A1_21101_01</text>
+            <text x="165" y="245" font-size="8" fill="#1e293b">Materiales, Útiles y Equipos Menores</text>
+            <text x="320" y="245" font-size="8" fill="#475569">Gasto Directo</text>
+            <text x="445" y="245" font-size="8" fill="#475569">GASTO_DIRECTO_GENERAL</text>
+            <text x="595" y="245" font-size="8" fill="#1e293b">Proveedor</text>
+            <text x="685" y="245" font-size="8" font-family="monospace" font-weight="bold" fill="#1B3A2D">21101 - Materiales</text>
+            <text x="815" y="245" font-size="8" fill="#475569">1 - Corriente</text>
+            <text x="880" y="245" font-size="8" fill="#1e293b">Bienes Consumo (211-218)</text>
+            <rect x="915" y="232" width="22" height="18" fill="#f1f5f9" stroke="#cbd5e1" rx="2"/>
+            <text x="926" y="244" font-size="8" fill="#334155" text-anchor="middle">✏</text>
+            <rect x="940" y="232" width="22" height="18" fill="#fef2f2" stroke="#fecaca" rx="2"/>
+            <text x="951" y="244" font-size="8" fill="#b91c1c" text-anchor="middle">🗑</text>
+
+            <!-- Fila 3: Servicios Básicos Luz -->
+            <rect x="35" y="256" width="930" height="30" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="45" y="275" font-size="8" font-family="monospace" font-weight="bold" fill="#1B3A2D">R_A1_31101_01</text>
+            <text x="165" y="275" font-size="8" fill="#1e293b">Servicio de Energía Eléctrica (CFE)</text>
+            <text x="320" y="275" font-size="8" fill="#475569">Gasto Directo</text>
+            <text x="445" y="275" font-size="8" fill="#475569">SERVICIOS_BASICOS</text>
+            <text x="595" y="275" font-size="8" fill="#1e293b">Proveedor</text>
+            <text x="685" y="275" font-size="8" font-family="monospace" font-weight="bold" fill="#1B3A2D">31101 - Energía Eléctrica</text>
+            <text x="815" y="275" font-size="8" fill="#475569">1 - Corriente</text>
+            <text x="880" y="275" font-size="8" fill="#1e293b">Servicios Básicos (311-319)</text>
+            <rect x="915" y="262" width="22" height="18" fill="#f1f5f9" stroke="#cbd5e1" rx="2"/>
+            <text x="926" y="274" font-size="8" fill="#334155" text-anchor="middle">✏</text>
+            <rect x="940" y="262" width="22" height="18" fill="#fef2f2" stroke="#fecaca" rx="2"/>
+            <text x="951" y="274" font-size="8" fill="#b91c1c" text-anchor="middle">🗑</text>
+
+            <!-- Fila 4: Viáticos por Comprobar -->
+            <rect x="35" y="286" width="930" height="30" fill="#f8fafc" stroke="#f1f5f9"/>
+            <text x="45" y="305" font-size="8" font-family="monospace" font-weight="bold" fill="#1B3A2D">R_A1_37501_01</text>
+            <text x="165" y="305" font-size="8" fill="#1e293b">Viáticos Nacionales para Servidores Públicos</text>
+            <text x="320" y="305" font-size="8" fill="#475569">Gastos a Comprobar</text>
+            <text x="445" y="305" font-size="8" fill="#475569">COMPROBACION_VIATICOS</text>
+            <text x="595" y="305" font-size="8" fill="#1e293b">Empleado</text>
+            <text x="685" y="305" font-size="8" font-family="monospace" font-weight="bold" fill="#1B3A2D">37501 - Viáticos Nacionales</text>
+            <text x="815" y="305" font-size="8" fill="#475569">1 - Corriente</text>
+            <text x="880" y="305" font-size="8" fill="#94a3b8">No Aplica</text>
+            <rect x="915" y="292" width="22" height="18" fill="#f1f5f9" stroke="#cbd5e1" rx="2"/>
+            <text x="926" y="304" font-size="8" fill="#334155" text-anchor="middle">✏</text>
+            <rect x="940" y="292" width="22" height="18" fill="#fef2f2" stroke="#fecaca" rx="2"/>
+            <text x="951" y="304" font-size="8" fill="#b91c1c" text-anchor="middle">🗑</text>
+
+            <!-- Paginación / Footer -->
+            <rect x="35" y="325" width="930" height="35" fill="#f1f5f9" stroke="#cbd5e1" rx="0 0 3 3"/>
+            <text x="50" y="347" font-size="8" fill="#64748b">Mostrando 4 de 103 reglas filtradas</text>
+            <text x="945" y="347" font-size="8" font-weight="bold" fill="#1B3A2D" text-anchor="end">Página 1 de 26  ‹ 1 2 3 … 26 ›</text>
           </svg>
         </div>
       </div>
@@ -1590,6 +1732,12 @@ export class MatrizConversionController {
           <td>2026-09-08</td>
           <td>2.0</td>
           <td>Homologación completa con el sistema real SIAF-PJEV: migración al esquema <code>contabilidad.matriz_conversion</code>, incorporación de SPs oficiales LEER/CRUD, integración de controlador NestJS Swagger, inclusión de Matriz A0 de reclasificación de OP (Migración 180), desacoplamiento de nómina a cuenta puente 2.1.1.9 (Migración 179) y motor de simulación interactiva con aritmética BigInt.</td>
+          <td>Julio César Barrales Flores</td>
+        </tr>
+        <tr>
+          <td>2026-09-08</td>
+          <td>2.1</td>
+          <td>Implementación de vista dual en interfaz de reglas: selector de modo <strong>Vista Mosaico</strong> (tarjetas completas con movimientos de partida doble) y <strong>Vista Detalles</strong> (tabla compacta con las columnas del encabezado: Clave Identificadora, Nombre, Tipo y Subtipo de Procedimiento, Beneficiario, Clasificador COG/CRI, Tipo de Gasto, Subtipo de Proveedor y Acciones de edición/eliminación).</td>
           <td>Julio César Barrales Flores</td>
         </tr>
       </tbody>
