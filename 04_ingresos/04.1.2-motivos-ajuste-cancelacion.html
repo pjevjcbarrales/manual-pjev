@@ -231,8 +231,8 @@
           <td><code>CAP_INCORRECTO</code></td>
           <td><strong>Capítulo de gasto o fondo incorrecto</strong></td>
           <td><span class="tag-status sev-ctrl">Control</span></td>
-          <td>Analista / Jefe</td>
-          <td>Reasignación de techo presupuestal multilínea.</td>
+          <td>Jefe de Presupuesto (solicita analista, aprueba jefatura)</td>
+          <td>Reasignación de techo presupuestal multilínea (genera_contramovimiento = true).</td>
         </tr>
         <tr>
           <td>9</td>
@@ -264,7 +264,7 @@
           <td><strong>Otro motivo autorizado</strong></td>
           <td><span class="tag-status sev-crit">Crítica</span></td>
           <td>Dirección Gral. Adm.</td>
-          <td>Exige captura obligatoria de justificación ampliada.</td>
+          <td>Sin póliza automática (genera_contramovimiento = false). Exige justificación y póliza manual en 03.2.1 si aplica.</td>
         </tr>
       </tbody>
     </table>
@@ -638,6 +638,12 @@ export class MotivosAjusteIngresoController {
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción del Cambio</th></tr></thead>
       <tbody>
+        <tr>
+          <td><code>v2.1.0</code></td>
+          <td>08/09/2026</td>
+          <td>Daryl / Julio César</td>
+          <td><strong>Precisiones de gobernanza en ajuste:</strong> Se clarifica que <code>CAP_INCORRECTO</code> es solicitado por el analista y aprobado por el Jefe de Presupuesto (altera techos autorizados); y que <code>OTRO_AUTORIZ</code> no genera contramovimiento contable automático (genera_contramovimiento = false), delegando a Contabilidad la póliza manual si aplica.</td>
+        </tr>
         <tr>
           <td><code>v2.0.0</code></td>
           <td>07/09/2026</td>
