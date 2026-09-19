@@ -44,6 +44,9 @@ Cuando se documente un nuevo módulo, se deben respetar las siguientes reglas t�
     * **Servicios API REST (Swagger / NestJS)**: Tabla de endpoints HTTP y controlador NestJS con decoradores (`@ApiTags`, `@ApiOperation`, `@UseGuards`).
     * **Regla de Ubicación Mandatoria**: Los SPs y Swagger deben situarse **inmediatamente después del modelo de datos / diccionario de campos**, reenumerando secuencialmente las secciones siguientes (1 a 14/15).
     * **Convergencia con la Matriz de Conversión CONAC (`03.1.2`)**: Los conceptos operan desacoplados; mapean hacia CRI y disparan automáticamente las Matrices B.1 (Devengado), B.2 (Recaudado), B.3 (Simultáneo) o Pasivos/Reversos sin captura manual de cuentas contables.
+* **Último Avance Consolidado (¿Dónde me quedé?)**:
+  * **Análisis y Reconstrucción Canónica de Fuentes de Financiamiento (`01.2.4`)**: Árbol jerárquico SAFPOJ, clasificación No Etiquetado / Etiquetado LDF, catálogo canónico 2026, modelo de datos, SPs (`fn_leer_fuentesf`, `fn_crud_fuentesf`), API NestJS y wireframes SVG interactivos en `01_cfg/01.2.4-fuentes-financiamiento.html`.
+  * Archivo de seguimiento de sesiones: [ULTIMAS_CONVERSACIONES.md](file:///c:/dixsys/manual_pjev/ULTIMAS_CONVERSACIONES.md).
 * **Próximo Objetivo (05 · Cuentas por Pagar - CxP)**:
   * Responsable técnico de desarrollo: Cristian.
   * Catálogos: `05.1.1 Requisitos documentales`, `05.1.2 Tarifas y zonas de viáticos`, `05.1.3 Conceptos de retención y deducción`.
