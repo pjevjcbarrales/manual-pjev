@@ -14,18 +14,88 @@
   .method.put    { background:#fff3e0; color:#e65100; }
   .method.delete { background:#fdecea; color:#991b1b; }
   .wireframe-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
-  .wf-tab { padding:6px 14px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
+  .wf-tab { padding:8px 16px; font-size:11.5px; font-weight:700; border-radius:6px; border:1px solid var(--pjev-borde); background:var(--pjev-blanco); cursor:pointer; color:var(--pjev-texto-muted); transition:all 0.15s; }
   .wf-tab.active { background:var(--pjev-verde-oscuro); color:#fff; border-color:var(--pjev-verde-oscuro); }
   .wf-panel { display:none; }
   .wf-panel.active { display:block; }
-  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); }
-  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
-  .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; }
-  .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; }
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); box-shadow:0 3px 12px rgba(0,0,0,0.06); }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; }
+  .wf-bar-label { font-size:11px; font-weight:700; color:var(--pjev-texto-muted); text-transform:uppercase; letter-spacing:0.5px; }
+  .wf-svg-area  { background:#fafafa; padding:20px; overflow-x:auto; }
   .flujo-box { background:var(--code-bg); border-radius:8px; padding:20px; font-family:var(--font-mono); font-size:12px; color:var(--code-text); line-height:1.8; overflow-x:auto; }
   .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
   .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
   .badge-p { background:#fff3e0; color:#e65100; border:1px solid #ffcc80; }
+  .badge-norma { background:#e8f5e9; color:#1b5e20; border:1px solid #a5d6a7; }
+  
+  /* Formato del Reporte Físico SAFPOJ */
+  .safpoj-sheet {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 26px 32px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #0f172a;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    margin-top: 14px;
+    margin-bottom: 24px;
+  }
+  .safpoj-header {
+    text-align: center;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  .safpoj-title-main { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; margin: 0; color: #0f172a; }
+  .safpoj-title-sub  { font-size: 12px; font-weight: 700; color: #334155; margin: 4px 0; }
+  .safpoj-org        { font-size: 11px; font-weight: 600; color: #64748b; margin: 0; }
+  
+  .safpoj-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin-bottom: 24px;
+  }
+  .safpoj-table th {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    padding: 8px 12px;
+    font-weight: 700;
+    text-align: left;
+    color: #0f172a;
+  }
+  .safpoj-table td {
+    border: 1px solid #e2e8f0;
+    padding: 6px 12px;
+  }
+  .row-lvl1 { font-weight: 800; background: #f8fafc; }
+  .row-lvl2 { font-weight: 700; color: #1e293b; }
+  .row-lvl3 { font-weight: 600; color: #334155; }
+  .row-leaf { font-weight: 500; color: #0f172a; }
+  .indent-1 { padding-left: 8px; }
+  .indent-2 { padding-left: 22px; }
+  .indent-3 { padding-left: 38px; }
+  .indent-4 { padding-left: 56px; }
+  .code-col { font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
+  .tag-ff { background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; border: 1px solid #bae6fd; }
+
+  .safpoj-signatures {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 36px;
+    padding-top: 10px;
+  }
+  .safpoj-sig-box {
+    text-align: center;
+    width: 42%;
+  }
+  .safpoj-sig-line {
+    border-top: 1px solid #475569;
+    margin-bottom: 6px;
+  }
+  .safpoj-sig-role { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+  .safpoj-sig-name { font-size: 11px; font-weight: 700; color: #0f172a; line-height: 1.3; }
+  .safpoj-sig-charge { font-size: 9.5px; color: #475569; line-height: 1.2; }
 </style>
 </head>
 <body>
@@ -34,162 +104,394 @@
     <div class="elem-breadcrumb">
       <a href="../index.html">Manual Dev</a> ›
       <span>Configuración Inicial</span> ›
-      <span>Catálogos Base</span> ›
+      <span>Catálogos Presupuestales</span> ›
       <span>Fuentes de Financiamiento</span>
     </div>
 
     <div class="elem-header">
       <div>
         <div class="elem-id">01.2.4</div>
-        <h1 class="elem-title">Fuentes de Financiamiento</h1>
-        <p class="elem-desc">Catálogo que identifica el origen de los recursos que conforman el presupuesto (Recursos Fiscales, Propios, FASP, etc.).</p>
+        <h1 class="elem-title">Fuentes de Financiamiento y Clasificador Presupuestal</h1>
+        <p class="elem-desc">Catálogo que identifica el origen de los recursos que conforman el presupuesto del Poder Judicial y su articulación en árbol con la Clasificación Económica de Ingresos (SEFIPLAN / SAFPOJ / CONAC).</p>
         <div class="mod-header-badges">
-          <span class="mod-badge badge-p">Modo B — Especificación para DB</span>
-          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">cfg / catalogos / fuentes-financiamiento</code></span>
+          <span class="mod-badge badge-p">Modo B — Especificación Canónica BD</span>
+          <span class="mod-badge badge-norma">Armonización CONAC / SEFIPLAN</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta Frontend: <code style="font-family:var(--font-mono);font-size:10px;">/cfg/cpp/fuentesf</code></span>
+          <span class="elem-tag" style="font-size:10px;">Endpoint Backend: <code style="font-family:var(--font-mono);font-size:10px;">/configuracion/fuentesf</code></span>
         </div>
       </div>
     </div>
 
-    <!-- 1. DESCRIPCIÓN -->
+    <!-- 1. VISTA EN ÁRBOL SAFPOJ -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-      <p>Este catálogo es fundamental para llevar cuentas separadas del gasto por <strong>origen del recurso</strong>. Por ejemplo, los subsidios federales o el Fondo de Aportaciones para la Seguridad Pública (FASP) requieren cuentas bancarias productivas específicas y una comprobación contable aislada para el ORFIS y la Auditoría Superior de la Federación (ASF).</p>
+      <div class="section-title"><span class="section-num">1</span> Estructura Oficial en Árbol (SAFPOJ / SEFIPLAN)</div>
+      <p>En el sistema oficial del Poder Judicial y la SEFIPLAN, las <strong>Fuentes de Financiamiento de 6 dígitos</strong> se presentan organizadas en un <strong>árbol jerárquico</strong> dentro del <em>Estado Analítico de Ingresos</em>, bajo la cuenta mayor de transferencias corrientes <strong><code>1180000</code></strong>:</p>
+
+      <!-- FORMATO OFICIAL SAFPOJ -->
+      <div class="safpoj-sheet">
+        <div class="safpoj-header">
+          <p class="safpoj-title-main">PODER JUDICIAL DEL ESTADO DE VERACRUZ</p>
+          <p class="safpoj-title-sub">ESTADO ANALÍTICO DE INGRESOS — ACUMULADO AL EJERCICIO FISCAL 2026</p>
+          <p class="safpoj-org">DE LA ORGANIZACIÓN: 301 C CONSEJO DE LA JUDICATURA</p>
+        </div>
+
+        <table class="safpoj-table">
+          <thead>
+            <tr>
+              <th style="width: 260px;">CLAVE ECONÓMICA Y FTE. FTO.</th>
+              <th>CONCEPTO</th>
+              <th style="width: 150px; text-align:center;">RÉGIMEN LDF / CONAC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-lvl1">
+              <td class="code-col">1180000</td>
+              <td><span class="indent-1">📁 TRANSF, ASIGNACIONES Y DONATIVOS CORR. RECIB.</span></td>
+              <td style="text-align:center;"><span class="tag-ff">Rubro Mayor</span></td>
+            </tr>
+            <tr class="row-lvl2">
+              <td class="code-col">1182000</td>
+              <td><span class="indent-2">📁 DEL SECTOR PUBLICO</span></td>
+              <td style="text-align:center;"><span class="tag-ff">Sector Público</span></td>
+            </tr>
+            <tr class="row-lvl3">
+              <td class="code-col">1182001</td>
+              <td><span class="indent-3">📁 PROVENIENTES DEL GOBIERNO FEDERAL</span></td>
+              <td style="text-align:center;"><span class="tag-ff">Ámbito Federal</span></td>
+            </tr>
+            <tr class="row-leaf">
+              <td class="code-col">1182001-250126</td>
+              <td><span class="indent-4">🔹 APORTACION FEDERAL FASP 2026</span></td>
+              <td style="text-align:center;"><span class="tag-ff" style="background:#fef3c7;color:#92400e;border-color:#fde68a;">Etiquetado Federal</span></td>
+            </tr>
+            <tr class="row-lvl3">
+              <td class="code-col">1182002</td>
+              <td><span class="indent-3">📁 PROVENIENTES DEL GOBIERNO ESTATAL</span></td>
+              <td style="text-align:center;"><span class="tag-ff">Ámbito Estatal</span></td>
+            </tr>
+            <tr class="row-leaf">
+              <td class="code-col">1182002-160126</td>
+              <td><span class="indent-4">🔹 PRESUPUESTO AUTORIZADO 2026 (Subsidio Ordinario)</span></td>
+              <td style="text-align:center;"><span class="tag-ff">No Etiquetado</span></td>
+            </tr>
+            <tr class="row-leaf">
+              <td class="code-col">1182002-160926</td>
+              <td><span class="indent-4">🔹 PRESUPUESTO AUTORIZADO 2026 (Convenios / Ajustes)</span></td>
+              <td style="text-align:center;"><span class="tag-ff">No Etiquetado</span></td>
+            </tr>
+            <tr class="row-leaf">
+              <td class="code-col">1182002-170126</td>
+              <td><span class="indent-4">🔹 OTROS INGRESOS 2026 (Recursos Propios)</span></td>
+              <td style="text-align:center;"><span class="tag-ff">No Etiquetado (Propios)</span></td>
+            </tr>
+            <tr class="row-leaf">
+              <td class="code-col">1182002-170226</td>
+              <td><span class="indent-4">🔹 FONDO AUXILIAR PARA LA IMPARTICION DE JUSTICIA</span></td>
+              <td style="text-align:center;"><span class="tag-ff">No Etiquetado (Fdo. Aux.)</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Firmas Institucionales -->
+        <div class="safpoj-signatures">
+          <div class="safpoj-sig-box">
+            <div class="safpoj-sig-line"></div>
+            <div class="safpoj-sig-role">ELABORÓ</div>
+            <div class="safpoj-sig-name">C.P. JUAN CARLOS HERNÁNDEZ LUNA</div>
+            <div class="safpoj-sig-charge">JEFE DEL DEPTO. DE PROGRAMACIÓN Y PRESUPUESTO</div>
+          </div>
+          <div class="safpoj-sig-box">
+            <div class="safpoj-sig-line"></div>
+            <div class="safpoj-sig-role">REVISÓ</div>
+            <div class="safpoj-sig-name">L.C. ALDO RAFAEL DOMÍNGUEZ RODRÍGUEZ</div>
+            <div class="safpoj-sig-charge">SUBDIRECTOR DE RECURSOS FINANCIEROS</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- 2. MARCO NORMATIVO -->
+    <!-- 2. DESGLOSE DE LA CLAVE COMPUESTA -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
-      <table class="props-table">
-        <thead><tr><th>Norma</th><th>Artículo / Punto</th><th>Obligación que genera</th></tr></thead>
-        <tbody>
-          <tr><td>Ley de Disciplina Financiera</td><td>Control de Fondos</td><td>Prohibición de mezclar recursos etiquetados (Federales) con recursos de libre disposición (Estatales / Propios).</td></tr>
-          <tr><td>Criterios PPE PJEV</td><td>Estructura Clave</td><td>La Fuente de Financiamiento es el componente que determina qué cuenta bancaria (Chequera) pagará el recurso.</td></tr>
-        </tbody>
-      </table>
+      <div class="section-title"><span class="section-num">2</span> Composición de la Clave: Económica + Fuente</div>
+      <p>La columna <strong><code>CLAVE ECONÓMICA Y FTE. FTO.</code></strong> se forma uniendo el concepto económico de 7 dígitos con la fuente de financiamiento de 6 dígitos:</p>
+      
+      <div class="flujo-box">
+  ┌────────────────────────────────────────────────────────┐   ┌───────────────────────────────────────────────┐
+  │ 1. CLASIFICACIÓN ECONÓMICA SEFIPLAN (7 Dígitos)        │   │ 2. FUENTE DE FINANCIAMIENTO CONAC (6 Dígitos) │
+  ├────────────────────────────────────────────────────────┤   ├───────────────────────────────────────────────┤
+  │ 1       = Ingreso Corriente                            │   │ 25 = CONAC Federal Etiquetado                 │
+  │ 1       = Sector Público Centralizado                  │   │ 01 = Fondo FASP                               │
+  │ 8       = Transferencias y Asignaciones Corrientes     │   │ 26 = Ejercicio Fiscal 2026                    │
+  │ 2       = Entidades del Sector Público                 │   │                                               │
+  │ 001/002 = Origen Federal (001) / Origen Estatal (002)  │   │ Clave Fuente: "250126"                        │
+  └────────────────────────────────────────────────────────┘   └───────────────────────────────────────────────┘
+                                           │                         │
+                                           └───────────► ◄───────────┘
+                                                         │
+                                        1182001 - 250126
+      </div>
     </div>
 
-    <!-- 3. ROLES -->
+    <!-- 3. MARCO NORMATIVO -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">3</span> Roles que intervienen</div>
+      <div class="section-title"><span class="section-num">3</span> Marco Normativo</div>
       <table class="props-table">
-        <thead><tr><th>Rol</th><th>Acción permitida</th><th>Restricción</th></tr></thead>
+        <thead><tr><th>Norma / Entidad</th><th>Artículo / Referencia</th><th>Obligación que genera</th></tr></thead>
         <tbody>
-          <tr><td><strong>Administrador / Jefe Presupuesto</strong></td><td>CRUD</td><td>No puede desactivar fuentes de financiamiento que tengan saldos presupuestales vivos.</td></tr>
+          <tr>
+            <td><strong>CONAC</strong></td>
+            <td><em>Clasificador por Fuentes de Financiamiento</em> (DOF 02/01/2013, reforma DOF 20/12/2016 — NOR_01_02_007)</td>
+            <td>Clasificación homogénea en 1. No Etiquetado (11 Fiscales, 14 Propios, 15 Federales, 16 Estatales, 17 Libre Disp.) y 2. Etiquetado (25 Federales, 26 Estatales).</td>
+          </tr>
+          <tr>
+            <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
+            <td>Artículos 4, 19 fr. III, 40 y 41</td>
+            <td>Obligatoriedad de interrelación automática presupuestaria-contable e identificación del origen del recurso en toda operación de activo o gasto.</td>
+          </tr>
+          <tr>
+            <td><strong>Ley de Disciplina Financiera (LDF)</strong></td>
+            <td>Control de Fondos y Cuentas Bancarias</td>
+            <td>Prohibición estricta de mezclar recursos etiquetados (Federales como FASP) con recursos de libre disposición (Estatales / Propios). Exige cuentas bancarias productivas exclusivas.</td>
+          </tr>
+          <tr>
+            <td><strong>SEFIPLAN Veracruz</strong></td>
+            <td>Catálogo 9. Fuente de Financiamiento (Decreto Anual de Presupuesto)</td>
+            <td>Nomenclatura oficial anual de las fuentes transferidas al Poder Judicial.</td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <!-- 4. MODELO DE DATOS -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos Canónico (<code>config.catalogo_fuentes_fin</code>)</div>
       <table class="props-table">
-        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Req.</th><th>Descripción / Regla de Negocio</th></tr></thead>
         <tbody>
-        <tr><td><code>cff_id</code> <span class="badge-req">REQ</span></td><td><code>INT PK</code></td><td>ID Autoincrementable.</td></tr>
-        <tr><td><code>cff_clave</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(10)</code></td><td>Clave presupuestal de la fuente (Ej. '11001'). Unique.</td></tr>
-        <tr><td><code>cff_abrev</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(5)</code></td><td>Abreviatura (Ej. 'FASP', 'RP').</td></tr>
-        <tr><td><code>cff_nombre</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(150)</code></td><td>Nombre largo descriptivo.</td></tr>
-        <tr><td><code>cff_descripcion</code></td><td><code>VARCHAR(300)</code></td><td>Normativa u origen legal del fondo.</td></tr>
-        <tr><td><code>cff_tipo</code></td><td><code>SMALLINT</code></td><td>Tipo de fuente (1=Estatal, 2=Federal, 3=Propios).</td></tr>
-        <tr><td><code>estatus_registro</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>1=Activo, 0=Baja Lógica.</td></tr>
+        <tr><td><code>cff_id</code></td><td><code>INT PK</code></td><td><span class="badge-req">REQ</span></td><td>Identificador autonumérico primario.</td></tr>
+        <tr><td><code>cff_clave</code></td><td><code>VARCHAR(10)</code></td><td><span class="badge-req">REQ</span></td><td>Clave numérica de 6 dígitos (Ej. '250126', '160126').</td></tr>
+        <tr><td><code>cff_abrev</code></td><td><code>VARCHAR(5)</code></td><td><span class="badge-req">REQ</span></td><td>Abreviatura corta utilizada en la Clave Presupuestal (Ej. 'EST', 'PROP', 'FASP').</td></tr>
+        <tr><td><code>cff_nombre</code></td><td><code>VARCHAR(150)</code></td><td><span class="badge-req">REQ</span></td><td>Nombre completo descriptivo del fondo (Ej. 'SUBSIDIO ESTATAL 2026').</td></tr>
+        <tr><td><code>cff_descripcion</code></td><td><code>VARCHAR(300)</code></td><td>OPT</td><td>Normativa, convenio u origen legal del fondo.</td></tr>
+        <tr><td><code>cff_tipo</code></td><td><code>SMALLINT</code></td><td><span class="badge-req">REQ</span></td><td>Tipo de fuente (1=Estatal, 2=Federal, 3=Propios, 4=Concentradora).</td></tr>
+        <tr><td><code>cff_ejercicio</code></td><td><code>INT FK</code></td><td><span class="badge-req">REQ</span></td><td>FK a <code>config.catalogo_ejercicios(eje_id)</code>. Ejercicio fiscal al que pertenece la clave.</td></tr>
+        <tr><td><code>cff_concentradora</code></td><td><code>SMALLINT</code></td><td><span class="badge-req">REQ</span></td><td>1=Cuenta concentradora (agrupa fondos), 0=Cuenta individual (requiere chequera).</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td><span class="badge-req">REQ</span></td><td>1=Activo, 0=Inactivo (Baja Lógica).</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(20)</code> / <code>TIMESTAMPTZ</code></td><td><span class="badge-req">REQ</span></td><td>Auditoría transversal de creación.</td></tr>
+        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(20)</code> / <code>TIMESTAMPTZ</code></td><td>OPT</td><td>Auditoría transversal de última modificación.</td></tr>
         </tbody>
       </table>
+      <p style="font-size:12px;margin-top:8px;color:var(--pjev-texto-muted);"><strong>Restricción de Unicidad:</strong> <code>UNIQUE(cff_clave, cff_ejercicio)</code> — La clave debe ser única por cada ejercicio fiscal.</p>
     </div>
 
-    <!-- 5. STORED PROCEDURES (ESPECIFICACIÓN) -->
+    <!-- 5. CATÁLOGO DE FONDOS DEL PJEV -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">5</span> Stored Procedures (Especificación)</div>
-      <p style="font-size:13px;margin-bottom:16px;color:var(--pjev-texto-muted);">SP requeridos a construir por el equipo de Base de Datos basados en el modelo Prisma.</p>
-      
-      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.1. Procedimiento LEER (<code>fn_leer_catalogo_fuentes_fin</code>)</h4>
-      <table class="props-table" style="margin-bottom:20px;">
-        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
-        <tbody>
-        <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>ID del registro o NULL</td></tr>
-        <tr><td><code>@p_busqueda</code></td><td><code>VARCHAR</code></td><td>Filtro cff_clave, cff_abrev, cff_nombre</td></tr>
-        <tr><td><code>@p_estatus</code></td><td><code>INT</code></td><td>Estatus registro</td></tr>
-        </tbody>
-      </table>
-
-      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.2. Procedimiento ABC (<code>fn_abc_catalogo_fuentes_fin</code>)</h4>
-      <table class="props-table" style="margin-bottom:20px;">
-        <thead><tr><th>Parámetros de Entrada (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
-        <tbody>
-        <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>ID o NULL</td></tr>
-        <tr><td><code>@p_clave</code></td><td><code>VARCHAR</code></td><td>Clave</td></tr>
-        <tr><td><code>@p_abrev</code></td><td><code>VARCHAR</code></td><td>Abreviatura</td></tr>
-        <tr><td><code>@p_nombre</code></td><td><code>VARCHAR</code></td><td>Nombre del fondo</td></tr>
-        <tr><td><code>@p_accion</code></td><td><code>SMALLINT</code></td><td>2=Alta, 3=Cambio, 4=Baja</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 6. SERVICIOS REST -->
-    <div class="doc-section">
-      <div class="section-title"><span class="section-num">6</span> Servicios REST</div>
+      <div class="section-title"><span class="section-num">5</span> Fondos Canónicos Configurados en PJEV</div>
       <table class="props-table">
-        <thead><tr><th>Método</th><th>Endpoint</th><th>Body / Params</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Fondo / Código</th><th>Clave Fuente 2026</th><th>Abrev.</th><th>Nombre del Fondo</th><th>Clasificación CONAC</th><th>Régimen LDF</th></tr></thead>
         <tbody>
-        <tr><td><code class="method get">GET</code></td><td><code>/configuracion/fuentes-financiamiento</code></td><td><code>?q=...</code></td><td>Invoca fn_leer.</td></tr>
-        <tr><td><code class="method post">POST</code></td><td><code>/configuracion/fuentes-financiamiento</code></td><td>{ clave, abrev, nombre... }</td><td>Alta (accion=2)</td></tr>
-        <tr><td><code class="method put">PUT</code></td><td><code>/configuracion/fuentes-financiamiento/:id</code></td><td>{ ... }</td><td>Modificación (accion=3)</td></tr>
+          <tr><td><strong>601</strong></td><td><code>160126</code></td><td>EST</td><td>PRESUPUESTO AUTORIZADO (Subsidio Estatal Ordinario)</td><td>11 / 16. Recursos Estatales</td><td>No Etiquetado</td></tr>
+          <tr><td><strong>603</strong></td><td><code>160926</code></td><td>CONV</td><td>CONVENIO FINANCIERO (Asignaciones Adicionales)</td><td>16. Recursos Estatales</td><td>No Etiquetado</td></tr>
+          <tr><td><strong>701</strong></td><td><code>170126</code></td><td>PROP</td><td>OTROS INGRESOS (Recursos Propios)</td><td>14 / 17. Libre Disposición</td><td>No Etiquetado</td></tr>
+          <tr><td><strong>702</strong></td><td><code>170226</code></td><td>FAUX</td><td>FONDO AUXILIAR PARA LA IMPARTICIÓN DE JUSTICIA</td><td>14 / 17. Libre Disposición</td><td>No Etiquetado</td></tr>
+          <tr><td><strong>501</strong></td><td><code>250126</code></td><td>FASP</td><td>APORTACIÓN FEDERAL FASP</td><td>25. Recursos Federales</td><td>Etiquetado</td></tr>
+          <tr><td><strong>502</strong></td><td><code>250226</code></td><td>JLAB</td><td>JUZGADOS LABORALES (Subsidio Federal / Convenio)</td><td>25. Recursos Federales</td><td>Etiquetado</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 7. PANTALLAS -->
+    <!-- 6. SERVICIOS REST (BACKEND) -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">7</span> Diseño de Interfaces (UI)</div>
+      <div class="section-title"><span class="section-num">6</span> Servicios REST (Backend NestJS)</div>
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint</th><th>Parámetros / DTO</th><th>Descripción</th></tr></thead>
+        <tbody>
+        <tr><td><code class="method get">GET</code></td><td><code>/configuracion/fuentesf/catalogos</code></td><td>-</td><td>Retorna lista de ejercicios fiscales para combos de captura.</td></tr>
+        <tr><td><code class="method get">GET</code></td><td><code>/configuracion/fuentesf</code></td><td><code>?search=...&ejercicio=2026&page=1&limit=20</code></td><td>Bandeja paginada con filtros por texto y ejercicio.</td></tr>
+        <tr><td><code class="method get">GET</code></td><td><code>/configuracion/fuentesf/reporte</code></td><td><code>?agrupado=tipo&conDetalle=true</code></td><td>Genera reporte agrupado y exportaciones (CSV / XLS).</td></tr>
+        <tr><td><code class="method get">GET</code></td><td><code>/configuracion/fuentesf/:id</code></td><td><code>id: number</code></td><td>Consulta del detalle completo de una fuente.</td></tr>
+        <tr><td><code class="method post">POST</code></td><td><code>/configuracion/fuentesf</code></td><td><code>{ cff_clave, cff_abrev, cff_nombre, cff_tipo, cff_ejercicio, cff_concentradora }</code></td><td>Crea nueva fuente de financiamiento.</td></tr>
+        <tr><td><code class="method patch">PATCH</code></td><td><code>/configuracion/fuentesf/:id</code></td><td><code>{ cff_abrev, cff_nombre, cff_tipo, cff_concentradora, estatus_registro }</code></td><td>Actualiza datos de la fuente existente.</td></tr>
+        <tr><td><code class="method delete">DELETE</code></td><td><code>/configuracion/fuentesf/:id</code></td><td><code>id: number</code></td><td>Baja lógica auditada (si no tiene saldo vivo).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. PANTALLAS Y WIREFRAMES -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">7</span> Diseño de Interfaces (UI en SIAF-PJEV)</div>
       <div class="wireframe-tabs">
-        <button class="wf-tab active" onclick="showWF('p1',this)">pantalla_leer con valores</button>
-        <button class="wf-tab" onclick="showWF('p3',this)">pantalla_abc con @parametros</button>
+        <button class="wf-tab active" onclick="showWF('p-arbol',this)">🌳 Árbol Analítico SAFPOJ (1180000)</button>
+        <button class="wf-tab" onclick="showWF('p1',this)">📋 Bandeja del Catálogo (/cfg/cpp/fuentesf)</button>
+        <button class="wf-tab" onclick="showWF('p3',this)">📝 Formulario CRUD (/cfg/cpp/fuentesf/[id])</button>
       </div>
 
-      <div id="wf-p1" class="wf-panel active">
+      <!-- TAB 1: ÁRBOL SAFPOJ SVG -->
+      <div id="wf-p-arbol" class="wf-panel active">
         <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">pantalla_leer con valores</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Árbol Analítico de Ingresos — SAFPOJ / SEFIPLAN 2026</span></div>
           <div class="wf-svg-area">
-            <svg viewBox="0 0 800 200" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
-              <rect width="800" height="200" fill="#f8ebdf" />
-              <text x="20" y="30" font-size="16" font-weight="bold" fill="#1b3a2d">Fuentes de Financiamiento</text>
-              <rect x="20" y="50" width="760" height="36" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
-              <text x="35" y="72" font-size="12" fill="#94a3b8">Buscar...</text>
-              <rect x="20" y="100" width="760" height="80" fill="#ffffff" stroke="#cbd5e1" rx="4" />
-              <rect x="20" y="100" width="760" height="30" fill="#f8fafc" />
-              <text x="35" y="120" font-size="10" font-weight="bold" fill="#64748b">CLAVE</text>
-              <text x="150" y="120" font-size="10" font-weight="bold" fill="#64748b">ABREVIATURA</text>
-              <text x="280" y="120" font-size="10" font-weight="bold" fill="#64748b">NOMBRE DEL FONDO</text>
-              <text x="35" y="150" font-size="11" fill="#333">11001</text>
-              <text x="150" y="150" font-size="11" fill="#333">RF</text>
-              <text x="280" y="150" font-size="11" fill="#333">Recursos Fiscales Estatales Mantenimiento PJEV</text>
+            <svg viewBox="0 0 800 320" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="320" fill="#ffffff" stroke="#cbd5e1" rx="6" />
+              
+              <!-- Encabezado Reporte -->
+              <rect x="0" y="0" width="800" height="42" fill="#1e293b" />
+              <text x="400" y="26" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">ESTADO ANALÍTICO DE INGRESOS — ESTRUCTURA DE FUENTES DE FINANCIAMIENTO 2026</text>
+              
+              <!-- Tabla Head -->
+              <rect x="20" y="55" width="760" height="26" fill="#f1f5f9" stroke="#cbd5e1" />
+              <text x="35" y="72" font-size="10" font-weight="bold" fill="#0f172a">CLAVE ECONÓMICA Y FTE. FTO.</text>
+              <text x="300" y="72" font-size="10" font-weight="bold" fill="#0f172a">CONCEPTO</text>
+              <text x="680" y="72" font-size="10" font-weight="bold" fill="#0f172a" text-anchor="middle">RÉGIMEN LDF</text>
+
+              <!-- Fila 1: 1180000 -->
+              <rect x="20" y="81" width="760" height="26" fill="#f8fafc" stroke="#e2e8f0" />
+              <text x="35" y="98" font-size="11" font-weight="bold" fill="#0f172a" font-family="monospace">1180000</text>
+              <text x="300" y="98" font-size="11" font-weight="bold" fill="#0f172a">📁 TRANSF, ASIGNACIONES Y DONATIVOS CORR. RECIB.</text>
+              <text x="680" y="98" font-size="9.5" font-weight="bold" fill="#0284c7" text-anchor="middle">RUBRO MAYOR</text>
+
+              <!-- Fila 2: 1182000 -->
+              <rect x="20" y="107" width="760" height="26" fill="#ffffff" stroke="#e2e8f0" />
+              <text x="35" y="124" font-size="11" font-weight="bold" fill="#334155" font-family="monospace">1182000</text>
+              <text x="320" y="124" font-size="11" font-weight="bold" fill="#334155">📁 DEL SECTOR PUBLICO</text>
+              <text x="680" y="124" font-size="9.5" font-weight="bold" fill="#475569" text-anchor="middle">SECTOR PÚBLICO</text>
+
+              <!-- Fila 3: 1182001 -->
+              <rect x="20" y="133" width="760" height="26" fill="#ffffff" stroke="#e2e8f0" />
+              <text x="35" y="150" font-size="11" font-weight="bold" fill="#475569" font-family="monospace">1182001</text>
+              <text x="340" y="150" font-size="10.5" font-weight="bold" fill="#475569">📁 PROVENIENTES DEL GOBIERNO FEDERAL</text>
+              <text x="680" y="150" font-size="9.5" fill="#475569" text-anchor="middle">ÁMBITO FEDERAL</text>
+
+              <!-- Fila 4: FASP 250126 -->
+              <rect x="20" y="159" width="760" height="26" fill="#fffbeb" stroke="#fde68a" />
+              <text x="35" y="176" font-size="11" font-weight="bold" fill="#b45309" font-family="monospace">1182001-250126</text>
+              <text x="360" y="176" font-size="10.5" font-weight="600" fill="#92400e">🔹 APORTACION FEDERAL FASP 2026</text>
+              <text x="680" y="176" font-size="9.5" font-weight="bold" fill="#b45309" text-anchor="middle">ETIQUETADO FEDERAL</text>
+
+              <!-- Fila 5: 1182002 -->
+              <rect x="20" y="185" width="760" height="26" fill="#ffffff" stroke="#e2e8f0" />
+              <text x="35" y="202" font-size="11" font-weight="bold" fill="#475569" font-family="monospace">1182002</text>
+              <text x="340" y="202" font-size="10.5" font-weight="bold" fill="#475569">📁 PROVENIENTES DEL GOBIERNO ESTATAL</text>
+              <text x="680" y="202" font-size="9.5" fill="#475569" text-anchor="middle">ÁMBITO ESTATAL</text>
+
+              <!-- Fila 6: 160126 -->
+              <rect x="20" y="211" width="760" height="26" fill="#f0fdf4" stroke="#bbf7d0" />
+              <text x="35" y="228" font-size="11" font-weight="bold" fill="#15803d" font-family="monospace">1182002-160126</text>
+              <text x="360" y="228" font-size="10.5" font-weight="600" fill="#166534">🔹 PRESUPUESTO AUTORIZADO 2026 (Subsidio Ordinario)</text>
+              <text x="680" y="228" font-size="9.5" font-weight="bold" fill="#15803d" text-anchor="middle">NO ETIQUETADO</text>
+
+              <!-- Fila 7: 170126 -->
+              <rect x="20" y="237" width="760" height="26" fill="#faf5ff" stroke="#e9d5ff" />
+              <text x="35" y="254" font-size="11" font-weight="bold" fill="#7e22ce" font-family="monospace">1182002-170126</text>
+              <text x="360" y="254" font-size="10.5" font-weight="600" fill="#6b21a8">🔹 OTROS INGRESOS 2026 (Recursos Propios)</text>
+              <text x="680" y="254" font-size="9.5" font-weight="bold" fill="#7e22ce" text-anchor="middle">NO ETIQUETADO</text>
+
+              <!-- Fila 8: 170226 -->
+              <rect x="20" y="263" width="760" height="26" fill="#faf5ff" stroke="#e9d5ff" />
+              <text x="35" y="280" font-size="11" font-weight="bold" fill="#7e22ce" font-family="monospace">1182002-170226</text>
+              <text x="360" y="280" font-size="10.5" font-weight="600" fill="#6b21a8">🔹 FONDO AUXILIAR PARA LA IMPARTICION DE JUSTICIA</text>
+              <text x="680" y="280" font-size="9.5" font-weight="bold" fill="#7e22ce" text-anchor="middle">NO ETIQUETADO</text>
+
+              <rect x="20" y="289" width="760" height="20" fill="#f8fafc" />
+              <text x="400" y="303" font-size="9.5" fill="#64748b" text-anchor="middle">Elaboró: Depto. de Programación y Presupuesto · Revisó: Subdirección de Recursos Financieros</text>
             </svg>
           </div>
         </div>
       </div>
 
+      <!-- TAB 2: GRID CLÁSICO -->
+      <div id="wf-p1" class="wf-panel">
+        <div class="wf-box">
+          <div class="wf-bar"><span class="wf-bar-label">Bandeja de Fuentes de Financiamiento — Filtro por Ejercicio</span></div>
+          <div class="wf-svg-area">
+            <svg viewBox="0 0 800 230" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="230" fill="#f8ebdf" />
+              <text x="20" y="28" font-size="15" font-weight="bold" fill="#1b3a2d">Catálogo de Fuentes de Financiamiento</text>
+              
+              <rect x="20" y="42" width="460" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="32" y="63" font-size="11" fill="#94a3b8">Buscar por clave, abrev o nombre...</text>
+              
+              <rect x="490" y="42" width="140" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="502" y="63" font-size="11" fill="#334155">Ejercicio: 2026 ▼</text>
+
+              <rect x="640" y="42" width="140" height="32" fill="#1A7A3C" rx="4" />
+              <text x="710" y="63" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nueva Fuente</text>
+              
+              <rect x="20" y="85" width="760" height="130" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <rect x="20" y="85" width="760" height="28" fill="#f1f5f9" />
+              <text x="35" y="103" font-size="10" font-weight="bold" fill="#475569">CLAVE</text>
+              <text x="120" y="103" font-size="10" font-weight="bold" fill="#475569">ABREV</text>
+              <text x="200" y="103" font-size="10" font-weight="bold" fill="#475569">NOMBRE DEL FONDO</text>
+              <text x="530" y="103" font-size="10" font-weight="bold" fill="#475569">AÑO</text>
+              <text x="590" y="103" font-size="10" font-weight="bold" fill="#475569">TIPO</text>
+              <text x="680" y="103" font-size="10" font-weight="bold" fill="#475569">CONCENTRADORA</text>
+              
+              <text x="35" y="130" font-size="11" font-weight="600" fill="#1e293b">160126</text>
+              <text x="120" y="130" font-size="11" fill="#334155">EST</text>
+              <text x="200" y="130" font-size="11" fill="#334155">SUBSIDIO ESTATAL ORDINARIO 2026</text>
+              <text x="530" y="130" font-size="11" fill="#334155">2026</text>
+              <text x="590" y="130" font-size="11" fill="#334155">Estatal</text>
+              <text x="680" y="130" font-size="11" fill="#64748b">No</text>
+              
+              <text x="35" y="160" font-size="11" font-weight="600" fill="#1e293b">170226</text>
+              <text x="120" y="160" font-size="11" fill="#334155">FAUX</text>
+              <text x="200" y="160" font-size="11" fill="#334155">FONDO AUXILIAR IMPARTICION JUSTICIA 2026</text>
+              <text x="530" y="160" font-size="11" fill="#334155">2026</text>
+              <text x="590" y="160" font-size="11" fill="#334155">Propios</text>
+              <text x="680" y="160" font-size="11" fill="#64748b">No</text>
+
+              <text x="35" y="190" font-size="11" font-weight="600" fill="#1e293b">250126</text>
+              <text x="120" y="190" font-size="11" fill="#334155">FASP</text>
+              <text x="200" y="190" font-size="11" fill="#334155">APORTACION FEDERAL FASP 2026</text>
+              <text x="530" y="190" font-size="11" fill="#334155">2026</text>
+              <text x="590" y="190" font-size="11" fill="#334155">Federal</text>
+              <text x="680" y="190" font-size="11" fill="#64748b">No</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: FORMULARIO CRUD -->
       <div id="wf-p3" class="wf-panel">
         <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">pantalla_abc con @parametros</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Formulario de Captura / Edición</span></div>
           <div class="wf-svg-area">
-            <svg viewBox="0 0 800 250" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
-              <rect width="800" height="250" fill="#f8ebdf" />
-              <text x="20" y="30" font-size="16" font-weight="bold" fill="#1b3a2d">Nueva Fuente</text>
-              <rect x="20" y="50" width="760" height="150" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+            <svg viewBox="0 0 800 240" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="240" fill="#f8ebdf" />
+              <text x="20" y="28" font-size="15" font-weight="bold" fill="#1b3a2d">Detalle de Fuente de Financiamiento</text>
               
-              <text x="35" y="90" font-size="10" font-weight="bold" fill="#475569">CLAVE *</text>
-              <rect x="35" y="100" width="100" height="32" fill="#EBF0FB" stroke="#2E5FA3" rx="4" />
-              <text x="45" y="120" font-size="10" fill="#2E5FA3" font-style="italic">@p_clave</text>
+              <rect x="20" y="45" width="760" height="135" fill="#ffffff" stroke="#cbd5e1" rx="4" />
               
-              <text x="155" y="90" font-size="10" font-weight="bold" fill="#475569">ABREV *</text>
-              <rect x="155" y="100" width="80" height="32" fill="#EBF0FB" stroke="#2E5FA3" rx="4" />
-              <text x="165" y="120" font-size="10" fill="#2E5FA3" font-style="italic">@p_abrev</text>
+              <text x="35" y="75" font-size="10" font-weight="bold" fill="#475569">CLAVE (6 DÍGITOS) *</text>
+              <rect x="35" y="85" width="140" height="30" fill="#f8fafc" stroke="#94a3b8" rx="4" />
+              <text x="45" y="104" font-size="11" font-weight="600" fill="#0f172a">250126</text>
 
-              <text x="255" y="90" font-size="10" font-weight="bold" fill="#475569">NOMBRE *</text>
-              <rect x="255" y="100" width="350" height="32" fill="#EBF0FB" stroke="#2E5FA3" rx="4" />
-              <text x="265" y="120" font-size="10" fill="#2E5FA3" font-style="italic">@p_nombre</text>
+              <text x="195" y="75" font-size="10" font-weight="bold" fill="#475569">ABREVIATURA *</text>
+              <rect x="195" y="85" width="90" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="205" y="104" font-size="11" fill="#0f172a">FASP</text>
 
-              <rect x="20" y="210" width="100" height="36" fill="#1A7A3C" rx="4" />
-              <text x="70" y="232" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar</text>
+              <text x="305" y="75" font-size="10" font-weight="bold" fill="#475569">EJERCICIO *</text>
+              <rect x="305" y="85" width="100" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="315" y="104" font-size="11" fill="#0f172a">2026 ▼</text>
+
+              <text x="425" y="75" font-size="10" font-weight="bold" fill="#475569">TIPO *</text>
+              <rect x="425" y="85" width="140" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="435" y="104" font-size="11" fill="#0f172a">2 - Federal ▼</text>
+
+              <text x="585" y="75" font-size="10" font-weight="bold" fill="#475569">CONCENTRADORA *</text>
+              <rect x="585" y="85" width="170" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="595" y="104" font-size="11" fill="#0f172a">0 - No concentradora ▼</text>
+
+              <text x="35" y="138" font-size="10" font-weight="bold" fill="#475569">NOMBRE COMPLETO DEL FONDO *</text>
+              <rect x="35" y="146" width="720" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="45" y="163" font-size="11" fill="#0f172a">APORTACION FEDERAL FASP 2026</text>
+
+              <!-- Botones -->
+              <rect x="20" y="195" width="120" height="32" fill="#1A7A3C" rx="4" />
+              <text x="80" y="215" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar Cambios</text>
+
+              <rect x="150" y="195" width="90" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="195" y="215" font-size="11" fill="#475569" text-anchor="middle">Cancelar</text>
             </svg>
           </div>
         </div>
@@ -200,18 +502,61 @@
     <div class="doc-section">
       <div class="section-title"><span class="section-num">8</span> Reglas de Negocio Críticas</div>
       <table class="props-table">
-        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia</th><th>Dónde se valida</th><th>Fuente (Normativa / Técnica)</th></tr></thead>
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia / Validación</th><th>Dónde se valida</th><th>Fuente Normativa</th></tr></thead>
         <tbody>
-        <tr><td><strong>RN-01</strong></td><td>Clave única global.</td><td>Restricción a nivel BD.</td><td>SP</td><td>Técnica: UNIQUE en cff_clave.</td></tr>
+          <tr>
+            <td><strong>RN-01</strong></td>
+            <td><strong>Unicidad por Ejercicio</strong>: <code>cff_clave</code> debe ser única por cada ejercicio fiscal.</td>
+            <td>Restricción <code>UNIQUE(cff_clave, cff_ejercicio)</code> a nivel BD. Evita duplicidad en el mismo año permitiendo históricos.</td>
+            <td>BD / Backend</td>
+            <td>Técnica / Ficha Técnica v3.0</td>
+          </tr>
+          <tr>
+            <td><strong>RN-02</strong></td>
+            <td><strong>Cuentas Concentradoras</strong>: Si <code>cff_concentradora = 1</code>, agrupa cuentas bancarias y no requiere cuenta contable individual directa.</td>
+            <td>El sistema permite asociación múltiple sin exigir chequera 1:1.</td>
+            <td>Tesorería / Backend</td>
+            <td>Criterios de Tesorería PJEV</td>
+          </tr>
+          <tr>
+            <td><strong>RN-03</strong></td>
+            <td><strong>Vinculación Bancaria Obligatoria</strong>: Si <code>cff_concentradora = 0</code>, debe existir una cuenta bancaria/chequera vinculada directamente.</td>
+            <td>No se pueden dispersar pagos ni autorizar afectaciones de gasto si la fuente no tiene chequera asignada.</td>
+            <td>Tesorería / Pagos</td>
+            <td>Ley de Disciplina Financiera</td>
+          </tr>
+          <tr>
+            <td><strong>RN-04</strong></td>
+            <td><strong>Alerta de Ejercicio</strong>: Si el usuario selecciona una fuente de un ejercicio fiscal diferente al activo en sesión.</td>
+            <td>El sistema emite modal de advertencia: <em>«Esta fuente pertenece al ejercicio [año]. ¿Desea continuar?»</em>.</td>
+            <td>Frontend / API</td>
+            <td>Ficha Técnica v3.0</td>
+          </tr>
+          <tr>
+            <td><strong>RN-05</strong></td>
+            <td><strong>Integridad Referencial (Baja Lógica)</strong>: No se permite inactivar ni eliminar una fuente con partidas o movimientos vigentes.</td>
+            <td>El backend rechaza el borrado lógico con código de error institucional si existen pólizas o techos asociados.</td>
+            <td>Backend / SP</td>
+            <td>Auditoría Financiera LGCG</td>
+          </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- 9. FLUJO -->
+    <!-- 9. FLUJOS DE INTEGRACIÓN -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">9</span> Flujos de Integración</div>
-      <div class="flujo-box">[Catálogo FF] → (Componente Financiamiento) → [Clave Presupuestal]
-[Catálogo FF] → (Asignación obligatoria) → [Cuentas Bancarias / Chequeras]</div>
+      <div class="section-title"><span class="section-num">9</span> Flujos de Integración y Reportes Oficiales</div>
+      <div class="flujo-box">
+  1. EGRESOS (Gasto):
+     [Catálogo Fuentes] ───► [Clave Presupuestal (cp_fondo_especifico)] ───► [Techos Globales pp_techo_fuente]
+                         ───► [Chequeras Bancarias chq_fuente_fin_id]   ───► [Pólizas de Egreso pm_fuente_fin_id]
+
+  2. INGRESOS (Estado Analítico de Ingresos):
+     [Clave Económica SEFIPLAN] - [Fuente de Financiamiento CONAC]
+     Ejemplo Federal: 1182001 - 250126 (APORTACIÓN FEDERAL FASP 2026)
+     Ejemplo Estatal: 1182002 - 160126 (PRESUPUESTO AUTORIZADO 2026)
+     Ejemplo Propios: 1182002 - 170226 (FONDO AUXILIAR PARA LA IMPARTICIÓN DE JUSTICIA 2026)
+      </div>
     </div>
 
     <div class="doc-footer">
