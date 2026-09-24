@@ -15,17 +15,21 @@ Se implementó la homologación transversal del **Catálogo de Fuentes de Financ
 
 ## 2. Definición Canónica de Fuentes de Financiamiento 2026
 
-La clave presupuestal oficial de la fuente de financiamiento se compone de **6 dígitos**:
-`[CONAC 2 dígitos] + [Fondo / Origen 2 dígitos] + [Año Fiscal 2 dígitos]`
+La fuente de financiamiento se almacena atómicamente homologada con `presupuesto.clave_presupuestal`:
+* **`cff_tipo_fondo`**: 1 dígito (`1` = Estatal / No Etiquetado / Propios, `2` = Etiquetado / Federal)
+* **`cff_fondo_especifico`**: 3 dígitos (`601`, `609`, `701`, `702`, `501`, `502`)
+* **`cff_anio`**: 2 dígitos (calculado automáticamente a partir de `cff_ejercicio` $\rightarrow$ `eje_anio % 100`, ej. `26`)
+* **`cff_tipo_gasto`**: 1 dígito (`1` = Gasto Corriente, `2` = Gasto de Capital)
+* **`cff_clave`**: Clave concatenada resultante (`[tipo_fondo][fondo_especifico][anio]`, 6 dígitos)
 
-| Clave (`cff_clave`) | Abrev (`cff_abrev`) | Denominación Oficial | Ejercicio (`eje_id`) | Tipo (`cff_tipo`) | Régimen LDF | Subcuenta SAFPOJ |
-| :---: | :---: | :--- | :---: | :---: | :---: | :---: |
-| **`160126`** | `EST` | PRESUPUESTO AUTORIZADO 2026 (Subsidio Estatal) | 2026 (`1`) | Estatal (`1`) | No Etiquetado | `1182002-160126` |
-| **`160926`** | `CONV` | PRESUPUESTO AUTORIZADO 2026 (CONVENIOS) | 2026 (`1`) | Estatal (`1`) | No Etiquetado | `1182002-160926` |
-| **`170126`** | `PROP` | OTROS INGRESOS 2026 (Recursos Propios) | 2026 (`1`) | Propios (`3`) | No Etiquetado | `1182002-170126` |
-| **`170226`** | `FAUX` | FONDO AUXILIAR PARA LA IMPARTICIÓN DE JUSTICIA 2026 | 2026 (`1`) | Propios (`3`) | No Etiquetado | `1182002-170226` |
-| **`250126`** | `FASP` | APORTACIÓN FEDERAL FASP 2026 | 2026 (`1`) | Federal (`2`) | Etiquetado Federal | `1182001-250126` |
-| **`250226`** | `JLAB` | JUZGADOS LABORALES 2026 | 2026 (`1`) | Federal (`2`) | Etiquetado Federal | `1182001-250226` |
+| Tipo Fondo | Fondo Esp. | Año | Clave Concatenada (`cff_clave`) | Abrev (`cff_abrev`) | Denominación Oficial | Ejercicio (`eje_id`) | Régimen LDF | Subcuenta SAFPOJ |
+| :---: | :---: | :---: | :---: | :---: | :--- | :---: | :---: | :---: |
+| `1` | `601` | `26` | **`160126`** | `EST` | PRESUPUESTO AUTORIZADO 2026 (Subsidio Estatal) | 2026 (`1`) | No Etiquetado | `1182002-160126` |
+| `1` | `609` | `26` | **`160926`** | `CONV` | PRESUPUESTO AUTORIZADO 2026 (CONVENIOS) | 2026 (`1`) | No Etiquetado | `1182002-160926` |
+| `1` | `701` | `26` | **`170126`** | `PROP` | OTROS INGRESOS 2026 (Recursos Propios) | 2026 (`1`) | No Etiquetado | `1182002-170126` |
+| `1` | `702` | `26` | **`170226`** | `FAUX` | FONDO AUXILIAR PARA LA IMPARTICIÓN DE JUSTICIA 2026 | 2026 (`1`) | No Etiquetado | `1182002-170226` |
+| `2` | `501` | `26` | **`250126`** | `FASP` | APORTACIÓN FEDERAL FASP 2026 | 2026 (`1`) | Etiquetado Federal | `1182001-250126` |
+| `2` | `502` | `26` | **`250226`** | `JLAB` | JUZGADOS LABORALES 2026 | 2026 (`1`) | Etiquetado Federal | `1182001-250226` |
 
 ---
 
@@ -51,35 +55,28 @@ En los estados analíticos e informes del Poder Judicial, las fuentes de financi
 ## 4. Cambios Realizados por Capa Técnica
 
 ### A. Base de Datos (PostgreSQL)
-* **Script:** `packages/database/sql/20260918_1930_fuentes_financiamiento_canonico_2026.sql`
+* **Script:** `packages/database/prisma/migrations/010_homologacion_campos_fuentesf.sql`
 * **Acciones:**
-  - Limpieza de espacios residuales (`TRIM`) en `cff_clave`, `cff_abrev` y `cff_nombre`.
-  - Asignación formal de fuentes 2025 al ejercicio fiscal `eje_id = 5`.
-  - Inserción y actualización idempotente de las 6 fuentes canónicas del ejercicio 2026 (`eje_id = 1`).
-  - Validación de unicidad de clave por ejercicio fiscal (`cff_ejercicio`, `cff_clave`).
+  - Adición de columnas `cff_tipo_fondo`, `cff_fondo_especifico`, `cff_anio`, `cff_tipo_gasto` en `config.catalogo_fuentes_fin`.
+  - Poblado automático de registros históricos a partir de `cff_clave` y de `config.catalogo_ejercicios`.
+  - Creación de índices dedicados para optimización de reportes cruzados con `presupuesto.clave_presupuestal`.
 
 ### B. Backend (NestJS)
 * **Archivo:** `apps/backend/src/configuracion/fuentesf/fuentesf.service.ts`
 * **Acciones:**
-  - Validación de formato alfanumérico/numérico de 6 caracteres (`^[0-9]{6}$`).
-  - Métodos `findAll`, `findOne` y `mapRow` enriquecidos con campos de metadatos computados:
-    - `regimenLdf`: *Etiquetado Federal* (para prefijo 25) vs *No Etiquetado* (para prefijos 16, 17).
-    - `conacClasificacion`: Etiqueta normativa CONAC.
-  - Generación de reportes analíticos con desglose de la cuenta mayor `1180000`.
+  - Soporte de DTO con campos atómicos (`tipoFondo`, `fondoEspecifico`, `tipoGasto`) y cálculo automático de `cff_anio` y `cff_clave`.
+  - Enriquecimiento de `mapRow` con los valores atómicos y calculados para el frontend.
 
 ### C. Frontend (Next.js / PJEV-UI)
 * **Bandeja Principal:** `apps/frontend/app/(dashboard)/cfg/cpp/fuentesf/page.tsx`
-  - Switch interactivo para alternar entre **Vista Tabla Grid** y **Vista en Árbol SAFPOJ**.
-  - Insignias de régimen LDF con paleta oficial PJEV.
+  - Grid con soporte de claves de 6 dígitos y enlaces a edición.
 * **Formulario ABC:** `apps/frontend/app/(dashboard)/cfg/cpp/fuentesf/[id]/page.tsx`
-  - Validación Zod para claves de 6 dígitos.
-  - Sincronización automática de sufijo anual conforme al ejercicio seleccionado.
+  - Control compuesto con selector de tipo de fondo, fondo específico (3 chars), año calculado en tiempo real y barra de previsualización en vivo de la clave concatenada (`160126`).
 
 ### D. Manual Web de Desarrollo
 * **Página Canónica:** `sitio_web/01_cfg/01.2.4-fuentes-financiamiento.html`
-  - Secciones 1 a 15 con el marco normativo LDF/CONAC/SEFIPLAN.
-  - SPs `fn_leer_fuentesf` y `fn_crud_fuentesf`.
-  - Wireframes SVG con pestañas interactivas, diagrama de árbol y controles PJEV.
+  - Homologación formal con `presupuesto.clave_presupuestal` (`02.1.1`).
+  - Wireframe SVG actualizado mostrando los controles atómicos y la clave concatenada.
 
 ---
 

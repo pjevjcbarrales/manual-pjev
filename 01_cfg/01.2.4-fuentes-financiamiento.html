@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="../shared.css">
 <style>
   body { padding: 36px 44px 80px; background: var(--pjev-crema); }
-  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:var(--font-mono); }
   .method.get    { background:#e8f5e9; color:#1b5e20; }
   .method.post   { background:#e3f2fd; color:#0d47a1; }
   .method.patch  { background:#fff8e1; color:#795548; }
@@ -22,6 +22,69 @@
   .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
   .wf-bar-label { font-size:11px; font-weight:600; color:var(--pjev-texto-muted); text-transform:uppercase; }
   .wf-svg-area  { background:#f9f9f9; padding:16px; overflow-x:auto; }
+  
+  /* Code Snippet Styles */
+  .code-snippet-container {
+    margin-bottom: 24px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .code-snippet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #111a14;
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+  .code-snippet-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--pjev-dorado, #DEAC50);
+  }
+  .code-snippet-badge {
+    background: rgba(222, 172, 80, 0.18);
+    color: var(--pjev-dorado, #DEAC50);
+    border: 1px solid rgba(222, 172, 80, 0.35);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .code-wrap {
+    background: var(--code-bg, #111c11);
+    color: var(--code-text, #a8d8a8);
+    font-family: var(--font-mono, 'Cascadia Code', 'Consolas', monospace);
+    font-size: 12.5px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .code-wrap pre {
+    margin: 0;
+    padding: 0;
+    background: transparent !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+  }
+  .code-wrap code {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    color: inherit !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+  
   .flujo-box { background:var(--code-bg); border-radius:8px; padding:20px; font-family:var(--font-mono); font-size:12px; color:var(--code-text); line-height:1.8; overflow-x:auto; }
   .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
   .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
@@ -58,11 +121,18 @@
       <div class="section-title"><span class="section-num">1</span> Descripción General</div>
       <p>El catálogo de <strong>Fuentes de Financiamiento</strong> clasifica los recursos públicos que ingresan y se ejercen en el Poder Judicial, permitiendo dar trazabilidad al origen de los fondos conforme a los lineamientos del CONAC y la Ley de Disciplina Financiera (LDF).</p>
       
-      <p style="margin-top:12px;">En la integración del <em>Estado Analítico de Ingresos</em> y la <em>Clave Presupuestal de Egresos</em>, las fuentes de financiamiento se estructuran en <strong>6 dígitos</strong> y se articulan jerárquicamente con la Clasificación Económica de Ingresos bajo el rubro institucional <strong><code>1180000</code></strong> (Transferencias, Asignaciones y Donativos Corrientes Recibidos):</p>
+      <p style="margin-top:12px;">En la arquitectura del SIAF-PJEV, la fuente de financiamiento se gestiona mediante <strong>segmentos atómicos homologados con la Clave Presupuestal (<code>02.1.1</code>)</strong>, permitiendo tanto su visualización en una clave resumen de <strong>6 dígitos</strong> como su articulación jerárquica con el árbol de Ingresos bajo el rubro institucional <strong><code>1180000</code></strong> (Transferencias, Asignaciones y Donativos Corrientes Recibidos):</p>
 
       <ul style="margin: 12px 0 16px 20px; line-height: 1.7; font-size: 13.5px; color: var(--pjev-texto);">
-        <li><strong>Estructura de la Clave (6 dígitos):</strong> <code>[CONAC 2d]</code> + <code>[Fondo 2d]</code> + <code>[Año Fiscal 2d]</code> (Ej. <code>160126</code> = <code>16</code> Transferencias Estatales + <code>01</code> Ordinario + <code>26</code> Ejercicio 2026).</li>
-        <li><strong>Subcuenta 1182001 (Federal):</strong> Fondos etiquetados provenientes del Gobierno Federal (Ej. <code>250126</code> FASP).</li>
+        <li><strong>Segmentación Atómica Homologada:</strong>
+          <br>— <code>cff_tipo_fondo</code> (1 dígito): <code>1</code> = Estatal / Propios (No Etiquetado), <code>2</code> = Federal (Etiquetado).
+          <br>— <code>cff_fondo_especifico</code> (3 dígitos): <code>601</code> (Presupuesto Autorizado), <code>609</code> (Convenios), <code>701</code> (Recursos Propios), <code>702</code> (Fondo Auxiliar), <code>501</code> (FASP), <code>502</code> (Juzgados Laborales).
+          <br>— <code>cff_anio</code> (2 dígitos): Calculado automáticamente a partir del ejercicio fiscal vinculado (ej. <code>26</code> para 2026).
+          <br>— <code>cff_tipo_gasto</code> (1 dígito): Clasificador de gasto por defecto (<code>1</code> = Corriente, <code>2</code> = Capital).
+        </li>
+        <li><strong>Clave Concatenada Resultante (6 dígitos):</strong> <code>cff_clave = [tipo_fondo][fondo_especifico][anio]</code> (Ej. <code>160126</code>, <code>250126</code>).</li>
+        <li><strong>Segmento en Clave Presupuestal (7 dígitos):</strong> <code>...-[tipo_fondo]-[fondo_especifico]-[anio]-[tipo_gasto]</code> (Ej. <code>...-1-601-26-1</code>).</li>
+        <li><strong>Subcuenta 1182001 (Federal):</strong> Fondos etiquetados provenientes del Gobierno Federal (Ej. <code>250126</code> FASP, <code>250226</code> JLAB).</li>
         <li><strong>Subcuenta 1182002 (Estatal):</strong> Subsidio estatal ordinario (<code>160126</code>), convenios (<code>160926</code>), recursos propios (<code>170126</code>) y fondo auxiliar (<code>170226</code>).</li>
       </ul>
     </div>
@@ -130,71 +200,87 @@
     <!-- 4. MODELO DE DATOS -->
     <div class="doc-section">
       <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
-      <p style="font-size:13px;margin-bottom:12px;color:var(--pjev-texto-muted);">Tabla canónica en PostgreSQL: <code>tb_fuentes_financiamiento</code>.</p>
+      <p style="font-size:13px;margin-bottom:12px;color:var(--pjev-texto-muted);">Tabla canónica en PostgreSQL: <code>config.catalogo_fuentes_fin</code> (homologada con <code>presupuesto.clave_presupuestal</code>).</p>
       
       <table class="props-table" style="margin-bottom:24px;">
-        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción / Homologación</th></tr></thead>
         <tbody>
-          <tr><td><code>ff_id</code> <span class="badge-req">REQ</span></td><td><code>INT PK</code></td><td>Identificador único del registro (autoincrementable)</td></tr>
-          <tr><td><code>eje_id</code> <span class="badge-req">REQ</span></td><td><code>INT FK</code></td><td>Enlace al catálogo de Ejercicios Fiscales (<code>tb_ejercicios</code>)</td></tr>
-          <tr><td><code>ff_clave</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(10)</code></td><td>Clave presupuestal de 6 dígitos (Ej. <code>160126</code>, <code>250126</code>)</td></tr>
-          <tr><td><code>ff_nombre</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(250)</code></td><td>Nombre descriptivo del fondo o subsidio</td></tr>
-          <tr><td><code>ff_abrev</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(10)</code></td><td>Abreviatura institucional (Ej. EST, FASP, FAUX, PROP)</td></tr>
-          <tr><td><code>ff_tipo</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(50)</code></td><td>Tipo de recurso: <code>1 - Estatal</code>, <code>2 - Federal</code>, <code>3 - Propios</code></td></tr>
-          <tr><td><code>ff_concentradora</code> <span class="badge-req">REQ</span></td><td><code>BOOLEAN</code></td><td>Indicador de cuenta concentradora (<code>false</code> por defecto)</td></tr>
+          <tr><td><code>cff_id</code> <span class="badge-req">REQ</span></td><td><code>INT PK</code></td><td>Identificador único del registro (autoincrementable)</td></tr>
+          <tr><td><code>cff_ejercicio</code> <span class="badge-req">REQ</span></td><td><code>INT FK</code></td><td>Enlace al catálogo de Ejercicios Fiscales (<code>catalogo_ejercicios.eje_id</code>)</td></tr>
+          <tr><td><code>cff_tipo_fondo</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>Tipo de Fondo homologado (<code>1</code> = Estatal / Propios, <code>2</code> = Federal) [= <code>cp_tipo_fondo</code>]</td></tr>
+          <tr><td><code>cff_fondo_especifico</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(3)</code></td><td>Fondo Específico (Ej. <code>601</code>, <code>609</code>, <code>701</code>, <code>702</code>, <code>501</code>, <code>502</code>) [= <code>cp_fondo_especifico</code>]</td></tr>
+          <tr><td><code>cff_anio</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>Año fiscal en 2 dígitos calculado automáticamente desde <code>cff_ejercicio</code> (Ej. <code>26</code>) [= <code>cp_anio</code>]</td></tr>
+          <tr><td><code>cff_tipo_gasto</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>Clasificador de gasto por defecto: <code>1</code> = Gasto Corriente, <code>2</code> = Gasto de Capital [= <code>cp_tipo_gasto</code>]</td></tr>
+          <tr><td><code>cff_clave</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(10)</code></td><td>Clave concatenada para visualización y reportes: <code>[tipo_fondo][fondo_especifico][anio]</code> (Ej. <code>160126</code>, <code>250126</code>)</td></tr>
+          <tr><td><code>cff_nombre</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(150)</code></td><td>Denominación oficial del fondo o subsidio</td></tr>
+          <tr><td><code>cff_abrev</code> <span class="badge-req">REQ</span></td><td><code>VARCHAR(5)</code></td><td>Nemotécnico institucional (Ej. EST, FASP, FAUX, PROP)</td></tr>
+          <tr><td><code>cff_tipo</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>Clasificación institucional: <code>1 - Estatal</code>, <code>2 - Federal</code>, <code>3 - Propios</code>, <code>4 - Concentradora</code></td></tr>
+          <tr><td><code>cff_concentradora</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>Indicador de cuenta concentradora (<code>0</code> = No, <code>1</code> = Sí)</td></tr>
           <tr><td><code>estatus_registro</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>Baja lógica: <code>1</code> = Activo, <code>0</code> = Inactivo</td></tr>
-          <tr><td><code>creado_en</code></td><td><code>TIMESTAMP</code></td><td>Fecha y hora de creación</td></tr>
-          <tr><td><code>creado_por</code></td><td><code>INT</code></td><td>ID del usuario que registró</td></tr>
-          <tr><td><code>modificado_en</code></td><td><code>TIMESTAMP</code></td><td>Fecha y hora de última modificación</td></tr>
-          <tr><td><code>modificado_por</code></td><td><code>INT</code></td><td>ID del usuario que modificó</td></tr>
+          <tr><td><code>creado_en / fecha_c</code></td><td><code>TIMESTAMPTZ</code></td><td>Fecha y hora de creación</td></tr>
+          <tr><td><code>creado_por / usuario_c</code></td><td><code>VARCHAR(20)</code></td><td>Usuario que registró</td></tr>
+          <tr><td><code>modificado_en / fecha_m</code></td><td><code>TIMESTAMPTZ</code></td><td>Fecha y hora de última modificación</td></tr>
+          <tr><td><code>modificado_por / usuario_m</code></td><td><code>VARCHAR(20)</code></td><td>Usuario que modificó</td></tr>
         </tbody>
       </table>
 
       <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">Catálogo Canónico de Fuentes — Ejercicio Fiscal 2026</h4>
       <table class="props-table">
-        <thead><tr><th>Clave</th><th>Abrev</th><th>Descripción Oficial del Fondo</th><th>Tipo / Régimen LDF</th><th>Cta. Económica</th></tr></thead>
+        <thead><tr><th>Tipo Fondo</th><th>Fondo Esp.</th><th>Año</th><th>Clave Concatenada</th><th>Abrev</th><th>Descripción Oficial del Fondo</th><th>Régimen LDF</th></tr></thead>
         <tbody>
           <tr>
-            <td><code>160126</code></td>
+            <td><code>1</code></td>
+            <td><code>601</code></td>
+            <td><code>26</code></td>
+            <td><strong><code>160126</code></strong></td>
             <td><strong>EST</strong></td>
             <td>Presupuesto Autorizado 2026 (Subsidio Ordinario)</td>
             <td><span class="tag-ldf-no">No Etiquetado</span></td>
-            <td><code>1182002</code></td>
           </tr>
           <tr>
-            <td><code>160926</code></td>
+            <td><code>1</code></td>
+            <td><code>609</code></td>
+            <td><code>26</code></td>
+            <td><strong><code>160926</code></strong></td>
             <td><strong>CONV</strong></td>
             <td>Ingresos Extraordinarios por Convenios 2026</td>
             <td><span class="tag-ldf-no">No Etiquetado</span></td>
-            <td><code>1182002</code></td>
           </tr>
           <tr>
-            <td><code>170126</code></td>
+            <td><code>1</code></td>
+            <td><code>701</code></td>
+            <td><code>26</code></td>
+            <td><strong><code>170126</code></strong></td>
             <td><strong>PROP</strong></td>
             <td>Otros Ingresos 2026 (Recursos Propios)</td>
             <td><span class="tag-ldf-no">No Etiquetado</span></td>
-            <td><code>1182002</code></td>
           </tr>
           <tr>
-            <td><code>170226</code></td>
+            <td><code>1</code></td>
+            <td><code>702</code></td>
+            <td><code>26</code></td>
+            <td><strong><code>170226</code></strong></td>
             <td><strong>FAUX</strong></td>
             <td>Fondo Auxiliar para la Impartición de Justicia 2026</td>
             <td><span class="tag-ldf-no">No Etiquetado</span></td>
-            <td><code>1182002</code></td>
           </tr>
           <tr>
-            <td><code>250126</code></td>
+            <td><code>2</code></td>
+            <td><code>501</code></td>
+            <td><code>26</code></td>
+            <td><strong><code>250126</code></strong></td>
             <td><strong>FASP</strong></td>
             <td>Aportación Federal FASP 2026 (Seguridad Pública)</td>
             <td><span class="tag-ldf-et">Etiquetado Federal</span></td>
-            <td><code>1182001</code></td>
           </tr>
           <tr>
-            <td><code>250226</code></td>
+            <td><code>2</code></td>
+            <td><code>502</code></td>
+            <td><code>26</code></td>
+            <td><strong><code>250226</code></strong></td>
             <td><strong>JLAB</strong></td>
             <td>Recursos Federales Justicia Laboral 2026</td>
             <td><span class="tag-ldf-et">Etiquetado Federal</span></td>
-            <td><code>1182001</code></td>
           </tr>
         </tbody>
       </table>
@@ -202,35 +288,347 @@
 
     <!-- 5. STORED PROCEDURES -->
     <div class="doc-section">
-      <div class="section-title"><span class="section-num">5</span> Procedimientos Almacenados</div>
-      <p style="font-size:13px;margin-bottom:16px;color:var(--pjev-texto-muted);">Procedimientos transaccionales bajo contrato <code>{ cod_resultado, msg_resultado, data }</code>.</p>
+      <div class="section-title"><span class="section-num">5</span> Procedimientos Almacenados (Stored Procedures)</div>
+      <p style="font-size:13px;margin-bottom:16px;color:var(--pjev-texto-muted);">Procedimientos transaccionales bajo esquema <code>config</code>, convención <code>SECURITY DEFINER</code> y contrato estándar JSONB <code>{ "cod_resultado": 0, "msg_resultado": "OK", "data": [...] }</code>.</p>
       
-      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.1. Procedimiento LEER (<code>fn_fuentes_financiamiento_leer</code>)</h4>
-      <table class="props-table" style="margin-bottom:20px;">
+      <!-- 5.1 LEER -->
+      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.1. Procedimiento LEER (<code>config.fn_fuentes_financiamiento_leer</code>)</h4>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:8px;">Consulta las fuentes de financiamiento del ejercicio fiscal, devolviendo tanto los campos atómicos homologados (<code>cff_tipo_fondo</code>, <code>cff_fondo_especifico</code>, <code>cff_anio</code>, <code>cff_tipo_gasto</code>) como la clave concatenada y metadatos de clasificación LDF.</p>
+
+      <table class="props-table" style="margin-bottom:12px;">
         <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>ID de la fuente (o NULL para listado general)</td></tr>
-          <tr><td><code>@p_busqueda</code></td><td><code>VARCHAR</code></td><td>Filtro por clave, nombre o abreviatura</td></tr>
-          <tr><td><code>@p_eje_id</code></td><td><code>INT</code></td><td>Filtro obligatorio por Ejercicio Fiscal (Ej. 1 = 2026)</td></tr>
-          <tr><td><code>@p_estatus</code></td><td><code>INT</code></td><td>1 = Activos, 0 = Inactivos, NULL = Todos</td></tr>
+          <tr><td><code>p_id</code></td><td><code>INT</code></td><td>ID de la fuente (o <code>NULL</code> para listado general / bandeja).</td></tr>
+          <tr><td><code>p_busqueda</code></td><td><code>VARCHAR</code></td><td>Filtro opcional por clave concatenada, nombre descriptivo o nemotécnico.</td></tr>
+          <tr><td><code>p_eje_id</code></td><td><code>INT</code></td><td>Filtro obligatorio por Ejercicio Fiscal (FK <code>catalogo_ejercicios.eje_id</code>).</td></tr>
+          <tr><td><code>p_tipo_fondo</code></td><td><code>SMALLINT</code></td><td>Filtro opcional por Tipo de Fondo (<code>1</code> = Estatal/Propios, <code>2</code> = Federal).</td></tr>
+          <tr><td><code>p_estatus</code></td><td><code>INT</code></td><td><code>1</code> = Activos, <code>0</code> = Inactivos, <code>NULL</code> = Todos.</td></tr>
+          <tr><td><code>p_page</code></td><td><code>INT</code></td><td>Número de página para paginación (default 1).</td></tr>
+          <tr><td><code>p_limit</code></td><td><code>INT</code></td><td>Límite de registros por página (default 20, máximo 100).</td></tr>
         </tbody>
       </table>
 
-      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.2. Procedimiento ABC (<code>fn_fuentes_financiamiento_abc</code>)</h4>
-      <table class="props-table" style="margin-bottom:20px;">
-        <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción</th></tr></thead>
+      <div class="code-snippet-container">
+        <div class="code-snippet-header">
+          <span class="code-snippet-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--pjev-dorado);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            config.fn_fuentes_financiamiento_leer.sql
+          </span>
+          <span class="code-snippet-badge">PL/pgSQL</span>
+        </div>
+        <div class="code-wrap">
+<pre><code><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> config.fn_fuentes_financiamiento_leer(
+    p_id          <span style="color:#c678dd;">INT</span>      <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_busqueda    <span style="color:#c678dd;">VARCHAR</span>  <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_eje_id      <span style="color:#c678dd;">INT</span>      <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_tipo_fondo  <span style="color:#c678dd;">SMALLINT</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_estatus     <span style="color:#c678dd;">INT</span>      <span style="color:#d1d5db;">DEFAULT 1</span>,
+    p_page        <span style="color:#c678dd;">INT</span>      <span style="color:#d1d5db;">DEFAULT 1</span>,
+    p_limit       <span style="color:#c678dd;">INT</span>      <span style="color:#d1d5db;">DEFAULT 20</span>
+)
+<span style="color:#c678dd;">RETURNS</span> <span style="color:#c678dd;">JSONB</span>
+<span style="color:#c678dd;">LANGUAGE</span> plpgsql
+<span style="color:#c678dd;">SECURITY DEFINER</span>
+<span style="color:#c678dd;">SET</span> search_path = config, presupuesto, public
+<span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span>
+    v_offset <span style="color:#c678dd;">INT</span>;
+    v_total  <span style="color:#c678dd;">INT</span>;
+    v_data   <span style="color:#c678dd;">JSONB</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    v_offset := (GREATEST(p_page, <span style="color:#d19a66;">1</span>) - <span style="color:#d19a66;">1</span>) * LEAST(GREATEST(p_limit, <span style="color:#d19a66;">1</span>), <span style="color:#d19a66;">100</span>);
+
+    <span style="color:#5c6370;font-style:italic;">-- Conteo total para paginación</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#61afef;">COUNT</span>(*) <span style="color:#c678dd;">INTO</span> v_total
+    <span style="color:#c678dd;">FROM</span> config.catalogo_fuentes_fin ff
+    <span style="color:#c678dd;">WHERE</span> (p_id <span style="color:#c678dd;">IS NULL OR</span> ff.cff_id = p_id)
+      <span style="color:#c678dd;">AND</span> (p_eje_id <span style="color:#c678dd;">IS NULL OR</span> ff.cff_ejercicio = p_eje_id)
+      <span style="color:#c678dd;">AND</span> (p_tipo_fondo <span style="color:#c678dd;">IS NULL OR</span> ff.cff_tipo_fondo = p_tipo_fondo)
+      <span style="color:#c678dd;">AND</span> (p_estatus <span style="color:#c678dd;">IS NULL OR</span> ff.estatus_registro = p_estatus)
+      <span style="color:#c678dd;">AND</span> (
+          p_busqueda <span style="color:#c678dd;">IS NULL OR</span>
+          ff.cff_clave <span style="color:#c678dd;">ILIKE</span> <span style="color:#98c379;">'%'</span> || <span style="color:#61afef;">TRIM</span>(p_busqueda) || <span style="color:#98c379;">'%'</span> <span style="color:#c678dd;">OR</span>
+          ff.cff_abrev <span style="color:#c678dd;">ILIKE</span> <span style="color:#98c379;">'%'</span> || <span style="color:#61afef;">TRIM</span>(p_busqueda) || <span style="color:#98c379;">'%'</span> <span style="color:#c678dd;">OR</span>
+          ff.cff_nombre <span style="color:#c678dd;">ILIKE</span> <span style="color:#98c379;">'%'</span> || <span style="color:#61afef;">TRIM</span>(p_busqueda) || <span style="color:#98c379;">'%'</span>
+      );
+
+    <span style="color:#5c6370;font-style:italic;">-- Recuperación de registros con formato enriquecido</span>
+    <span style="color:#c678dd;">SELECT</span> <span style="color:#61afef;">COALESCE</span>(<span style="color:#61afef;">jsonb_agg</span>(
+        <span style="color:#61afef;">jsonb_build_object</span>(
+            <span style="color:#98c379;">'id'</span>,                  ff.cff_id,
+            <span style="color:#98c379;">'ejercicioId'</span>,         ff.cff_ejercicio,
+            <span style="color:#98c379;">'ejercicioAnio'</span>,       ce.eje_anio,
+            <span style="color:#98c379;">'tipoFondo'</span>,           ff.cff_tipo_fondo,
+            <span style="color:#98c379;">'fondoEspecifico'</span>,     ff.cff_fondo_especifico,
+            <span style="color:#98c379;">'anio'</span>,                ff.cff_anio,
+            <span style="color:#98c379;">'tipoGasto'</span>,           ff.cff_tipo_gasto,
+            <span style="color:#98c379;">'tipoGastoLabel'</span>,      <span style="color:#c678dd;">CASE WHEN</span> ff.cff_tipo_gasto = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span> <span style="color:#98c379;">'Capital'</span> <span style="color:#c678dd;">ELSE</span> <span style="color:#98c379;">'Corriente'</span> <span style="color:#c678dd;">END</span>,
+            <span style="color:#98c379;">'clave'</span>,               ff.cff_clave,
+            <span style="color:#98c379;">'abrev'</span>,               ff.cff_abrev,
+            <span style="color:#98c379;">'nombre'</span>,              ff.cff_nombre,
+            <span style="color:#98c379;">'descripcion'</span>,         ff.cff_descripcion,
+            <span style="color:#98c379;">'tipo'</span>,                ff.cff_tipo,
+            <span style="color:#98c379;">'tipoLabel'</span>,           <span style="color:#c678dd;">CASE</span> ff.cff_tipo
+                                       <span style="color:#c678dd;">WHEN</span> <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span> <span style="color:#98c379;">'Estatal'</span>
+                                       <span style="color:#c678dd;">WHEN</span> <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span> <span style="color:#98c379;">'Federal'</span>
+                                       <span style="color:#c678dd;">WHEN</span> <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span> <span style="color:#98c379;">'Propios'</span>
+                                       <span style="color:#c678dd;">WHEN</span> <span style="color:#d19a66;">4</span> <span style="color:#c678dd;">THEN</span> <span style="color:#98c379;">'Concentradora'</span>
+                                       <span style="color:#c678dd;">ELSE</span> <span style="color:#98c379;">'Desconocido'</span>
+                                   <span style="color:#c678dd;">END</span>,
+            <span style="color:#98c379;">'regimenLdf'</span>,          <span style="color:#c678dd;">CASE WHEN</span> ff.cff_tipo_fondo = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span> <span style="color:#98c379;">'Etiquetado Federal'</span> <span style="color:#c678dd;">ELSE</span> <span style="color:#98c379;">'No Etiquetado'</span> <span style="color:#c678dd;">END</span>,
+            <span style="color:#98c379;">'concentradora'</span>,       ff.cff_concentradora,
+            <span style="color:#98c379;">'estatus'</span>,             ff.estatus_registro,
+            <span style="color:#98c379;">'fechaCreacion'</span>,       ff.fecha_c,
+            <span style="color:#98c379;">'usuarioCreacion'</span>,     ff.usuario_c
+        )
+    ), <span style="color:#98c379;">'[]'</span>::<span style="color:#c678dd;">jsonb</span>) <span style="color:#c678dd;">INTO</span> v_data
+    <span style="color:#c678dd;">FROM</span> config.catalogo_fuentes_fin ff
+    <span style="color:#c678dd;">LEFT JOIN</span> config.catalogo_ejercicios ce <span style="color:#c678dd;">ON</span> ce.eje_id = ff.cff_ejercicio
+    <span style="color:#c678dd;">WHERE</span> (p_id <span style="color:#c678dd;">IS NULL OR</span> ff.cff_id = p_id)
+      <span style="color:#c678dd;">AND</span> (p_eje_id <span style="color:#c678dd;">IS NULL OR</span> ff.cff_ejercicio = p_eje_id)
+      <span style="color:#c678dd;">AND</span> (p_tipo_fondo <span style="color:#c678dd;">IS NULL OR</span> ff.cff_tipo_fondo = p_tipo_fondo)
+      <span style="color:#c678dd;">AND</span> (p_estatus <span style="color:#c678dd;">IS NULL OR</span> ff.estatus_registro = p_estatus)
+      <span style="color:#c678dd;">AND</span> (
+          p_busqueda <span style="color:#c678dd;">IS NULL OR</span>
+          ff.cff_clave <span style="color:#c678dd;">ILIKE</span> <span style="color:#98c379;">'%'</span> || <span style="color:#61afef;">TRIM</span>(p_busqueda) || <span style="color:#98c379;">'%'</span> <span style="color:#c678dd;">OR</span>
+          ff.cff_abrev <span style="color:#c678dd;">ILIKE</span> <span style="color:#98c379;">'%'</span> || <span style="color:#61afef;">TRIM</span>(p_busqueda) || <span style="color:#98c379;">'%'</span> <span style="color:#c678dd;">OR</span>
+          ff.cff_nombre <span style="color:#c678dd;">ILIKE</span> <span style="color:#98c379;">'%'</span> || <span style="color:#61afef;">TRIM</span>(p_busqueda) || <span style="color:#98c379;">'%'</span>
+      )
+    <span style="color:#c678dd;">ORDER BY</span> ff.cff_ejercicio <span style="color:#c678dd;">DESC</span>, ff.cff_clave <span style="color:#c678dd;">ASC</span>
+    <span style="color:#c678dd;">OFFSET</span> v_offset
+    <span style="color:#c678dd;">LIMIT</span> LEAST(GREATEST(p_limit, <span style="color:#d19a66;">1</span>), <span style="color:#d19a66;">100</span>);
+
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(
+        <span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>,
+        <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Consulta ejecutada exitosamente'</span>,
+        <span style="color:#98c379;">'total'</span>,         v_total,
+        <span style="color:#98c379;">'pagina'</span>,        p_page,
+        <span style="color:#98c379;">'data'</span>,          v_data
+    );
+<span style="color:#c678dd;">END</span>;
+$$;</code></pre>
+        </div>
+      </div>
+
+      <!-- 5.2 ABC -->
+      <h4 style="margin-top: 10px; margin-bottom: 10px; color: var(--pjev-verde-oscuro);">5.2. Procedimiento ABC (<code>config.fn_fuentes_financiamiento_abc</code>)</h4>
+      <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:8px;">Control transaccional para Alta (<code>1</code>), Cambio (<code>2</code>) y Baja Lógica (<code>3</code>). Realiza el cálculo automático de <code>cff_anio</code> a partir de <code>catalogo_ejercicios.eje_anio</code>, ensambla la <code>cff_clave</code> concatenada y valida la integridad presupuestal antes de cualquier modificación o baja.</p>
+
+      <table class="props-table" style="margin-bottom:12px;">
+        <thead><tr><th>Parámetro (IN)</th><th>Tipo</th><th>Descripción / Validación</th></tr></thead>
         <tbody>
-          <tr><td><code>@p_id</code></td><td><code>INT</code></td><td>ID de la fuente (NULL en creación)</td></tr>
-          <tr><td><code>@p_clave</code></td><td><code>VARCHAR(10)</code></td><td>Clave presupuestal de 6 dígitos</td></tr>
-          <tr><td><code>@p_nombre</code></td><td><code>VARCHAR(250)</code></td><td>Nombre completo del fondo</td></tr>
-          <tr><td><code>@p_abrev</code></td><td><code>VARCHAR(10)</code></td><td>Abreviatura institucional</td></tr>
-          <tr><td><code>@p_tipo</code></td><td><code>VARCHAR(50)</code></td><td>Tipo de fondo (Estatal, Federal, Propios)</td></tr>
-          <tr><td><code>@p_eje_id</code></td><td><code>INT</code></td><td>Ejercicio fiscal al que pertenece</td></tr>
-          <tr><td><code>@p_concentradora</code></td><td><code>BOOLEAN</code></td><td>Indicador de concentradora</td></tr>
-          <tr><td><code>@p_accion</code></td><td><code>SMALLINT</code></td><td>1 = Alta, 2 = Cambio, 3 = Baja Lógica</td></tr>
-          <tr><td><code>@p_usuario_id</code></td><td><code>INT</code></td><td>ID de usuario auditor</td></tr>
+          <tr><td><code>p_accion</code></td><td><code>SMALLINT</code></td><td><code>1</code> = Alta, <code>2</code> = Modificación, <code>3</code> = Baja Lógica (estatus=0).</td></tr>
+          <tr><td><code>p_id</code></td><td><code>INT</code></td><td>ID de la fuente (<code>NULL</code> en Alta, obligatorio en Cambio y Baja).</td></tr>
+          <tr><td><code>p_ejercicio_id</code></td><td><code>INT</code></td><td>ID del Ejercicio Fiscal (FK <code>catalogo_ejercicios.eje_id</code>).</td></tr>
+          <tr><td><code>p_tipo_fondo</code></td><td><code>SMALLINT</code></td><td><code>1</code> = Estatal / Propios (No Etiquetado), <code>2</code> = Federal (Etiquetado).</td></tr>
+          <tr><td><code>p_fondo_especifico</code></td><td><code>VARCHAR(3)</code></td><td>3 dígitos exactos del fondo (ej. <code>601</code>, <code>702</code>, <code>501</code>).</td></tr>
+          <tr><td><code>p_tipo_gasto</code></td><td><code>SMALLINT</code></td><td>Clasificador de gasto aplicable (<code>1</code> = Corriente, <code>2</code> = Capital).</td></tr>
+          <tr><td><code>p_abrev</code></td><td><code>VARCHAR(5)</code></td><td>Abreviatura institucional en mayúsculas (ej. <code>EST</code>, <code>FASP</code>).</td></tr>
+          <tr><td><code>p_nombre</code></td><td><code>VARCHAR(150)</code></td><td>Denominación formal completa del fondo.</td></tr>
+          <tr><td><code>p_descripcion</code></td><td><code>VARCHAR(300)</code></td><td>Descripción opcional o justificación normativa.</td></tr>
+          <tr><td><code>p_tipo</code></td><td><code>SMALLINT</code></td><td>Tipo institucional (1=Estatal, 2=Federal, 3=Propios, 4=Concentradora).</td></tr>
+          <tr><td><code>p_concentradora</code></td><td><code>SMALLINT</code></td><td>Indicador de cuenta concentradora (<code>0</code> = No, <code>1</code> = Sí).</td></tr>
+          <tr><td><code>p_usuario_id</code></td><td><code>VARCHAR(20)</code></td><td>Identificador del usuario operador para la bitácora de auditoría.</td></tr>
         </tbody>
       </table>
+
+      <div class="code-snippet-container">
+        <div class="code-snippet-header">
+          <span class="code-snippet-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--pjev-dorado);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            config.fn_fuentes_financiamiento_abc.sql
+          </span>
+          <span class="code-snippet-badge">PL/pgSQL</span>
+        </div>
+        <div class="code-wrap">
+<pre><code><span style="color:#c678dd;">CREATE OR REPLACE FUNCTION</span> config.fn_fuentes_financiamiento_abc(
+    p_accion            <span style="color:#c678dd;">SMALLINT</span>,
+    p_id                <span style="color:#c678dd;">INT</span>          <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_ejercicio_id      <span style="color:#c678dd;">INT</span>          <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_tipo_fondo        <span style="color:#c678dd;">SMALLINT</span>     <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_fondo_especifico  <span style="color:#c678dd;">VARCHAR(3)</span>   <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_tipo_gasto        <span style="color:#c678dd;">SMALLINT</span>     <span style="color:#d1d5db;">DEFAULT 1</span>,
+    p_abrev             <span style="color:#c678dd;">VARCHAR(5)</span>   <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_nombre            <span style="color:#c678dd;">VARCHAR(150)</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_descripcion       <span style="color:#c678dd;">VARCHAR(300)</span> <span style="color:#d1d5db;">DEFAULT NULL</span>,
+    p_tipo              <span style="color:#c678dd;">SMALLINT</span>     <span style="color:#d1d5db;">DEFAULT 1</span>,
+    p_concentradora     <span style="color:#c678dd;">SMALLINT</span>     <span style="color:#d1d5db;">DEFAULT 0</span>,
+    p_usuario_id        <span style="color:#c678dd;">VARCHAR(20)</span>  <span style="color:#d1d5db;">DEFAULT 'SISTEMA'</span>
+)
+<span style="color:#c678dd;">RETURNS</span> <span style="color:#c678dd;">JSONB</span>
+<span style="color:#c678dd;">LANGUAGE</span> plpgsql
+<span style="color:#c678dd;">SECURITY DEFINER</span>
+<span style="color:#c678dd;">SET</span> search_path = config, presupuesto, public
+<span style="color:#c678dd;">AS</span> $$
+<span style="color:#c678dd;">DECLARE</span>
+    v_eje_anio      <span style="color:#c678dd;">INT</span>;
+    v_cff_anio      <span style="color:#c678dd;">SMALLINT</span>;
+    v_clave_final   <span style="color:#c678dd;">VARCHAR(10)</span>;
+    v_fondo_esp     <span style="color:#c678dd;">VARCHAR(3)</span>;
+    v_abrev         <span style="color:#c678dd;">VARCHAR(5)</span>;
+    v_nuevo_id      <span style="color:#c678dd;">INT</span>;
+    v_partidas_cnt  <span style="color:#c678dd;">INT</span>;
+<span style="color:#c678dd;">BEGIN</span>
+    <span style="color:#5c6370;font-style:italic;">-- ─────────────────────────────────────────────────────────────────</span>
+    <span style="color:#5c6370;font-style:italic;">-- 1. ACCIÓN 1: ALTA (CREACIÓN)</span>
+    <span style="color:#5c6370;font-style:italic;">-- ─────────────────────────────────────────────────────────────────</span>
+    <span style="color:#c678dd;">IF</span> p_accion = <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#5c6370;font-style:italic;">-- Validaciones iniciales</span>
+        <span style="color:#c678dd;">IF</span> p_ejercicio_id <span style="color:#c678dd;">IS NULL THEN</span>
+            <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">400</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'El ejercicio fiscal es obligatorio'</span>);
+        <span style="color:#c678dd;">END IF;</span>
+
+        <span style="color:#5c6370;font-style:italic;">-- Obtener año fiscal del ejercicio</span>
+        <span style="color:#c678dd;">SELECT</span> eje_anio <span style="color:#c678dd;">INTO</span> v_eje_anio
+        <span style="color:#c678dd;">FROM</span> config.catalogo_ejercicios
+        <span style="color:#c678dd;">WHERE</span> eje_id = p_ejercicio_id;
+
+        <span style="color:#c678dd;">IF NOT FOUND THEN</span>
+            <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">404</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'El ejercicio fiscal especificado no existe'</span>);
+        <span style="color:#c678dd;">END IF;</span>
+
+        <span style="color:#5c6370;font-style:italic;">-- RN-02: Calcular cff_anio en 2 dígitos</span>
+        v_cff_anio := (v_eje_anio % <span style="color:#d19a66;">100</span>)::<span style="color:#c678dd;">SMALLINT</span>;
+
+        <span style="color:#5c6370;font-style:italic;">-- Normalizar fondo específico y abreviatura</span>
+        v_fondo_esp := <span style="color:#61afef;">UPPER</span>(<span style="color:#61afef;">TRIM</span>(COALESCE(p_fondo_especifico, <span style="color:#98c379;">''</span>)));
+        v_abrev     := <span style="color:#61afef;">UPPER</span>(<span style="color:#61afef;">TRIM</span>(COALESCE(p_abrev, <span style="color:#98c379;">''</span>)));
+
+        <span style="color:#c678dd;">IF</span> v_fondo_esp = <span style="color:#98c379;">''</span> <span style="color:#c678dd;">OR</span> <span style="color:#61afef;">LENGTH</span>(v_fondo_esp) &gt; <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span>
+            <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">400</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'El fondo específico debe tener de 1 a 3 caracteres alfanuméricos'</span>);
+        <span style="color:#c678dd;">END IF;</span>
+
+        <span style="color:#5c6370;font-style:italic;">-- RN-03: Ensamblar clave concatenada [tipo_fondo][fondo_especifico][anio]</span>
+        v_clave_final := COALESCE(p_tipo_fondo, <span style="color:#d19a66;">1</span>)::<span style="color:#c678dd;">TEXT</span> || v_fondo_esp || <span style="color:#61afef;">LPAD</span>(v_cff_anio::<span style="color:#c678dd;">TEXT</span>, <span style="color:#d19a66;">2</span>, <span style="color:#98c379;">'0'</span>);
+
+        <span style="color:#5c6370;font-style:italic;">-- RN-04: Validar unicidad de clave por ejercicio fiscal</span>
+        <span style="color:#c678dd;">IF EXISTS</span> (
+            <span style="color:#c678dd;">SELECT</span> <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">FROM</span> config.catalogo_fuentes_fin
+            <span style="color:#c678dd;">WHERE</span> cff_clave = v_clave_final <span style="color:#c678dd;">AND</span> cff_ejercicio = p_ejercicio_id
+        ) <span style="color:#c678dd;">THEN</span>
+            <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(
+                <span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">409</span>,
+                <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'RN-04: La clave concatenada '</span> || v_clave_final || <span style="color:#98c379;">' ya existe para el ejercicio '</span> || v_eje_anio::<span style="color:#c678dd;">TEXT</span>
+            );
+        <span style="color:#c678dd;">END IF;</span>
+
+        <span style="color:#5c6370;font-style:italic;">-- Insertar registro canónico</span>
+        <span style="color:#c678dd;">INSERT INTO</span> config.catalogo_fuentes_fin (
+            cff_clave, cff_abrev, cff_nombre, cff_descripcion,
+            cff_ejercicio, cff_tipo, cff_tipo_fondo, cff_fondo_especifico,
+            cff_anio, cff_tipo_gasto, cff_concentradora,
+            estatus_registro, usuario_c, fecha_c
+        ) <span style="color:#c678dd;">VALUES</span> (
+            v_clave_final, v_abrev, <span style="color:#61afef;">TRIM</span>(p_nombre), <span style="color:#61afef;">TRIM</span>(p_descripcion),
+            p_ejercicio_id, COALESCE(p_tipo, <span style="color:#d19a66;">1</span>), COALESCE(p_tipo_fondo, <span style="color:#d19a66;">1</span>), v_fondo_esp,
+            v_cff_anio, COALESCE(p_tipo_gasto, <span style="color:#d19a66;">1</span>), COALESCE(p_concentradora, <span style="color:#d19a66;">0</span>),
+            <span style="color:#d19a66;">1</span>, p_usuario_id, <span style="color:#61afef;">NOW</span>()
+        ) <span style="color:#c678dd;">RETURNING</span> cff_id <span style="color:#c678dd;">INTO</span> v_nuevo_id;
+
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(
+            <span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>,
+            <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Fuente de financiamiento creada exitosamente'</span>,
+            <span style="color:#98c379;">'data'</span>, <span style="color:#61afef;">jsonb_build_object</span>(
+                <span style="color:#98c379;">'id'</span>,              v_nuevo_id,
+                <span style="color:#98c379;">'clave'</span>,           v_clave_final,
+                <span style="color:#98c379;">'tipoFondo'</span>,       p_tipo_fondo,
+                <span style="color:#98c379;">'fondoEspecifico'</span>, v_fondo_esp,
+                <span style="color:#98c379;">'anio'</span>,            v_cff_anio
+            )
+        );
+
+    <span style="color:#5c6370;font-style:italic;">-- ─────────────────────────────────────────────────────────────────</span>
+    <span style="color:#5c6370;font-style:italic;">-- 2. ACCIÓN 2: MODIFICACIÓN (CAMBIO)</span>
+    <span style="color:#5c6370;font-style:italic;">-- ─────────────────────────────────────────────────────────────────</span>
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">2</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">IF</span> p_id <span style="color:#c678dd;">IS NULL THEN</span>
+            <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">400</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'El ID de la fuente es obligatorio para modificar'</span>);
+        <span style="color:#c678dd;">END IF;</span>
+
+        <span style="color:#5c6370;font-style:italic;">-- Recuperar ejercicio si no viene dado</span>
+        <span style="color:#c678dd;">IF</span> p_ejercicio_id <span style="color:#c678dd;">IS NOT NULL THEN</span>
+            <span style="color:#c678dd;">SELECT</span> eje_anio <span style="color:#c678dd;">INTO</span> v_eje_anio <span style="color:#c678dd;">FROM</span> config.catalogo_ejercicios <span style="color:#c678dd;">WHERE</span> eje_id = p_ejercicio_id;
+            v_cff_anio := (v_eje_anio % <span style="color:#d19a66;">100</span>)::<span style="color:#c678dd;">SMALLINT</span>;
+        <span style="color:#c678dd;">ELSE</span>
+            <span style="color:#c678dd;">SELECT</span> ff.cff_anio <span style="color:#c678dd;">INTO</span> v_cff_anio <span style="color:#c678dd;">FROM</span> config.catalogo_fuentes_fin ff <span style="color:#c678dd;">WHERE</span> ff.cff_id = p_id;
+        <span style="color:#c678dd;">END IF;</span>
+
+        <span style="color:#c678dd;">IF</span> p_fondo_especifico <span style="color:#c678dd;">IS NOT NULL THEN</span>
+            v_fondo_esp := <span style="color:#61afef;">UPPER</span>(<span style="color:#61afef;">TRIM</span>(p_fondo_especifico));
+            v_clave_final := COALESCE(p_tipo_fondo, <span style="color:#d19a66;">1</span>)::<span style="color:#c678dd;">TEXT</span> || v_fondo_esp || <span style="color:#61afef;">LPAD</span>(v_cff_anio::<span style="color:#c678dd;">TEXT</span>, <span style="color:#d19a66;">2</span>, <span style="color:#98c379;">'0'</span>);
+
+            <span style="color:#5c6370;font-style:italic;">-- Validar unicidad excluyendo el registro actual</span>
+            <span style="color:#c678dd;">IF EXISTS</span> (
+                <span style="color:#c678dd;">SELECT</span> <span style="color:#d19a66;">1</span> <span style="color:#c678dd;">FROM</span> config.catalogo_fuentes_fin
+                <span style="color:#c678dd;">WHERE</span> cff_clave = v_clave_final
+                  <span style="color:#c678dd;">AND</span> cff_ejercicio = COALESCE(p_ejercicio_id, cff_ejercicio)
+                  <span style="color:#c678dd;">AND</span> cff_id &lt;&gt; p_id
+            ) <span style="color:#c678dd;">THEN</span>
+                <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">409</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'RN-04: La clave resultante ya está asignada a otra fuente'</span>);
+            <span style="color:#c678dd;">END IF;</span>
+        <span style="color:#c678dd;">END IF;</span>
+
+        <span style="color:#c678dd;">UPDATE</span> config.catalogo_fuentes_fin
+        <span style="color:#c678dd;">SET</span>
+            cff_clave            = COALESCE(v_clave_final, cff_clave),
+            cff_abrev            = COALESCE(<span style="color:#61afef;">UPPER</span>(<span style="color:#61afef;">TRIM</span>(p_abrev)), cff_abrev),
+            cff_nombre           = COALESCE(<span style="color:#61afef;">TRIM</span>(p_nombre), cff_nombre),
+            cff_descripcion      = COALESCE(<span style="color:#61afef;">TRIM</span>(p_descripcion), cff_descripcion),
+            cff_ejercicio        = COALESCE(p_ejercicio_id, cff_ejercicio),
+            cff_tipo             = COALESCE(p_tipo, cff_tipo),
+            cff_tipo_fondo       = COALESCE(p_tipo_fondo, cff_tipo_fondo),
+            cff_fondo_especifico = COALESCE(v_fondo_esp, cff_fondo_especifico),
+            cff_anio             = COALESCE(v_cff_anio, cff_anio),
+            cff_tipo_gasto       = COALESCE(p_tipo_gasto, cff_tipo_gasto),
+            cff_concentradora    = COALESCE(p_concentradora, cff_concentradora),
+            usuario_m            = p_usuario_id,
+            fecha_m              = <span style="color:#61afef;">NOW</span>()
+        <span style="color:#c678dd;">WHERE</span> cff_id = p_id;
+
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Fuente modificada exitosamente'</span>);
+
+    <span style="color:#5c6370;font-style:italic;">-- ─────────────────────────────────────────────────────────────────</span>
+    <span style="color:#5c6370;font-style:italic;">-- 3. ACCIÓN 3: BAJA LÓGICA (INACTIVACIÓN)</span>
+    <span style="color:#5c6370;font-style:italic;">-- ─────────────────────────────────────────────────────────────────</span>
+    <span style="color:#c678dd;">ELSIF</span> p_accion = <span style="color:#d19a66;">3</span> <span style="color:#c678dd;">THEN</span>
+        <span style="color:#c678dd;">IF</span> p_id <span style="color:#c678dd;">IS NULL THEN</span>
+            <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">400</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'El ID de la fuente es obligatorio para inactivar'</span>);
+        <span style="color:#c678dd;">END IF;</span>
+
+        <span style="color:#5c6370;font-style:italic;">-- RN-05: Validar que no tenga afectaciones presupuestales vigentes</span>
+        <span style="color:#c678dd;">SELECT</span> <span style="color:#61afef;">COUNT</span>(*) <span style="color:#c678dd;">INTO</span> v_partidas_cnt
+        <span style="color:#c678dd;">FROM</span> cxp.afectaciones_gasto_partidas agp
+        <span style="color:#c678dd;">WHERE</span> agp.f_fuente_fin_id = p_id <span style="color:#c678dd;">AND</span> agp.estatus_registro = <span style="color:#d19a66;">1</span>;
+
+        <span style="color:#c678dd;">IF</span> v_partidas_cnt &gt; <span style="color:#d19a66;">0</span> <span style="color:#c678dd;">THEN</span>
+            <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(
+                <span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">409</span>,
+                <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'RN-05: No se puede inactivar la fuente porque cuenta con partidas o afectaciones vigentes'</span>
+            );
+        <span style="color:#c678dd;">END IF;</span>
+
+        <span style="color:#5c6370;font-style:italic;">-- RN-06: Aplicar baja lógica</span>
+        <span style="color:#c678dd;">UPDATE</span> config.catalogo_fuentes_fin
+        <span style="color:#c678dd;">SET</span> estatus_registro = <span style="color:#d19a66;">0</span>,
+            usuario_m        = p_usuario_id,
+            fecha_m          = <span style="color:#61afef;">NOW</span>()
+        <span style="color:#c678dd;">WHERE</span> cff_id = p_id;
+
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">0</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Fuente inactivada correctamente'</span>);
+
+    <span style="color:#c678dd;">ELSE</span>
+        <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(<span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">400</span>, <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Acción inválida. Use 1 (Alta), 2 (Cambio) o 3 (Baja)'</span>);
+    <span style="color:#c678dd;">END IF;</span>
+
+<span style="color:#c678dd;">EXCEPTION WHEN OTHERS THEN</span>
+    <span style="color:#c678dd;">RETURN</span> <span style="color:#61afef;">jsonb_build_object</span>(
+        <span style="color:#98c379;">'cod_resultado'</span>, <span style="color:#d19a66;">500</span>,
+        <span style="color:#98c379;">'msg_resultado'</span>, <span style="color:#98c379;">'Error interno en base de datos: '</span> || <span style="color:#61afef;">SQLERRM</span>
+    );
+<span style="color:#c678dd;">END</span>;
+$$;</code></pre>
+        </div>
+      </div>
     </div>
 
     <!-- 6. SERVICIOS REST -->
@@ -243,7 +641,7 @@
             <td><code class="method get">GET</code></td>
             <td><code>/configuracion/fuentesf</code></td>
             <td><code>?ejercicioId=1&amp;q=busqueda</code></td>
-            <td>Consulta fuentes activas del ejercicio con enriquecimiento LDF.</td>
+            <td>Consulta fuentes activas del ejercicio con campos atómicos (<code>tipoFondo</code>, <code>fondoEspecifico</code>, <code>anio</code>) y clave concatenada.</td>
           </tr>
           <tr>
             <td><code class="method get">GET</code></td>
@@ -254,20 +652,20 @@
           <tr>
             <td><code class="method post">POST</code></td>
             <td><code>/configuracion/fuentesf</code></td>
-            <td><code>{ clave, nombre, abrev, tipo, ejercicioId, concentradora }</code></td>
-            <td>Registra una nueva fuente validando unicidad por ejercicio.</td>
+            <td><code>{ tipoFondo, fondoEspecifico, tipoGasto, abrev, nombre, ejercicioId, tipo, concentradora }</code></td>
+            <td>Registra una nueva fuente calculando <code>anio</code> y <code>clave</code> concatenada automáticamente.</td>
           </tr>
           <tr>
-            <td><code class="method put">PUT</code></td>
+            <td><code class="method patch">PATCH</code></td>
             <td><code>/configuracion/fuentesf/:id</code></td>
-            <td><code>{ nombre, abrev, tipo, concentradora }</code></td>
-            <td>Actualiza metadatos de la fuente.</td>
+            <td><code>{ tipoFondo, fondoEspecifico, tipoGasto, nombre, abrev, tipo, concentradora, estatus }</code></td>
+            <td>Actualiza metadatos y recalcula la clave si se modifican los componentes atómicos.</td>
           </tr>
           <tr>
             <td><code class="method delete">DELETE</code></td>
             <td><code>/configuracion/fuentesf/:id</code></td>
             <td>—</td>
-            <td>Aplica baja lógica si no tiene claves presupuestales ligadas.</td>
+            <td>Aplica baja lógica si no tiene partidas presupuestales ligadas.</td>
           </tr>
         </tbody>
       </table>
@@ -364,49 +762,66 @@
               <text x="200" y="120" font-size="10" font-weight="bold" fill="#64748b">NOMBRE</text>
               <text x="540" y="120" font-size="10" font-weight="bold" fill="#64748b">TIPO</text>
               <text x="680" y="120" font-size="10" font-weight="bold" fill="#64748b">ESTATUS</text>
-              <text x="35" y="150" font-size="11" fill="#1A7A3C" font-style="italic">{ff_clave}</text>
-              <text x="120" y="150" font-size="11" fill="#1A7A3C" font-style="italic">{ff_abrev}</text>
-              <text x="200" y="150" font-size="11" fill="#1A7A3C" font-style="italic">{ff_nombre}</text>
-              <text x="540" y="150" font-size="11" fill="#1A7A3C" font-style="italic">{ff_tipo}</text>
+              <text x="35" y="150" font-size="11" fill="#1A7A3C" font-style="italic">{cff_clave}</text>
+              <text x="120" y="150" font-size="11" fill="#1A7A3C" font-style="italic">{cff_abrev}</text>
+              <text x="200" y="150" font-size="11" fill="#1A7A3C" font-style="italic">{cff_nombre}</text>
+              <text x="540" y="150" font-size="11" fill="#1A7A3C" font-style="italic">{cff_tipo}</text>
               <text x="680" y="150" font-size="11" fill="#1A7A3C" font-style="italic">{estatus_registro}</text>
             </svg>
           </div>
         </div>
       </div>
 
-      <!-- TAB 3: FORMULARIO CRUD -->
+      <!-- TAB 3: FORMULARIO CRUD CON SEGMENTOS ATÓMICOS Y PREVIEW -->
       <div id="wf-p3" class="wf-panel">
         <div class="wf-box">
-          <div class="wf-bar"><span class="wf-bar-label">Formulario de Captura / Edición</span></div>
+          <div class="wf-bar"><span class="wf-bar-label">Formulario con Segmentación Atómica y Previsualización en Vivo</span></div>
           <div class="wf-svg-area">
-            <svg viewBox="0 0 800 240" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
-              <rect width="800" height="240" fill="#f8ebdf" />
-              <text x="20" y="28" font-size="15" font-weight="bold" fill="#1b3a2d">Detalle de Fuente de Financiamiento</text>
+            <svg viewBox="0 0 800 270" width="100%" height="auto" font-family="'Segoe UI',sans-serif">
+              <rect width="800" height="270" fill="#f8ebdf" />
+              <text x="20" y="24" font-size="14" font-weight="bold" fill="#1b3a2d">Detalle de Fuente de Financiamiento (Segmentación Homologada)</text>
               
-              <rect x="20" y="45" width="760" height="180" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <!-- Tarjeta de previsualización en vivo -->
+              <rect x="20" y="38" width="760" height="42" fill="#ffffff" stroke="#1A7A3C" rx="4" />
+              <text x="35" y="55" font-size="9" font-weight="bold" fill="#64748b">CLAVE CONCATENADA RESULTANTE (6 DÍGITOS):</text>
+              <text x="35" y="72" font-size="16" font-weight="bold" fill="#1A7A3C">160126</text>
               
-              <text x="35" y="75" font-size="10" font-weight="bold" fill="#475569">CLAVE (6 DÍGITOS) *</text>
-              <rect x="35" y="85" width="140" height="30" fill="#ffffff" stroke="#94a3b8" rx="4" />
-              <text x="45" y="104" font-size="11" font-weight="600" fill="#0f172a">160126</text>
+              <text x="450" y="55" font-size="9" font-weight="bold" fill="#64748b">SEGMENTO EN CLAVE PRESUPUESTAL:</text>
+              <text x="450" y="72" font-size="13" font-weight="bold" fill="#0369a1">...-1-601-26-1</text>
 
-              <text x="195" y="75" font-size="10" font-weight="bold" fill="#475569">ABREVIATURA *</text>
-              <rect x="195" y="85" width="90" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" />
-              <text x="205" y="104" font-size="11" fill="#0f172a">EST</text>
+              <!-- Formulario de 4 columnas -->
+              <rect x="20" y="90" width="760" height="165" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              
+              <text x="35" y="112" font-size="10" font-weight="bold" fill="#475569">TIPO FONDO (cff_tipo_fondo) *</text>
+              <rect x="35" y="120" width="160" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="45" y="138" font-size="10" fill="#0f172a">1 - Estatal / No Etiquetado ▼</text>
 
-              <text x="305" y="75" font-size="10" font-weight="bold" fill="#475569">EJERCICIO *</text>
-              <rect x="305" y="85" width="100" height="30" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
-              <text x="315" y="104" font-size="11" fill="#0f172a">2026 ▼</text>
+              <text x="210" y="112" font-size="10" font-weight="bold" fill="#475569">FONDO ESP. (cff_fondo_esp) *</text>
+              <rect x="210" y="120" width="110" height="28" fill="#ffffff" stroke="#94a3b8" rx="4" />
+              <text x="220" y="138" font-size="11" font-weight="bold" fill="#0f172a">601</text>
 
-              <text x="425" y="75" font-size="10" font-weight="bold" fill="#475569">TIPO DE RECURSO *</text>
-              <rect x="425" y="85" width="160" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" />
-              <text x="435" y="104" font-size="11" fill="#0f172a">1 - Estatal (No Etiquetado) ▼</text>
+              <text x="335" y="112" font-size="10" font-weight="bold" fill="#475569">AÑO (cff_anio) *</text>
+              <rect x="335" y="120" width="80" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="4" />
+              <text x="345" y="138" font-size="11" font-weight="bold" fill="#64748b">26</text>
 
-              <text x="35" y="145" font-size="10" font-weight="bold" fill="#475569">NOMBRE COMPLETO DEL FONDO *</text>
-              <rect x="35" y="155" width="550" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4" />
-              <text x="45" y="174" font-size="11" fill="#0f172a">PRESUPUESTO AUTORIZADO 2026 (Subsidio Estatal Ordinario)</text>
+              <text x="430" y="112" font-size="10" font-weight="bold" fill="#475569">TIPO GASTO (cff_tipo_gasto) *</text>
+              <rect x="430" y="120" width="140" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="440" y="138" font-size="10" fill="#0f172a">1 - Corriente ▼</text>
 
-              <rect x="640" y="155" width="120" height="30" fill="#1A7A3C" rx="4" />
-              <text x="700" y="174" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar</text>
+              <text x="585" y="112" font-size="10" font-weight="bold" fill="#475569">ABREV (cff_abrev) *</text>
+              <rect x="585" y="120" width="90" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="595" y="138" font-size="11" font-weight="bold" fill="#0f172a">EST</text>
+
+              <text x="35" y="172" font-size="10" font-weight="bold" fill="#475569">EJERCICIO FISCAL (cff_ejercicio) *</text>
+              <rect x="35" y="180" width="160" height="28" fill="#f8fafc" stroke="#cbd5e1" rx="4" />
+              <text x="45" y="198" font-size="11" fill="#0f172a">2026 (Activo) ▼</text>
+
+              <text x="210" y="172" font-size="10" font-weight="bold" fill="#475569">NOMBRE COMPLETO DEL FONDO (cff_nombre) *</text>
+              <rect x="210" y="180" width="465" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4" />
+              <text x="220" y="198" font-size="11" fill="#0f172a">PRESUPUESTO AUTORIZADO 2026 (Subsidio Estatal Ordinario)</text>
+
+              <rect x="640" y="218" width="120" height="28" fill="#1A7A3C" rx="4" />
+              <text x="700" y="236" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Guardar</text>
             </svg>
           </div>
         </div>
@@ -422,34 +837,41 @@
         <tbody>
           <tr>
             <td><strong>RN-01</strong></td>
-            <td>Estructura Canónica de 6 Dígitos (<code>[CONAC 2d] + [Fondo 2d] + [Año 2d]</code>).</td>
-            <td>No se admiten claves numéricas de longitud distinta o formatos libres.</td>
-            <td>Frontend / Backend (DTO y Regex)</td>
+            <td>Segmentación Atómica Homologada (<code>cff_tipo_fondo</code> + <code>cff_fondo_especifico</code> + <code>cff_anio</code> + <code>cff_tipo_gasto</code>).</td>
+            <td>Garantiza paridad 1:1 con las columnas de <code>presupuesto.clave_presupuestal</code>.</td>
+            <td>Database Schema / DTO</td>
             <td>SEFIPLAN / CONAC</td>
           </tr>
           <tr>
             <td><strong>RN-02</strong></td>
-            <td>Unicidad de clave por Ejercicio Fiscal (<code>ff_clave</code> + <code>eje_id</code>).</td>
-            <td>No pueden existir dos fuentes con la misma clave dentro del mismo año fiscal.</td>
-            <td>Database Unique Constraint</td>
+            <td>Cálculo Automático de Año Fiscal (<code>cff_anio = eje_anio % 100</code>).</td>
+            <td>El usuario no captura manualmente el año; se sincroniza de forma reactiva con el ejercicio fiscal.</td>
+            <td>Frontend Form / Backend Service</td>
             <td>Arquitectura SIAF</td>
           </tr>
           <tr>
             <td><strong>RN-03</strong></td>
+            <td>Generación y Visualización de Clave Concatenada (<code>cff_clave</code>).</td>
+            <td>La clave se construye automáticamente y se muestra en tiempo real en los controles y reportes.</td>
+            <td>Frontend Preview / Backend DTO</td>
+            <td>Estándar PJEV</td>
+          </tr>
+          <tr>
+            <td><strong>RN-04</strong></td>
+            <td>Unicidad de clave por Ejercicio Fiscal (<code>cff_clave</code> + <code>cff_ejercicio</code>).</td>
+            <td>No pueden existir dos fuentes con la misma combinación dentro del mismo año fiscal.</td>
+            <td>Database Unique Constraint</td>
+            <td>Arquitectura SIAF</td>
+          </tr>
+          <tr>
+            <td><strong>RN-05</strong></td>
             <td>Integridad Presupuestal y Afectación.</td>
             <td>No se puede desactivar una fuente si tiene techos asignados o pólizas presupuestales.</td>
             <td>Backend / Stored Procedure</td>
             <td>Ley de Disciplina Financiera</td>
           </tr>
           <tr>
-            <td><strong>RN-04</strong></td>
-            <td>Clasificación Obligatoria de Régimen LDF.</td>
-            <td>Toda fuente debe catalogarse como Etiquetada o No Etiquetada para la Cuenta Pública.</td>
-            <td>Backend DTO</td>
-            <td>CONAC / LDF</td>
-          </tr>
-          <tr>
-            <td><strong>RN-05</strong></td>
+            <td><strong>RN-06</strong></td>
             <td>Baja Lógica Mandatoria.</td>
             <td>Prohibido el <code>DELETE</code> físico en base de datos; aplicar <code>estatus_registro = 0</code>.</td>
             <td>Backend Service / Prisma</td>
