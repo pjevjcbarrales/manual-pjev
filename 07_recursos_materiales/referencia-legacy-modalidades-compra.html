@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.2.5-modalidades-compra.html</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.patch  { background:#fff8e1; color:#795548; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-b { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+</style>
+</head>
+<body>
+<div class="doc-main-inner">
+
+    <div class="elem-breadcrumb">
+      <a href="../index.html">Manual Dev</a> ›
+      <span>Recursos Materiales</span> ›
+      <span>07.2.5 Modalidades de Compra (Umbrales)</span>
+    </div>
+
+    <div class="elem-header">
+      <div>
+        <div class="elem-id">07.2.5</div>
+        <h1 class="elem-title">Catálogo de Modalidades y Umbrales</h1>
+        <p class="elem-desc">Catálogo normativo que define los montos mínimos y máximos (en UMAs o Pesos) autorizados para cada ejercicio fiscal, para clasificar automáticamente la modalidad de compra que corresponde a un requerimiento.</p>
+        <div class="mod-header-badges">
+          <span class="mod-badge badge-b">Modo B — Por desarrollar</span>
+          <span class="mod-badge badge-s">Tipo: Simple (Catálogo)</span>
+          <span class="elem-tag" style="font-size:10px;">Ruta: <code style="font-family:var(--font-mono);font-size:10px;">adq / cat / modalidades</code></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. DESCRIPCIÓN -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+      <p>Año con año, el Presupuesto de Egresos del Estado y la Ley de Adquisiciones actualizan los montos máximos permitidos para realizar compras por Adjudicación Directa, Invitación a Cuando Menos Tres Personas y Licitación Simplificada. Este catálogo permite mantener configurados dichos topes sin necesidad de modificar el código fuente del sistema.</p>
+    </div>
+
+    <!-- 4. MODELO DE DATOS -->
+    <div class="doc-section">
+      <div class="section-title"><span class="section-num">4</span> Modelo de Datos</div>
+      <table class="props-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id_modalidad_umbral</code> <span class="badge-req">REQ</span></td><td><code>INT PK</code></td><td>Identificador único</td></tr>
+          <tr><td><code>ejercicio_fiscal</code> <span class="badge-req">REQ</span></td><td><code>INT</code></td><td>Año en el que aplica el umbral (ej. 2026)</td></tr>
+          <tr><td><code>tipo_modalidad</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>1=Directa, 2=Invitación a 3, 3=Licitación</td></tr>
+          <tr><td><code>monto_minimo</code> <span class="badge-req">REQ</span></td><td><code>NUMERIC(18,2)</code></td><td>Límite inferior para que aplique la modalidad</td></tr>
+          <tr><td><code>monto_maximo</code> <span class="badge-req">REQ</span></td><td><code>NUMERIC(18,2)</code></td><td>Límite superior para que aplique la modalidad</td></tr>
+          <tr><td><code>estatus</code> <span class="badge-req">REQ</span></td><td><code>SMALLINT</code></td><td>1=Vigente, 0=Inactivo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>
+</body>
+</html>
