@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1290" role="img" aria-labelledby="titulo descripcion">
+  <title id="titulo">Expediente, ubicación, documentos y metadatos del piloto Contabilidad</title>
+  <desc id="descripcion">Versión ajustada del esquema del analista. Mueble, posición y contenedor son entidades físicas relacionadas con un expediente lógico clasificado por CGCA y CADIDO. El índice puede incluir póliza, CFDI, cédula de proveedor, empleados u obra según el procedimiento. Los metadatos comunes, específicos y técnicos se definen por separado. UUID fiscal y fecha de timbrado aplican al CFDI, no a todos los documentos.</desc>
+  <defs><marker id="flecha" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#87928a"/></marker></defs>
+  <style>text{font-family:Arial,sans-serif;fill:#263a2c}.titulo{font-size:26px;font-weight:700}.cab{font-size:21px;font-weight:700}.txt{font-size:19px}.nota{font-size:17px;fill:#536354}.fisico{fill:#e4efff;stroke:#668cca;stroke-width:2}.logico{fill:#e1f4e4;stroke:#6da67b;stroke-width:2}.doc{fill:#fff1cf;stroke:#c68c36;stroke-width:2}.meta{fill:#f1eafa;stroke:#ab8bc6;stroke-width:2}.linea{fill:none;stroke:#87928a;stroke-width:2;marker-end:url(#flecha)}.relacion{stroke-dasharray:7 5}</style>
+  <rect width="1500" height="1290" rx="12" fill="#fbfaf7"/>
+  <text x="40" y="42" class="titulo">2. Expediente, soporte físico, documentos y metadatos</text>
+  <text x="40" y="71" class="nota">Base del analista · Ajuste de relaciones y aplicabilidad por tipo documental · Datos de ejemplo</text>
+  <rect x="550" y="100" width="400" height="75" rx="12" class="fisico"/>
+  <text x="750" y="130" class="cab" text-anchor="middle">Mueble de archivo</text>
+  <text x="750" y="157" class="txt" text-anchor="middle">Archivero o anaquel identificado</text>
+  <path d="M750 175V210" class="linea"/>
+  <rect x="550" y="210" width="400" height="75" rx="12" class="fisico"/>
+  <text x="750" y="240" class="cab" text-anchor="middle">Ubicación física</text>
+  <text x="750" y="267" class="txt" text-anchor="middle">Depósito / mueble / nivel o gaveta / posición</text>
+  <path d="M750 285V320" class="linea"/>
+  <rect x="550" y="320" width="400" height="85" rx="12" class="fisico"/>
+  <text x="750" y="352" class="cab" text-anchor="middle">Contenedor o unidad física</text>
+  <text x="750" y="381" class="txt" text-anchor="middle">Caja, recopilador, carpeta o tomo</text>
+  <path d="M750 405V465" class="linea relacion"/>
+  <text x="770" y="438" class="nota">Relación con 0..N unidades físicas</text>
+  <rect x="550" y="465" width="400" height="105" rx="12" class="logico"/>
+  <text x="750" y="498" class="cab" text-anchor="middle">Expediente · identidad lógica</text>
+  <text x="750" y="528" class="txt" text-anchor="middle">Folio estable EXP-2026-001058 (ejemplo)</text>
+  <text x="750" y="553" class="nota" text-anchor="middle">Productor, clasificación e índice documental</text>
+  <rect x="40" y="465" width="380" height="105" rx="12" class="logico"/>
+  <text x="230" y="498" class="cab" text-anchor="middle">CGCA + versión</text>
+  <text x="230" y="528" class="txt" text-anchor="middle">DGA2500 / 2530 / serie o subserie</text>
+  <text x="230" y="553" class="nota" text-anchor="middle">La clasificación no depende del anaquel</text>
+  <path d="M420 516H550" class="linea relacion"/>
+  <rect x="1080" y="465" width="380" height="105" rx="12" class="logico"/>
+  <text x="1270" y="498" class="cab" text-anchor="middle">CADIDO + versión</text>
+  <text x="1270" y="528" class="txt" text-anchor="middle">Regla de conservación y destino</text>
+  <text x="1270" y="553" class="nota" text-anchor="middle">Cómputo con cierre y evento validados</text>
+  <path d="M1080 516H950" class="linea relacion"/>
+  <path d="M750 570V620" class="linea"/>
+  <rect x="550" y="620" width="400" height="75" rx="12" class="doc"/>
+  <text x="750" y="650" class="cab" text-anchor="middle">Documentos indexados</text>
+  <text x="750" y="677" class="nota" text-anchor="middle">Según expediente y procedimiento aplicables</text>
+  <path d="M650 695V730H170V765" class="linea"/>
+  <path d="M700 695V740H460V765" class="linea"/>
+  <path d="M750 695V765" class="linea"/>
+  <path d="M800 695V740H1040V765" class="linea"/>
+  <path d="M850 695V730H1330V765" class="linea"/>
+  <rect x="40" y="765" width="260" height="100" rx="12" class="doc"/>
+  <text x="170" y="800" class="cab" text-anchor="middle">Póliza contable</text>
+  <text x="170" y="829" class="txt" text-anchor="middle">Ejercicio, tipo, folio</text>
+  <text x="170" y="854" class="nota" text-anchor="middle">Referencia al ID del sistema</text>
+  <rect x="330" y="765" width="260" height="100" rx="12" class="doc"/>
+  <text x="460" y="800" class="cab" text-anchor="middle">CFDI</text>
+  <text x="460" y="829" class="txt" text-anchor="middle">XML + representación PDF</text>
+  <text x="460" y="854" class="nota" text-anchor="middle">Objetos relacionados distintos</text>
+  <rect x="620" y="765" width="260" height="100" rx="12" class="doc"/>
+  <text x="750" y="800" class="cab" text-anchor="middle">Cédula de proveedor</text>
+  <text x="750" y="829" class="txt" text-anchor="middle">Identificación y soportes</text>
+  <text x="750" y="854" class="nota" text-anchor="middle">Versión y fecha de referencia</text>
+  <rect x="910" y="765" width="260" height="100" rx="12" class="doc"/>
+  <text x="1040" y="800" class="cab" text-anchor="middle">Cédula de empleados</text>
+  <text x="1040" y="829" class="txt" text-anchor="middle">Periodo y lote de dispersión</text>
+  <text x="1040" y="854" class="nota" text-anchor="middle">Acceso por finalidad y permisos</text>
+  <rect x="1200" y="765" width="260" height="100" rx="12" class="doc"/>
+  <text x="1330" y="800" class="cab" text-anchor="middle">Cédula de obra</text>
+  <text x="1330" y="829" class="txt" text-anchor="middle">Contrato y estimación</text>
+  <text x="1330" y="854" class="nota" text-anchor="middle">Enlace al expediente de origen</text>
+  <path d="M170 865V900H580V940" class="linea"/>
+  <path d="M460 865V910H660V940" class="linea"/>
+  <path d="M750 865V940" class="linea"/>
+  <path d="M1040 865V910H840V940" class="linea"/>
+  <path d="M1330 865V900H920V940" class="linea"/>
+  <rect x="510" y="940" width="480" height="65" rx="12" class="meta"/>
+  <text x="750" y="980" class="cab" text-anchor="middle">Metadatos de control y por tipo documental</text>
+  <path d="M650 1005V1025H265V1050" class="linea"/>
+  <path d="M750 1005V1050" class="linea"/>
+  <path d="M850 1005V1025H1235V1050" class="linea"/>
+  <rect x="40" y="1050" width="450" height="165" rx="12" class="meta"/>
+  <text x="265" y="1084" class="cab" text-anchor="middle">Comunes de control · propuesta</text>
+  <text x="60" y="1116" class="txt">Título, tipo y fecha documental</text>
+  <text x="60" y="1145" class="txt">Expediente, productor e índice</text>
+  <text x="60" y="1174" class="txt">Clasificación/versiones y acceso</text>
+  <text x="60" y="1203" class="txt">Soporte y procedencia de incorporación</text>
+  <rect x="525" y="1050" width="450" height="165" rx="12" class="meta"/>
+  <text x="750" y="1084" class="cab" text-anchor="middle">Específicos · según tipo</text>
+  <text x="545" y="1116" class="txt">CFDI: UUID fiscal de 36 caracteres</text>
+  <text x="545" y="1145" class="txt">CFDI: RFC y fechas de emisión / timbrado</text>
+  <text x="545" y="1174" class="txt">Póliza: ejercicio, tipo, número e ID</text>
+  <text x="545" y="1203" class="txt">Otros: beneficiario, periodo o contrato</text>
+  <rect x="1010" y="1050" width="450" height="165" rx="12" class="meta"/>
+  <text x="1235" y="1084" class="cab" text-anchor="middle">Técnicos · archivo digital</text>
+  <text x="1030" y="1116" class="txt">MIME, tamaño y hash de integridad</text>
+  <text x="1030" y="1145" class="txt">Versión, original y derivados</text>
+  <text x="1030" y="1174" class="txt">OCR / indexación según permisos</text>
+  <text x="1030" y="1203" class="txt">Bitácora de incorporación y validación</text>
+  <text x="40" y="1250" class="nota">Los cinco tipos son ejemplos de soportes; una plantilla por procedimiento define cuáles se requieren.</text>
+  <text x="40" y="1276" class="nota">Cédulas de otras áreas conservan su productor y su versión. Consultarlas desde Contabilidad no transfiere su administración.</text>
+</svg>

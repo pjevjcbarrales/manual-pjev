@@ -1,6 +1,10 @@
 # Módulo de Manejo de Archivos y Gestión Documental Digital (SIAF-PJEV)
 ## Plan de Trabajo y Marco Normativo Institucional
 
+> **Referencia rectora del diseño inicial, 29-10-2026:** [Recalibración archivística DGA–2530–Contabilidad](RECALIBRACION_ARCHIVISTICA_DGA_PJEV.md), basada en los CGCA/CADIDO denominados 2024, PADA 2025 y XLV_c.xls recibidos. El usuario confirmó el foco en Contabilidad dentro de la Subdirección de Recursos Financieros. Se mantienen modelo general y versiones, con cuatro series/doce subseries de referencia, **2 años en trámite + 8 en concentración y destino Archivo Histórico**. Se incorporan inventarios, responsables, transferencias, préstamos y seguimiento. Los valores genéricos, ejemplos de claves y autoridades de disposición de este antecedente deben cotejarse con la nueva referencia; no constituyen reglas operativas aprobadas.
+
+> **Ampliación funcional del 29-10-2026:** se incorporó el bloque **4.1 Sistema de Control de Archivo · Registro de documentos y Digitalización**, documentado en [la especificación inicial](CONTROL_ARCHIVO_REGISTRO_DIGITALIZACION_PJEV.md) y en [09.2.4 del manual](../09_gestion_documental/09.2.4-control-archivo.html). Incluye ocho opciones, marbetes, ubicación física y acervo anterior. Distingue identidad de ubicación, y cancelación de captura de baja documental. Sus contratos son propuestas pendientes de desarrollo; los instrumentos, autoridades y disposiciones institucionales aplicables requieren validación. Esta ampliación no valida automáticamente las afirmaciones normativas ni el estado de implementación del presente antecedente.
+
 **Entidad:** Poder Judicial del Estado de Veracruz (PJEV)  
 **Proyecto:** Sistema Integral de Administración y Finanzas (SIAF-PJEV)  
 **Componente:** Subsistema Transversal de Gestión Documental y Archivos  

@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIAF-PJEV · 07.3.1 Control y Auditoría CFDI (Conciliación Metadata, Sabana Excel, DIOT y Fiscalización)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy-900: #0c1b2e; --navy-800: #132844; --navy-700: #1b3558; --navy-600: #23426c;
+    --gold-500: #c8962e; --gold-400: #d9aa45; --gold-100: #faf3e0;
+    --slate-900: #1a202c; --slate-700: #374151; --slate-600: #4b5563; --slate-500: #6b7280;
+    --slate-300: #d1d5db; --slate-200: #e5e7eb; --slate-100: #f3f4f6; --slate-50: #f9fafb;
+    --white: #ffffff;
+    --green-700: #15803d; --green-100: #dcfce7;
+    --amber-700: #b45309; --amber-100: #fef3c7;
+    --red-700: #b91c1c; --red-100: #fee2e2;
+    --blue-700: #1d4ed8; --blue-100: #dbeafe;
+    --purple-700: #6d28d9; --purple-100: #ede9fe;
+    --teal-700: #0f766e; --teal-100: #ccfbf1;
+  }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: var(--slate-900); background: var(--slate-100); line-height: 1.65; font-size: 15px; }
+  .page-wrapper { max-width: 1200px; margin: 0 auto; background: var(--white); box-shadow: 0 0 40px rgba(0,0,0,.08); }
+
+  /* ── PORTADA ── */
+  .cover { background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 60%, var(--navy-600) 100%); color: var(--white); padding: 48px 56px 40px; position: relative; overflow: hidden; }
+  .cover::after { content: ''; position: absolute; right: -80px; top: -80px; width: 360px; height: 360px; border-radius: 50%; background: rgba(200,150,46,.08); }
+  .cover-institution { font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold-400); font-weight: 600; margin-bottom: 6px; }
+  .cover-system { font-size: 13px; color: rgba(255,255,255,.7); margin-bottom: 24px; }
+  .cover-doc-type { display: inline-block; background: var(--gold-500); color: var(--navy-900); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 14px; border-radius: 3px; margin-bottom: 14px; }
+  .cover h1 { font-size: 28px; font-weight: 700; line-height: 1.25; margin-bottom: 8px; }
+  .cover-sub { font-size: 16px; color: rgba(255,255,255,.85); font-weight: 400; margin-bottom: 28px; }
+  .cover-meta { display: flex; flex-wrap: wrap; gap: 24px; border-top: 1px solid rgba(255,255,255,.15); padding-top: 20px; font-size: 12.5px; color: rgba(255,255,255,.75); }
+  .cover-meta strong { color: var(--gold-400); }
+
+  /* ── CONTENIDO ── */
+  .content { padding: 40px 56px 56px; }
+  .toc { background: var(--slate-50); border: 1px solid var(--slate-200); border-left: 4px solid var(--gold-500); border-radius: 4px; padding: 20px 28px; margin-bottom: 36px; }
+  .toc h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--navy-700); margin-bottom: 10px; }
+  .toc ol { columns: 2; column-gap: 32px; padding-left: 20px; font-size: 13.5px; color: var(--slate-700); }
+  .toc li { margin-bottom: 4px; break-inside: avoid; }
+  .toc a { color: var(--navy-600); text-decoration: none; }
+  .toc a:hover { color: var(--gold-500); text-decoration: underline; }
+
+  .section { margin-bottom: 40px; page-break-inside: avoid; }
+  .section-header { display: flex; align-items: center; gap: 12px; border-bottom: 2px solid var(--navy-800); padding-bottom: 8px; margin-bottom: 20px; }
+  .section-num { background: var(--navy-800); color: var(--gold-400); font-size: 13px; font-weight: 700; width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-title { font-size: 20px; font-weight: 700; color: var(--navy-800); }
+  h3 { font-size: 16px; font-weight: 600; color: var(--navy-700); margin: 22px 0 10px; }
+  h4 { font-size: 14.5px; font-weight: 600; color: var(--slate-700); margin: 16px 0 8px; }
+  p { margin-bottom: 12px; color: var(--slate-700); }
+
+  /* ── TABLAS ACCESIBLES (modern-web-guidance: responsive-table) ── */
+  .table-wrapper { overflow-x: auto; max-width: 100%; margin: 14px 0 20px; border-radius: 6px; border: 1px solid var(--slate-200); }
+  .table-wrapper:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 2px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 0; }
+  thead th { background: var(--navy-800); color: var(--white); font-weight: 600; text-align: left; padding: 10px 14px; font-size: 12.5px; text-transform: uppercase; letter-spacing: .5px; position: sticky; inset-block-start: 0; z-index: 2; }
+  tbody th { position: sticky; inset-inline-start: 0; background: var(--white); z-index: 1; font-weight: 600; padding: 9px 14px; border-bottom: 1px solid var(--slate-200); text-align: left; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid var(--slate-200); color: var(--slate-700); vertical-align: top; }
+  tbody tr:nth-child(even) { background: var(--slate-50); }
+  tbody tr:hover { background: var(--gold-100); }
+
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 3px; text-transform: uppercase; letter-spacing: .5px; }
+  .badge-pk { background: var(--gold-100); color: var(--amber-700); border: 1px solid var(--gold-400); }
+  .badge-fk { background: var(--blue-100); color: var(--blue-700); }
+  .badge-req { background: var(--green-100); color: var(--green-700); }
+  .badge-opt { background: var(--slate-100); color: var(--slate-500); }
+  .badge-get { background: var(--blue-100); color: var(--blue-700); }
+  .badge-post { background: var(--green-100); color: var(--green-700); }
+  .badge-put { background: var(--amber-100); color: var(--amber-700); }
+  .badge-del { background: var(--red-100); color: var(--red-700); }
+  .badge-idx { background: var(--purple-100); color: var(--purple-700); }
+  .badge-uk { background: var(--teal-100); color: var(--teal-700); }
+  .badge-norma { background: #1e3a8a; color: #ffffff; }
+  .badge-pjev { background: #92400e; color: #ffffff; }
+  .badge-tech { background: #065f46; color: #ffffff; }
+
+  .callout { border-radius: 6px; padding: 16px 20px; margin: 16px 0; font-size: 13.5px; }
+  .callout-info { background: var(--blue-100); border-left: 4px solid var(--blue-700); color: var(--navy-800); }
+  .callout-warn { background: var(--amber-100); border-left: 4px solid var(--amber-700); color: #78350f; }
+  .callout-success { background: var(--green-100); border-left: 4px solid var(--green-700); color: #14532d; }
+  .callout-danger { background: var(--red-100); border-left: 4px solid var(--red-700); color: #7f1d1d; }
+  .callout strong { display: block; margin-bottom: 4px; }
+
+  pre { background: var(--navy-900); color: #e2e8f0; padding: 18px 22px; border-radius: 6px; overflow-x: auto; font-size: 12.8px; line-height: 1.55; margin: 12px 0 18px; font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; }
+  code { font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 12.8px; }
+  p code, td code, li code { background: var(--slate-100); color: var(--navy-700); padding: 1px 6px; border-radius: 3px; font-size: 12.5px; }
+  .kw { color: #93c5fd; } .tp { color: #fda4af; } .cm { color: #6b7280; font-style: italic; } .st { color: #86efac; } .fn { color: #fde68a; }
+
+  .flow-container { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 16px 0 20px; padding: 20px; background: var(--slate-50); border-radius: 6px; border: 1px solid var(--slate-200); justify-content: center; }
+  .flow-step { background: var(--navy-800); color: var(--white); padding: 10px 16px; border-radius: 6px; font-size: 12.5px; font-weight: 600; text-align: center; min-width: 115px; }
+  .flow-step.gold { background: var(--gold-500); color: var(--navy-900); }
+  .flow-step.green { background: var(--green-700); }
+  .flow-step.teal { background: var(--teal-700); }
+  .flow-arrow { font-size: 18px; color: var(--gold-500); font-weight: 700; }
+
+  .wireframe-card { background: var(--slate-50); border: 1px solid var(--slate-300); border-radius: 8px; padding: 20px; margin: 18px 0; }
+  .wireframe-title { font-size: 13px; font-weight: 700; color: var(--navy-700); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .wireframe-title span { background: var(--gold-500); color: var(--navy-900); padding: 2px 8px; border-radius: 3px; font-size: 11px; }
+
+  .rule-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin: 14px 0; }
+  .rule-card { background: var(--slate-50); border: 1px solid var(--slate-200); border-left: 4px solid var(--navy-700); border-radius: 4px; padding: 14px 16px; }
+  .rule-card.gold-border { border-left-color: var(--gold-500); }
+  .rule-card.red-border { border-left-color: var(--red-700); }
+  .rule-card.green-border { border-left-color: var(--green-700); }
+  .rule-id { font-size: 11px; font-weight: 700; color: var(--navy-600); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .rule-text { font-size: 13px; color: var(--slate-700); }
+
+  ul, ol { padding-left: 22px; margin-bottom: 12px; color: var(--slate-700); }
+  li { margin-bottom: 5px; font-size: 14px; }
+
+  .doc-footer { background: var(--navy-900); color: rgba(255,255,255,.6); padding: 24px 56px; font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .doc-footer strong { color: var(--gold-400); }
+
+  @media print {
+    body { background: white; font-size: 12px; }
+    .page-wrapper { box-shadow: none; }
+    .cover { padding: 28px 36px; }
+    .content { padding: 24px 36px; }
+    .section { page-break-inside: avoid; }
+    pre { font-size: 10.5px; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+<!-- ═══════════════ PORTADA ═══════════════ -->
+<header class="cover">
+  <div class="cover-institution">Poder Judicial del Estado de Veracruz · Consejo de la Judicatura</div>
+  <div class="cover-system">SIAF-PJEV — Sistema Integral de Administración Financiera · Armonizado CONAC</div>
+  <div class="cover-doc-type">Manual Técnico y Funcional de Desarrollo</div>
+  <h1>07.3.1 Control y Auditoría CFDI</h1>
+  <div class="cover-sub">Conciliación Metadata SAT vs. Bóveda vs. Pólizas Contables · Pre-armado DIOT · Monitoreo de Cancelados y PPD · Sabana Analítica Excel/PDF</div>
+  <div class="cover-meta">
+    <div><strong>Módulo:</strong> 07 — Repositorio CFDI (Administrador XML)</div>
+    <div><strong>Submódulo:</strong> 07.3 — Control y Auditoría CFDI</div>
+    <div><strong>Documento:</strong> ESP-07.3.1-AUDITORIA-CFDI v2.0</div>
+    <div><strong>Fecha:</strong> Octubre 2026</div>
+    <div><strong>Esquema BD:</strong> cfdi</div>
+    <div><strong>Estado:</strong> Especificación Definitiva (DOC-08)</div>
+  </div>
+</header>
+
+<div class="content">
+
+<!-- ═══════════════ TABLA DE CONTENIDO ═══════════════ -->
+<nav class="toc">
+  <h3>Contenido del Documento</h3>
+  <ol>
+    <li><a href="#s1">Objetivo y Alcance (Normativa, PJEV y Herramientas Plus)</a></li>
+    <li><a href="#s2">Catálogo de los 7 Reportes y Controles de Auditoría</a></li>
+    <li><a href="#s3">Flujo de Conciliación Triple y Pre-armado DIOT</a></li>
+    <li><a href="#s4">Modelo de Datos (Vistas y Tablas de Conciliación — Esquema cfdi)</a></li>
+    <li><a href="#s5">Stored Procedures PostgreSQL (Auditoría, Conciliación y DIOT)</a></li>
+    <li><a href="#s6">Especificación de Endpoints REST (NestJS + FastAPI Export)</a></li>
+    <li><a href="#s7">Reglas de Negocio y Fiscalización (LGCG / CFF / ORFIS / ASF)</a></li>
+    <li><a href="#s8">Prototipos de Interfaz (UI Wireframes SVG)</a></li>
+    <li><a href="#s9">Mapa de Integración Inter-Módulos</a></li>
+    <li><a href="#s10">Seguridad, Roles y Pista de Auditoría</a></li>
+    <li><a href="#s11">Casos de Prueba (QA / Criterios de Aceptación)</a></li>
+    <li><a href="#s12">Control de Versiones</a></li>
+  </ol>
+</nav>
+
+<!-- ═══════════════ 1. OBJETIVO Y ALCANCE ═══════════════ -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <div class="section-title">Objetivo y Alcance Funcional</div>
+  </div>
+
+  <p>El módulo <strong>07.3.1 Control y Auditoría CFDI</strong> constituye el centro de inteligencia fiscal, conciliación y fiscalización del <strong>Repositorio CFDI (Administrador de XML)</strong> del SIAF-PJEV. Integra las capacidades avanzadas de las <strong>Herramientas Plus</strong> del sistema preconfigurado (<code>XMLs</code>, <code>Metadata .txt</code>, <code>DIOT</code> y <code>Exportar a excel</code>) con los libros contables y presupuestales del Poder Judicial del Estado de Veracruz.</p>
+
+  <p>Su propósito es garantizar que <strong>el 100% de los comprobantes fiscales registrados en el SAT a favor o a cargo del PJEV concilien exactamente con los XML resguardados en la Bóveda Institucional y con las pólizas contables y afectaciones presupuestales del ejercicio</strong>, detectando oportunamente cancelaciones posteriores al pago, facturas <code>PPD</code> sin complemento <code>REP 2.0</code>, comprobantes huérfanos y diferencias de impuestos antes de las auditorías del ORFIS, la ASF y la Contraloría del PJEV.</p>
+
+  <h3>1.1 Distinción Expresa: Requisito Normativo vs. Regla Institucional PJEV vs. Propuesta Tecnológica</h3>
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Distinción entre requisito normativo, regla institucional y propuesta tecnológica en auditoría CFDI">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:170px">Categoría</th>
+          <th>Fundamento / Origen</th>
+          <th>Alcance Obligatorio en 07.3.1 Control y Auditoría CFDI</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><span class="badge badge-norma">1. Requisito Normativo</span></th>
+          <td>LGCG Arts. 36, 42 y 43 · CFF Arts. 28, 29, 29-A y 69-B · LIVA Art. 32 Fracc. VIII (DIOT) · Reglas RMF SAT</td>
+          <td>
+            <ul>
+              <li>Todo registro contable del gasto devengado, ejercido y pagado debe estar respaldado por documentación comprobatoria y justificativa original y vigente (UUID).</li>
+              <li>Presentación mensual de la Declaración Informativa de Operaciones con Terceros (<strong>DIOT</strong>) sobre actos o actividades efectivamente pagados (flujo de efectivo).</li>
+              <li>Detección de comprobantes cancelados en ejercicios o meses posteriores a su deducción/registro presupuestal y monitoreo de proveedores en listas del Art. 69-B CFF.</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <th><span class="badge badge-pjev">2. Regla Institucional PJEV</span></th>
+          <td>Cierre Mensual Contable-Presupuestal DGA-PJEV · Lineamientos de Contraloría y Fiscalización ORFIS/ASF</td>
+          <td>
+            <ul>
+              <li><strong>Cierre Mensual condicionado a Conciliación CFDI:</strong> Antes de ejecutar el <code>03.3.1 Cierre de Periodo Mensual</code>, Contabilidad y Cuentas por Pagar deben revisar el tablero <code>07.3.1</code> para asegurar que no existan pólizas devengadas con CFDI cancelados o inválidos.</li>
+              <li><strong>Control estricto de PPD vs. REP 2.0:</strong> Todo pago liquidado en Tesorería (<code>06.2.4</code>) cuya factura origen tenga método de pago <code>PPD</code> debe recibir su Complemento de Recepción de Pagos (<code>REP 2.0</code>) a más tardar el <strong>día 5 natural del mes siguiente</strong> al pago.</li>
+              <li><strong>Integridad con Archivo Institucional:</strong> Ningún expediente de adquisición, obra o viáticos puede transferirse a archivo definitivo (<code>10.3.2</code>) si presenta alertas fiscales abiertas en <code>07.3.1</code>.</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <th><span class="badge badge-tech">3. Propuesta Tecnológica / Referente Funcional</span></th>
+          <td>Herramientas Plus preconfiguradas (<em>XMLs</em>, <em>Metadata</em>, <em>DIOT</em>, <em>Exportar a excel</em>) + Arquitectura SIAF-PJEV</td>
+          <td>
+            <ul>
+              <li><strong>Conciliación Triple Automatizada:</strong> Cruce matricial entre el archivo oficial <code>Metadata .txt</code> descargado del SAT Web Service vs. los XML físicos en <code>cfdi.boveda_comprobantes</code> vs. las pólizas en <code>contabilidad.poliza</code>.</li>
+              <li><strong>Generador de Sabana Analítica XML a Excel (<code>.xlsx</code>):</strong> Desglose en columnas de encabezado, impuestos trasladados/retenidos, nodo nómina/pago, vínculo presupuestal y número de póliza contable.</li>
+              <li><strong>Pre-armado DIOT desde CFDI pagados:</strong> Cruce automático de los CFDI de tipo Ingreso (<code>PUE</code> pagados en el mes) y Pago (<code>REP 2.0</code> del mes) con los movimientos bancarios de Tesorería, exportable hacia <code>05.3.4 Declaración DIOT</code>.</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ 2. CATÁLOGO DE REPORTES Y CONTROLES ═══════════════ -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <div class="section-title">Catálogo de los 7 Reportes y Controles de Auditoría CFDI</div>
+  </div>
+
+  <p>El módulo <code>07.3.1</code> organiza sus capacidades en <strong>7 vistas y motores de auditoría</strong> accesibles mediante pestañas operativas:</p>
+
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Catálogo de los 7 reportes y controles de auditoría CFDI">
+    <table>
+      <thead>
+        <tr>
+          <th>Clave</th>
+          <th>Reporte / Herramienta de Auditoría</th>
+          <th>Referente Funcional / Origen</th>
+          <th>Descripción Operativa y Acción Correctiva</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><code>AUD-01</code></th>
+          <td><strong>CFDI Inválidos, Cancelados o con Cambio de Estatus (<code>cambio_a_cancelado</code>)</strong></td>
+          <td>Almacén CFDI (<code>[Verificar estatus]</code>) + Cron Nocturno SAT</td>
+          <td>Identifica comprobantes que fueron registrados y devengados como <code>VIGENTE</code> pero que posteriormente aparecieron como <code>CANCELADO</code> en el SAT. Genera alerta crítica a Contabilidad (<code>03.2.2</code>) y Cuentas por Pagar (<code>05.2.1</code>) para reclamo al proveedor o reversión contable.</td>
+        </tr>
+        <tr>
+          <th><code>AUD-02</code></th>
+          <td><strong>Intentos de Duplicidad y Reutilización de UUID</strong></td>
+          <td>Bitácora <code>cfdi.validaciones_log</code> + <code>cfdi.vinculos_expediente</code></td>
+          <td>Audita todos los intentos rechazados de cargar un mismo UUID dos veces o de asociar un comprobante de años o meses anteriores a una nueva solicitud de pago, mostrando usuario, fecha, módulo e IP.</td>
+        </tr>
+        <tr>
+          <th><code>AUD-03</code></th>
+          <td><strong>CFDI en Almacén sin Vincular (Comprobantes Huérfanos)</strong></td>
+          <td>Almacén CFDI vs. <code>cfdi.vinculos_expediente</code></td>
+          <td>Lista los CFDI emitidos a favor del PJEV (`RFC Receptor = PJE...`) descargados del SAT que aún no han sido vinculados a ningún trámite de Cuentas por Pagar, Viáticos, Materiales o Fondo Fijo después de $N$ días de su emisión. Permite detectar facturas ocultas o emitidas por error por proveedores.</td>
+        </tr>
+        <tr>
+          <th><code>AUD-04</code></th>
+          <td><strong>Seguimiento de Facturas <code>PPD</code> sin Complemento de Pago (<code>REP 2.0</code>)</strong></td>
+          <td>Almacén CFDI (<code>[Relacionar UUIDs]</code>) + Tesorería (<code>06.2.4</code>)</td>
+          <td>Cruza las facturas con <code>metodo_pago = 'PPD'</code> que ya tienen transferencia bancaria dispersada en Tesorería pero no cuentan con un CFDI de tipo <code>P</code> (Pago 2.0) relacionado en <code>cfdi.boveda_comprobantes_relaciones</code>. Calcula los días de atraso respecto al día 5 del mes siguiente.</td>
+        </tr>
+        <tr>
+          <th><code>AUD-05</code></th>
+          <td><strong>Conciliación Triple: <code>Metadata .txt</code> SAT vs. Bóveda XML vs. Pólizas Contables</strong></td>
+          <td>Herramientas Plus → <code>Metadata</code> + <code>XMLs</code></td>
+          <td>Importa el paquete oficial <code>Metadata .txt</code> del SAT Web Service y ejecuta la matriz de conciliación: (A) En Metadata SAT pero sin XML físico en Bóveda; (B) Estatus distinto entre Metadata SAT y Bóveda; (C) En Bóveda pero sin Póliza Contable; (D) Póliza Contable de gasto sin UUID vinculado.</td>
+        </tr>
+        <tr>
+          <th><code>AUD-06</code></th>
+          <td><strong>Pre-armado Automático de Cédula <code>DIOT</code> desde CFDI</strong></td>
+          <td>Herramientas Plus → <code>DIOT</code> + Enlace con <code>05.3.4</code></td>
+          <td>Extrae de los XML efectivamente pagados en el periodo (<code>PUE</code> pagados en el mes + <code>REP 2.0</code> pagados en el mes, restando Notas de Crédito <code>E</code>) las bases gravadas al 16%, 8%, 0%, exentas e IVA retenido por RFC de proveedor, pre-llenando el lote oficial para <code>05.3.4 Declaración DIOT</code>.</td>
+        </tr>
+        <tr>
+          <th><code>AUD-07</code></th>
+          <td><strong>Sabana Analítica Masiva XML a Excel (<code>.xlsx</code>) y PDF</strong></td>
+          <td>Almacén CFDI → <code>[Exportar a excel]</code> + Herramientas Plus → <code>XMLs</code></td>
+          <td>Exporta hasta 200,000 registros con desglose completo de nodos XML (Emisor, Receptor, Conceptos concatenados, Impuestos Trasladados/Retenidos, Complementos, Estatus SAT, Estatus 69-B, Folio de Devengado CXP, Número de Póliza Contable y Folio de Pago en Tesorería).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ 3. FLUJO DE CONCILIACIÓN TRIPLE Y DIOT ═══════════════ -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <div class="section-title">Flujo de Conciliación Triple (SAT — Bóveda — Contabilidad)</div>
+  </div>
+
+  <div class="flow-container">
+    <div class="flow-step">1. Descarga Metadata .txt<br><small>SAT Web Service (07.1.1)</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step gold">2. Carga y Parseo<br><small>cfdi.conciliacion_metadata</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step teal">3. Cruce vs. Bóveda XML<br><small>Detecta Faltantes / Cancelados</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">4. Cruce vs. CXP y Pólizas<br><small>Verifica Devengado y Pagado</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step green">5. Dictamen / Pre-DIOT<br><small>Liberación Cierre Mensual</small></div>
+  </div>
+
+  <div class="callout callout-info">
+    <strong>¿Por qué es indispensable conciliar con el archivo <code>Metadata .txt</code> del SAT?</strong>
+    El archivo de <strong>Metadata del SAT</strong> (descargable hasta por 1,000,000 de registros por petición vía Web Service) incluye <strong>tanto los CFDI vigentes como los CFDI cancelados</strong> (con su fecha exacta de cancelación), mientras que la descarga directa de archivos XML del SAT a menudo omite los XML de comprobantes recibidos que ya fueron cancelados. Por ello, el cruce entre <code>Metadata .txt</code> y la Bóveda XML es el único mecanismo técnico infalible para descubrir el 100% de las cancelaciones ocurridas en el ejercicio.
+  </div>
+</section>
+
+<!-- ═══════════════ 4. MODELO DE DATOS ═══════════════ -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <div class="section-title">Modelo de Datos (Tablas y Vistas de Auditoría — Esquema <code>cfdi</code>)</div>
+  </div>
+
+  <p>Además de consultar las tablas maestras definidas en <code>07.1.1</code> y <code>07.2.1</code>, este submódulo incorpora dos estructuras de persistencia dedicadas a la conciliación de Metadata del SAT y al pre-armado de la DIOT, junto con la vista consolidada de fiscalización.</p>
+
+  <h3>4.1 Tabla: <code>cfdi.conciliacion_metadata_lotes</code> (Cabecera de Conciliación Mensual)</h3>
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Estructura de la tabla cfdi.conciliacion_metadata_lotes">
+    <table>
+      <thead>
+        <tr><th>Columna</th><th>Tipo</th><th>Restricción</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr><th><code>id_conciliacion</code></th><td><code>BIGSERIAL</code></td><td><span class="badge badge-pk">PK</span></td><td>Identificador del lote de conciliación</td></tr>
+        <tr><th><code>id_ejercicio</code></th><td><code>INTEGER</code></td><td><span class="badge badge-req">NOT NULL</span></td><td>Ejercicio fiscal conciliado</td></tr>
+        <tr><th><code>mes_periodo</code></th><td><code>SMALLINT</code></td><td><span class="badge badge-req">NOT NULL</span></td><td>Mes conciliado (<code>1..12</code>)</td></tr>
+        <tr><th><code>id_solicitud_ws</code></th><td><code>BIGINT</code></td><td><span class="badge badge-fk">FK</span> <span class="badge badge-opt">NULL</span></td><td>Referencia opcional a <code>cfdi.descargas_sat_solicitudes</code></td></tr>
+        <tr><th><code>nombre_archivo_metadata</code></th><td><code>VARCHAR(250)</code></td><td><span class="badge badge-req">NOT NULL</span></td><td>Nombre del archivo <code>.txt</code> o <code>.zip</code> de Metadata procesado</td></tr>
+        <tr><th><code>total_registros_metadata</code></th><td><code>INTEGER</code></td><td><span class="badge badge-req">DEFAULT 0</span></td><td>Total de UUID leídos del archivo Metadata del SAT</td></tr>
+        <tr><th><code>total_conciliados_ok</code></th><td><code>INTEGER</code></td><td><span class="badge badge-req">DEFAULT 0</span></td><td>UUID que coinciden en Bóveda XML y estatus</td></tr>
+        <tr><th><code>total_faltantes_xml</code></th><td><code>INTEGER</code></td><td><span class="badge badge-req">DEFAULT 0</span></td><td>UUID presentes en Metadata SAT pero sin XML en Bóveda</td></tr>
+        <tr><th><code>total_diferencia_estatus</code></th><td><code>INTEGER</code></td><td><span class="badge badge-req">DEFAULT 0</span></td><td>UUID Vigentes en Bóveda pero Cancelados en Metadata SAT</td></tr>
+        <tr><th><code>total_sin_poliza</code></th><td><code>INTEGER</code></td><td><span class="badge badge-req">DEFAULT 0</span></td><td>UUID Vigentes en Bóveda sin vínculo contable/presupuestal</td></tr>
+        <tr><th><code>estatus_conciliacion</code></th><td><code>VARCHAR(20)</code></td><td><span class="badge badge-req">DEFAULT 'PROCESADA'</span></td><td><code>PROCESADA</code>, <code>CON_DIFERENCIAS</code>, <code>DICTAMINADA_OK</code></td></tr>
+        <tr><th><code>estatus_registro</code></th><td><code>VARCHAR(10)</code></td><td><span class="badge badge-req">DEFAULT 'ACTIVO'</span></td><td>Borrado lógico institucional</td></tr>
+        <tr><th><code>usuario_c / fecha_c / usuario_m / fecha_m</code></th><td><code>Auditoría</code></td><td><span class="badge badge-req">NOT NULL</span></td><td>Campos de auditoría estándar SIAF-PJEV</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>4.2 Tabla: <code>cfdi.conciliacion_metadata_detalle</code> (Renglones del Archivo Metadata SAT)</h3>
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Estructura de la tabla cfdi.conciliacion_metadata_detalle">
+    <table>
+      <thead>
+        <tr><th>Columna</th><th>Tipo</th><th>Restricción</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr><th><code>id_detalle_meta</code></th><td><code>BIGSERIAL</code></td><td><span class="badge badge-pk">PK</span></td><td>Identificador del renglón de Metadata</td></tr>
+        <tr><th><code>id_conciliacion</code></th><td><code>BIGINT</code></td><td><span class="badge badge-fk">FK</span> <span class="badge badge-req">NOT NULL</span></td><td>Referencia a <code>cfdi.conciliacion_metadata_lotes</code></td></tr>
+        <tr><th><code>uuid</code></th><td><code>UUID</code></td><td><span class="badge badge-idx">INDEX</span> <span class="badge badge-req">NOT NULL</span></td><td>Folio fiscal leído del archivo Metadata del SAT</td></tr>
+        <tr><th><code>rfc_emisor</code></th><td><code>VARCHAR(13)</code></td><td><span class="badge badge-req">NOT NULL</span></td><td>RFC Emisor reportado por el SAT</td></tr>
+        <tr><th><code>nombre_emisor</code></th><td><code>VARCHAR(300)</code></td><td><span class="badge badge-opt">NULL</span></td><td>Razón social emisora</td></tr>
+        <tr><th><code>rfc_receptor</code></th><td><code>VARCHAR(13)</code></td><td><span class="badge badge-req">NOT NULL</span></td><td>RFC Receptor reportado por el SAT</td></tr>
+        <tr><th><code>fecha_emision</code></th><td><code>TIMESTAMPTZ</code></td><td><span class="badge badge-req">NOT NULL</span></td><td>Fecha de emisión en Metadata</td></tr>
+        <tr><th><code>fecha_certificacion</code></th><td><code>TIMESTAMPTZ</code></td><td><span class="badge badge-opt">NULL</span></td><td>Fecha de timbrado PAC</td></tr>
+        <tr><th><code>pac_certifico</code></th><td><code>VARCHAR(13)</code></td><td><span class="badge badge-opt">NULL</span></td><td>RFC del PAC que certificó</td></tr>
+        <tr><th><code>monto_total</code></th><td><code>NUMERIC(18,6)</code></td><td><span class="badge badge-req">NOT NULL</span></td><td>Monto total reportado en Metadata</td></tr>
+        <tr><th><code>efecto_comprobante</code></th><td><code>CHAR(1)</code></td><td><span class="badge badge-req">NOT NULL</span></td><td><code>I</code>, <code>E</code>, <code>T</code>, <code>N</code>, <code>P</code></td></tr>
+        <tr><th><code>estatus_metadata_sat</code></th><td><code>SMALLINT</code></td><td><span class="badge badge-req">NOT NULL</span></td><td><code>1</code> = Vigente, <code>0</code> = Cancelado (formato nativo Metadata SAT)</td></tr>
+        <tr><th><code>fecha_cancelacion_sat</code></th><td><code>TIMESTAMPTZ</code></td><td><span class="badge badge-opt">NULL</span></td><td>Fecha de cancelación informada en el archivo Metadata</td></tr>
+        <tr><th><code>resultado_cruce</code></th><td><code>VARCHAR(35)</code></td><td><span class="badge badge-idx">INDEX</span> <span class="badge badge-req">NOT NULL</span></td><td><code>CONCILIADO_OK</code>, <code>FALTA_XML_EN_BOVEDA</code>, <code>DIFERENCIA_ESTATUS_CANCELADO</code>, <code>DIFERENCIA_IMPORTE</code>, <code>HUERFANO_SIN_VINCULO_SIAF</code></td></tr>
+        <tr><th><code>id_cfdi_boveda</code></th><td><code>BIGINT</code></td><td><span class="badge badge-fk">FK</span> <span class="badge badge-opt">NULL</span></td><td>Referencia a <code>cfdi.boveda_comprobantes</code> si existe en Bóveda</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>4.3 DDL SQL Completo (Tablas y Vista de Conciliación Consolidada)</h3>
+  <pre><code><span class="kw">CREATE TABLE IF NOT EXISTS</span> cfdi.conciliacion_metadata_lotes (
+    id_conciliacion          <span class="tp">BIGSERIAL PRIMARY KEY</span>,
+    id_ejercicio             <span class="tp">INTEGER NOT NULL</span>,
+    mes_periodo              <span class="tp">SMALLINT NOT NULL</span> <span class="kw">CHECK</span> (mes_periodo <span class="kw">BETWEEN</span> 1 <span class="kw">AND</span> 12),
+    id_solicitud_ws          <span class="tp">BIGINT REFERENCES</span> cfdi.descargas_sat_solicitudes(id_solicitud_ws),
+    nombre_archivo_metadata  <span class="tp">VARCHAR(250) NOT NULL</span>,
+    total_registros_metadata <span class="tp">INTEGER NOT NULL DEFAULT</span> 0,
+    total_conciliados_ok     <span class="tp">INTEGER NOT NULL DEFAULT</span> 0,
+    total_faltantes_xml      <span class="tp">INTEGER NOT NULL DEFAULT</span> 0,
+    total_diferencia_estatus <span class="tp">INTEGER NOT NULL DEFAULT</span> 0,
+    total_sin_poliza         <span class="tp">INTEGER NOT NULL DEFAULT</span> 0,
+    estatus_conciliacion     <span class="tp">VARCHAR(20) NOT NULL DEFAULT</span> <span class="st">'PROCESADA'</span>
+                             <span class="kw">CHECK</span> (estatus_conciliacion <span class="kw">IN</span> (<span class="st">'PROCESADA'</span>,<span class="st">'CON_DIFERENCIAS'</span>,<span class="st">'DICTAMINADA_OK'</span>)),
+    estatus_registro         <span class="tp">VARCHAR(10) NOT NULL DEFAULT</span> <span class="st">'ACTIVO'</span>
+                             <span class="kw">CHECK</span> (estatus_registro <span class="kw">IN</span> (<span class="st">'ACTIVO'</span>,<span class="st">'INACTIVO'</span>,<span class="st">'ELIMINADO'</span>)),
+    usuario_c                <span class="tp">VARCHAR(100) NOT NULL</span>,
+    fecha_c                  <span class="tp">TIMESTAMPTZ NOT NULL DEFAULT</span> NOW(),
+    usuario_m                <span class="tp">VARCHAR(100)</span>,
+    fecha_m                  <span class="tp">TIMESTAMPTZ</span>
+);
+
+<span class="kw">CREATE TABLE IF NOT EXISTS</span> cfdi.conciliacion_metadata_detalle (
+    id_detalle_meta          <span class="tp">BIGSERIAL PRIMARY KEY</span>,
+    id_conciliacion          <span class="tp">BIGINT NOT NULL REFERENCES</span> cfdi.conciliacion_metadata_lotes(id_conciliacion),
+    uuid                     <span class="tp">UUID NOT NULL</span>,
+    rfc_emisor               <span class="tp">VARCHAR(13) NOT NULL</span>,
+    nombre_emisor            <span class="tp">VARCHAR(300)</span>,
+    rfc_receptor             <span class="tp">VARCHAR(13) NOT NULL</span>,
+    fecha_emision            <span class="tp">TIMESTAMPTZ NOT NULL</span>,
+    fecha_certificacion      <span class="tp">TIMESTAMPTZ</span>,
+    pac_certifico            <span class="tp">VARCHAR(13)</span>,
+    monto_total              <span class="tp">NUMERIC(18,6) NOT NULL</span>,
+    efecto_comprobante       <span class="tp">CHAR(1) NOT NULL</span>,
+    estatus_metadata_sat     <span class="tp">SMALLINT NOT NULL CHECK</span> (estatus_metadata_sat <span class="kw">IN</span> (0, 1)),
+    fecha_cancelacion_sat    <span class="tp">TIMESTAMPTZ</span>,
+    resultado_cruce          <span class="tp">VARCHAR(35) NOT NULL</span>,
+    id_cfdi_boveda           <span class="tp">BIGINT REFERENCES</span> cfdi.boveda_comprobantes(id_cfdi),
+    estatus_registro         <span class="tp">VARCHAR(10) NOT NULL DEFAULT</span> <span class="st">'ACTIVO'</span>,
+    usuario_c                <span class="tp">VARCHAR(100) NOT NULL</span>,
+    fecha_c                  <span class="tp">TIMESTAMPTZ NOT NULL DEFAULT</span> NOW(),
+    usuario_m                <span class="tp">VARCHAR(100)</span>,
+    fecha_m                  <span class="tp">TIMESTAMPTZ</span>
+);
+
+<span class="cm">-- Vista Consolidada de Auditoría y Sabana Analítica CFDI (cfdi.vw_conciliacion_cfdi_siaf)</span>
+<span class="kw">CREATE OR REPLACE VIEW</span> cfdi.vw_conciliacion_cfdi_siaf <span class="kw">AS</span>
+<span class="kw">SELECT</span>
+    b.id_cfdi,
+    b.uuid,
+    b.direccion,
+    b.version_cfdi,
+    b.tipo_comprobante,
+    b.serie,
+    b.folio,
+    b.fecha_emision,
+    b.fecha_timbrado,
+    b.rfc_emisor,
+    b.nombre_emisor,
+    b.rfc_receptor,
+    b.nombre_receptor,
+    b.metodo_pago,
+    b.forma_pago,
+    b.moneda,
+    b.subtotal,
+    b.descuento,
+    b.total_impuestos_trasladados,
+    b.total_impuestos_retenidos,
+    b.total,
+    b.complementos_detectados,
+    b.estatus_sat,
+    b.cambio_a_cancelado,
+    b.estatus_efos_69b,
+    b.estatus_vinculacion,
+    v.modulo_origen,
+    v.tipo_documento_origen,
+    v.folio_documento_origen,
+    v.momento_contable,
+    v.id_poliza_contable,
+    v.monto_vinculado,
+    (<span class="kw">SELECT</span> COUNT(*) <span class="kw">FROM</span> cfdi.boveda_comprobantes_relaciones r
+      <span class="kw">WHERE</span> r.uuid_relacionado = b.uuid <span class="kw">AND</span> r.estatus_registro = <span class="st">'ACTIVO'</span>) <span class="kw">AS</span> num_cfdi_hijos_relacionados
+<span class="kw">FROM</span> cfdi.boveda_comprobantes b
+<span class="kw">LEFT JOIN</span> cfdi.vinculos_expediente v
+       <span class="kw">ON</span> v.id_cfdi = b.id_cfdi
+      <span class="kw">AND</span> v.estatus_vinculo = <span class="st">'ACTIVO'</span>
+      <span class="kw">AND</span> v.estatus_registro = <span class="st">'ACTIVO'</span>
+<span class="kw">WHERE</span> b.estatus_registro = <span class="st">'ACTIVO'</span>;</code></pre>
+</section>
+
+<!-- ═══════════════ 5. STORED PROCEDURES POSTGRESQL ═══════════════ -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <div class="section-title">Stored Procedures PostgreSQL (Auditoría, Conciliación Metadata y Pre-DIOT)</div>
+  </div>
+
+  <h3>5.1 <code>cfdi.fn_leer_auditoria_cfdi</code> (Motor de los 7 Reportes de Auditoría y Sabana Excel)</h3>
+  <pre><code><span class="kw">CREATE OR REPLACE FUNCTION</span> cfdi.fn_leer_auditoria_cfdi(
+    p_params <span class="tp">JSONB</span>
+)
+<span class="kw">RETURNS</span> <span class="tp">JSONB</span>
+<span class="kw">LANGUAGE</span> plpgsql
+<span class="kw">SECURITY DEFINER</span>
+<span class="kw">SET</span> search_path = cfdi, public
+<span class="kw">AS</span> $$
+<span class="kw">DECLARE</span>
+    v_tipo_reporte   <span class="tp">VARCHAR(30)</span> := COALESCE(p_params-&gt;&gt;<span class="st">'tipo_reporte'</span>, <span class="st">'RESUMEN_EJECUTIVO'</span>);
+    v_fecha_inicio   <span class="tp">DATE</span>        := (p_params-&gt;&gt;<span class="st">'fecha_inicio'</span>)::<span class="tp">DATE</span>;
+    v_fecha_fin      <span class="tp">DATE</span>        := (p_params-&gt;&gt;<span class="st">'fecha_fin'</span>)::<span class="tp">DATE</span>;
+    v_kpis           <span class="tp">JSONB</span>;
+    v_registros      <span class="tp">JSONB</span>;
+<span class="kw">BEGIN</span>
+    <span class="cm">-- 1. KPIs globales del periodo auditado</span>
+    <span class="kw">SELECT</span> jsonb_build_object(
+        <span class="st">'total_cfdi_periodo'</span>, COUNT(*),
+        <span class="st">'total_vigentes'</span>, COUNT(*) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> estatus_sat = <span class="st">'VIGENTE'</span>),
+        <span class="st">'total_cancelados'</span>, COUNT(*) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> estatus_sat = <span class="st">'CANCELADO'</span>),
+        <span class="st">'alerta_cambio_a_cancelado'</span>, COUNT(*) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> cambio_a_cancelado = <span class="kw">TRUE</span>),
+        <span class="st">'alerta_efos_69b'</span>, COUNT(*) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> estatus_efos_69b <span class="kw">IN</span> (<span class="st">'PRESUNTO'</span>,<span class="st">'DEFINITIVO'</span>)),
+        <span class="st">'huerfanos_sin_vincular'</span>, COUNT(*) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> direccion = <span class="st">'RECIBIDO'</span> <span class="kw">AND</span> estatus_sat = <span class="st">'VIGENTE'</span> <span class="kw">AND</span> estatus_vinculacion = <span class="st">'DISPONIBLE'</span>),
+        <span class="st">'ppd_sin_complemento_rep'</span>, COUNT(*) <span class="kw">FILTER</span> (
+            <span class="kw">WHERE</span> metodo_pago = <span class="st">'PPD'</span> <span class="kw">AND</span> tipo_comprobante = <span class="st">'I'</span> <span class="kw">AND</span> estatus_sat = <span class="st">'VIGENTE'</span>
+              <span class="kw">AND NOT EXISTS</span> (
+                  <span class="kw">SELECT</span> 1 <span class="kw">FROM</span> cfdi.boveda_comprobantes_relaciones r
+                  <span class="kw">JOIN</span> cfdi.boveda_comprobantes p <span class="kw">ON</span> p.id_cfdi = r.id_cfdi_origen
+                  <span class="kw">WHERE</span> r.uuid_relacionado = boveda_comprobantes.uuid
+                    <span class="kw">AND</span> p.tipo_comprobante = <span class="st">'P'</span>
+                    <span class="kw">AND</span> p.estatus_sat = <span class="st">'VIGENTE'</span>
+              )
+        )
+    )
+    <span class="kw">INTO</span> v_kpis
+    <span class="kw">FROM</span> cfdi.boveda_comprobantes
+    <span class="kw">WHERE</span> estatus_registro = <span class="st">'ACTIVO'</span>
+      <span class="kw">AND</span> (v_fecha_inicio <span class="kw">IS NULL OR</span> fecha_emision::date &gt;= v_fecha_inicio)
+      <span class="kw">AND</span> (v_fecha_fin    <span class="kw">IS NULL OR</span> fecha_emision::date &lt;= v_fecha_fin);
+
+    <span class="cm">-- 2. Detalle según el reporte solicitado (AUD-01 a AUD-07)</span>
+    <span class="kw">SELECT</span> COALESCE(jsonb_agg(row_to_json(t)), <span class="st">'[]'</span>::jsonb)
+      <span class="kw">INTO</span> v_registros
+      <span class="kw">FROM</span> (
+          <span class="kw">SELECT</span> *
+          <span class="kw">FROM</span> cfdi.vw_conciliacion_cfdi_siaf w
+          <span class="kw">WHERE</span> (v_fecha_inicio <span class="kw">IS NULL OR</span> w.fecha_emision::date &gt;= v_fecha_inicio)
+            <span class="kw">AND</span> (v_fecha_fin    <span class="kw">IS NULL OR</span> w.fecha_emision::date &lt;= v_fecha_fin)
+            <span class="kw">AND</span> (
+                (v_tipo_reporte = <span class="st">'AUD_01_CANCELADOS'</span> <span class="kw">AND</span> (w.estatus_sat = <span class="st">'CANCELADO'</span> <span class="kw">OR</span> w.cambio_a_cancelado = <span class="kw">TRUE</span>)) <span class="kw">OR</span>
+                (v_tipo_reporte = <span class="st">'AUD_03_HUERFANOS'</span>  <span class="kw">AND</span> w.direccion = <span class="st">'RECIBIDO'</span> <span class="kw">AND</span> w.estatus_vinculacion = <span class="st">'DISPONIBLE'</span>) <span class="kw">OR</span>
+                (v_tipo_reporte = <span class="st">'AUD_04_PPD_SIN_REP'</span> <span class="kw">AND</span> w.metodo_pago = <span class="st">'PPD'</span> <span class="kw">AND</span> w.tipo_comprobante = <span class="st">'I'</span> <span class="kw">AND</span> w.num_cfdi_hijos_relacionados = 0) <span class="kw">OR</span>
+                (v_tipo_reporte = <span class="st">'AUD_07_SABANA'</span>)
+            )
+          <span class="kw">ORDER BY</span> w.fecha_emision <span class="kw">DESC</span>
+          <span class="kw">LIMIT</span> 500
+      ) t;
+
+    <span class="kw">RETURN</span> jsonb_build_object(
+        <span class="st">'error'</span>, <span class="kw">FALSE</span>,
+        <span class="st">'mensaje'</span>, <span class="st">'Consulta de control y auditoría CFDI ejecutada correctamente.'</span>,
+        <span class="st">'data'</span>, jsonb_build_object(
+            <span class="st">'tipo_reporte'</span>, v_tipo_reporte,
+            <span class="st">'kpis'</span>, v_kpis,
+            <span class="st">'registros'</span>, v_registros
+        )
+    );
+<span class="kw">EXCEPTION WHEN OTHERS THEN</span>
+    <span class="kw">RETURN</span> jsonb_build_object(<span class="st">'error'</span>, <span class="kw">TRUE</span>, <span class="st">'mensaje'</span>, SQLERRM, <span class="st">'data'</span>, <span class="kw">NULL</span>);
+<span class="kw">END</span>;
+$$;</code></pre>
+
+  <h3>5.2 <code>cfdi.fn_crud_conciliacion_metadata</code> (Cruce Masivo de Metadata <code>.txt</code> SAT vs. Bóveda XML)</h3>
+  <pre><code><span class="kw">CREATE OR REPLACE FUNCTION</span> cfdi.fn_crud_conciliacion_metadata(
+    p_params <span class="tp">JSONB</span>
+)
+<span class="kw">RETURNS</span> <span class="tp">JSONB</span>
+<span class="kw">LANGUAGE</span> plpgsql
+<span class="kw">SECURITY DEFINER</span>
+<span class="kw">SET</span> search_path = cfdi, public
+<span class="kw">AS</span> $$
+<span class="kw">DECLARE</span>
+    v_usuario         <span class="tp">VARCHAR(100)</span> := COALESCE(p_params-&gt;&gt;<span class="st">'usuario'</span>, <span class="st">'SISTEMA'</span>);
+    v_id_conciliacion <span class="tp">BIGINT</span>;
+    v_item            <span class="tp">JSONB</span>;
+    v_id_cfdi         <span class="tp">BIGINT</span>;
+    v_estatus_boveda  <span class="tp">VARCHAR(20)</span>;
+    v_vinculacion     <span class="tp">VARCHAR(20)</span>;
+    v_resultado       <span class="tp">VARCHAR(35)</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">INSERT INTO</span> cfdi.conciliacion_metadata_lotes (
+        id_ejercicio, mes_periodo, nombre_archivo_metadata, usuario_c
+    ) <span class="kw">VALUES</span> (
+        (p_params-&gt;&gt;<span class="st">'id_ejercicio'</span>)::<span class="tp">INTEGER</span>,
+        (p_params-&gt;&gt;<span class="st">'mes_periodo'</span>)::<span class="tp">SMALLINT</span>,
+        p_params-&gt;&gt;<span class="st">'nombre_archivo_metadata'</span>,
+        v_usuario
+    )
+    <span class="kw">RETURNING</span> id_conciliacion <span class="kw">INTO</span> v_id_conciliacion;
+
+    <span class="kw">FOR</span> v_item <span class="kw">IN SELECT</span> * <span class="kw">FROM</span> jsonb_array_elements(COALESCE(p_params-&gt;<span class="st">'registros_metadata'</span>, <span class="st">'[]'</span>::jsonb))
+    <span class="kw">LOOP</span>
+        <span class="kw">SELECT</span> id_cfdi, estatus_sat, estatus_vinculacion
+          <span class="kw">INTO</span> v_id_cfdi, v_estatus_boveda, v_vinculacion
+          <span class="kw">FROM</span> cfdi.boveda_comprobantes
+         <span class="kw">WHERE</span> uuid = (v_item-&gt;&gt;<span class="st">'uuid'</span>)::<span class="tp">UUID</span>
+           <span class="kw">AND</span> estatus_registro = <span class="st">'ACTIVO'</span>;
+
+        <span class="kw">IF</span> v_id_cfdi <span class="kw">IS NULL THEN</span>
+            v_resultado := <span class="st">'FALTA_XML_EN_BOVEDA'</span>;
+        <span class="kw">ELSIF</span> (v_item-&gt;&gt;<span class="st">'estatus_metadata_sat'</span>)::<span class="tp">SMALLINT</span> = 0 <span class="kw">AND</span> v_estatus_boveda = <span class="st">'VIGENTE'</span> <span class="kw">THEN</span>
+            v_resultado := <span class="st">'DIFERENCIA_ESTATUS_CANCELADO'</span>;
+            <span class="cm">-- Actualiza inmediatamente el CFDI en Bóveda y enciende la alerta de cambio a cancelado</span>
+            <span class="kw">UPDATE</span> cfdi.boveda_comprobantes
+               <span class="kw">SET</span> estatus_sat        = <span class="st">'CANCELADO'</span>,
+                   cambio_a_cancelado = <span class="kw">TRUE</span>,
+                   fecha_cancelacion  = (v_item-&gt;&gt;<span class="st">'fecha_cancelacion_sat'</span>)::<span class="tp">TIMESTAMPTZ</span>,
+                   usuario_m          = v_usuario,
+                   fecha_m            = NOW()
+             <span class="kw">WHERE</span> id_cfdi = v_id_cfdi;
+        <span class="kw">ELSIF</span> v_vinculacion = <span class="st">'DISPONIBLE'</span> <span class="kw">THEN</span>
+            v_resultado := <span class="st">'HUERFANO_SIN_VINCULO_SIAF'</span>;
+        <span class="kw">ELSE</span>
+            v_resultado := <span class="st">'CONCILIADO_OK'</span>;
+        <span class="kw">END IF</span>;
+
+        <span class="kw">INSERT INTO</span> cfdi.conciliacion_metadata_detalle (
+            id_conciliacion, uuid, rfc_emisor, nombre_emisor, rfc_receptor,
+            fecha_emision, monto_total, efecto_comprobante, estatus_metadata_sat,
+            fecha_cancelacion_sat, resultado_cruce, id_cfdi_boveda, usuario_c
+        ) <span class="kw">VALUES</span> (
+            v_id_conciliacion,
+            (v_item-&gt;&gt;<span class="st">'uuid'</span>)::<span class="tp">UUID</span>,
+            v_item-&gt;&gt;<span class="st">'rfc_emisor'</span>,
+            v_item-&gt;&gt;<span class="st">'nombre_emisor'</span>,
+            v_item-&gt;&gt;<span class="st">'rfc_receptor'</span>,
+            (v_item-&gt;&gt;<span class="st">'fecha_emision'</span>)::<span class="tp">TIMESTAMPTZ</span>,
+            (v_item-&gt;&gt;<span class="st">'monto_total'</span>)::<span class="tp">NUMERIC</span>,
+            v_item-&gt;&gt;<span class="st">'efecto_comprobante'</span>,
+            (v_item-&gt;&gt;<span class="st">'estatus_metadata_sat'</span>)::<span class="tp">SMALLINT</span>,
+            (v_item-&gt;&gt;<span class="st">'fecha_cancelacion_sat'</span>)::<span class="tp">TIMESTAMPTZ</span>,
+            v_resultado,
+            v_id_cfdi,
+            v_usuario
+        );
+    <span class="kw">END LOOP</span>;
+
+    <span class="cm">-- Actualizar contadores de cabecera</span>
+    <span class="kw">UPDATE</span> cfdi.conciliacion_metadata_lotes l
+       <span class="kw">SET</span> total_registros_metadata = (<span class="kw">SELECT</span> COUNT(*) <span class="kw">FROM</span> cfdi.conciliacion_metadata_detalle d <span class="kw">WHERE</span> d.id_conciliacion = v_id_conciliacion),
+           total_conciliados_ok     = (<span class="kw">SELECT</span> COUNT(*) <span class="kw">FROM</span> cfdi.conciliacion_metadata_detalle d <span class="kw">WHERE</span> d.id_conciliacion = v_id_conciliacion <span class="kw">AND</span> d.resultado_cruce = <span class="st">'CONCILIADO_OK'</span>),
+           total_faltantes_xml      = (<span class="kw">SELECT</span> COUNT(*) <span class="kw">FROM</span> cfdi.conciliacion_metadata_detalle d <span class="kw">WHERE</span> d.id_conciliacion = v_id_conciliacion <span class="kw">AND</span> d.resultado_cruce = <span class="st">'FALTA_XML_EN_BOVEDA'</span>),
+           total_diferencia_estatus = (<span class="kw">SELECT</span> COUNT(*) <span class="kw">FROM</span> cfdi.conciliacion_metadata_detalle d <span class="kw">WHERE</span> d.id_conciliacion = v_id_conciliacion <span class="kw">AND</span> d.resultado_cruce = <span class="st">'DIFERENCIA_ESTATUS_CANCELADO'</span>),
+           total_sin_poliza         = (<span class="kw">SELECT</span> COUNT(*) <span class="kw">FROM</span> cfdi.conciliacion_metadata_detalle d <span class="kw">WHERE</span> d.id_conciliacion = v_id_conciliacion <span class="kw">AND</span> d.resultado_cruce = <span class="st">'HUERFANO_SIN_VINCULO_SIAF'</span>)
+     <span class="kw">WHERE</span> l.id_conciliacion = v_id_conciliacion;
+
+    <span class="kw">RETURN</span> jsonb_build_object(
+        <span class="st">'error'</span>, <span class="kw">FALSE</span>,
+        <span class="st">'mensaje'</span>, <span class="st">'Conciliación de Metadata SAT contra Bóveda XML finalizada.'</span>,
+        <span class="st">'data'</span>, jsonb_build_object(<span class="st">'id_conciliacion'</span>, v_id_conciliacion)
+    );
+<span class="kw">EXCEPTION WHEN OTHERS THEN</span>
+    <span class="kw">RETURN</span> jsonb_build_object(<span class="st">'error'</span>, <span class="kw">TRUE</span>, <span class="st">'mensaje'</span>, SQLERRM, <span class="st">'data'</span>, <span class="kw">NULL</span>);
+<span class="kw">END</span>;
+$$;</code></pre>
+
+  <h3>5.3 <code>cfdi.fn_generar_pre_diot_cfdi</code> (Pre-armado Automático de Cédula DIOT desde XML Pagados)</h3>
+  <pre><code><span class="kw">CREATE OR REPLACE FUNCTION</span> cfdi.fn_generar_pre_diot_cfdi(
+    p_params <span class="tp">JSONB</span>
+)
+<span class="kw">RETURNS</span> <span class="tp">JSONB</span>
+<span class="kw">LANGUAGE</span> plpgsql
+<span class="kw">SECURITY DEFINER</span>
+<span class="kw">SET</span> search_path = cfdi, public
+<span class="kw">AS</span> $$
+<span class="kw">DECLARE</span>
+    v_fecha_inicio <span class="tp">DATE</span> := (p_params-&gt;&gt;<span class="st">'fecha_inicio'</span>)::<span class="tp">DATE</span>;
+    v_fecha_fin    <span class="tp">DATE</span> := (p_params-&gt;&gt;<span class="st">'fecha_fin'</span>)::<span class="tp">DATE</span>;
+    v_proveedores  <span class="tp">JSONB</span>;
+<span class="kw">BEGIN</span>
+    <span class="kw">SELECT</span> COALESCE(jsonb_agg(row_to_json(t)), <span class="st">'[]'</span>::jsonb)
+      <span class="kw">INTO</span> v_proveedores
+      <span class="kw">FROM</span> (
+          <span class="kw">SELECT</span>
+              b.rfc_emisor <span class="kw">AS</span> rfc_proveedor,
+              MAX(b.nombre_emisor) <span class="kw">AS</span> nombre_proveedor,
+              <span class="st">'04'</span> <span class="kw">AS</span> tipo_tercero_sat,
+              <span class="st">'85'</span> <span class="kw">AS</span> tipo_operacion_sat,
+              COUNT(b.id_cfdi) <span class="kw">AS</span> num_cfdi_pagados,
+              ROUND(SUM(<span class="kw">CASE WHEN</span> b.tipo_comprobante = <span class="st">'E'</span> <span class="kw">THEN</span> -b.subtotal <span class="kw">ELSE</span> b.subtotal <span class="kw">END</span>), 0) <span class="kw">AS</span> base_gravada_16,
+              ROUND(SUM(<span class="kw">CASE WHEN</span> b.tipo_comprobante = <span class="st">'E'</span> <span class="kw">THEN</span> -b.total_impuestos_trasladados <span class="kw">ELSE</span> b.total_impuestos_trasladados <span class="kw">END</span>), 0) <span class="kw">AS</span> iva_acreditable_16,
+              ROUND(SUM(<span class="kw">CASE WHEN</span> b.tipo_comprobante = <span class="st">'E'</span> <span class="kw">THEN</span> -b.total_impuestos_retenidos <span class="kw">ELSE</span> b.total_impuestos_retenidos <span class="kw">END</span>), 0) <span class="kw">AS</span> iva_retenido,
+              MAX(b.estatus_efos_69b) <span class="kw">AS</span> estatus_efos_69b
+          <span class="kw">FROM</span> cfdi.boveda_comprobantes b
+          <span class="kw">JOIN</span> cfdi.vinculos_expediente v
+            <span class="kw">ON</span> v.id_cfdi = b.id_cfdi
+           <span class="kw">AND</span> v.estatus_vinculo = <span class="st">'ACTIVO'</span>
+          <span class="kw">WHERE</span> b.direccion = <span class="st">'RECIBIDO'</span>
+            <span class="kw">AND</span> b.estatus_sat = <span class="st">'VIGENTE'</span>
+            <span class="kw">AND</span> v.momento_contable = <span class="st">'PAGADO'</span>
+            <span class="kw">AND</span> b.fecha_emision::date <span class="kw">BETWEEN</span> v_fecha_inicio <span class="kw">AND</span> v_fecha_fin
+          <span class="kw">GROUP BY</span> b.rfc_emisor
+          <span class="kw">ORDER BY</span> base_gravada_16 <span class="kw">DESC</span>
+      ) t;
+
+    <span class="kw">RETURN</span> jsonb_build_object(
+        <span class="st">'error'</span>, <span class="kw">FALSE</span>,
+        <span class="st">'mensaje'</span>, <span class="st">'Pre-armado de cédula DIOT generado desde CFDI efectivamente pagados.'</span>,
+        <span class="st">'data'</span>, jsonb_build_object(
+            <span class="st">'fecha_inicio'</span>, v_fecha_inicio,
+            <span class="st">'fecha_fin'</span>, v_fecha_fin,
+            <span class="st">'proveedores_diot'</span>, v_proveedores
+        )
+    );
+<span class="kw">EXCEPTION WHEN OTHERS THEN</span>
+    <span class="kw">RETURN</span> jsonb_build_object(<span class="st">'error'</span>, <span class="kw">TRUE</span>, <span class="st">'mensaje'</span>, SQLERRM, <span class="st">'data'</span>, <span class="kw">NULL</span>);
+<span class="kw">END</span>;
+$$;</code></pre>
+</section>
+
+<!-- ═══════════════ 6. ENDPOINTS REST ═══════════════ -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <div class="section-title">Especificación de Endpoints REST (NestJS + Microservicio FastAPI Export)</div>
+  </div>
+
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Endpoints REST del módulo 07.3.1 Control y Auditoría CFDI">
+    <table>
+      <thead>
+        <tr><th>Método</th><th>Ruta API</th><th>Stored Procedure / Servicio</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><span class="badge badge-get">GET</span></th>
+          <td><code>/api/v1/cfdi/auditoria/reportes</code></td>
+          <td><code>cfdi.fn_leer_auditoria_cfdi</code></td>
+          <td>Ejecuta cualquiera de los reportes de auditoría (<code>AUD_01_CANCELADOS</code>, <code>AUD_03_HUERFANOS</code>, <code>AUD_04_PPD_SIN_REP</code>, <code>AUD_07_SABANA</code>) y devuelve los KPIs del periodo.</td>
+        </tr>
+        <tr>
+          <th><span class="badge badge-post">POST</span></th>
+          <td><code>/api/v1/cfdi/auditoria/conciliar-metadata</code></td>
+          <td><code>cfdi.fn_crud_conciliacion_metadata</code></td>
+          <td>Sube un archivo <code>Metadata .txt</code> o <code>.zip</code> del SAT Web Service y ejecuta la Conciliación Triple contra Bóveda y Pólizas.</td>
+        </tr>
+        <tr>
+          <th><span class="badge badge-post">POST</span></th>
+          <td><code>/api/v1/cfdi/auditoria/pre-diot</code></td>
+          <td><code>cfdi.fn_generar_pre_diot_cfdi</code></td>
+          <td>Genera la cédula pre-DIOT desde los CFDI pagados del mes y permite enviarla a <code>05.3.4 Declaración DIOT</code> o descargar el archivo batch <code>.txt</code> para el aplicativo DEM-DIOT del SAT.</td>
+        </tr>
+        <tr>
+          <th><span class="badge badge-post">POST</span></th>
+          <td><code>/api/v1/cfdi/auditoria/exportar-sabana</code></td>
+          <td>FastAPI <code>openpyxl</code> + <code>cfdi.vw_conciliacion_cfdi_siaf</code></td>
+          <td>Equivalente al botón <code>[Exportar a excel]</code> del Almacén CFDI y la herramienta <code>XMLs</code>: genera la Sabana Analítica en formato <code>.xlsx</code> con pestañas de Encabezado, Conceptos, Impuestos y Vínculo Contable.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ 7. REGLAS DE NEGOCIO ═══════════════ -->
+<section class="section" id="s7">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <div class="section-title">Reglas de Negocio y Fiscalización (LGCG / CFF / ORFIS / ASF)</div>
+  </div>
+
+  <div class="rule-grid">
+    <div class="rule-card red-border">
+      <div class="rule-id">RN-07.3.1-01 · Semáforo para Cierre Contable Mensual</div>
+      <div class="rule-text">El módulo <code>03.3.1 Cierre de Periodo Mensual</code> consulta el indicador <code>alerta_cambio_a_cancelado</code> de <code>07.3.1</code>. Si existen pólizas de gasto del mes cuyo CFDI cambió a <code>CANCELADO</code>, el sistema exige aclaración o póliza de reversión antes de cerrar el periodo.</div>
+    </div>
+    <div class="rule-card gold-border">
+      <div class="rule-id">RN-07.3.1-02 · Vencimiento Legal del REP 2.0 (Día 5 del Mes Siguiente)</div>
+      <div class="rule-text">De acuerdo con la RMF del SAT, todo CFDI con método de pago <code>PPD</code> liquidado en un mes debe contar con su Complemento de Recepción de Pagos (<code>REP 2.0</code>) a más tardar el día 5 natural del mes inmediato siguiente. El reporte <code>AUD-04</code> marca en ámbar los pagos del mes en curso y en rojo los vencidos.</div>
+    </div>
+    <div class="rule-card green-border">
+      <div class="rule-id">RN-07.3.1-03 · Pre-armado DIOT sobre Flujo de Efectivo</div>
+      <div class="rule-text">Conforme al Art. 32 Fracc. VIII de la LIVA, la herramienta <code>DIOT</code> (<code>AUD-06</code>) únicamente acumula CFDI cuyo vínculo en SIAF-PJEV haya alcanzado el momento contable <code>PAGADO</code> dentro del mes declarado, excluyendo los comprobantes que solo están en <code>DEVENGADO</code>.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-id">RN-07.3.1-04 · Conciliación Obligatoria con Metadata .txt</div>
+      <div class="rule-text">Al finalizar cada mes, el área de Control Fiscal debe importar el archivo <code>Metadata .txt</code> descargado del SAT Web Service para descubrir el 100% de los comprobantes cancelados en el SAT y recuperar automáticamente los XML faltantes en la Bóveda.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-id">RN-07.3.1-05 · Depuración Controlada de Comprobantes Huérfanos</div>
+      <div class="rule-text">Los comprobantes en estado <code>DISPONIBLE</code> (sin vínculo SIAF) con más de 60 días de antigüedad aparecen en el reporte <code>AUD-03</code> para dictaminar si corresponden a facturas emitidas por error al RFC del PJEV (para solicitar su cancelación) o a trámites pendientes de captura.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-id">RN-07.3.1-06 · Sabana Analítica para Entrega a ORFIS y ASF</div>
+      <div class="rule-text">La exportación a Excel (<code>AUD-07</code>) incluye en una sola fila por UUID tanto los metadatos fiscales del XML como la clave presupuestal, el número de póliza contable y el folio SPEI/Cheque de Tesorería, cumpliendo los formatos de compulsa de auditoría gubernamental.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 8. PROTOTIPOS DE INTERFAZ (SVG WIREFRAMES) ═══════════════ -->
+<section class="section" id="s8">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <div class="section-title">Prototipos de Interfaz (UI Wireframes SVG)</div>
+  </div>
+
+  <!-- WIREFRAME 1: TABLERO DE AUDITORIA Y CONCILIACION TRIPLE -->
+  <div class="wireframe-card">
+    <div class="wireframe-title"><span>Pantalla 1</span> Tablero de Control y Auditoría CFDI — Conciliación Metadata SAT vs. Bóveda vs. Pólizas</div>
+    <svg viewBox="0 0 980 460" width="100%" style="background:#fff;border:1px solid #d1d5db;border-radius:6px">
+      <!-- Top Bar -->
+      <rect x="0" y="0" width="980" height="44" fill="#0c1b2e"/>
+      <text x="18" y="27" fill="#d9aa45" font-size="13" font-weight="bold" font-family="Segoe UI">SIAF-PJEV · 07.3.1 Control y Auditoría CFDI — Inteligencia Fiscal, Conciliación y Sabana Excel</text>
+      <rect x="780" y="9" width="184" height="26" rx="4" fill="#15803d"/>
+      <text x="800" y="26" fill="#fff" font-size="11" font-weight="bold" font-family="Segoe UI">📥 Exportar Sabana Excel (.xlsx)</text>
+
+      <!-- KPI Cards -->
+      <rect x="16" y="56" width="180" height="64" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="28" y="76" fill="#64748b" font-size="10.5" font-weight="bold" font-family="Segoe UI">CFDI EN PERIODO (OCT 2026)</text>
+      <text x="28" y="104" fill="#0c1b2e" font-size="22" font-weight="bold" font-family="Segoe UI">4,820</text>
+      <text x="105" y="104" fill="#15803d" font-size="11" font-weight="bold" font-family="Segoe UI">99.4% Conciliados</text>
+
+      <rect x="208" y="56" width="180" height="64" rx="6" fill="#fef2f2" stroke="#fca5a5"/>
+      <text x="220" y="76" fill="#991b1b" font-size="10.5" font-weight="bold" font-family="Segoe UI">CAMBIARON A CANCELADO</text>
+      <text x="220" y="104" fill="#b91c1c" font-size="22" font-weight="bold" font-family="Segoe UI">2</text>
+      <text x="250" y="104" fill="#b91c1c" font-size="10.5" font-family="Segoe UI">Con póliza devengada</text>
+
+      <rect x="400" y="56" width="180" height="64" rx="6" fill="#fffbeb" stroke="#fcd34d"/>
+      <text x="412" y="76" fill="#92400e" font-size="10.5" font-weight="bold" font-family="Segoe UI">PPD SIN REP 2.0 (PAGADOS)</text>
+      <text x="412" y="104" fill="#b45309" font-size="22" font-weight="bold" font-family="Segoe UI">9</text>
+      <text x="442" y="104" fill="#b45309" font-size="10.5" font-family="Segoe UI">Vencen día 5 Nov</text>
+
+      <rect x="592" y="56" width="180" height="64" rx="6" fill="#eff6ff" stroke="#93c5fd"/>
+      <text x="604" y="76" fill="#1e40af" font-size="10.5" font-weight="bold" font-family="Segoe UI">HUÉRFANOS EN ALMACÉN</text>
+      <text x="604" y="104" fill="#1d4ed8" font-size="22" font-weight="bold" font-family="Segoe UI">14</text>
+      <text x="642" y="104" fill="#1e40af" font-size="10.5" font-family="Segoe UI">Sin vínculo CXP/Mat</text>
+
+      <rect x="784" y="56" width="180" height="64" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+      <text x="796" y="76" fill="#166534" font-size="10.5" font-weight="bold" font-family="Segoe UI">FALTANTES METADATA SAT</text>
+      <text x="796" y="104" fill="#15803d" font-size="22" font-weight="bold" font-family="Segoe UI">0</text>
+      <text x="825" y="104" fill="#15803d" font-size="10.5" font-family="Segoe UI">100% XML en Bóveda</text>
+
+      <!-- Sub-tabs de los 7 Reportes -->
+      <rect x="16" y="134" width="948" height="34" rx="4" fill="#f1f5f9"/>
+      <rect x="20" y="138" width="155" height="26" rx="4" fill="#132844"/>
+      <text x="32" y="155" fill="#d9aa45" font-size="11" font-weight="bold" font-family="Segoe UI">AUD-01 · Cancelados (2)</text>
+      <text x="190" y="155" fill="#475569" font-size="11" font-weight="bold" font-family="Segoe UI">AUD-02 · Duplicados</text>
+      <text x="320" y="155" fill="#475569" font-size="11" font-weight="bold" font-family="Segoe UI">AUD-03 · Huérfanos (14)</text>
+      <text x="475" y="155" fill="#475569" font-size="11" font-weight="bold" font-family="Segoe UI">AUD-04 · PPD sin REP (9)</text>
+      <text x="635" y="155" fill="#475569" font-size="11" font-weight="bold" font-family="Segoe UI">AUD-05 · Metadata SAT</text>
+      <text x="785" y="155" fill="#475569" font-size="11" font-weight="bold" font-family="Segoe UI">AUD-06 · Pre-DIOT</text>
+      <text x="900" y="155" fill="#475569" font-size="11" font-weight="bold" font-family="Segoe UI">AUD-07 · Sabana</text>
+
+      <!-- Grid de Alertas AUD-01 -->
+      <rect x="16" y="180" width="948" height="28" fill="#132844"/>
+      <text x="26" y="198" fill="#fff" font-size="11" font-weight="bold" font-family="Segoe UI">UUID</text>
+      <text x="175" y="198" fill="#fff" font-size="11" font-weight="bold" font-family="Segoe UI">PROVEEDOR EMISOR</text>
+      <text x="370" y="198" fill="#fff" font-size="11" font-weight="bold" font-family="Segoe UI">TOTAL</text>
+      <text x="455" y="198" fill="#fff" font-size="11" font-weight="bold" font-family="Segoe UI">ESTATUS SAT</text>
+      <text x="580" y="198" fill="#fff" font-size="11" font-weight="bold" font-family="Segoe UI">TRÁMITE CXP / PÓLIZA</text>
+      <text x="770" y="198" fill="#fff" font-size="11" font-weight="bold" font-family="Segoe UI">ACCIÓN REQUERIDA</text>
+
+      <rect x="16" y="208" width="948" height="40" fill="#fef2f2" stroke="#e2e8f0"/>
+      <text x="26" y="232" fill="#0f172a" font-size="11" font-family="Consolas">E89A1200-44BC-11EF...</text>
+      <text x="175" y="232" fill="#0f172a" font-size="11" font-family="Segoe UI">SERVICIOS INTEGRALES DEL GOLFO SA</text>
+      <text x="370" y="232" fill="#0f172a" font-size="11" font-weight="bold" font-family="Segoe UI">$48,720.00</text>
+      <rect x="455" y="217" width="110" height="20" rx="3" fill="#fee2e2"/>
+      <text x="462" y="231" fill="#b91c1c" font-size="10" font-weight="bold" font-family="Segoe UI">CANCELADO POST</text>
+      <text x="580" y="232" fill="#1e3a8a" font-size="11" font-weight="bold" font-family="Segoe UI">CXP-2026-0391 · Póliza D-0884</text>
+      <rect x="770" y="215" width="180" height="24" rx="4" fill="#b91c1c"/>
+      <text x="784" y="231" fill="#fff" font-size="10.5" font-weight="bold" font-family="Segoe UI">Generar Póliza Reversión / Reclamo</text>
+
+      <rect x="16" y="248" width="948" height="40" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="26" y="272" fill="#0f172a" font-size="11" font-family="Consolas">91B44510-88AC-49D1...</text>
+      <text x="175" y="272" fill="#0f172a" font-size="11" font-family="Segoe UI">PAPELERÍA MAYORISTA XALAPA SA</text>
+      <text x="370" y="272" fill="#0f172a" font-size="11" font-weight="bold" font-family="Segoe UI">$12,180.00</text>
+      <rect x="455" y="257" width="110" height="20" rx="3" fill="#fee2e2"/>
+      <text x="462" y="271" fill="#b91c1c" font-size="10" font-weight="bold" font-family="Segoe UI">CANCELADO POST</text>
+      <text x="580" y="272" fill="#1e3a8a" font-size="11" font-weight="bold" font-family="Segoe UI">CXP-2026-0402 · Póliza D-0901</text>
+      <rect x="770" y="255" width="180" height="24" rx="4" fill="#b91c1c"/>
+      <text x="784" y="271" fill="#fff" font-size="10.5" font-weight="bold" font-family="Segoe UI">Sustituir CFDI (Relación 04)</text>
+
+      <!-- Sección Inferior: Herramientas Plus (Metadata y DIOT) -->
+      <rect x="16" y="306" width="464" height="138" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="32" y="330" fill="#132844" font-size="13" font-weight="bold" font-family="Segoe UI">🧩 Herramienta Plus: Conciliación de Metadata (.txt) SAT</text>
+      <text x="32" y="352" fill="#475569" font-size="11.5" font-family="Segoe UI">Compare el archivo oficial Metadata descargado por Web Service contra</text>
+      <text x="32" y="368" fill="#475569" font-size="11.5" font-family="Segoe UI">el Almacén CFDI y las pólizas contables del mes antes del cierre.</text>
+      <rect x="32" y="386" width="240" height="36" rx="4" fill="#132844"/>
+      <text x="48" y="408" fill="#d9aa45" font-size="11.5" font-weight="bold" font-family="Segoe UI">📂 Importar Metadata .txt / .zip</text>
+      <rect x="284" y="386" width="180" height="36" rx="4" fill="#0f766e"/>
+      <text x="302" y="408" fill="#fff" font-size="11.5" font-weight="bold" font-family="Segoe UI">📄 Dictamen Conciliación</text>
+
+      <rect x="500" y="306" width="464" height="138" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="516" y="330" fill="#132844" font-size="13" font-weight="bold" font-family="Segoe UI">📊 Herramienta Plus: Pre-armado DIOT desde CFDI Pagados</text>
+      <text x="516" y="352" fill="#475569" font-size="11.5" font-family="Segoe UI">Extrae automáticamente tasas de IVA (16%, 8%, 0%, Exento) y retenciones</text>
+      <text x="516" y="368" fill="#475569" font-size="11.5" font-family="Segoe UI">de los CFDI con momento contable PAGADO en el mes seleccionado.</text>
+      <rect x="516" y="386" width="220" height="36" rx="4" fill="#c8962e"/>
+      <text x="532" y="408" fill="#0c1b2e" font-size="11.5" font-weight="bold" font-family="Segoe UI">⚡ Generar Cédula Pre-DIOT</text>
+      <rect x="748" y="386" width="198" height="36" rx="4" fill="#1d4ed8"/>
+      <text x="764" y="408" fill="#fff" font-size="11.5" font-weight="bold" font-family="Segoe UI">🔗 Enviar a 05.3.4 DIOT</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══════════════ 9. MAPA DE INTEGRACIÓN ═══════════════ -->
+<section class="section" id="s9">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <div class="section-title">Mapa de Integración Inter-Módulos</div>
+  </div>
+
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Mapa de integración de 07.3.1 Control y Auditoría CFDI">
+    <table>
+      <thead>
+        <tr><th>Módulo Conectado</th><th>Dirección</th><th>Objetivo de la Interfaz con 07.3.1 Control y Auditoría CFDI</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><code>03.3.1</code> Cierre de Periodo Mensual</th>
+          <td>Consumidor de Semáforo</td>
+          <td>Verifica que la conciliación mensual de CFDI esté en estado <code>DICTAMINADA_OK</code> y sin pólizas activas respaldadas por CFDI cancelados.</td>
+        </tr>
+        <tr>
+          <th><code>05.3.4</code> Declaración DIOT</th>
+          <td>Receptor de Cédula</td>
+          <td>Recibe la cédula pre-DIOT calculada por <code>cfdi.fn_generar_pre_diot_cfdi</code> con el desglose de actos o actividades pagados por RFC de proveedor.</td>
+        </tr>
+        <tr>
+          <th><code>06.2.4</code> Gestión de Pagos y Dispersiones</th>
+          <td>Fuente de Flujo de Efectivo</td>
+          <td>Proporciona la fecha real de pago bancario para activar el conteo de exigibilidad de los complementos <code>REP 2.0</code> (<code>AUD-04</code>) y el flujo de efectivo de la DIOT (<code>AUD-06</code>).</td>
+        </tr>
+        <tr>
+          <th><code>10.3.1</code> Expediente Digital por Operación</th>
+          <td>Consumidor de Certificación</td>
+          <td>Integra el dictamen de validación y vigencia CFDI dentro del índice electrónico del expediente único para fiscalización de ORFIS y ASF.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ 10. SEGURIDAD Y AUDITORÍA ═══════════════ -->
+<section class="section" id="s10">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Seguridad, Roles y Pista de Auditoría</div>
+  </div>
+
+  <ul>
+    <li><strong>Roles con acceso al módulo <code>07.3.1</code>:</strong> <code>ROL_AUDITOR_CFDI</code>, <code>ROL_CONTADOR_GENERAL</code>, <code>ROL_CONTRALORIA_PJEV</code> y <code>ROL_SUPERVISOR_CXP</code>.</li>
+    <li><strong>Trazabilidad de Exportaciones:</strong> Toda descarga de la Sabana Analítica Excel (<code>AUD-07</code>) o del archivo batch <code>DIOT</code> queda registrada en <code>seguridad.bitacora_acceso</code> con usuario, filtros aplicados, hash del archivo generado y marca de tiempo.</li>
+  </ul>
+</section>
+
+<!-- ═══════════════ 11. CASOS DE PRUEBA (QA) ═══════════════ -->
+<section class="section" id="s11">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Casos de Prueba (QA / Criterios de Aceptación)</div>
+  </div>
+
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Casos de prueba QA del módulo 07.3.1 Control y Auditoría CFDI">
+    <table>
+      <thead>
+        <tr><th>ID Caso</th><th>Escenario de Prueba</th><th>Resultado Esperado</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><code>QA-07.3.1-01</code></th>
+          <td>Importar un archivo <code>Metadata .txt</code> donde un UUID que estaba <code>VIGENTE</code> en Bóveda aparece con estatus <code>0</code> (Cancelado).</td>
+          <td><code>cfdi.fn_crud_conciliacion_metadata</code> clasifica el renglón como <code>DIFERENCIA_ESTATUS_CANCELADO</code>, actualiza el CFDI a <code>CANCELADO</code>, activa <code>cambio_a_cancelado = TRUE</code> y lo muestra en <code>AUD-01</code>.</td>
+        </tr>
+        <tr>
+          <th><code>QA-07.3.1-02</code></th>
+          <td>Ejecutar el reporte <code>AUD-04 (PPD sin REP 2.0)</code> para una factura <code>PPD</code> pagada en Tesorería hace 20 días que no tiene CFDI tipo <code>P</code> relacionado.</td>
+          <td>El reporte lista la factura, muestra el folio de pago de Tesorería, el RFC del proveedor y resalta el atraso respecto al día 5 del mes siguiente.</td>
+        </tr>
+        <tr>
+          <th><code>QA-07.3.1-03</code></th>
+          <td>Generar el pre-armado DIOT (<code>AUD-06</code>) con dos facturas: una en momento <code>PAGADO</code> y otra únicamente en <code>DEVENGADO</code>.</td>
+          <td><code>cfdi.fn_generar_pre_diot_cfdi</code> incluye exclusivamente la factura con momento contable <code>PAGADO</code> y excluye la devengada no pagada.</td>
+        </tr>
+        <tr>
+          <th><code>QA-07.3.1-04</code></th>
+          <td>Presionar <code>[Exportar Sabana Excel]</code> (<code>AUD-07</code>) sobre un periodo con 1,500 comprobantes.</td>
+          <td>El servicio FastAPI genera el archivo <code>.xlsx</code> con todas las columnas fiscales, contables y presupuestales en menos de 5 segundos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ 12. CONTROL DE VERSIONES ═══════════════ -->
+<section class="section" id="s12">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">Control de Versiones</div>
+  </div>
+  <div class="table-wrapper" tabindex="0" role="region" aria-label="Control de versiones del documento 07.3.1">
+    <table>
+      <thead>
+        <tr><th>Versión</th><th>Fecha</th><th>Autor</th><th>Descripción de Cambios</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><code>v2.0</code></th>
+          <td>Octubre 2026</td>
+          <td>Arquitectura SIAF-PJEV</td>
+          <td>Especificación definitiva DOC-08 de Control y Auditoría CFDI integrando los 7 reportes de fiscalización, Conciliación Triple con <code>Metadata .txt</code> SAT, Pre-armado DIOT y Sabana Analítica Excel.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<footer class="doc-footer">
+  <div><strong>SIAF-PJEV</strong> · Poder Judicial del Estado de Veracruz · Manual Técnico de Desarrollo</div>
+  <div>Módulo 07.3.1 · Control y Auditoría CFDI · Esquema <code>cfdi</code></div>
+</footer>
+
+</div>
+</body>
+</html>

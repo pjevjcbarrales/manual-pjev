@@ -2,6 +2,14 @@
 -- SISTEMA INTEGRAL DE ADMINISTRACIÓN Y FINANZAS (SIAF-PJEV)
 -- SUBSISTEMA TRANSVERSAL DE GESTIÓN DOCUMENTAL Y ARCHIVOS DIGITALES
 -- ==============================================================================
+-- ANTECEDENTE DE ESQUEMA, NO MIGRACIÓN LISTA PARA PRODUCCIÓN.
+-- Recalibración 29-10-2026: consultar RECALIBRACION_ARCHIVISTICA_DGA_PJEV.md.
+-- El modelo definitivo requiere instrumentos/nodos/reglas versionados, Subsección,
+-- valores contable y fiscal separados, ámbitos y eventos de custodia.
+-- Se retiran defaults genéricos de guarda y destino. No ejecutar sin cotejar
+-- esquema real y preparar la migración. No se ha aplicado a ninguna base de datos.
+-- Referencia 2530 recibida: 2 años de trámite, 8 de concentración y destino
+-- histórico. Debe suministrarse la regla aplicable; no es default institucional.
 -- Fundamentación:
 --   1. Ley General de Archivos (LGA - DOF 15-06-2018)
 --   2. Ley de Archivos del Estado de Veracruz de Ignacio de la Llave
@@ -23,7 +31,7 @@ COMMENT ON SCHEMA "archivos" IS 'Esquema transversal de gestión documental, arc
 -- Cuadro General de Clasificación Archivística (CGCA)
 CREATE TABLE IF NOT EXISTS "archivos"."cgca_catalogo" (
     "cgca_id" SERIAL PRIMARY KEY,
-    "cgca_codigo" VARCHAR(50) NOT NULL UNIQUE,       -- Ej: 'PJEV-DGA-RF-01.01'
+    "cgca_codigo" VARCHAR(50) NOT NULL UNIQUE,       -- Ej. fuente: '2530.3a'; unicidad por versión pendiente de rediseño
     "fondo" VARCHAR(100) NOT NULL DEFAULT 'PODER JUDICIAL DEL ESTADO DE VERACRUZ',
     "subfondo" VARCHAR(100) NULL,
     "seccion" VARCHAR(100) NOT NULL,                 -- Ej: 'RECURSOS FINANCIEROS', 'RECURSOS MATERIALES'
@@ -43,11 +51,11 @@ CREATE TABLE IF NOT EXISTS "archivos"."cadido_catalogo" (
     "cgca_codigo" VARCHAR(50) NOT NULL REFERENCES "archivos"."cgca_catalogo"("cgca_codigo") ON UPDATE CASCADE,
     "valor_administrativo" BOOLEAN NOT NULL DEFAULT FALSE,
     "valor_legal" BOOLEAN NOT NULL DEFAULT FALSE,
-    "valor_fiscal_contable" BOOLEAN NOT NULL DEFAULT TRUE,
+    "valor_fiscal_contable" BOOLEAN NOT NULL,      -- Campo previo: separar contable/fiscal en el rediseño versionado
     "valor_tecnico" BOOLEAN NOT NULL DEFAULT FALSE,
-    "vigencia_tramite_anios" INT NOT NULL DEFAULT 1,        -- Años en Archivo de Trámite
-    "vigencia_concentracion_anios" INT NOT NULL DEFAULT 5,  -- Años en Archivo de Concentración
-    "destino_final" VARCHAR(25) NOT NULL DEFAULT 'BAJA_DOCUMENTAL', -- 'BAJA_DOCUMENTAL' o 'TRANSFERENCIA_HISTORICA'
+    "vigencia_tramite_anios" INT NOT NULL,          -- Regla documentada de la versión aplicable, sin default universal
+    "vigencia_concentracion_anios" INT NOT NULL,    -- Regla documentada de la versión aplicable
+    "destino_final" VARCHAR(25) NOT NULL,           -- Destino documentado; nunca baja predeterminada
     "fundamento_legal" TEXT NOT NULL,                      -- Ej: 'CFF Art. 30, LGCG Art. 44, LGA Art. 14'
     "estatus_registro" SMALLINT NOT NULL DEFAULT 1,
     "usuario_c" VARCHAR(50) NOT NULL,
@@ -72,11 +80,11 @@ CREATE TABLE IF NOT EXISTS "archivos"."documento" (
 
     -- Control Archivístico Institucional (LGA Arts. 11, 13, 14, 46)
     "cgca_codigo" VARCHAR(50) NULL REFERENCES "archivos"."cgca_catalogo"("cgca_codigo") ON UPDATE CASCADE,
-    "valor_documental" VARCHAR(25) NOT NULL DEFAULT 'FISCAL_CONTABLE',
-    "vigencia_tramite_anios" INT NOT NULL DEFAULT 1,
-    "vigencia_concentracion_anios" INT NOT NULL DEFAULT 5,
+    "valor_documental" VARCHAR(25) NOT NULL,        -- Propuesta previa; valores separados en la especificación recalibrada
+    "vigencia_tramite_anios" INT NOT NULL,
+    "vigencia_concentracion_anios" INT NOT NULL,
     "fecha_cierre_tramite" DATE NULL,
-    "destino_final" VARCHAR(25) NOT NULL DEFAULT 'BAJA_DOCUMENTAL',
+    "destino_final" VARCHAR(25) NOT NULL,
     "estado_archivistico" VARCHAR(20) NOT NULL DEFAULT 'TRAMITE', -- 'TRAMITE', 'CONCENTRACION', 'HISTORICO', 'BAJA'
 
     -- Seguridad, Confidencialidad y Transparencia (LGTAIP / IVAI)

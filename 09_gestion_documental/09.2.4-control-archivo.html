@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Primer alcance funcional del Sistema de Control de Archivo del SIAF-PJEV: registro, digitalización, marbetes y ubicación física.">
+  <title>09.2.4 Control de Archivo — SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body{padding:32px 38px 70px} .doc-main-inner{max-width:1120px;margin:auto}.elem-header{display:block}.elem-title{margin-top:8px}.elem-breadcrumb{flex-wrap:wrap}
+    .etiquetas{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.etiqueta{border:1px solid var(--pjev-borde);border-radius:20px;padding:4px 12px;font-size:12px;background:white}.pendiente{background:var(--pjev-warning-bg);color:var(--pjev-warning-text)}
+    .intro{max-width:850px;font-size:16px;margin-top:14px}.barra-enlaces{display:flex;gap:18px;flex-wrap:wrap;margin:18px 0 28px}.barra-enlaces a{font-weight:600;color:var(--pjev-verde-oscuro)}
+    .indice{border:1px solid var(--pjev-borde);border-radius:8px;background:#fff;padding:18px 22px;margin:24px 0}.indice ol{display:grid;grid-template-columns:1fr 1fr;gap:5px 30px;padding-left:20px}.indice a{color:var(--pjev-verde-oscuro);font-size:13px}
+    .modelo{background:#fff;border:1px solid var(--pjev-borde);border-radius:9px;margin:24px 0;overflow:hidden}.modelo figcaption{padding:12px 18px;border-bottom:1px solid var(--pjev-borde);font-weight:700}.diagrama-scroll{overflow-x:auto}.modelo svg{display:block;width:100%;min-width:800px;height:auto}.nota{font-size:12px;color:var(--pjev-texto-muted);padding:0 18px 16px}
+    .diagramas h2{font-size:23px;color:var(--pjev-verde-oscuro);margin:25px 0 12px}.diagramas p{margin:10px 0}.diagramas a{color:var(--pjev-verde-oscuro)}.diagrama-analista{background:#fff;border:1px solid var(--pjev-borde);border-radius:8px;margin:15px 0}.diagrama-analista summary{padding:15px 18px;cursor:pointer;font-weight:700;color:var(--pjev-verde-oscuro)}.diagrama-analista .modelo{border:0;border-radius:0;margin:0}.modelo img{display:block;width:100%;height:auto}.modelo .ciclo{min-width:850px}.modelo .estructura{min-width:1200px}
+    article h2{font-size:23px;color:var(--pjev-verde-oscuro);margin:36px 0 14px;padding-top:12px;border-top:2px solid var(--pjev-borde);scroll-margin-top:20px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:10px 0}article li{margin:7px 0}article code{overflow-wrap:anywhere}article a{color:var(--pjev-verde-oscuro);overflow-wrap:anywhere}
+    .tabla-scroll{overflow-x:auto;margin:18px 0;max-width:100%}.tabla-scroll:focus-visible{outline:3px solid var(--pjev-dorado)}.props-table{min-width:630px;margin:0;font-size:13px}.props-table th,.props-table td{vertical-align:top;white-space:normal}.props-table td{overflow-wrap:anywhere}.props-table th:first-child{min-width:110px}
+    .opcion{border:1px solid var(--pjev-borde);border-radius:7px;background:#fff;margin:12px 0;scroll-margin-top:15px}.opcion summary{cursor:pointer;padding:16px 20px;font-weight:700;color:var(--pjev-verde-oscuro);font-size:16px}.opcion[open] summary{border-bottom:1px solid var(--pjev-borde);background:#f4f7f3}.opcion-body{padding:4px 20px 15px}.opcion-body p:last-child{border-left:3px solid var(--pjev-dorado);padding-left:12px}.expandir{font:inherit;padding:8px 12px;border:1px solid var(--pjev-borde);border-radius:5px;background:white;cursor:pointer;color:var(--pjev-verde-oscuro);margin:10px 0}
+    .demo{border:1px solid var(--pjev-borde);border-radius:9px;background:white;margin:28px 0;padding:22px}.demo h2{color:var(--pjev-verde-oscuro);font-size:21px}.demo p{margin:8px 0}.demo form{display:flex;align-items:end;gap:10px;margin:16px 0}.demo label{display:block;flex:1;font-weight:600}.demo input,.demo select{display:block;width:100%;min-width:0;font:inherit;padding:10px;border:1px solid #7c8f81;border-radius:5px;margin-top:5px;background:white}.demo button{background:var(--pjev-verde-oscuro);color:white;border:0;border-radius:5px;padding:12px 18px;font:inherit;cursor:pointer}.ejemplos{display:flex;flex-wrap:wrap;gap:8px}.ejemplos button{font-size:12px;background:var(--pjev-crema);color:var(--pjev-verde-oscuro);border:1px solid var(--pjev-borde);padding:6px 10px}.resultado{margin-top:18px;padding:16px;background:#f4f7f3;border-left:4px solid var(--pjev-verde-claro);overflow-wrap:anywhere}.resultado h3{font-size:17px}.resultado dl{display:grid;grid-template-columns:160px 1fr;gap:7px 12px;margin:12px 0}.resultado dt{font-weight:700}.resultado dd{margin:0}.resultado ul{padding-left:22px}.demo-nota{color:var(--pjev-texto-muted);font-size:12px}.mensaje{font-weight:600}.ruta{padding:12px 0;color:var(--pjev-verde-oscuro);font-family:var(--font-mono);font-size:12px;overflow-wrap:anywhere}
+    button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--pjev-dorado);outline-offset:3px}footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--pjev-borde);font-size:12px;color:var(--pjev-texto-muted)}
+    @media(max-width:700px){body{padding:20px 16px 50px}.indice ol{grid-template-columns:1fr}.demo{padding:16px}.demo form{flex-direction:column;align-items:stretch}.resultado dl{grid-template-columns:1fr;gap:2px}.resultado dd{margin-bottom:9px}.elem-title{font-size:27px}}
+    @media print{body{padding:0;background:white}.indice,.expandir,.demo form,.ejemplos,.barra-enlaces{display:none}.opcion{break-inside:avoid}.opcion-body{display:block!important}.tabla-scroll{overflow:visible}.props-table{min-width:0;font-size:10px}.modelo svg,.modelo .ciclo,.modelo .estructura{min-width:0}.diagrama-analista{break-before:page}}
+  </style>
+</head>
+<body>
+<main class="doc-main-inner">
+  <nav class="elem-breadcrumb" aria-label="Ruta del manual"><a href="../index.html">Manual Dev</a> › <span>09 · Gestión Documental y Archivo</span> › <span>09.2 · Registro y Operación</span></nav>
+  <header class="elem-header">
+    <div class="elem-id">09.2.4 · Requerimiento de origen 4.1</div>
+    <h1 class="elem-title">Sistema de Control de Archivo</h1>
+    <p class="intro">Piloto en la Dirección General de Administración → Subdirección de Recursos Financieros (2530), con foco en Contabilidad. Clasificación, expedientes, inventarios y ciclo de vida con un modelo general configurable.</p>
+    <div class="etiquetas"><span class="etiqueta">DGA–2530 · Contabilidad</span><span class="etiqueta">CGCA / CADIDO · PADA</span><span class="etiqueta">29 octubre 2026</span><span class="etiqueta pendiente">Diseño recalibrado · Desarrollo pendiente</span></div>
+  </header>
+  <div class="barra-enlaces"><a href="../docs/CONTROL_ARCHIVO_REGISTRO_DIGITALIZACION_PJEV.md">Especificación fuente</a><a href="../docs/RECALIBRACION_ARCHIVISTICA_DGA_PJEV.md">Fuentes y recalibración</a><a href="09.1.1-cgca.html">CGCA</a><a href="09.1.2-cadido.html">CADIDO</a><a href="09.3.2-transferencias-documentales.html">Transferencias</a></div>
+
+  <section class="demo" aria-labelledby="clasificacion-titulo">
+    <h2 id="clasificacion-titulo">Clasificación institucional del piloto</h2>
+    <p class="ruta">CGCA: FOPJ01 → PLENOCJP → DGA2500 → 2530</p>
+    <p>4 series y 12 subseries de referencia. Alcance confirmado: Contabilidad. Otras áreas se incorporarán por configuración y permisos.</p>
+    <p class="demo-nota">Datos transcritos de los instrumentos recibidos, con notas de 2025. La vigencia operativa debe ratificarse. En el CADIDO, el fondo figura como FOPJO1; se conserva la discrepancia.</p>
+    <label for="clasificacion-piloto">Serie o subserie de referencia<select id="clasificacion-piloto"><option value="2530.1">2530.1 · ESTADOS CONTABLES</option><option value="2530.1a">2530.1a · MENSUAL</option><option value="2530.1b">2530.1b · TRIMESTRAL</option><option value="2530.1c">2530.1c · ANUAL</option><option value="2530.2">2530.2 · INFORMACIÓN PRESUPUESTARIA Y PROGRAMÁTICA</option><option value="2530.2a">2530.2a · MENSUAL</option><option value="2530.2b">2530.2b · TRIMESTRAL</option><option value="2530.2c">2530.2c · ANUAL</option><option value="2530.3">2530.3 · POLIZAS</option><option value="2530.3a" selected>2530.3a · INGRESOS</option><option value="2530.3b">2530.3b · TRAMITADA</option><option value="2530.3c">2530.3c · LIQUIDADA</option><option value="2530.3d">2530.3d · TRANSFERENCIAS PRESUPUESTALES</option><option value="2530.3e">2530.3e · TRASPASOS BANCARIOS</option><option value="2530.3f">2530.3f · MANUALES</option><option value="2530.4">2530.4 · CONCILIACIÓN CONTABLE/PRESUPUESTAL</option></select></label>
+    <div id="ficha-clasificacion" class="resultado" role="status" aria-live="polite" aria-atomic="true"></div>
+    <p class="demo-nota">Selector de referencia local. La selección no reclasifica expedientes, no cambia el estado de una póliza ni concede permisos. «Tramitada» y «Liquidada» son nombres de subseries.</p>
+  </section>
+
+    <section class="diagramas" id="diagramas-analista" aria-labelledby="diagramas-titulo">
+    <h2 id="diagramas-titulo">Diagramas de base del analista · Versiones ajustadas</h2>
+    <p>Se conserva la estructura conceptual de las dos vistas recibidas. Los ajustes para DGA–2530–Contabilidad están registrados en la <a href="../docs/VALIDACION_DIAGRAMAS_ARCHIVO_PJEV.md">validación y relación de cambios</a>, con las imágenes originales de contraste.</p>
+    <details class="diagrama-analista" open>
+      <summary>1. CGCA, CADIDO, expedientes y ciclo de vida</summary>
+      <figure class="modelo">
+        <div class="diagrama-scroll" tabindex="0" role="region" aria-label="Diagrama de ciclo archivístico; desplazamiento horizontal en pantallas pequeñas"><img class="ciclo" src="diagramas/01-ciclo-archivistico-2530.svg" alt="CGCA y CADIDO versionados se relacionan con expedientes e inventarios; trámite de 2 años, transferencia primaria, concentración de 8 años y transferencia secundaria hacia Archivo Histórico, según el referente 2530."></div>
+        <figcaption>Plazos de referencia del CADIDO recibido, pp. 36–37. Cómputo y transferencias requieren sus actos de validación. <a href="diagramas/01-ciclo-archivistico-2530.svg">Abrir SVG editable</a>.</figcaption>
+      </figure>
+    </details>
+    <details class="diagrama-analista">
+      <summary>2. Archivo físico, expediente, documentos indexados y metadatos</summary>
+      <figure class="modelo">
+        <div class="diagrama-scroll" tabindex="0" role="region" aria-label="Diagrama de expediente y documentos; desplazamiento horizontal"><img class="estructura" src="diagramas/02-expediente-documentos-metadatos.svg" alt="El mueble, la posición y los contenedores físicos se relacionan con un expediente lógico clasificado. Los documentos indexados conservan metadatos comunes, específicos por tipo y técnicos."></div>
+        <figcaption>Los cinco tipos documentales son ejemplos según procedimiento. Los metadatos se validan por aplicabilidad. <a href="diagramas/02-expediente-documentos-metadatos.svg">Abrir SVG editable</a>.</figcaption>
+      </figure>
+    </details>
+    <p class="nota">En pantallas pequeñas, desliza cada diagrama para recorrerlo. Los SVG son versiones de diseño ajustadas sobre la base del analista.</p>
+  </section>
+
+
+  <section class="demo demo-marbete" aria-labelledby="demo-titulo">
+    <h2 id="demo-titulo">Maqueta de consulta por marbete</h2>
+    <p class="demo-nota">Datos ficticios en esta página, sin conexión a servicios. Permite revisar cómo se mostrarían la ubicación, los tomos y un código anterior.</p>
+    <form id="consulta-marbete"><label for="codigo-marbete">Número de marbete<input id="codigo-marbete" name="marbete" value="PJEV-ARC-000001" maxlength="80" autocomplete="off" spellcheck="false"></label><button type="submit">Consultar ejemplo</button></form>
+    <div class="ejemplos" aria-label="Ejemplos de consulta"><button type="button" data-codigo="PJEV-ARC-000001">Expediente en dos tomos</button><button type="button" data-codigo="ANT-0842">Marbete anterior</button><button type="button" data-codigo="PJEV-CAJ-000020">Caja con contenido</button><button type="button" data-codigo="LEG-0007">Archivo Inicial pendiente</button></div>
+    <div id="resultado-marbete" class="resultado" role="status" aria-live="polite" aria-atomic="true"></div>
+  </section>
+
+  <nav class="indice" aria-label="Contenido de la especificación"><ol><li><a href="#seccion-1">Objetivo y alcance</a></li><li><a href="#seccion-2">Fundamento y naturaleza de las reglas</a></li><li><a href="#seccion-3">Conceptos que deben permanecer separados</a></li><li><a href="#seccion-4">Ocho opciones del módulo</a></li><li><a href="#seccion-5">Datos y estados propuestos</a></li><li><a href="#seccion-6">Contratos técnicos propuestos, todavía sin implementación</a></li><li><a href="#seccion-7">Actores e interfaces</a></li><li><a href="#seccion-8">Criterios de aceptación y construcción incremental</a></li><li><a href="#seccion-9">Fuentes y antecedentes</a></li><li><a href="#seccion-10">Historial</a></li></ol></nav>
+  <button type="button" class="expandir" id="expandir-opciones" aria-expanded="false">Abrir las ocho opciones</button>
+  <article aria-label="Especificación funcional del bloque 4.1"><p><strong>Primer bloque:</strong> Registro de documentos y Digitalización.<br><strong>Manual SIAF-PJEV:</strong> 09.2.4 Control de Archivo.<br><strong>Fecha:</strong> 29 de octubre de 2026.<br><strong>Recalibración institucional:</strong> CGCA/CADIDO denominados 2024, notas de 2025; PADA 2025 y registro XLV del primer trimestre de 2025.<br><strong>Estado:</strong> especificación funcional inicial; pendiente de validación institucional y desarrollo. No acredita implementación en base de datos, servicios o producción.</p>
+<h2 id="seccion-1">1. Objetivo y alcance</h2>
+<p>Generar y administrar el inventario del acervo documental y de los expedientes del Organismo; relacionar cada expediente con sus documentos digitales y sus unidades físicas, y permitir su identificación, localización, consulta y seguimiento durante su ciclo de vida.</p>
+<p>La implantación inicial corresponde a <strong>DGA2500 — Dirección General de Administración → 2530 — Subdirección de Recursos Financieros, con foco en Contabilidad</strong>, equivalencia confirmada por el usuario. La estructura general admite otras unidades, series y versiones mediante configuración; las demás áreas no adquieren permisos por pertenecer a la misma DGA. El ámbito operativo de Contabilidad se distingue de la subsección archivística 2530.</p>
+<p>La meta de digitalización integral se medirá contra un inventario validado. Un expediente registrado puede estar pendiente de digitalizar o localizar; no se declarará completo por tener un archivo PDF. La incorporación de expedientes jurisdiccionales requerirá identificar sus procedimientos y permisos específicos. El sistema comprende el ciclo de vida documental, incluidos inventarios, transferencias, préstamos, conservación y seguimiento, además de la digitalización.</p>
+<p>La <a href="../docs/RECALIBRACION_ARCHIVISTICA_DGA_PJEV.md">recalibración institucional</a> detalla el contraste de los cinco archivos recibidos. La cotización del Congreso de 2018 queda como antecedente histórico; el CGCA, CADIDO y PADA del PJEV pasan a orientar el diseño institucional.</p>
+<p>Se conserva «4.1» como referencia del requerimiento recibido. En la navegación del manual se incorpora como <strong>09.2.4</strong>, dentro de Gestión Documental y Archivo, para mantener la numeración existente. Las ocho opciones se identifican como CA-01 a CA-08; no son ocho subsistemas nuevos.</p>
+<h2 id="seccion-2">2. Fundamento y naturaleza de las reglas</h2>
+<div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de especificación"><table class="props-table">
+<thead>
+<tr>
+<th>Naturaleza</th>
+<th>Fuente y contraste</th>
+<th>Consecuencia para el diseño</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Requisito normativo</td>
+<td>Ley General de Archivos, arts. 11 y 13, 43 a 47: organización, instrumentos de control y gestión electrónica con integridad y trazabilidad. Texto consultado con reforma DOF 14-11-2025.</td>
+<td>Relacionar documentos con su expediente y clasificación; registrar cambios. La digitalización no habilita por sí sola la destrucción de originales.</td>
+</tr>
+<tr>
+<td>Requisito normativo</td>
+<td>LGCG, arts. 42 y 43; texto consultado con reforma DOF 14-05-2026.</td>
+<td>Conservar el soporte original justificativo y comprobatorio de los registros y facilitar su consulta autorizada.</td>
+</tr>
+<tr>
+<td>Requisito normativo</td>
+<td>Disposiciones Generales para el Archivo Contable Gubernamental, CONAC, apartados IV a VI; obligatorias desde 01-01-2024.</td>
+<td>Parametrizar conservación y excepciones: regla general de seis años, contados desde el año siguiente al cierre del ejercicio; soportes patrimoniales hasta la baja del bien; asuntos pendientes y CxC/CxP sujetos a sus reglas particulares. El vencimiento no ejecuta una baja automática.</td>
+</tr>
+<tr>
+<td>Regla institucional documentada</td>
+<td>CGCA recibido, pp. 31–32; CADIDO recibido, pp. 36–37.</td>
+<td>Referencia 2530: cuatro series y doce subseries, con 2 años en trámite, 8 en concentración y marca de destino Archivo Histórico. No configurar baja por vencimiento para estas entradas.</td>
+</tr>
+<tr>
+<td>Planeación institucional documentada</td>
+<td>PADA 2025, pp. 12–20.</td>
+<td>Inventarios, responsables, transferencias, consulta/préstamos, capacitación, espacios, riesgos y seguimiento de actividades. El programa del ejercicio 2025 no acredita su ejecución ni se convierte en calendario de 2026.</td>
+</tr>
+<tr>
+<td>Evidencia de publicación</td>
+<td>XLV_c.xls, Informacion, filas 7–14.</td>
+<td>Enlaces a instrumentos y corte 01-01-2025 a 31-03-2025. No genera expedientes ni inventario de volumen documental.</td>
+</tr>
+<tr>
+<td>Requerimiento funcional recibido</td>
+<td>Ocho opciones del bloque 4.1 proporcionado por el usuario.</td>
+<td>Base del alcance funcional; por sí solo no acredita un procedimiento institucional autorizado.</td>
+</tr>
+<tr>
+<td>Propuesta tecnológica</td>
+<td>Identificador estable, marbetes con código de barras, sugerencia de ubicación, SHA-256, OCR, estados separados y control de concurrencia.</td>
+<td>Decisiones de diseño sujetas a implementación y validación; no son tecnologías impuestas por la LGA.</td>
+</tr>
+</tbody></table></div>
+<p><strong>Validaciones institucionales pendientes para puesta en operación:</strong> acto de aprobación y vigencia de los instrumentos recibidos, equivalencias con su actualización funcional, discrepancia de fondo <code>FOPJ01</code>/<code>FOPJO1</code>, eventos de inicio de cómputo, autoridad y evidencias para transferencia/disposición, política de acceso y formatos de inventario/marbetes. Las fuentes ya están identificadas y contrastadas; la validación de vigencia no se presume por su descarga en 2026. La nota final del CGCA está fechada 09-03-2025 y la del CADIDO 09-04-2025; ambas informan transición hacia clasificación funcional.</p>
+<p>NOM-151, firma electrónica, formatos de preservación y certificaciones se evaluarán según el acto y soporte aplicables. Escaneo, OCR y hash de integridad no equivalen a certificación ni otorgan por sí solos valor de original.</p>
+<h3>Jerarquía y clasificación inicial</h3>
+<p>El CGCA publica <code>FOPJ01 → PLENOCJP → DGA2500 → 2530</code>. El CADIDO escribe el fondo como <code>FOPJO1</code>: se conservan ambas grafías como incidencia documental, sin fusionarlas automáticamente. La <a href="../docs/datos_archivisticos_dga_2530_2024.json">referencia estructurada</a> mantiene los literales, páginas y huellas de las fuentes.</p>
+<div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de especificación"><table class="props-table">
+<thead>
+<tr>
+<th>Serie</th>
+<th>Denominación</th>
+<th>Subseries</th>
+<th>Trámite / concentración</th>
+<th>Destino en CADIDO</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2530.1</td>
+<td>Estados contables</td>
+<td>a Mensual; b Trimestral; c Anual.</td>
+<td>2 / 8 años</td>
+<td>Archivo Histórico</td>
+</tr>
+<tr>
+<td>2530.2</td>
+<td>Información presupuestaria y programática</td>
+<td>a Mensual; b Trimestral; c Anual.</td>
+<td>2 / 8 años</td>
+<td>Archivo Histórico</td>
+</tr>
+<tr>
+<td>2530.3</td>
+<td>Pólizas</td>
+<td>a Ingresos; b Tramitada; c Liquidada; d Transferencias presupuestales; e Traspasos bancarios; f Manuales.</td>
+<td>2 / 8 años</td>
+<td>Archivo Histórico</td>
+</tr>
+<tr>
+<td>2530.4</td>
+<td>Conciliación contable/presupuestal</td>
+<td>Sin subserie publicada en el bloque.</td>
+<td>2 / 8 años</td>
+<td>Archivo Histórico</td>
+</tr>
+</tbody></table></div>
+<p>Las denominaciones Tramitada/Liquidada son subseries del instrumento, independientes del estado financiero de un trámite. La correspondencia con tipos de póliza del sistema se validará expresamente. Los dos CADIDO recibidos son idénticos por SHA-256 y representan una sola versión lógica.</p>
+<p>Los plazos 2/8 son fases de referencia, no una fecha de destrucción a diez años. Se requieren cierre formal, evento de cómputo y procedimiento de transferencia; las marcas de Información Pública/Reservada del CADIDO tampoco conceden permisos automáticamente.</p>
+<h3>Antecedente histórico subordinado</h3>
+<p>Se revisó la cotización de Velasco Asesores para digitalizar el archivo contable de la LXIV Legislatura del Congreso del Estado de Veracruz, <strong>fechada el 15 de agosto de 2018</strong>, aunque está guardada en una carpeta denominada «Cotizaciones 2019». Su alcance comercial abarca pólizas de noviembre de 2016 a agosto de 2018. Se incorpora como <strong>antecedente funcional de otra institución</strong>, sin atribuirle valor normativo ni aprobación institucional del PJEV. El <a href="../docs/REFERENCIA_ARCHIVO_DIGITAL_CONGRESO_2018.md">contraste del antecedente</a> conserva procedencia, observaciones y datos económicos históricos.</p>
+<p>Sus ideas de preparación física, consulta, enlace financiero y capacitación se conservan cuando son compatibles con los instrumentos del PJEV. La clasificación por recopilador o código de póliza del Congreso no rige el piloto.</p>
+<h2 id="seccion-3">3. Conceptos que deben permanecer separados</h2>
+<div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de especificación"><table class="props-table">
+<thead>
+<tr>
+<th>Concepto</th>
+<th>Identidad y relación</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Expediente</td>
+<td>Unidad lógica de un asunto. Identificador interno estable, folio institucional, unidad productora, ámbito operativo, nodo y versión de clasificación y regla de disposición. Puede abarcar varias carpetas o tomos.</td>
+</tr>
+<tr>
+<td>Documento</td>
+<td>Pieza documental vinculada al expediente. Tipo, fecha, emisor, soporte, orden documental y versiones. Un PDF de varias páginas no implica varios documentos.</td>
+</tr>
+<tr>
+<td>Archivo digital</td>
+<td>Binario de una versión documental, con ruta privada, tamaño, MIME y hash; puede ser original electrónico, digitalización o derivado de consulta.</td>
+</tr>
+<tr>
+<td>Carpeta, tomo y caja</td>
+<td>Unidades físicas con identidad propia. Una caja puede contener unidades de varios expedientes. No se modifica el expediente al cambiar de caja.</td>
+</tr>
+<tr>
+<td>Marbete</td>
+<td>Identificador visible de un expediente o unidad física; el tipo de objeto debe ser explícito. Mantiene historial y equivalencias anteriores.</td>
+</tr>
+<tr>
+<td>Ubicación</td>
+<td>Archivo, depósito, zona, archivero/anaquel, nivel y posición. Es distinta del identificador y puede cambiar.</td>
+</tr>
+<tr>
+<td>Instrumento y versión</td>
+<td>CGCA/CADIDO/PADA/Guía u otro instrumento, fuente, periodo, fecha, acto y validación. Un expediente conserva la versión aplicada aunque exista otra posterior.</td>
+</tr>
+<tr>
+<td>Préstamo / transferencia</td>
+<td>Eventos con solicitud, autorización y recepción. La salida en préstamo muestra custodio temporal; una transferencia cambia custodia y fase sólo al confirmarse, conservando productor e inventario.</td>
+</tr>
+</tbody></table></div>
+<p>Un marbete de expediente que abarque varias unidades físicas devolverá todas sus localizaciones. Un marbete de caja permitirá consultar su contenido según permisos. La unidad física raíz ocupa capacidad; sus unidades contenidas heredan ubicación efectiva para evitar contar el mismo espacio dos veces. La ocupación física no se calcula con el tamaño de los archivos digitales.</p>
+<h3>Diagramas de base del analista</h3>
+<p>Se incorporan dos vistas complementarias estudiadas por el analista: ciclo archivístico y relación entre soporte físico, expediente, documentos y metadatos. Se conserva su estructura conceptual; la <a href="../docs/VALIDACION_DIAGRAMAS_ARCHIVO_PJEV.md">validación y relación de ajustes</a> identifica cada cambio y conserva las imágenes recibidas.</p>
+<p>La primera vista se particulariza para 2530 con 2/8 años de referencia y destino histórico. La segunda distingue muebles, posiciones y contenedores del expediente lógico, mantiene los cinco tipos documentales como ejemplos y separa metadatos comunes, específicos y técnicos. UUID fiscal y timbrado sólo aplican a los tipos que los contienen; los soportes de proveedor, empleados u obra se exigen según el procedimiento, conservando sus áreas productoras.</p>
+<h2 id="seccion-4">4. Ocho opciones del módulo</h2>
+<details class="opcion" id="ca-01" open><summary>CA-01. Enlace Digital de Documentos</summary><div class="opcion-body">
+<p><strong>Finalidad:</strong> escanear o incorporar documentos, etiquetarlos, ordenarlos y vincularlos con el expediente correcto.</p>
+<ul>
+<li>Entrada: expediente existente o alta previa; tipo documental, fecha, soporte, orden, folios físicos cuando existan y archivo o lote de digitalización.</li>
+<li>Para lotes físicos: registrar entrega, periodo/área, contenedores, inventario de hojas/documentos y condición de recepción. Preparar y ordenar antes del escaneo, dejando constancia de incidencias. El retiro de grapas o el desmontaje de carpetas se realiza conforme al tratamiento autorizado; después se rearma y devuelve el acervo con acuse.</li>
+<li>Flujo: identificar expediente → capturar metadatos → escanear/importar → revisar orientación, legibilidad, integridad y orden → subsanar incidencias → validar e incorporar.</li>
+<li>El índice documental se define por serie y procedimiento; una plantilla puede marcar tipos esperados, secuencia y excepciones justificadas. No se impone un orden universal a todas las series.</li>
+<li>En el piloto, elegir serie/subserie 2530 y versión desde el expediente. El estado de digitalización es independiente de subseries «Tramitada» y «Liquidada». Una carpeta física o un código financiero no reemplaza la clasificación archivística.</li>
+<li>Conservar por separado orden documental, folio físico y número de página digital. Los anexos no renumeran silenciosamente folios ya asentados.</li>
+<li>El escaneo directo requiere integrar un dispositivo o agente compatible; el navegador por sí solo no garantiza control del escáner. La importación de PDF/imágenes es una ruta alternativa.</li>
+<li>Validar tipo y tamaño reales, permisos y contenido malicioso antes de incorporar. Calcular hash en servidor; un duplicado genera advertencia contextual, sin eliminar documentos de otros expedientes.</li>
+<li>OCR opcional como índice de búsqueda sujeto a los mismos permisos; no sustituye el original ni corrige automáticamente metadatos. Rotaciones, OCR y PDF de consulta son derivados con procedencia identificable.</li>
+<li>Salida: documento/versiones incorporadas, índice actualizado, resultado de calidad, responsable y bitácora. Un reescaneo crea versión y conserva la anterior.</li>
+<li>La entrega del lote incluirá manifiesto de documentos/versiones, conteos conciliados, incidencias aceptadas o pendientes, validación de consulta por el área receptora y devolución del soporte físico. Se propone capacitación y guía de operación para que el personal institucional continúe con el acervo posterior.</li>
+</ul>
+<p><strong>Aceptación:</strong> un lote incompleto o rechazado no marca el expediente como digitalizado validado; reintentar el lote no duplica documentos.</p>
+</div></details><details class="opcion" id="ca-02"><summary>CA-02. Impresión de Marbetes</summary><div class="opcion-body">
+<p><strong>Finalidad:</strong> identificar expedientes, carpetas, tomos y cajas mediante número legible y código de barras.</p>
+<ul>
+<li>Seleccionar tipo de unidad, cantidad y plantilla de impresión; generar un número único por institución, sin reutilizar números cancelados.</li>
+<li>Imprimir identificador, tipo de unidad, área o serie cuando proceda y número de tomo/caja. Evitar datos personales o asuntos sensibles en la etiqueta visible.</li>
+<li>Propuesta: Code 128 para lectores láser compatibles; validar simbología, impresora y tamaño físico con el equipo real. La maqueta gráfica del manual no es una etiqueta lista para lectura.</li>
+<li>Registrar emisión y reimpresión con usuario, fecha, motivo y plantilla. Reimprimir conserva el número; reemplazarlo crea una equivalencia auditable.</li>
+</ul>
+<p><strong>Aceptación:</strong> el número escrito y el leído llevan al mismo objeto. Un marbete antiguo informa su sustitución sin crear otro expediente.</p>
+</div></details><details class="opcion" id="ca-03"><summary>CA-03. Ubicación Física de los Documentos</summary><div class="opcion-body">
+<p><strong>Finalidad:</strong> asignar o sugerir un espacio físico disponible para una unidad de archivo.</p>
+<ul>
+<li>Mantener catálogo de ubicaciones, condiciones de uso, capacidad total, ocupada y reservada, unidad de medida y restricciones de conservación/acceso.</li>
+<li>Distinguir archivo de trámite, concentración e histórico de depósito/anaquel/posición. Trasladar una caja dentro del mismo depósito es reubicación; una transferencia archivística exige inventario y recepción, no se acredita cambiando sólo su posición.</li>
+<li>Filtrar espacios activos, compatibles, autorizados y con capacidad suficiente. Ordenar candidatos por continuidad de la serie/área, cercanía y menor espacio remanente compatible, según parámetros institucionales.</li>
+<li>La sugerencia requiere confirmación del custodio. La asignación manual pasa por las mismas validaciones y registra motivo.</li>
+<li>En una transacción: bloquear/revalidar capacidad, reservar destino y registrar movimiento. Confirmada la colocación física, actualizar ubicación vigente y liberar origen. Cancelar una reserva libera destino sin alterar origen.</li>
+<li>Si no hay espacio compatible, mostrar «Sin ubicación disponible». No sobreasignar ni inventar una ubicación.</li>
+<li>La propuesta admite capacidad en posiciones de caja o centímetros lineales, pero una asignación compara cantidades de la misma unidad y perfil. No mezclar unidades ni omitir dimensiones/peso cuando restrinjan el espacio.</li>
+</ul>
+<p><strong>Aceptación:</strong> dos usuarios compitiendo por el último espacio no pueden confirmar dos ocupaciones; antes de confirmar la colocación se distingue ubicación actual de destino reservado.</p>
+</div></details><details class="opcion" id="ca-04"><summary>CA-04. Ubicación Física de los Documentos Anteriores</summary><div class="opcion-body">
+<p><strong>Finalidad:</strong> aplicar el mismo control a acervo capturado mediante Registro de Archivo Inicial.</p>
+<ul>
+<li>Dependencia explícita: Registro de Archivo Inicial, mencionado en el requerimiento pero aún no definido como módulo completo. Se prepara su contrato de entrada sin inventar sus reglas.</li>
+<li>Capturar procedencia, lote, área, folio y marbete anterior, descripción, fechas disponibles, contenedor y ubicación declarada; separar datos declarados de datos verificados.</li>
+<li>Detectar posibles duplicados; conservar identificadores históricos y correspondencias. Una colisión de marbetes históricos queda en conciliación y requiere contexto; nunca se resuelve escogiendo un expediente arbitrario.</li>
+<li>Para archivo contable anterior, conservar recopilador de origen y referencia financiera. La vista «recopilador → tipo de póliza → documento» es una agrupación de consulta; no sustituye el expediente, el CGCA ni la jerarquía de ubicaciones. Los códigos históricos se homologan con el catálogo real antes de vincularlos a pólizas actuales.</li>
+<li>Aplicar CA-03 después de verificar físicamente. El acervo sin corroborar se marca «Ubicación no verificada»; tampoco se presume digitalizado ni se fabrican fechas o folios faltantes.</li>
+<li>Conservar la clasificación y versión históricas y proponer equivalencia con las actuales. No aplicar retrospectivamente una regla de conservación ni una fecha de cierre inventadas.</li>
+</ul>
+<p><strong>Aceptación:</strong> consultar un marbete histórico conciliado encuentra el expediente actual y su procedencia. Reimportar un mismo lote no genera duplicados.</p>
+</div></details><details class="opcion" id="ca-05"><summary>CA-05. Registro de Anexos</summary><div class="opcion-body">
+<p><strong>Finalidad:</strong> incorporar nuevas piezas a un expediente, carpeta o caja ya archivados, preservando su contexto.</p>
+<ul>
+<li>Identificar destino por marbete, resolver expediente y unidad física; una caja con varios expedientes requiere seleccionar el expediente receptor.</li>
+<li>Registrar folio de anexo, fecha documental y de incorporación, remitente, motivo, tipo, número de hojas, orden, soporte y vínculo con el documento al que complementa, si procede.</li>
+<li>Asociar archivos, validar calidad y emitir constancia de incorporación. Conservar el índice previo; toda corrección queda versionada.</li>
+<li>Un expediente cerrado requiere autorización de adición o reapertura conforme a su procedimiento; no se abre automáticamente. Recalcular capacidad si el anexo aumenta el volumen físico.</li>
+<li>Conservar el cómputo anterior y el efecto autorizado del anexo. No reiniciar plazos de guarda por una nueva carga o reescaneo.</li>
+</ul>
+<p><strong>Aceptación:</strong> el anexo aparece en el índice y la bitácora sin sobrescribir documentos ni perder el orden previamente validado.</p>
+</div></details><details class="opcion" id="ca-06"><summary>CA-06. Buscar Documentos en Archivo</summary><div class="opcion-body">
+<p><strong>Finalidad:</strong> localizar por marbete vigente o anterior, captura manual o lector de código de barras.</p>
+<ul>
+<li>Mostrar tipo de objeto, folio, área, disponibilidad, unidades contenidas, ubicación actual verificada y calidad de digitalización, según autorización.</li>
+<li>Un documento hereda la ubicación de su unidad física; un expediente puede devolver varias ubicaciones. Marbetes históricos ambiguos requieren contexto de procedencia.</li>
+<li>Filtros complementarios propuestos: asunto, serie, fechas, tipo documental y contenido OCR autorizado.</li>
+<li>Para Contabilidad: serie/subserie 2530, versión, periodo del expediente, unidad productora, fase de archivo, disponibilidad y préstamo vigente. Un expediente prestado informa ubicación habitual y custodio temporal a usuarios autorizados.</li>
+<li>Para soporte contable, consultar también por institución/sistema de origen, ejercicio, tipo y número de póliza, más periodo cuando sea necesario para distinguir registros. Conservar vínculo al ID persistente de la póliza confirmada y resolver datos en su sistema de origen. Si el folio es ambiguo, mostrar candidatos autorizados y conciliar; si la póliza histórica aún no está en SIAF, permitir registro documental con vínculo pendiente, sin crear una póliza ficticia.</li>
+<li>Consultar o leer un código nunca mueve, presta ni elimina una unidad. No se revelan ubicación o metadatos de expedientes fuera del permiso del usuario.</li>
+</ul>
+<p><strong>Aceptación:</strong> una búsqueda autorizada distingue «pendiente de localizar», «no verificada» y «ubicada». El buscador y el OCR respetan el mismo alcance de acceso que el visor.</p>
+</div></details><details class="opcion" id="ca-07"><summary>CA-07. Eliminar Documentos del Archivo</summary><div class="opcion-body">
+<p><strong>Finalidad:</strong> atender el requerimiento mediante rutas controladas, distinguiendo errores de captura y disposición documental.</p>
+<ul>
+<li><strong>Corrección de captura:</strong> cancelación lógica justificada de registros erróneos, conservando identificación, evidencia y auditoría; no equivale a baja documental ni destruye soportes. Una desvinculación errónea conserva el documento y sus demás relaciones.</li>
+<li><strong>Baja documental:</strong> solicitud a 09.3.3 con inventario, valoración, revisión de conservación e impedimentos, dictamen y autorización competente. Este módulo registra y consulta la solicitud; no ejecuta una eliminación inmediata por marbete.</li>
+<li>La clasificación de acceso, litigios, auditorías, observaciones, obligaciones pendientes y vínculo patrimonial se verifican antes de promover la baja, conforme a las disposiciones aplicables. No bastan fecha vencida, escaneo completo ni un rol administrador.</li>
+<li>Las 16 entradas de referencia 2530 señalan destino Archivo Histórico y bloquean la baja ordinaria por vencimiento. Corresponde evaluar transferencia secundaria conforme al procedimiento aplicable, sin ejecutar traslado o disposición de forma automática.</li>
+<li>Conservar prueba del resultado y trazabilidad. Una baja autorizada tampoco se interpreta como autorización técnica indiscriminada para borrar copias o respaldos.</li>
+</ul>
+<p><strong>Aceptación:</strong> escanear un marbete no habilita un borrado directo; cancelar una captura no altera el estado archivístico ni una póliza o trámite asociado.</p>
+</div></details><details class="opcion" id="ca-08"><summary>CA-08. Cambio de Marbetes</summary><div class="opcion-body">
+<p><strong>Finalidad:</strong> conservar la opción solicitada, separando las dos operaciones que su descripción mezcla.</p>
+<ul>
+<li><strong>Reubicar:</strong> mantener identificador y marbete, aplicar CA-03 y registrar origen, destino, motivo y confirmación de custodia. Si la etiqueta contiene ubicación, reimprimirla con el mismo identificador.</li>
+<li><strong>Sustituir marbete:</strong> emitir nuevo código por deterioro o corrección autorizada, conservar el anterior como alias y registrar causa, responsable y fecha. No cambia ubicación por sí solo.</li>
+<li>Si ambas acciones son necesarias, registrar eventos separados relacionados. Mover una caja actualiza la ubicación efectiva de su contenido, conserva la trazabilidad de sus integrantes y no duplica ocupación.</li>
+</ul>
+<p><strong>Aceptación:</strong> tras una reubicación funciona el mismo marbete; tras una sustitución ambos números resuelven la misma identidad e informan cuál está vigente.</p>
+</div></details><h2 id="seccion-5">5. Datos y estados propuestos</h2>
+<p>Reutilizar el diseño existente <code>archivos.documento</code>, <code>documento_version</code>, <code>documento_relacion</code>, <code>documento_bitacora</code>, <code>cgca_catalogo</code> y <code>cadido_catalogo</code>, previa revisión de su implementación real. Los SQL del manual son antecedentes de diseño y no prueban que existan en producción.</p>
+<p>El modelo debe incorporar nodos e instrumentos versionados. La referencia nueva no puede cargarse en una estructura que sólo admita clave global única, omita Subsección o mezcle valores contable/fiscal. Se conservan reglas por serie/subserie y versión, nunca valores universales de 1/5 años o destino de baja.</p>
+<div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de especificación"><table class="props-table">
+<thead>
+<tr>
+<th>Entidad propuesta</th>
+<th>Datos y restricciones mínimas</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>expediente</td>
+<td>UUID, folio único institucional, asunto, área, serie y versión de instrumentos, fechas de apertura/cierre, acceso, procedencia y estados separados.</td>
+</tr>
+<tr>
+<td>expediente_documento</td>
+<td>Expediente, documento y versión, orden documental único por expediente, folio físico si existe y motivo de incorporación.</td>
+</tr>
+<tr>
+<td>unidad_fisica</td>
+<td>UUID, tipo CAJA/CARPETA/TOMO, padre físico permitido, expediente cuando corresponda, dimensiones/ocupación; sin ciclos. Caja puede contener carpetas/tomos de diferentes expedientes.</td>
+</tr>
+<tr>
+<td>documento_unidad_fisica</td>
+<td>Documento y unidad física contenedora; controlar cambios y ausencia de soporte físico para documentos nacidos electrónicos.</td>
+</tr>
+<tr>
+<td>marbete / marbete_alias</td>
+<td>Número institucional no reutilizable, objeto expediente o unidad física (una sola referencia), vigencia, historial y procedencia de códigos anteriores. Alias histórico ambiguo exige contexto.</td>
+</tr>
+<tr>
+<td>ubicacion_fisica</td>
+<td>Jerarquía, responsable, capacidad total/ocupada/reservada, unidad de medida, perfil físico y restricciones.</td>
+</tr>
+<tr>
+<td>movimiento_ubicacion</td>
+<td>Unidad raíz, origen, destino reservado, estado, motivo, solicitante, confirmante y fechas. Un solo movimiento abierto por unidad; historial de contención.</td>
+</tr>
+<tr>
+<td>lote_digitalizacion / control_calidad</td>
+<td>Identificador de reintento, periodo, área, contenedores, recepción/preparación/devolución, hojas físicas, imágenes esperadas/generadas/aceptadas, documentos y expedientes; operador, revisor, incidencias, manifiesto y aceptación de entrega. No equiparar hojas con imágenes ni inventar cantidades esperadas.</td>
+</tr>
+<tr>
+<td>anexo / lote_archivo_inicial</td>
+<td>Procedencia, fecha de incorporación, objetos afectados, evidencia, conciliación y autorización cuando aplique.</td>
+</tr>
+<tr>
+<td>referencia_financiera_documental</td>
+<td>Documento, sistema e institución de origen, ejercicio, tipo y número de póliza, periodo si distingue registros, ID de origen confirmado, estado de conciliación y recopilador histórico. Reutilizar documento_relacion para el vínculo validado; esta referencia no crea una segunda póliza.</td>
+</tr>
+<tr>
+<td>instrumento / instrumento_version / nodo_clasificacion</td>
+<td>Tipo de instrumento, fuente y hash, fechas, estado de validación, nodo padre, nivel, código fuente y literal; claves únicas dentro de versión, sin reescribir versiones aplicadas.</td>
+</tr>
+<tr>
+<td>regla_disposicion / equivalencia</td>
+<td>Nodo y versión, valores administrativo/legal/contable/fiscal separados, marcas originales de información, plazos por fase, destino, disparador y resolución de equivalencia con fuente/responsable.</td>
+</tr>
+<tr>
+<td>ambito_operativo / responsable_archivo</td>
+<td>Institución, unidad orgánica, subsección archivística relacionada, proceso, series habilitadas y perfiles por vigencia. Contabilidad no recibe todos los permisos de 2530 por defecto.</td>
+</tr>
+<tr>
+<td>inventario / transferencia / prestamo</td>
+<td>Finalidad, expedientes y unidades, origen/destino, solicitante, autorizaciones, recepción, fechas, custodia temporal y devolución; eventos distintos de marbetes.</td>
+</tr>
+<tr>
+<td>programa_archivistico / actividad / riesgo</td>
+<td>Ejercicio, responsable, calendario programado, evidencia ejecutada, avance verificable e incidencias de conservación/espacio. El PADA 2025 se conserva como programa fuente.</td>
+</tr>
+</tbody></table></div>
+<p>Todas las entidades de mantenimiento contemplarán <code>estatus_registro</code>, <code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code>. Eventos históricos se agregan sin sobrescribir su contenido; el usuario se obtiene de la sesión autenticada. El registro lógico no sustituye los estados de negocio.</p>
+<div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de especificación"><table class="props-table">
+<thead>
+<tr>
+<th>Dimensión</th>
+<th>Estados propuestos</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Trámite del expediente</td>
+<td>ABIERTO, CERRADO; reapertura como evento autorizado.</td>
+</tr>
+<tr>
+<td>Ciclo archivístico</td>
+<td>TRAMITE, CONCENTRACION, HISTORICO, BAJA_EJECUTADA cuando proceda legalmente; autorización y ejecución son eventos distintos. El referente 2530 tiene destino histórico.</td>
+</tr>
+<tr>
+<td>Digitalización</td>
+<td>PENDIENTE, EN_PROCESO, EN_REVISION, OBSERVADA, VALIDADA; completitud sustentada por inventario.</td>
+</tr>
+<tr>
+<td>Localización física</td>
+<td>PENDIENTE, DECLARADA_NO_VERIFICADA, UBICADA_VERIFICADA, NO_APLICA para soporte exclusivamente electrónico.</td>
+</tr>
+<tr>
+<td>Movimiento físico</td>
+<td>RESERVADO, CONFIRMADO, CANCELADO. El destino reservado nunca suplanta la ubicación actual.</td>
+</tr>
+<tr>
+<td>Vinculación financiera</td>
+<td>PENDIENTE, PROPUESTA, VALIDADA, RECHAZADA; independiente de la calidad del escaneo. La confirmación exige identificar una póliza del sistema de origen de forma inequívoca.</td>
+</tr>
+<tr>
+<td>Transferencia</td>
+<td>PROPUESTA, EN_REVISION, AUTORIZADA, ENTREGADA, RECIBIDA, RECHAZADA/CANCELADA, según procedimiento aprobado. La autorización no prueba recepción.</td>
+</tr>
+<tr>
+<td>Préstamo</td>
+<td>SOLICITADO, AUTORIZADO, ENTREGADO, DEVUELTO, CANCELADO; vencimiento e incidencias se registran sin cambiar fase archivística.</td>
+</tr>
+</tbody></table></div>
+<p>El vencimiento se muestra pendiente mientras falte cierre formal, disparador de cómputo o validación aplicable. Las fechas de escaneo y carga no sustituyen esos datos.</p>
+<p>Estos nombres son propuesta inicial: deberán mapearse a los catálogos definitivos sin cambiar silenciosamente el diseño anterior.</p>
+<h2 id="seccion-6">6. Contratos técnicos propuestos, todavía sin implementación</h2>
+<p>Los contratos se sitúan después del modelo de datos, conforme al orden del manual. Antes de crear migraciones se cotejará el esquema real y se resolverán las autoridades y los catálogos pendientes.</p>
+<p><strong>PostgreSQL:</strong> familias <code>archivos.fn_leer_expediente</code> / <code>fn_crud_expediente</code>, <code>fn_leer_marbete</code> / <code>fn_crud_marbete</code> y <code>fn_leer_movimiento_ubicacion</code> / <code>fn_crud_movimiento_ubicacion</code>. Retorno estándar <code>{ &quot;error&quot;: 0, &quot;mensaje&quot;: &quot;OK&quot;, &quot;data&quot;: {} }</code>; <code>-1</code> validación de negocio y <code>-2</code> error técnico. Las firmas exactas se definirán al cotejar el esquema. Funciones de escritura con autorización, transacción, auditoría e idempotencia; <code>SECURITY DEFINER</code> con <code>search_path</code> fijo, privilegios mínimos y actor de un contexto de sesión confiable.</p>
+<p><strong>REST / NestJS:</strong> autenticación y alcance de expediente en cada endpoint; roles propuestos de captura, digitalización, revisión, custodia y consulta. Auditoría de bajas según autoridad institucional, sin asumir que TI o un administrador puede autorizarlas.</p>
+<div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de especificación"><table class="props-table">
+<thead>
+<tr>
+<th>Método</th>
+<th>Ruta propuesta</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET / POST</td>
+<td><code>/api/v1/archivo-control/expedientes</code></td>
+<td>Consulta paginada / registro previo del expediente.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/expedientes/:id/lotes-digitalizacion</code></td>
+<td>Inicia lote; carga e integridad se apoyan en el servicio transversal de archivos.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/lotes-digitalizacion/:id/revision</code></td>
+<td>Acepta u observa calidad, sin sustituir versiones anteriores.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/marbetes/emisiones</code></td>
+<td>Emite o reimprime, diferenciando ambas acciones.</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/archivo-control/marbetes/:codigo</code></td>
+<td>Resuelve objeto, equivalencias y ubicación autorizada; procedencia si es ambigua.</td>
+</tr>
+<tr>
+<td>GET / POST</td>
+<td><code>/api/v1/archivo-control/unidades/:id/ubicaciones-sugeridas</code> / <code>.../movimientos</code></td>
+<td>Consulta candidatos / reserva destino con revalidación de capacidad.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/movimientos/:id/confirmacion</code></td>
+<td>Confirma colocación y libera origen de forma atómica.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/movimientos/:id/cancelacion</code></td>
+<td>Cancela reserva; conserva origen e historial.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/lotes-archivo-inicial</code></td>
+<td>Importa acervo y conserva procedencia; reintentos idempotentes.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/expedientes/:id/anexos</code></td>
+<td>Incorpora pieza con controles de cierre, índice y capacidad.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/documentos/:id/cancelacion-captura</code></td>
+<td>Cancelación lógica justificada y auditada.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/expedientes/:id/solicitudes-baja</code></td>
+<td>Remite al procedimiento 09.3.3; no ejecuta destrucción.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v1/archivo-control/marbetes/:id/sustitucion</code></td>
+<td>Nuevo número y alias del anterior; mantiene identidad y ubicación.</td>
+</tr>
+</tbody></table></div>
+<p>Ninguna ruta anterior se declara disponible. La integración documental reutilizará el servicio transversal; no debe crearse un segundo repositorio de binarios por módulo.</p>
+<p>La recalibración añade contratos de lectura de instrumentos/versiones/nodos por ámbito y de solicitud/recepción de transferencias y préstamos/devoluciones. Requieren validación de alcance en servidor, idempotencia e inventarios trazables; las firmas se detallan en la etapa de implementación. El selector de la maqueta consulta la referencia embebida y no llama a un backend.</p>
+<h2 id="seccion-7">7. Actores e interfaces</h2>
+<p>El área productora identifica el asunto y aporta documentación; captura registra; digitalización procesa; revisión valida calidad; custodia confirma ubicación; consulta accede según permisos. La aprobación de disposición documental se identifica mediante su fundamento institucional antes de habilitarla. La segregación entre captura, revisión y autorización se propone para validación.</p>
+<div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de especificación"><table class="props-table">
+<thead>
+<tr>
+<th>Interfaz</th>
+<th>Evidencias a relacionar, sin sustituir sus procesos</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Presupuesto</td>
+<td>Suficiencia, adecuaciones y soporte de compromiso mediante identificadores de origen.</td>
+</tr>
+<tr>
+<td>Contabilidad</td>
+<td>Pólizas, comprobantes y libros; referencia financiera compuesta e ID persistente confirmado, con versiones y vínculos auditables. Consultar información del registro de origen sin alterar importes o asientos al archivar.</td>
+</tr>
+<tr>
+<td>Cuentas por Pagar</td>
+<td>Expediente de pago y requisitos; conservar XML original y representación PDF como objetos relacionados distintos.</td>
+</tr>
+<tr>
+<td>Tesorería</td>
+<td>Orden de pago, comprobante de transferencia/cheque y acuses; acceso restringido a información bancaria.</td>
+</tr>
+<tr>
+<td>Recursos Materiales y control patrimonial</td>
+<td>Contrato, recepción, inventario y resguardo; conservación del soporte de adquisición mientras corresponda al bien. El marbete documental no sustituye el número de inventario patrimonial.</td>
+</tr>
+<tr>
+<td>Gestión Documental existente</td>
+<td>09.2.1 consulta transversal; 09.2.2 ingreso de archivos; 09.2.3 visor; 09.3.2 transferencias; 09.3.3 bajas; 09.4.3 bitácora. Reutilizar estas capacidades sin atribuirles desarrollo ya terminado.</td>
+</tr>
+</tbody></table></div>
+<p>Archivar, reubicar o reimprimir no genera momentos presupuestarios, pólizas, obligaciones de pago ni movimientos patrimoniales por sí solo.</p>
+<h2 id="seccion-8">8. Criterios de aceptación y construcción incremental</h2>
+<div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de especificación"><table class="props-table">
+<thead>
+<tr>
+<th>Caso</th>
+<th>Resultado verificable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Archivo Inicial sin datos completos</td>
+<td>Conserva faltantes y procedencia; no presume ubicación ni digitalización validada.</td>
+</tr>
+<tr>
+<td>Caja con tres expedientes</td>
+<td>Buscar su marbete lista únicamente contenido autorizado y ubicación efectiva.</td>
+</tr>
+<tr>
+<td>Expediente repartido en dos tomos</td>
+<td>Devuelve ambos tomos y ubicaciones, sin elegir una arbitrariamente.</td>
+</tr>
+<tr>
+<td>Reescaneo o anexo</td>
+<td>Conserva versión/índice anterior y registra calidad, motivo y responsable.</td>
+</tr>
+<tr>
+<td>Marbete emitido dos veces por reintento</td>
+<td>Una sola emisión, sin duplicar identidad ni consumir códigos indebidamente.</td>
+</tr>
+<tr>
+<td>Último espacio solicitado simultáneamente</td>
+<td>Solo una reserva válida; la otra recibe conflicto de capacidad.</td>
+</tr>
+<tr>
+<td>Cancelación de reubicación</td>
+<td>Libera destino y conserva origen; deja evento de cancelación.</td>
+</tr>
+<tr>
+<td>Sustitución de marbete</td>
+<td>Código anterior y vigente resuelven el mismo objeto y muestran historial.</td>
+</tr>
+<tr>
+<td>Baja con auditoría pendiente o soporte de bien vigente</td>
+<td>Detiene la solicitud y documenta el impedimento; no destruye soportes.</td>
+</tr>
+<tr>
+<td>Usuario sin acceso consulta o usa OCR</td>
+<td>No obtiene metadatos, texto ni ubicación fuera de su autorización.</td>
+</tr>
+<tr>
+<td>Dos pólizas con igual número en ejercicios o sistemas distintos</td>
+<td>La búsqueda distingue las referencias; no confirma el vínculo por el número aislado.</td>
+</tr>
+<tr>
+<td>Póliza histórica ausente del sistema financiero actual</td>
+<td>Conserva documento y procedencia con vínculo pendiente; no genera registros contables.</td>
+</tr>
+<tr>
+<td>Diez hojas a doble cara y un documento de varias hojas</td>
+<td>Registra por separado hojas, imágenes, documentos y expedientes; no presenta esas cantidades como equivalentes.</td>
+</tr>
+<tr>
+<td>Lote entregado para digitalización</td>
+<td>Concilia recepción, preparación, manifiesto digital e incidencias; acredita devolución física y aceptación del área receptora.</td>
+</tr>
+<tr>
+<td>Selección de una entrada 2530</td>
+<td>Consulta clave, literal, fuente, 2/8 años y Archivo Histórico; no ofrece baja por transcurso del tiempo.</td>
+</tr>
+<tr>
+<td>Dos copias idénticas del CADIDO</td>
+<td>Una versión lógica y una sola carga de las 16 entradas, con ambas procedencias.</td>
+</tr>
+<tr>
+<td>Nueva versión de instrumento</td>
+<td>Conserva versiones y equivalencias previas; la transición funcional no reescribe historia.</td>
+</tr>
+<tr>
+<td>Información marcada Pública y Reservada en CADIDO</td>
+<td>Conserva las marcas fuente y exige clasificación real/permisos antes de dar acceso.</td>
+</tr>
+<tr>
+<td>Préstamo y devolución de una unidad</td>
+<td>Registra acuses y custodio temporal; conserva ubicación habitual e identidad del expediente.</td>
+</tr>
+</tbody></table></div>
+<p>La cobertura se reportará por unidad: imágenes aceptadas sobre imágenes esperadas verificadas, documentos validados sobre documentos inventariados y expedientes completos sobre expedientes del alcance. Cuando un denominador no esté validado, se informará «por determinar». No se usará el máximo de hojas de una cotización histórica como inventario real ni como meta automática del PJEV.</p>
+<p><strong>Secuencia recalibrada:</strong> (1) fuentes/versiones, ámbito DGA–2530–Contabilidad y catálogo de referencia; (2) expediente, inventario inicial, responsables y ubicaciones; (3) marbetes, consulta y enlace financiero; (4) digitalización/calidad/anexos; (5) préstamos, transferencias y seguimiento de conservación/actividades. La disposición respeta el destino histórico de la referencia 2530. Las ocho funciones originales se mantienen integradas a este modelo general.</p>
+<p>Los instrumentos recibidos ya sustentan esta recalibración. Para puesta en operación se ratificará su versión aplicable y acto de aprobación, y se completarán el inventario real de espacios, formatos de transferencia/préstamo, muestras de marbetes/lectores y el procedimiento de Archivo Inicial. La Guía y el Informe de cumplimiento están enlazados en el XLS, pero su contenido no se ha dado por conocido.</p>
+<h2 id="seccion-9">9. Fuentes y antecedentes</h2>
+<ul>
+<li><a href="https://www.imss.gob.mx/sites/all/statics/pdf/leyes/4536_LGA.pdf">Ley General de Archivos, texto legislativo alojado por IMSS</a>, reforma indicada 14-11-2025; consulta 29-10-2026.</li>
+<li><a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LGCG.pdf">LGCG, Cámara de Diputados</a>, reforma indicada 14-05-2026; consulta 29-10-2026.</li>
+<li><a href="https://sidof.segob.gob.mx/notas/docFuente/5710974">Acuerdo CONAC: Disposiciones Generales para el Archivo Contable Gubernamental</a>, publicación 11-12-2023, apartados IV a VI; <a href="https://www.conac.gob.mx/es/CONAC/Normatividad_Vigente">índice de normatividad CONAC</a>.</li>
+<li>Fuente institucional local: <code>Documentación Normatividad/Manuales de PJE/03_MANUAL.ESPECIFICO.PROCEDIMIENTOS.SUBDIRECCION_DE_RECURSOS_MATERIALES_FEB_2023.pdf</code>, páginas PDF 10 a 12, revisadas directamente. Su vigencia operativa debe ratificarse para la puesta en servicio.</li>
+<li>Antecedentes de diseño, sin valor de norma ni prueba de despliegue: <code>PLAN_GESTION_DOCUMENTAL_Y_ARCHIVOS_SIAF_PJEV.md</code>, <code>FILE_BACKEND_ARCHITECTURE.md</code>, <code>FILE_COMPONENTS_AND_INTEGRATION_GUIDE.md</code>, <code>FILE_ADMIN_AND_SECURITY.md</code>, <code>archivos_schema.sql</code>.</li>
+<li><a href="../docs/REFERENCIA_ARCHIVO_DIGITAL_CONGRESO_2018.md">Antecedente comercial del Congreso de Veracruz, 15-08-2018</a>: cotización DOCX proporcionada por el usuario el 29-10-2026. Aporta preparación física, organización por recopilador/tipo/documento, enlace financiero, entrega y capacitación; no establece reglas institucionales del PJEV.</li>
+<li>Fuentes institucionales recibidas en Downloads: <code>CUADRO_DE_CLASIFICACION_ARCHIVISTICA_2024.pdf</code> (pp. 31–32 y nota p. 34); <code>CATALOGO__DE_DISPOSICION_DOCUMENTAL_2024.pdf</code> (pp. 36–37 y nota p. 39), con copia idéntica «(1)»; <code>PROGRAMA_ANUAL_DE_DESARROLLO_ARCHIVISTICO_2025.pdf</code> (pp. 12–20); <code>XLV_c.xls</code>, Informacion A1:L14 y tabla relacionada de responsables. <a href="../docs/RECALIBRACION_ARCHIVISTICA_DGA_PJEV.md">Procedencia, contraste y decisiones</a>.</li>
+</ul>
+<h2 id="seccion-10">10. Historial</h2>
+<div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de especificación"><table class="props-table">
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Cambio</th>
+<th>Estado</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>29-10-2026</td>
+<td>Alta del alcance 4.1; ocho opciones, modelo conceptual, contratos propuestos, interfaces y criterios de aceptación.</td>
+<td>Especificación inicial; validación institucional y desarrollo pendientes.</td>
+</tr>
+<tr>
+<td>29-10-2026</td>
+<td>Integración del antecedente del Congreso fechado 15-08-2018: preparación y entrega por lote, recopiladores, vínculo financiero inequívoco, conteos y capacitación.</td>
+<td>Propuesta funcional incorporada; sin trasladar precios, catálogo ni condiciones comerciales históricas.</td>
+</tr>
+<tr>
+<td>29-10-2026</td>
+<td>Recalibración con instrumentos institucionales PJEV y alcance DGA–2530–Contabilidad confirmado. Se incorporan cuatro series/doce subseries, plazos por fase, destino histórico, versiones, inventarios, préstamos y transferencias.</td>
+<td>Especificación y maqueta recalibradas; sin despliegue de base de datos o servicios.</td>
+</tr>
+<tr>
+<td>29-10-2026</td>
+<td>Incorporación de los dos diagramas de base del analista y versiones SVG ajustadas: ciclo 2530, identidad/ubicación, documentos por procedimiento y metadatos aplicables por tipo.</td>
+<td>Revisión documentada sobre la base existente; fuentes gráficas conservadas.</td>
+</tr>
+</tbody></table></div>
+</article>
+  <footer>Manual de Desarrollo SIAF-PJEV · OAJ-DGA · Dix Consultoría · Documento de trabajo. Los contratos y la maqueta no acreditan servicios implementados.</footer>
+</main>
+<script src="../shared.js"></script>
+<script>
+(() => {
+  'use strict';
+  const input = document.getElementById('codigo-marbete');
+  const output = document.getElementById('resultado-marbete');
+  const records = {
+    'PJEV-ARC-000001': { titulo:'Expediente de ejemplo · Pólizas de Ingresos', tipo:'Expediente · DGA–2530 · Contabilidad', vigente:'PJEV-ARC-000001', clasificacion:'2530.3a · Ingresos · Referencia CGCA/CADIDO recibida', digital:'En revisión · 2 documentos observados', ubicaciones:['Tomo 1 · Caja PJEV-CAJ-000020 · Archivo de trámite / Depósito A / Anaquel 03 / Nivel 02 / Posición 01', 'Tomo 2 · Caja PJEV-CAJ-000021 · Archivo de trámite / Depósito A / Anaquel 03 / Nivel 02 / Posición 02'] },
+    'PJEV-CAJ-000020': { titulo:'Caja de ejemplo · Archivo de trámite de Contabilidad', tipo:'Caja', vigente:'PJEV-CAJ-000020', clasificacion:'Clasificación conservada por cada expediente', digital:'Estado consultable por cada expediente', ubicaciones:['Archivo de trámite / Depósito A / Anaquel 03 / Nivel 02 / Posición 01'], contenido:['PJEV-ARC-000001 · Tomo 1 · Pólizas de Ingresos · 2530.3a','PJEV-ARC-000002 · Carpeta única · Conciliación contable/presupuestal · 2530.4'] },
+    'LEG-0007': { titulo:'Acervo anterior de ejemplo · Lote inicial 01', tipo:'Expediente de Archivo Inicial', vigente:'Pendiente de conciliación', digital:'Pendiente · Inventario sin verificar', ubicaciones:['Ubicación no verificada · Anaquel declarado 08 (sin corroboración física)'] }
+  };
+  const aliases = { 'ANT-0842':'PJEV-ARC-000001' };
+  function el(tag, text) { const node = document.createElement(tag); node.textContent = text; return node; }
+  function consultar() {
+    const codigo = input.value.trim().toUpperCase();
+    const resolved = aliases[codigo] || codigo;
+    const record = records[resolved];
+    output.replaceChildren();
+    if (!record) {
+      output.append(el('p', codigo ? 'Sin coincidencia en los datos de ejemplo. Usa uno de los cuatro marbetes sugeridos.' : 'Escribe un número de marbete para consultar los datos de ejemplo.'));
+      return;
+    }
+    if (aliases[codigo]) output.append(el('p', 'Marbete sustituido. El número anterior se conserva como alias del mismo expediente.'));
+    output.append(el('h3',record.titulo));
+    const dl = document.createElement('dl');
+    [['Tipo de objeto', record.tipo],['Marbete vigente',record.vigente],['Clasificación',record.clasificacion||'Pendiente de conciliación'],['Digitalización',record.digital]].forEach(([label,value]) => dl.append(el('dt',label),el('dd',value)));
+    output.append(dl, el('strong','Ubicación física'));
+    const places = document.createElement('ul'); record.ubicaciones.forEach(x => places.append(el('li',x))); output.append(places);
+    if (record.contenido) { output.append(el('strong','Contenido de ejemplo')); const contents = document.createElement('ul'); record.contenido.forEach(x=>contents.append(el('li',x))); output.append(contents); }
+    output.append(el('p','La consulta muestra información; cualquier reubicación, sustitución o baja requiere su operación específica.'));
+  }
+  document.getElementById('consulta-marbete').addEventListener('submit', event => { event.preventDefault(); consultar(); });
+  document.querySelectorAll('[data-codigo]').forEach(button=>button.addEventListener('click',()=>{ input.value=button.dataset.codigo; consultar(); }));
+  const classificationEntries = [{"codigo":"2530.1","tipo":"SERIE","serie_codigo":"2530.1","denominacion_cadido":"ESTADOS CONTABLES","denominacion_cgca":"ESTADOS CONTABLES","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":36,"fuente_cgca_paginas":[31],"vigencia_operativa_confirmada":false},{"codigo":"2530.1a","tipo":"SUBSERIE","serie_codigo":"2530.1","denominacion_cadido":"MENSUAL","denominacion_cgca":"MENSUAL","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":36,"fuente_cgca_paginas":[31],"vigencia_operativa_confirmada":false},{"codigo":"2530.1b","tipo":"SUBSERIE","serie_codigo":"2530.1","denominacion_cadido":"TRIMESTRAL","denominacion_cgca":"TRIMESTRAL","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":36,"fuente_cgca_paginas":[31],"vigencia_operativa_confirmada":false},{"codigo":"2530.1c","tipo":"SUBSERIE","serie_codigo":"2530.1","denominacion_cadido":"ANUAL","denominacion_cgca":"ANUAL","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":36,"fuente_cgca_paginas":[31],"vigencia_operativa_confirmada":false},{"codigo":"2530.2","tipo":"SERIE","serie_codigo":"2530.2","denominacion_cadido":"INFORMACIÓN PRESUPUESTARIA Y PROGRAMÁTICA","denominacion_cgca":"INFORMACIÓN PRESUPUESTARIA Y PROGRAMÁTICA","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"","fiscal":"","publica":"X","reservada":"","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":36,"fuente_cgca_paginas":[31],"vigencia_operativa_confirmada":false},{"codigo":"2530.2a","tipo":"SUBSERIE","serie_codigo":"2530.2","denominacion_cadido":"MENSUAL","denominacion_cgca":"MENSUAL","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"","fiscal":"","publica":"X","reservada":"","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":36,"fuente_cgca_paginas":[31],"vigencia_operativa_confirmada":false},{"codigo":"2530.2b","tipo":"SUBSERIE","serie_codigo":"2530.2","denominacion_cadido":"TRIMESTRAL","denominacion_cgca":"TRIMESTRAL","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"","fiscal":"","publica":"X","reservada":"","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":36,"fuente_cgca_paginas":[31],"vigencia_operativa_confirmada":false},{"codigo":"2530.2c","tipo":"SUBSERIE","serie_codigo":"2530.2","denominacion_cadido":"ANUAL","denominacion_cgca":"ANUAL","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"","fiscal":"","publica":"X","reservada":"","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":36,"fuente_cgca_paginas":[31],"vigencia_operativa_confirmada":false},{"codigo":"2530.3","tipo":"SERIE","serie_codigo":"2530.3","denominacion_cadido":"POLIZAS","denominacion_cgca":"POLIZAS","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"X","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":36,"fuente_cgca_paginas":[32],"vigencia_operativa_confirmada":false},{"codigo":"2530.3a","tipo":"SUBSERIE","serie_codigo":"2530.3","denominacion_cadido":"INGRESOS","denominacion_cgca":"INGRESOS","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"X","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":37,"fuente_cgca_paginas":[32],"vigencia_operativa_confirmada":false},{"codigo":"2530.3b","tipo":"SUBSERIE","serie_codigo":"2530.3","denominacion_cadido":"TRAMITADA","denominacion_cgca":"TRAMITADA","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"X","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":37,"fuente_cgca_paginas":[32],"vigencia_operativa_confirmada":false},{"codigo":"2530.3c","tipo":"SUBSERIE","serie_codigo":"2530.3","denominacion_cadido":"LIQUIDADA","denominacion_cgca":"LIQUIDADA","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"X","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":37,"fuente_cgca_paginas":[32],"vigencia_operativa_confirmada":false},{"codigo":"2530.3d","tipo":"SUBSERIE","serie_codigo":"2530.3","denominacion_cadido":"TRANFERENCIAS PRESUPUESTALES","denominacion_cgca":"TRANSFERENCIAS PRESUPUESTALES","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"X","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":37,"fuente_cgca_paginas":[32],"vigencia_operativa_confirmada":false},{"codigo":"2530.3e","tipo":"SUBSERIE","serie_codigo":"2530.3","denominacion_cadido":"TRASPASOS BANCARIOS","denominacion_cgca":"TRASPASOS BANCARIOS","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"X","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":37,"fuente_cgca_paginas":[32],"vigencia_operativa_confirmada":false},{"codigo":"2530.3f","tipo":"SUBSERIE","serie_codigo":"2530.3","denominacion_cadido":"MANUALES","denominacion_cgca":"MANUALES","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"X","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":37,"fuente_cgca_paginas":[32],"vigencia_operativa_confirmada":false},{"codigo":"2530.4","tipo":"SERIE","serie_codigo":"2530.4","denominacion_cadido":"CONCILIACIÓN CONTABLE/ PRESUPUESTAL","denominacion_cgca":"CONCILIACIÓN CONTABLE/PRESUPUESTAL","subseccion_codigo":"2530","seccion_codigo":"DGA2500","tramite_anios_referencia":2,"concentracion_anios_referencia":8,"destino_final_referencia":"TRANSFERENCIA_HISTORICA","marcas_fuente":{"administrativo":"X","legal":"","contable":"X","fiscal":"","publica":"X","reservada":"","confidencial":"","baja":"","historico":"X"},"fuente_cadido_pagina":37,"fuente_cgca_paginas":[32],"vigencia_operativa_confirmada":false}];
+  const selector = document.getElementById('clasificacion-piloto');
+  function showClassification() {
+    const entry=classificationEntries.find(item=>item.codigo===selector.value);
+    const panel=document.getElementById('ficha-clasificacion');
+    panel.replaceChildren();
+    if(!entry){panel.append(el('p','Selecciona una entrada del instrumento de referencia.'));return;}
+    panel.append(el('h3',entry.codigo+' · '+entry.denominacion_cgca));
+    const dl=document.createElement('dl');
+    [['Nivel',entry.tipo],['Serie',entry.serie_codigo],['Archivo de trámite',entry.tramite_anios_referencia+' años'],['Concentración',entry.concentracion_anios_referencia+' años'],['Destino marcado','Archivo Histórico'],['Fuente','CGCA p. '+entry.fuente_cgca_paginas.join(', ')+' · CADIDO p. '+entry.fuente_cadido_pagina],['Vencimiento','Pendiente de cierre, evento de cómputo y validación aplicables']].forEach(([label,value])=>dl.append(el('dt',label),el('dd',value)));
+    panel.append(dl,el('p','Esta referencia conduce a evaluar transferencia histórica. Cumplir los plazos no habilita baja por vencimiento.'));
+    if(entry.marcas_fuente.publica==='X'&&entry.marcas_fuente.reservada==='X')panel.append(el('p','El CADIDO marca Pública y Reservada. La clasificación real y los permisos se determinan para el documento o expediente.'));
+    if(entry.denominacion_cadido!==entry.denominacion_cgca)panel.append(el('p','Literal CADIDO conservado: '+entry.denominacion_cadido));
+  }
+  selector.addEventListener('change',showClassification);showClassification();
+  const options = [...document.querySelectorAll('details.opcion')];
+  const toggle = document.getElementById('expandir-opciones');
+  function syncToggle() { const all = options.every(x=>x.open); toggle.setAttribute('aria-expanded',String(all)); toggle.textContent = all ? 'Cerrar las ocho opciones' : 'Abrir las ocho opciones'; }
+  toggle.addEventListener('click',()=>{const open=!options.every(x=>x.open); options.forEach(x=>{x.open=open;});syncToggle();});
+  options.forEach(x=>x.addEventListener('toggle',syncToggle));
+  const printPanels=[...options,...document.querySelectorAll('.diagrama-analista')];
+  window.addEventListener('beforeprint',()=>{ printPanels.forEach(x=>{x.dataset.printOpen=String(x.open);x.open=true;}); });
+  window.addEventListener('afterprint',()=>{ printPanels.forEach(x=>{x.open=x.dataset.printOpen==='true';delete x.dataset.printOpen;});syncToggle(); });
+  function openHash() { const target=document.getElementById(location.hash.slice(1)); if(target?.matches('details.opcion')) target.open=true; }
+  window.addEventListener('hashchange',openHash); openHash(); consultar();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+{
+  "revision": "2026-10-29",
+  "naturaleza": "REFERENCIA_DOCUMENTAL_PARA_DISENO_NO_DESPLEGADA",
+  "version_referencia": "Instrumentos denominados 2024, publicados/reportados en 2025",
+  "alcance_inicial": {
+    "seccion_codigo": "DGA2500",
+    "seccion": "Dirección General de Administración",
+    "subseccion_codigo": "2530",
+    "subseccion_documental": "Subdirección de Recursos Financieros",
+    "foco_operativo": "Contabilidad",
+    "denominacion_solicitada": "subdirección de administración y contabilidad",
+    "equivalencia_organizacional_confirmada": true,
+    "confirmacion": "Confirmación expresa del usuario en este chat el 29-10-2026"
+  },
+  "modelo_general": {
+    "niveles": [
+      "FONDO",
+      "SUBFONDO",
+      "SECCION",
+      "SUBSECCION",
+      "SERIE",
+      "SUBSERIE"
+    ],
+    "subseccion_y_subserie_opcionales_segun_instrumento": true,
+    "apertura_de_otras_areas": "Configuración posterior por unidad y versión, sin cambiar identidades"
+  },
+  "jerarquia_referencia": {
+    "fondo_codigo_cgca": "FOPJ01",
+    "fondo_codigo_cadido": "FOPJO1",
+    "fondo_equivalencia_validada": false,
+    "subfondo_codigo": "PLENOCJP",
+    "seccion_codigo": "DGA2500",
+    "subseccion_codigo": "2530"
+  },
+  "subsecciones_dga_contexto": [
+    {
+      "codigo": "2510",
+      "nombre": "Subdirección de Recursos Humanos",
+      "piloto": false
+    },
+    {
+      "codigo": "2520",
+      "nombre": "Subdirección de Recursos Materiales, Infraestructura y Supervisión de Obra",
+      "piloto": false
+    },
+    {
+      "codigo": "2530",
+      "nombre": "Subdirección de Recursos Financieros",
+      "piloto": true
+    },
+    {
+      "codigo": "2540",
+      "nombre": "Subdirección de Tecnologías de la Información",
+      "piloto": false
+    }
+  ],
+  "observaciones": [
+    "CGCA p.34: nota de 09-03-2025; transición hacia clasificación funcional.",
+    "CADIDO p.39: nota de 09-04-2025; transición hacia clasificación funcional.",
+    "Fondo CGCA FOPJ01 y CADIDO FOPJO1: conservar ambas grafías y conciliar, sin normalización automática.",
+    "2530.3d: CGCA TRANSFERENCIAS y CADIDO TRANFERENCIAS; conservar ambos literales.",
+    "Marcas PÚBLICA y RESERVADA simultáneas no autorizan acceso ni sustituyen clasificación por documento.",
+    "XLV_c.xls es registro de publicación; no es inventario de expedientes ni prueba de vigencia actual.",
+    "Los 2+8 años son fases de referencia; no se calcula vencimiento sin cierre, disparador y validación aplicables."
+  ],
+  "fuentes": [
+    {
+      "id": "PADA_2025",
+      "nombre": "PROGRAMA_ANUAL_DE_DESARROLLO_ARCHIVISTICO_2025.pdf",
+      "ruta_original": "C:\\Users\\jcbar\\Downloads\\PROGRAMA_ANUAL_DE_DESARROLLO_ARCHIVISTICO_2025.pdf",
+      "sha256": "a71a7cba02a8eba3b55a8739884ed7f8220ae0042683c7b51abeff7f18e2aa76",
+      "bytes": 560480,
+      "paginas": 20,
+      "duplicado_de": null
+    },
+    {
+      "id": "CGCA_2024",
+      "nombre": "CUADRO_DE_CLASIFICACION_ARCHIVISTICA_2024.pdf",
+      "ruta_original": "C:\\Users\\jcbar\\Downloads\\CUADRO_DE_CLASIFICACION_ARCHIVISTICA_2024.pdf",
+      "sha256": "e0fcd06455e9baaa0d740096c19f4da58869b5f80731b78a2aa437156f48396c",
+      "bytes": 1088210,
+      "paginas": 34,
+      "duplicado_de": null
+    },
+    {
+      "id": "CADIDO_2024",
+      "nombre": "CATALOGO__DE_DISPOSICION_DOCUMENTAL_2024.pdf",
+      "ruta_original": "C:\\Users\\jcbar\\Downloads\\CATALOGO__DE_DISPOSICION_DOCUMENTAL_2024.pdf",
+      "sha256": "fb3578e3bcf5c86277ad736844e563aed8c3281a182217b6ec2335870d9a9afa",
+      "bytes": 857091,
+      "paginas": 39,
+      "duplicado_de": null
+    },
+    {
+      "id": "CADIDO_2024_COPIA",
+      "nombre": "CATALOGO__DE_DISPOSICION_DOCUMENTAL_2024 (1).pdf",
+      "ruta_original": "C:\\Users\\jcbar\\Downloads\\CATALOGO__DE_DISPOSICION_DOCUMENTAL_2024 (1).pdf",
+      "sha256": "fb3578e3bcf5c86277ad736844e563aed8c3281a182217b6ec2335870d9a9afa",
+      "bytes": 857091,
+      "paginas": 39,
+      "duplicado_de": "CADIDO_2024"
+    },
+    {
+      "id": "XLV_2025_T1",
+      "nombre": "XLV_c.xls",
+      "ruta_original": "C:\\Users\\jcbar\\Downloads\\XLV_c.xls",
+      "sha256": "7fa36df5a3d1abf2579cad76ddb053f558d8541e53ec1b644c072d3b52e27eae",
+      "bytes": 37888,
+      "paginas": null,
+      "duplicado_de": null
+    }
+  ],
+  "enlaces_publicados_xlv": {
+    "PROGRAMA_ANUAL_DE_DESARROLLO_ARCHIVISTICO_2025.pdf": "https://www.pjeveracruz.gob.mx/pjev/archivos/archivos/transparencia/Ley875/XLV/2025/1384/PROGRAMA_ANUAL_DE_DESARROLLO_ARCHIVISTICO_2025.pdf",
+    "CUADRO_DE_CLASIFICACION_ARCHIVISTICA_2024.pdf": "https://www.pjeveracruz.gob.mx/pjev/archivos/archivos/transparencia/Ley875/XLV/2025/1384/CUADRO_DE_CLASIFICACION_ARCHIVISTICA_2024.pdf",
+    "CATALOGO__DE_DISPOSICION_DOCUMENTAL_2024.pdf": "https://www.pjeveracruz.gob.mx/pjev/archivos/archivos/transparencia/Ley875/XLV/2025/1384/CATALOGO__DE_DISPOSICION_DOCUMENTAL_2024.pdf",
+    "GUIA_SIMPLE_DE_ARCHIVO_DOCUMENTAL_2024.pdf": "https://www.pjeveracruz.gob.mx/pjev/archivos/archivos/transparencia/Ley875/XLV/2025/1384/GUIA_SIMPLE_DE_ARCHIVO_DOCUMENTAL_2024.pdf",
+    "INFORME_ANUAL_DE_CUMPLIMIENTO_DEL_ARCHIVO_GENERAL_2024.pdf": "https://www.pjeveracruz.gob.mx/pjev/archivos/archivos/transparencia/Ley875/XLV/2025/1384/INFORME_ANUAL_DE_CUMPLIMIENTO_DEL_ARCHIVO_GENERAL_2024.pdf"
+  },
+  "registros": [
+    {
+      "codigo": "2530.1",
+      "tipo": "SERIE",
+      "serie_codigo": "2530.1",
+      "denominacion_cadido": "ESTADOS CONTABLES",
+      "denominacion_cgca": "ESTADOS CONTABLES",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 36,
+      "fuente_cgca_paginas": [
+        31
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.1a",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.1",
+      "denominacion_cadido": "MENSUAL",
+      "denominacion_cgca": "MENSUAL",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 36,
+      "fuente_cgca_paginas": [
+        31
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.1b",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.1",
+      "denominacion_cadido": "TRIMESTRAL",
+      "denominacion_cgca": "TRIMESTRAL",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 36,
+      "fuente_cgca_paginas": [
+        31
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.1c",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.1",
+      "denominacion_cadido": "ANUAL",
+      "denominacion_cgca": "ANUAL",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 36,
+      "fuente_cgca_paginas": [
+        31
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.2",
+      "tipo": "SERIE",
+      "serie_codigo": "2530.2",
+      "denominacion_cadido": "INFORMACIÓN PRESUPUESTARIA Y PROGRAMÁTICA",
+      "denominacion_cgca": "INFORMACIÓN PRESUPUESTARIA Y PROGRAMÁTICA",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 36,
+      "fuente_cgca_paginas": [
+        31
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.2a",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.2",
+      "denominacion_cadido": "MENSUAL",
+      "denominacion_cgca": "MENSUAL",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 36,
+      "fuente_cgca_paginas": [
+        31
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.2b",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.2",
+      "denominacion_cadido": "TRIMESTRAL",
+      "denominacion_cgca": "TRIMESTRAL",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 36,
+      "fuente_cgca_paginas": [
+        31
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.2c",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.2",
+      "denominacion_cadido": "ANUAL",
+      "denominacion_cgca": "ANUAL",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 36,
+      "fuente_cgca_paginas": [
+        31
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.3",
+      "tipo": "SERIE",
+      "serie_codigo": "2530.3",
+      "denominacion_cadido": "POLIZAS",
+      "denominacion_cgca": "POLIZAS",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "X",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 36,
+      "fuente_cgca_paginas": [
+        32
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.3a",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.3",
+      "denominacion_cadido": "INGRESOS",
+      "denominacion_cgca": "INGRESOS",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "X",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 37,
+      "fuente_cgca_paginas": [
+        32
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.3b",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.3",
+      "denominacion_cadido": "TRAMITADA",
+      "denominacion_cgca": "TRAMITADA",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "X",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 37,
+      "fuente_cgca_paginas": [
+        32
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.3c",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.3",
+      "denominacion_cadido": "LIQUIDADA",
+      "denominacion_cgca": "LIQUIDADA",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "X",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 37,
+      "fuente_cgca_paginas": [
+        32
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.3d",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.3",
+      "denominacion_cadido": "TRANFERENCIAS PRESUPUESTALES",
+      "denominacion_cgca": "TRANSFERENCIAS PRESUPUESTALES",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "X",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 37,
+      "fuente_cgca_paginas": [
+        32
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.3e",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.3",
+      "denominacion_cadido": "TRASPASOS BANCARIOS",
+      "denominacion_cgca": "TRASPASOS BANCARIOS",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "X",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 37,
+      "fuente_cgca_paginas": [
+        32
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.3f",
+      "tipo": "SUBSERIE",
+      "serie_codigo": "2530.3",
+      "denominacion_cadido": "MANUALES",
+      "denominacion_cgca": "MANUALES",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "X",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 37,
+      "fuente_cgca_paginas": [
+        32
+      ],
+      "vigencia_operativa_confirmada": false
+    },
+    {
+      "codigo": "2530.4",
+      "tipo": "SERIE",
+      "serie_codigo": "2530.4",
+      "denominacion_cadido": "CONCILIACIÓN CONTABLE/ PRESUPUESTAL",
+      "denominacion_cgca": "CONCILIACIÓN CONTABLE/PRESUPUESTAL",
+      "subseccion_codigo": "2530",
+      "seccion_codigo": "DGA2500",
+      "tramite_anios_referencia": 2,
+      "concentracion_anios_referencia": 8,
+      "destino_final_referencia": "TRANSFERENCIA_HISTORICA",
+      "marcas_fuente": {
+        "administrativo": "X",
+        "legal": "",
+        "contable": "X",
+        "fiscal": "",
+        "publica": "X",
+        "reservada": "",
+        "confidencial": "",
+        "baja": "",
+        "historico": "X"
+      },
+      "fuente_cadido_pagina": 37,
+      "fuente_cgca_paginas": [
+        32
+      ],
+      "vigencia_operativa_confirmada": false
+    }
+  ]
+}

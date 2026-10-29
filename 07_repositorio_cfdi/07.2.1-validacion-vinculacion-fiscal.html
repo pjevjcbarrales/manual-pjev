@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.2.1 Validación y Vinculación Fiscal (SAT, EFOS 69-B y Expedientes) — SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg, #111c11); color: var(--code-text, #a8d8a8);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 12.5px;
+    padding: 18px 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 20px;
+  }
+  .code-wrap pre, .code-wrap code {
+    margin: 0; padding: 0; background: transparent !important;
+    font-family: inherit !important; font-size: inherit !important; color: inherit !important;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  .badge-w { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:var(--font-mono); }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .method.patch  { background:#f3e8ff; color:#6b21a8; }
+
+  .wf-tabs, .sp-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 14px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.25s ease; }
+
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); margin-bottom:16px; }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .wf-bar-label { font-size:11px; font-weight:700; color:var(--pjev-verde-oscuro); text-transform:uppercase; letter-spacing:0.6px; }
+  .wf-svg-area { background:#f8fafc; padding:16px; overflow-x:auto; text-align:center; }
+
+  /* Responsive Table Container with Sticky Headers (modern-web-guidance: responsive-table) */
+  .table-wrapper {
+    overflow: auto;
+    max-inline-size: 100%;
+    max-block-size: min(560px, 80vh);
+    container-type: inline-size;
+    border-radius: 6px;
+    margin-bottom: 14px;
+  }
+  .table-wrapper:focus-visible { outline: 3px solid var(--pjev-dorado); outline-offset: 2px; }
+  .table-wrapper table { border-collapse: separate; border-spacing: 0; width: 100%; }
+  .table-wrapper thead { position: sticky; inset-block-start: 0; z-index: 2; }
+  .table-wrapper tbody th { position: sticky; inset-inline-start: 0; background: #ffffff; z-index: 1; text-align: left; }
+
+  .nat-badge { font-size:9px; font-weight:700; padding:2px 7px; border-radius:4px; text-transform:uppercase; display:inline-block; }
+  .nat-norm { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+  .nat-inst { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+  .nat-tech { background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div style="position: fixed; top: 20px; right: 45px; display: flex; gap: 10px; z-index: 9999;">
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro);" onclick="window.location.reload()">⟳ Refrescar</button>
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro);" onclick="window.print()">🖨 Imprimir</button>
+</div>
+
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Inicio</a> ›
+    <span>07 · Repositorio CFDI</span> ›
+    <span>07.2 · Procesos</span> ›
+    <span>07.2.1 Validación y vinculación fiscal</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">07.2.1</div>
+      <h1 class="elem-title">Validación y Vinculación Fiscal (SAT, EFOS 69-B, Buzón y Expedientes)</h1>
+      <p class="elem-desc">Motor de verificación estructural y criptográfica Anexo 20, consulta masiva de vigencia en el SAT, cruce permanente contra listas negras de EFOS (Art. 69-B del CFF), gestión de solicitudes de cancelación y constancias fiscales (CSF, CIF, Opinión 32-D), y vinculación polimórfica de comprobantes con Recursos Materiales, Cuentas por Pagar, Tesorería, Contabilidad y Archivo.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-w">Segunda Etapa — Especificación Funcional y Técnica Completa</span>
+        <span class="mod-badge badge-c">Tipo: Proceso Transaccional y Validador Fiscal</span>
+        <span class="mod-badge badge-s">Responsable: Cristian</span>
+        <span class="elem-tag" style="font-size:10px;">Ruta Frontend: <code style="font-family:var(--font-mono);font-size:10px;">/cfdi/validacion-vinculacion</code></span>
+        <span class="elem-tag" style="font-size:10px;">API: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/cfdi/validacion</code></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>Una vez que los comprobantes fiscales ingresan a la <a href="07.1.1-boveda-cfdi.html">07.1.1 Bóveda CFDI</a> (por descarga del SAT o por carga operativa), el módulo <strong>07.2.1 Validación y Vinculación Fiscal</strong> actúa como la compuerta de control de legalidad fiscal y presupuestaria del SIAF-PJEV. Su función es asegurar que ningún recurso público se devengue o pague con base en un comprobante apócrifo, cancelado, duplicado, sustituido o emitido por una Empresa que Factura Operaciones Simuladas (EFOS).</p>
+    <p>Asimismo, administra la **vinculación polimórfica sin copias** entre cada <code>UUID</code> de la bóveda y los actos administrativos del PJEV: recepciones de bienes y servicios, entradas de almacén, altas de activo fijo, estimaciones de obra, afectaciones de gasto, comprobaciones de viáticos, órdenes de pago, liquidaciones bancarias (y sus complementos de pago <code>REP 2.0</code>) y pólizas contables.</p>
+  </div>
+
+  <!-- 2. MARCO NORMATIVO Y NATURALEZA DE LAS REGLAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo y Distinción de Reglas</div>
+    <div tabindex="0" role="region" aria-label="Marco normativo de Validación y Vinculación Fiscal" class="table-wrapper">
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th style="width:15%;">Naturaleza</th>
+            <th style="width:27%;">Norma / Instrumento</th>
+            <th style="width:58%;">Obligación y Consecuencia en el Diseño del SIAF-PJEV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="nat-badge nat-norm">Requisito Normativo</span></th>
+            <td><strong>Código Fiscal de la Federación (CFF) · Art. 69-B</strong> (Operaciones Inexistentes / EFOS)</td>
+            <td>Obliga a verificar que los emisores de CFDI no se encuentren en los listados de contribuyentes con operaciones presuntamente inexistentes (<em>Presuntos</em>) o definitivas (<em>Definitivos</em>) publicados en el portal del SAT y en el DOF. El sistema bloquea automáticamente cualquier trámite de pago asociado a un RFC en estatus <code>PRESUNTO</code> o <code>DEFINITIVO</code>.</td>
+          </tr>
+          <tr>
+            <th><span class="nat-badge nat-norm">Requisito Normativo</span></th>
+            <td><strong>CFF · Art. 29-A (Cancelación de CFDI con aceptación del receptor y Motivos 01–04)</strong></td>
+            <td>Establece que el emisor debe solicitar la cancelación a través del Buzón Tributario y el receptor cuenta con 72 horas para aceptarla o rechazarla. Si un CFDI ya está vinculado a un devengo o pago en el SIAF-PJEV, el sistema impide aceptar su cancelación salvo que exista nota de crédito o sustitución previa autorizada (<code>Motivo 01</code> con relación <code>04</code>).</td>
+          </tr>
+          <tr>
+            <th><span class="nat-badge nat-norm">Requisito Normativo</span></th>
+            <td><strong>CFF · Art. 32-D</strong> y <strong>Código Financiero de Veracruz · Art. 183</strong></td>
+            <td>Exige verificar la <strong>Opinión del Cumplimiento de Obligaciones Fiscales (32-D)</strong> en sentido Positivo, así como la <strong>Constancia de Situación Fiscal (CSF)</strong> y la <strong>Cédula de Identificación Fiscal (CIF)</strong> vigentes de los proveedores y contratistas antes de contratar o liberar pagos.</td>
+          </tr>
+          <tr>
+            <th><span class="nat-badge nat-inst">Regla Institucional</span></th>
+            <td><strong>Manual Específico de Procedimientos SRF y SRM PJEV (Feb 2023)</strong></td>
+            <td>En adquisiciones, servicios generales, obra pública y comprobación de viáticos, el importe de los CFDI vinculados debe cuadrar con la recepción conforme y con las partidas presupuestales afectadas, controlando los anticipos y los pagos en parcialidades (<code>PPD</code>).</td>
+          </tr>
+          <tr>
+            <th><span class="nat-badge nat-tech">Propuesta Tecnológica</span></th>
+            <td><strong>Referente funcional externo (Módulos EFOS, Multi-acciones, Solicitudes de Cancelación, Buzón y Relación de UUIDs)</strong></td>
+            <td>Sincronización automatizada del archivo oficial <code>Listado_Completo_69-B.csv</code> del SAT, consola de aceptación/rechazo de solicitudes de cancelación en lote, monitor de constancias (CSF, CIF, 32-D) y tabla puente polimórfica <code>cfdi.vinculos_expediente</code> con control de saldos disponibles por CFDI.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3. CINCO CAPAS DE VALIDACIÓN Y VINCULACIÓN -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Las Cinco Capas de Validación y Vinculación Fiscal</div>
+    <div tabindex="0" role="region" aria-label="Cinco capas de validación fiscal" class="table-wrapper">
+      <table class="props-table">
+        <thead>
+          <tr><th>Capa</th><th>Proceso Técnico</th><th>Regla de Validación y Bloqueo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><strong>1. Validación Estructural y Criptográfica (Anexo 20)</strong></th>
+            <td>Verificación XSD CFDI 4.0, sello digital del emisor contra su Certificado de Sello Digital (CSD) y sello del PAC.</td>
+            <td>Rechaza archivos XML malformados, con sello alterado, o cuyo <code>RfcReceptor</code> no corresponda al RFC oficial del PJEV.</td>
+          </tr>
+          <tr>
+            <th><strong>2. Vigencia SAT y Solicitudes de Cancelación</strong></th>
+            <td>Consulta SOAP al servicio de verificación del SAT (<code>Vigente</code> / <code>Cancelado</code>) y monitoreo de solicitudes en Buzón Tributario.</td>
+            <td>Bloquea el uso de CFDI cancelados y rechaza automáticamente solicitudes de cancelación en el SAT cuando la factura ya tiene una orden de pago o póliza aplicada en el SIAF-PJEV.</td>
+          </tr>
+          <tr>
+            <th><strong>3. Monitoreo de EFOS (Art. 69-B CFF)</strong></th>
+            <td>Cruce diario del padrón de proveedores (<code>01.3.1</code>) y del almacén de CFDI contra las 4 listas del Art. 69-B (<em>Presunto, Desvirtuado, Definitivo, Sentencia Favorable</em>).</td>
+            <td>Marca <code>estatus_efos_69b</code> y cambia <code>estado_vinculacion = 'BLOQUEADO_FISCAL'</code> si el emisor aparece como <code>PRESUNTO</code> o <code>DEFINITIVO</code>, notificando a Contabilidad y Contraloría.</td>
+          </tr>
+          <tr>
+            <th><strong>4. Constancias y Opiniones Fiscales (CSF, CIF, 32-D)</strong></th>
+            <td>Control de vigencia (máximo 30 días naturales) y sentido positivo de la Opinión 32-D del SAT, SEFIPLAN e IMSS.</td>
+            <td>Alimenta automáticamente el semáforo de <code>05.1.1 Requisitos Documentales</code> antes de permitir el envío de una afectación de gasto o la formalización de un contrato en <code>08.3.4</code>.</td>
+          </tr>
+          <tr>
+            <th><strong>5. Vinculación Polimórfica y Complementos REP 2.0</strong></th>
+            <td>Asociación del <code>cfdi_id</code> con el trámite administrativo/contable y seguimiento de facturas <code>PPD</code>.</td>
+            <td>Impide que la suma de importes vinculados supere el total del CFDI; en facturas <code>PPD</code> exige vincular el Complemento de Recepción de Pagos (<code>TipoDeComprobante = 'P'</code>) tras el desembolso en Tesorería.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. MODELO DE DATOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Modelo de Datos y Diccionario de Campos (Esquema <code>cfdi</code>)</div>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showDBTab('db1',this)">4.1 cfdi.vinculos_expediente</button>
+      <button class="sp-tab" onclick="showDBTab('db2',this)">4.2 cfdi.boveda_comprobantes_relaciones</button>
+      <button class="sp-tab" onclick="showDBTab('db3',this)">4.3 cfdi.padron_efos_69b</button>
+      <button class="sp-tab" onclick="showDBTab('db4',this)">4.4 cfdi.solicitudes_cancelacion_buzon</button>
+    </div>
+
+    <div id="db-db1" class="sp-panel active">
+      <div class="code-wrap">
+<pre><code>CREATE TABLE cfdi.vinculos_expediente (
+    vinculo_id BIGSERIAL PRIMARY KEY,
+    f_cfdi_id BIGINT NOT NULL REFERENCES cfdi.boveda_comprobantes(cfdi_id) ON DELETE RESTRICT,
+    uuid UUID NOT NULL,
+    modulo_origen VARCHAR(30) NOT NULL
+        CHECK (modulo_origen IN ('RECURSOS_MATERIALES', 'ALMACEN', 'ACTIVO_FIJO', 'OBRA_PUBLICA', 'CXP', 'VIATICOS', 'PAGOS', 'INGRESOS', 'CONTABILIDAD', 'ARCHIVO')),
+    tipo_entidad_origen VARCHAR(40) NOT NULL
+        CHECK (tipo_entidad_origen IN ('CONTRATO_PEDIDO', 'RECEPCION_CONFORME', 'ENTRADA_ALMACEN', 'ALTA_PATRIMONIAL', 'ESTIMACION_OBRA', 'AFECTACION_GASTO', 'COMPROBACION_GASTO', 'ORDEN_PAGO', 'PAGO_BANCARIO', 'REGISTRO_INGRESO', 'POLIZA_CONTABLE', 'EXPEDIENTE_ARCHIVO')),
+    registro_origen_id VARCHAR(64) NOT NULL,
+    folio_institucional VARCHAR(60) NOT NULL,
+    monto_amparado NUMERIC(18,2) NOT NULL CHECK (monto_amparado &gt;= 0),
+    requiere_complemento_rep BOOLEAN NOT NULL DEFAULT false,
+    f_cfdi_complemento_pago_id BIGINT NULL REFERENCES cfdi.boveda_comprobantes(cfdi_id),
+    estatus_vinculo VARCHAR(20) NOT NULL DEFAULT 'ACTIVO'
+        CHECK (estatus_vinculo IN ('ACTIVO', 'LIBERADO_POR_CANCELACION', 'SUSTITUIDO')),
+    motivo_desvinculacion VARCHAR(300),
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ,
+    CONSTRAINT uq_cfdi_entidad_registro UNIQUE (f_cfdi_id, tipo_entidad_origen, registro_origen_id)
+);</code></pre>
+      </div>
+    </div>
+
+    <div id="db-db2" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE TABLE cfdi.boveda_comprobantes_relaciones (
+    relacion_id BIGSERIAL PRIMARY KEY,
+    f_cfdi_origen_id BIGINT NOT NULL REFERENCES cfdi.boveda_comprobantes(cfdi_id) ON DELETE RESTRICT,
+    uuid_origen UUID NOT NULL,
+    tipo_relacion_sat VARCHAR(10) NOT NULL, -- '01'=Nota crédito, '02'=Nota débito, '04'=Sustitución, '07'=Anticipo, 'REP20'=Complemento Pago
+    uuid_relacionado UUID NOT NULL,
+    f_cfdi_relacionado_id BIGINT NULL REFERENCES cfdi.boveda_comprobantes(cfdi_id) ON DELETE RESTRICT,
+    num_parcialidad SMALLINT NULL,
+    imp_saldo_ant NUMERIC(18,2) NULL,
+    imp_pagado NUMERIC(18,2) NULL,
+    imp_saldo_insoluto NUMERIC(18,2) NULL,
+    relacion_resuelta BOOLEAN NOT NULL DEFAULT false,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ
+);</code></pre>
+      </div>
+    </div>
+
+    <div id="db-db3" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE TABLE cfdi.padron_efos_69b (
+    efos_id BIGSERIAL PRIMARY KEY,
+    rfc VARCHAR(13) NOT NULL UNIQUE,
+    nombre_contribuyente VARCHAR(350) NOT NULL,
+    situacion_69b VARCHAR(25) NOT NULL
+        CHECK (situacion_69b IN ('PRESUNTO', 'DESVIRTUADO', 'DEFINITIVO', 'SENTENCIA_FAVORABLE')),
+    oficio_presuncion_sat VARCHAR(120),
+    fecha_pub_presuncion_sat DATE,
+    fecha_pub_presuncion_dof DATE,
+    oficio_definitivo_sat VARCHAR(120),
+    fecha_pub_definitivo_sat DATE,
+    fecha_pub_definitivo_dof DATE,
+    fecha_sincronizacion TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ
+);</code></pre>
+      </div>
+    </div>
+
+    <div id="db-db4" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE TABLE cfdi.solicitudes_cancelacion_buzon (
+    solicitud_canc_id BIGSERIAL PRIMARY KEY,
+    f_cfdi_id BIGINT NOT NULL REFERENCES cfdi.boveda_comprobantes(cfdi_id) ON DELETE RESTRICT,
+    uuid UUID NOT NULL,
+    rfc_emisor VARCHAR(13) NOT NULL,
+    motivo_cancelacion_sat CHAR(2) NOT NULL CHECK (motivo_cancelacion_sat IN ('01', '02', '03', '04')),
+    uuid_sustitucion UUID NULL,
+    fecha_solicitud_sat TIMESTAMPTZ NOT NULL,
+    fecha_limite_respuesta TIMESTAMPTZ NOT NULL,
+    tiene_vinculo_activo_siaf BOOLEAN NOT NULL DEFAULT false,
+    decision_institucional VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE'
+        CHECK (decision_institucional IN ('PENDIENTE', 'ACEPTADA', 'RECHAZADA_AUTOMATICA', 'RECHAZADA_MANUAL')),
+    justificacion_decision VARCHAR(400),
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ
+);</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Procedimientos Almacenados (Stored Procedures PostgreSQL)</div>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showSP('sp1',this)">5.1 cfdi.fn_leer_validacion_vinculacion_cfdi</button>
+      <button class="sp-tab" onclick="showSP('sp2',this)">5.2 cfdi.fn_crud_vinculacion_cfdi</button>
+      <button class="sp-tab" onclick="showSP('sp3',this)">5.3 cfdi.fn_cruzar_padron_efos_69b</button>
+    </div>
+
+    <div id="sp-sp1" class="sp-panel active">
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cfdi.fn_leer_validacion_vinculacion_cfdi(
+    p_usuario VARCHAR(50),
+    p_cfdi_id BIGINT DEFAULT NULL,
+    p_uuid UUID DEFAULT NULL,
+    p_rfc_emisor VARCHAR(13) DEFAULT NULL,
+    p_solo_alertas_efos BOOLEAN DEFAULT false
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cfdi, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT COALESCE(jsonb_agg(item), '[]'::jsonb)
+    INTO v_data
+    FROM (
+        SELECT
+            c.cfdi_id AS "cfdiId",
+            c.uuid AS "uuid",
+            c.rfc_emisor AS "rfcEmisor",
+            c.nombre_emisor AS "nombreEmisor",
+            c.total AS "total",
+            c.metodo_pago AS "metodoPago",
+            c.estatus_sat AS "estatusSat",
+            c.estatus_efos_69b AS "estatusEfos69b",
+            c.estado_vinculacion AS "estadoVinculacion",
+            COALESCE((
+                SELECT jsonb_agg(jsonb_build_object(
+                    'vinculoId', v.vinculo_id,
+                    'moduloOrigen', v.modulo_origen,
+                    'tipoEntidadOrigen', v.tipo_entidad_origen,
+                    'folioInstitucional', v.folio_institucional,
+                    'montoAmparado', v.monto_amparado,
+                    'requiereComplementoRep', v.requiere_complemento_rep,
+                    'estatusVinculo', v.estatus_vinculo
+                ))
+                FROM cfdi.vinculos_expediente v
+                WHERE v.f_cfdi_id = c.cfdi_id AND v.estatus_registro = 1
+            ), '[]'::jsonb) AS "vinculos",
+            COALESCE((
+                SELECT jsonb_agg(jsonb_build_object(
+                    'tipoRelacionSat', r.tipo_relacion_sat,
+                    'uuidRelacionado', r.uuid_relacionado,
+                    'relacionResuelta', r.relacion_resuelta,
+                    'impPagado', r.imp_pagado
+                ))
+                FROM cfdi.boveda_comprobantes_relaciones r
+                WHERE (r.f_cfdi_origen_id = c.cfdi_id OR r.f_cfdi_relacionado_id = c.cfdi_id)
+                  AND r.estatus_registro = 1
+            ), '[]'::jsonb) AS "relacionesUuid"
+        FROM cfdi.boveda_comprobantes c
+        WHERE c.estatus_registro = 1
+          AND (p_cfdi_id IS NULL OR c.cfdi_id = p_cfdi_id)
+          AND (p_uuid IS NULL OR c.uuid = p_uuid)
+          AND (p_rfc_emisor IS NULL OR c.rfc_emisor = UPPER(TRIM(p_rfc_emisor)))
+          AND (NOT COALESCE(p_solo_alertas_efos, false) OR c.estatus_efos_69b IN ('PRESUNTO', 'DEFINITIVO'))
+        ORDER BY c.fecha_emision DESC
+        LIMIT 100
+    ) item;
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', v_data);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <div id="sp-sp2" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cfdi.fn_crud_vinculacion_cfdi(
+    p_accion SMALLINT,          -- 1=Vincular CFDI a trámite/expediente, 2=Liberar vínculo por rechazo/cancelación
+    p_usuario VARCHAR(50),
+    p_payload JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cfdi, public
+AS $$
+DECLARE
+    v_cfdi RECORD;
+    v_monto_acumulado NUMERIC(18,2);
+    v_monto_nuevo NUMERIC(18,2) := COALESCE((p_payload-&gt;&gt;'montoAmparado')::NUMERIC, 0);
+    v_vinculo_id BIGINT;
+BEGIN
+    SELECT * INTO v_cfdi
+    FROM cfdi.boveda_comprobantes
+    WHERE cfdi_id = (p_payload-&gt;&gt;'cfdiId')::BIGINT AND estatus_registro = 1
+    FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'El CFDI indicado no existe en la Bóveda.', 'data', NULL);
+    END IF;
+
+    IF p_accion = 1 THEN
+        IF v_cfdi.estatus_sat &lt;&gt; 'VIGENTE' THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', format('Bloqueo fiscal: El CFDI %s se encuentra %s en el SAT.', v_cfdi.uuid, v_cfdi.estatus_sat), 'data', NULL);
+        END IF;
+
+        IF v_cfdi.estatus_efos_69b IN ('PRESUNTO', 'DEFINITIVO') THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', format('Bloqueo Art. 69-B CFF: El emisor %s figura como EFOS (%s).', v_cfdi.rfc_emisor, v_cfdi.estatus_efos_69b), 'data', NULL);
+        END IF;
+
+        -- Validar que no se duplique ni exceda el importe en trámites de gasto/devengo
+        IF (p_payload-&gt;&gt;'tipoEntidadOrigen') IN ('AFECTACION_GASTO', 'COMPROBACION_GASTO') THEN
+            SELECT COALESCE(SUM(monto_amparado), 0) INTO v_monto_acumulado
+            FROM cfdi.vinculos_expediente
+            WHERE f_cfdi_id = v_cfdi.cfdi_id
+              AND tipo_entidad_origen IN ('AFECTACION_GASTO', 'COMPROBACION_GASTO')
+              AND estatus_vinculo = 'ACTIVO'
+              AND estatus_registro = 1;
+
+            IF (v_monto_acumulado + v_monto_nuevo) &gt; (v_cfdi.total + 0.50) THEN
+                RETURN jsonb_build_object(
+                    'error', -1,
+                    'mensaje', format('Prevención de duplicidad: El CFDI %s (Total: $%s) ya tiene vinculados $%s en otros trámites de gasto.', v_cfdi.uuid, v_cfdi.total, v_monto_acumulado),
+                    'data', NULL
+                );
+            END IF;
+        END IF;
+
+        INSERT INTO cfdi.vinculos_expediente (
+            f_cfdi_id, uuid, modulo_origen, tipo_entidad_origen,
+            registro_origen_id, folio_institucional, monto_amparado,
+            requiere_complemento_rep, usuario_c
+        ) VALUES (
+            v_cfdi.cfdi_id, v_cfdi.uuid,
+            p_payload-&gt;&gt;'moduloOrigen',
+            p_payload-&gt;&gt;'tipoEntidadOrigen',
+            p_payload-&gt;&gt;'registroOrigenId',
+            p_payload-&gt;&gt;'folioInstitucional',
+            v_monto_nuevo,
+            (v_cfdi.metodo_pago = 'PPD'),
+            p_usuario
+        ) RETURNING vinculo_id INTO v_vinculo_id;
+
+        UPDATE cfdi.boveda_comprobantes
+        SET estado_vinculacion = 'VINCULADO_TOTAL',
+            usuario_m = p_usuario,
+            fecha_m = clock_timestamp()
+        WHERE cfdi_id = v_cfdi.cfdi_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'CFDI vinculado exitosamente al expediente.', 'data', jsonb_build_object('vinculoId', v_vinculo_id));
+
+    ELSIF p_accion = 2 THEN
+        UPDATE cfdi.vinculos_expediente
+        SET estatus_vinculo = 'LIBERADO_POR_CANCELACION',
+            motivo_desvinculacion = p_payload-&gt;&gt;'motivoDesvinculacion',
+            usuario_m = p_usuario,
+            fecha_m = clock_timestamp()
+        WHERE vinculo_id = (p_payload-&gt;&gt;'vinculoId')::BIGINT;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Vínculo liberado con trazabilidad en bitácora.', 'data', NULL);
+    END IF;
+
+    RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no válida.', 'data', NULL);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <div id="sp-sp3" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cfdi.fn_cruzar_padron_efos_69b(
+    p_usuario VARCHAR(50)
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cfdi, public
+AS $$
+DECLARE
+    v_afectados INTEGER := 0;
+BEGIN
+    UPDATE cfdi.boveda_comprobantes c
+    SET estatus_efos_69b = e.situacion_69b,
+        estado_vinculacion = CASE
+            WHEN e.situacion_69b IN ('PRESUNTO', 'DEFINITIVO') THEN 'BLOQUEADO_FISCAL'
+            ELSE c.estado_vinculacion
+        END,
+        usuario_m = p_usuario,
+        fecha_m = clock_timestamp()
+    FROM cfdi.padron_efos_69b e
+    WHERE c.rfc_emisor = e.rfc
+      AND e.estatus_registro = 1
+      AND c.estatus_efos_69b IS DISTINCT FROM e.situacion_69b;
+
+    GET DIAGNOSTICS v_afectados = ROW_COUNT;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', format('Cruce EFOS 69-B finalizado. Comprobantes actualizados: %s.', v_afectados),
+        'data', jsonb_build_object('comprobantesActualizados', v_afectados)
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SERVICIOS API REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <div tabindex="0" role="region" aria-label="Endpoints REST de Validación y Vinculación Fiscal" class="table-wrapper">
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Payload / Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code class="method get">GET</code></td><td><code>/api/v1/cfdi/validacion/expediente/:uuid</code></td><td>Param: <code>uuid</code></td><td>Devuelve el estado de validación SAT, EFOS 69-B, relaciones entre UUIDs y vínculos en SIAF-PJEV.</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/validacion/vincular</code></td><td>Body: <code>VincularCfdiExpedienteDto</code></td><td>Vincula un CFDI vigente a una recepción, entrada de almacén, alta patrimonial, afectación, orden de pago o póliza.</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/validacion/efos/sincronizar</code></td><td>Body: <code>{ origen: 'SAT_CSV' }</code></td><td>Descarga el listado oficial del Art. 69-B del SAT y ejecuta <code>cfdi.fn_cruzar_padron_efos_69b</code>.</td></tr>
+          <tr><td><code class="method get">GET</code></td><td><code>/api/v1/cfdi/validacion/solicitudes-cancelacion</code></td><td>Query: <code>{ estatus? }</code></td><td>Lista las solicitudes de cancelación recibidas en el Buzón Tributario con indicador de vínculo activo en SIAF.</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/validacion/solicitudes-cancelacion/resolver</code></td><td>Body: <code>ResolverCancelacionLoteDto</code></td><td>Acepta o rechaza en una sola corrida las solicitudes de cancelación del SAT.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 7. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Reglas de Negocio y Controles Fiscales</div>
+    <div tabindex="0" role="region" aria-label="Reglas de negocio de Validación Fiscal" class="table-wrapper">
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla</th><th>Consecuencia en el SIAF-PJEV</th></tr></thead>
+        <tbody>
+          <tr><th><strong>RN-VAL-01</strong></th><td><strong>Bloqueo Automático por EFOS (Art. 69-B CFF):</strong> Ningún CFDI cuyo emisor figure como <code>PRESUNTO</code> o <code>DEFINITIVO</code> puede vincularse a una afectación de gasto ni liberarse para pago.</td><td>Retorna error de negocio <code>-1</code> y genera alerta inmediata para la Subdirección de Recursos Financieros y Contraloría.</td></tr>
+          <tr><th><strong>RN-VAL-02</strong></th><td><strong>Protección contra Cancelación Unilateral en Buzón Tributario:</strong> Si un proveedor solicita cancelar un CFDI que ya está vinculado a un compromiso, devengo o pago activo en SIAF-PJEV, el sistema marca <code>RECHAZADA_AUTOMATICA</code>.</td><td>Solo permite aceptar la cancelación si antes se desafectó el trámite o existe un CFDI de sustitución (<code>TipoRelacion = 04</code>) debidamente validado.</td></tr>
+          <tr><th><strong>RN-VAL-03</strong></th><td><strong>Exigibilidad de Complemento de Pago (REP 2.0) en Facturas PPD:</strong> Toda factura emitida con método <code>PPD</code> y forma de pago <code>99</code> genera al momento del pago bancario en <code>06.2.2</code> una obligación pendiente de recepción de CFDI tipo <code>P</code>.</td><td>Bloquea nuevos trámites del proveedor si incumple la entrega del Complemento de Pago después del día 5 del mes siguiente al pago.</td></tr>
+          <tr><th><strong>RN-VAL-04</strong></th><td><strong>Cotejo de Recepción Conforme antes del Devengo (Regla CONAC):</strong> En compras y contrataciones de Recursos Materiales (<code>08</code>), la validación fiscal del CFDI es condición necesaria pero no suficiente para devengar.</td><td>Exige el vínculo simultáneo con la <code>RECEPCION_CONFORME</code>, <code>ENTRADA_ALMACEN</code> (Cap. 2000), <code>ALTA_PATRIMONIAL</code> (Cap. 5000) o <code>ESTIMACION_OBRA</code> (Cap. 6000).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 8. WIREFRAMES SVG INTERACTIVOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Diseño de Interfaces (Wireframes SVG Interactivos)</div>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">1. Monitor EFOS (Art. 69-B) y Cumplimiento 32-D / CSF</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">2. Consola de Vinculación Polimórfica y Grafo de UUIDs</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Solicitudes de Cancelación y Buzón Tributario</button>
+    </div>
+
+    <!-- WF 1: EFOS -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">07.2.1 Monitoreo de EFOS (Listas 69-B del SAT) y Constancias de Cumplimiento</span>
+          <span style="font-size:11px; color:#64748b;">Cruce permanente contra Padrón de Proveedores y Almacén CFDI</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 980 330" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:'Segoe UI',system-ui,sans-serif;">
+            <rect width="980" height="330" fill="#ffffff" rx="6" stroke="#cbd5e1"/>
+            <rect x="20" y="16" width="940" height="48" rx="6" fill="#183125"/>
+            <text x="36" y="45" font-size="14" font-weight="bold" fill="#ffffff">Monitor Institucional EFOS (Art. 69-B CFF) y Opiniones de Cumplimiento (32-D / CSF)</text>
+            <rect x="760" y="26" width="184" height="28" rx="4" fill="#deac50"/>
+            <text x="852" y="44" font-size="11" font-weight="bold" fill="#183125" text-anchor="middle">↻ Sincronizar Lista 69-B SAT</text>
+
+            <!-- KPIs -->
+            <rect x="20" y="78" width="225" height="64" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+            <text x="34" y="100" font-size="10.5" font-weight="bold" fill="#166534">PROVEEDORES SIN INCIDENCIA</text>
+            <text x="34" y="128" font-size="20" font-weight="bold" fill="#14532d">1,428 RFCs</text>
+
+            <rect x="258" y="78" width="225" height="64" rx="6" fill="#fef2f2" stroke="#fca5a5"/>
+            <text x="272" y="100" font-size="10.5" font-weight="bold" fill="#991b1b">ALERTA EFOS DEFINITIVO / PRESUNTO</text>
+            <text x="272" y="128" font-size="20" font-weight="bold" fill="#7f1d1d">2 RFCs (Bloqueados)</text>
+
+            <rect x="496" y="78" width="225" height="64" rx="6" fill="#eff6ff" stroke="#93c5fd"/>
+            <text x="510" y="100" font-size="10.5" font-weight="bold" fill="#1e40af">OPINIÓN 32-D POSITIVA VIGENTE</text>
+            <text x="510" y="128" font-size="20" font-weight="bold" fill="#1e3a8a">96.4% Activos</text>
+
+            <rect x="734" y="78" width="226" height="64" rx="6" fill="#fffbeb" stroke="#fde68a"/>
+            <text x="748" y="100" font-size="10.5" font-weight="bold" fill="#92400e">COMPLEMENTOS REP 2.0 PENDIENTES</text>
+            <text x="748" y="128" font-size="20" font-weight="bold" fill="#78350f">9 Facturas PPD</text>
+
+            <!-- Tabla -->
+            <rect x="20" y="156" width="940" height="28" fill="#183125" rx="4"/>
+            <text x="32" y="174" font-size="10.5" font-weight="bold" fill="#ffffff">RFC EMISOR</text>
+            <text x="150" y="174" font-size="10.5" font-weight="bold" fill="#ffffff">RAZÓN SOCIAL</text>
+            <text x="430" y="174" font-size="10.5" font-weight="bold" fill="#ffffff">ESTATUS 69-B SAT</text>
+            <text x="590" y="174" font-size="10.5" font-weight="bold" fill="#ffffff">OPINIÓN 32-D / CSF</text>
+            <text x="760" y="174" font-size="10.5" font-weight="bold" fill="#ffffff">EFECTO EN SIAF-PJEV</text>
+
+            <rect x="20" y="184" width="940" height="36" fill="#fef2f2" stroke="#fee2e2"/>
+            <text x="32" y="206" font-size="11" font-family="monospace" font-weight="bold" fill="#991b1b">GOM120101T33</text>
+            <text x="150" y="206" font-size="11" fill="#0f172a">GRUPO OPERADOR DEL GOLFO SA DE CV</text>
+            <rect x="430" y="192" width="120" height="20" rx="10" fill="#991b1b"/>
+            <text x="490" y="206" font-size="9.5" font-weight="bold" fill="#ffffff" text-anchor="middle">DEFINITIVO DOF</text>
+            <text x="590" y="206" font-size="11" font-weight="bold" fill="#991b1b">Negativa (Bloqueada)</text>
+            <text x="760" y="206" font-size="10.5" font-weight="bold" fill="#991b1b">⛔ Pago y Devengo Bloqueados</text>
+
+            <rect x="20" y="220" width="940" height="36" fill="#ffffff" stroke="#f1f5f9"/>
+            <text x="32" y="242" font-size="11" font-family="monospace" font-weight="bold" fill="#0f172a">CME050212H99</text>
+            <text x="150" y="242" font-size="11" fill="#0f172a">COMERCIALIZADORA VERACRUZANA SA DE CV</text>
+            <rect x="430" y="228" width="120" height="20" rx="10" fill="#dcfce7"/>
+            <text x="490" y="242" font-size="9.5" font-weight="bold" fill="#166534" text-anchor="middle">SIN INCIDENCIA</text>
+            <text x="590" y="242" font-size="11" font-weight="bold" fill="#166534">Positiva (Vence en 21d)</text>
+            <text x="760" y="242" font-size="10.5" font-weight="bold" fill="#166534">✓ Habilitado para Trámite</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF 2: VINCULACIÓN POLIMÓRFICA -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">07.2.1 Ficha de Vinculación Polimórfica y Grafo de Relación entre UUIDs</span>
+          <span style="font-size:11px; color:#64748b;">Un solo registro XML en Bóveda vinculado a Materiales, CxP, Pagos, Contabilidad y Archivo</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 980 300" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:'Segoe UI',system-ui,sans-serif;">
+            <rect width="980" height="300" fill="#ffffff" rx="6" stroke="#cbd5e1"/>
+            <!-- Nodo central CFDI -->
+            <rect x="30" y="40" width="290" height="220" rx="8" fill="#183125"/>
+            <text x="175" y="70" font-size="12" font-weight="bold" fill="#deac50" text-anchor="middle">CFDI ÚNICO EN BÓVEDA (07.1.1)</text>
+            <text x="175" y="96" font-size="10.5" font-family="monospace" fill="#ffffff" text-anchor="middle">UUID: 5B4A8E12-90C1-4D22-8F10</text>
+            <text x="175" y="120" font-size="11" fill="#e2e8f0" text-anchor="middle">Emisor: CME050212H99</text>
+            <text x="175" y="142" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">Total: $145,000.00 MXN (PPD)</text>
+            <rect x="75" y="160" width="200" height="24" rx="12" fill="#166534"/>
+            <text x="175" y="176" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">SAT: VIGENTE · 69-B: LIMPIO</text>
+            <text x="175" y="212" font-size="10" fill="#a7f3d0" text-anchor="middle">Relación REP 2.0: UUID 9F01...A312</text>
+            <text x="175" y="232" font-size="9.5" font-family="monospace" fill="#cbd5e1" text-anchor="middle">SHA-256: 8f94e2c0...44b1</text>
+
+            <!-- Vínculos Polimórficos -->
+            <line x1="320" y1="75" x2="410" y2="55" stroke="#183125" stroke-width="2"/>
+            <line x1="320" y1="115" x2="410" y2="115" stroke="#183125" stroke-width="2"/>
+            <line x1="320" y1="155" x2="410" y2="175" stroke="#183125" stroke-width="2"/>
+            <line x1="320" y1="195" x2="410" y2="235" stroke="#183125" stroke-width="2"/>
+
+            <rect x="410" y="30" width="530" height="45" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+            <text x="426" y="50" font-size="11" font-weight="bold" fill="#183125">08 · Recursos Materiales / Almacén / Activo Fijo</text>
+            <text x="426" y="66" font-size="10.5" fill="#475569">Contrato <tspan font-family="monospace">CTO-PJEV-2026-041</tspan> · Entrada Almacén <tspan font-family="monospace">EA-2026-0192</tspan> · 10 Equipos de Cómputo (Cap. 5000)</text>
+
+            <rect x="410" y="90" width="530" height="45" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+            <text x="426" y="110" font-size="11" font-weight="bold" fill="#183125">05 · Cuentas por Pagar (Afectación del Gasto y Orden de Pago)</text>
+            <text x="426" y="126" font-size="10.5" fill="#475569">Afectación <tspan font-family="monospace">AG-2026-00814</tspan> · Orden de Pago <tspan font-family="monospace">OP-2026-00590</tspan> · Amparado: $145,000.00</text>
+
+            <rect x="410" y="150" width="530" height="45" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+            <text x="426" y="170" font-size="11" font-weight="bold" fill="#183125">06 · Pagos / Tesorería y Complemento REP 2.0</text>
+            <text x="426" y="186" font-size="10.5" fill="#475569">Transferencia SPEI <tspan font-family="monospace">PAG-2026-00412</tspan> · Complemento de Pago vinculado: <tspan font-family="monospace" fill="#166534">9F01...A312 (Pagado 100%)</tspan></text>
+
+            <rect x="410" y="210" width="530" height="45" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+            <text x="426" y="230" font-size="11" font-weight="bold" fill="#183125">03 · Contabilidad y 09 · Control de Archivo (Serie 2530.3 Pólizas)</text>
+            <text x="426" y="246" font-size="10.5" fill="#475569">Póliza Devengado <tspan font-family="monospace">D-2026-10-0089</tspan> · Póliza Egreso <tspan font-family="monospace">E-2026-10-0044</tspan> · Marbete <tspan font-family="monospace">PJEV-ARC-000182</tspan></text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF 3: SOLICITUDES DE CANCELACIÓN -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">07.2.1 Bandeja de Solicitudes de Cancelación y Avisos del Buzón Tributario</span>
+          <span style="font-size:11px; color:#64748b;">Protección contra cancelación de facturas ya devengadas o pagadas</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 980 240" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:'Segoe UI',system-ui,sans-serif;">
+            <rect width="980" height="240" fill="#ffffff" rx="6" stroke="#cbd5e1"/>
+            <text x="20" y="34" font-size="15" font-weight="bold" fill="#183125">Solicitudes de Cancelación Recibidas en el SAT (Art. 29-A CFF)</text>
+            <rect x="640" y="14" width="150" height="28" rx="4" fill="#991b1b"/>
+            <text x="715" y="32" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="middle">Rechazar Seleccionadas</text>
+            <rect x="800" y="14" width="160" height="28" rx="4" fill="#166534"/>
+            <text x="880" y="32" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="middle">Aceptar Sin Vínculo SIAF</text>
+
+            <rect x="20" y="54" width="940" height="28" fill="#183125" rx="4"/>
+            <text x="34" y="72" font-size="10" font-weight="bold" fill="#ffffff">UUID FACTURA</text>
+            <text x="210" y="72" font-size="10" font-weight="bold" fill="#ffffff">PROVEEDOR EMISOR</text>
+            <text x="430" y="72" font-size="10" font-weight="bold" fill="#ffffff">MOTIVO SAT</text>
+            <text x="580" y="72" font-size="10" font-weight="bold" fill="#ffffff">VÍNCULO EN SIAF-PJEV</text>
+            <text x="780" y="72" font-size="10" font-weight="bold" fill="#ffffff">DECISIÓN / REGLA</text>
+
+            <rect x="20" y="82" width="940" height="40" fill="#fef2f2" stroke="#fee2e2"/>
+            <text x="34" y="106" font-size="10.5" font-family="monospace" fill="#0f172a">5B4A8E12-90C1-4D22</text>
+            <text x="210" y="106" font-size="10.5" fill="#0f172a">CME050212H99 ($145,000.00)</text>
+            <text x="430" y="106" font-size="10.5" fill="#0f172a">02 · Sin relación</text>
+            <text x="580" y="106" font-size="10.5" font-weight="bold" fill="#991b1b">Póliza D-2026-10-0089 Activa</text>
+            <text x="780" y="106" font-size="10" font-weight="bold" fill="#991b1b">⛔ Rechazo Obligatorio</text>
+
+            <rect x="20" y="122" width="940" height="40" fill="#f0fdf4" stroke="#dcfce7"/>
+            <text x="34" y="146" font-size="10.5" font-family="monospace" fill="#0f172a">7D11C094-11B4-409A</text>
+            <text x="210" y="146" font-size="10.5" fill="#0f172a">PAP980410K11 ($8,420.00)</text>
+            <text x="430" y="146" font-size="10.5" fill="#0f172a">01 · Con sustitución</text>
+            <text x="580" y="146" font-size="10.5" fill="#166534">Sin trámite contable activo</text>
+            <text x="780" y="146" font-size="10" font-weight="bold" fill="#166534">✓ Aceptable por Usuario</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. CASOS DE PRUEBA E HISTORIAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Casos de Prueba (Validación QA) e Historial</div>
+    <div tabindex="0" role="region" aria-label="Casos de prueba de Validación y Vinculación Fiscal" class="table-wrapper">
+      <table class="props-table">
+        <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Entrada / Acción</th><th>Resultado Esperado</th></tr></thead>
+        <tbody>
+          <tr><th><strong>CP-VAL-01</strong></th><td>Intento de vincular un mismo CFDI en dos afectaciones de gasto por el 100%</td><td>Vincular <code>UUID 5B4A...</code> ($145,000) en <code>AG-00814</code> y luego intentar vincularlo de nuevo en <code>AG-00899</code>.</td><td>El SP <code>cfdi.fn_crud_vinculacion_cfdi</code> rechaza la segunda operación con <code>error: -1</code> (Prevención de duplicidad).</td></tr>
+          <tr><th><strong>CP-VAL-02</strong></th><td>Proveedor publicado en lista definitiva del Art. 69-B (EFOS)</td><td>Ejecutar sincronización del padrón 69-B donde figura el RFC <code>GOM120101T33</code>.</td><td>Todos sus CFDI cambian a <code>estatus_efos_69b = 'DEFINITIVO'</code> y <code>estado_vinculacion = 'BLOQUEADO_FISCAL'</code>.</td></tr>
+          <tr><th><strong>CP-VAL-03</strong></th><td>Rechazo automático de solicitud de cancelación en Buzón Tributario</td><td>Recibir petición de cancelación SAT sobre un CFDI con póliza de devengo activa.</td><td>El sistema bloquea la aceptación y marca <code>RECHAZADA_AUTOMATICA</code> para proteger el soporte contable de la póliza.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showWF(wfId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('wf-' + wfId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showSP(spId, btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const section = parent.parentElement;
+    section.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('sp-' + spId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showDBTab(tabId, btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const section = parent.parentElement;
+    section.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('db-' + tabId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+</body>
+</html>

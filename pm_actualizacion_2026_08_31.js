@@ -456,9 +456,9 @@
   pagos('06.4.1','06.4 Informes','Informes de pagos y bancos',{responsable:'Eunice',estado:'Pendiente de desarrollo',opciones:['Pagos diarios','Programados, liberados, aplicados y cancelados','Libro de bancos','Disponibilidad financiera','Cheques y transferencias','Traspasos','Inversiones y rendimientos','Gastos de operación y liberación de recursos']});
 
   const cfdi = (id, sub, nombre, datos={}) => agregar(id,'07 Repositorio CFDI',sub,nombre,datos);
-  cfdi('07.1.1','07.1 Registro','Bóveda CFDI',{perfil:'cfg',f2:55,rutas:['/cfg/documentos'],responsable:'Cristian',estado:'Segunda etapa',alcance:'Transversal para Tesorería, Contabilidad y procesos que reciben comprobantes fiscales',opciones:['Carga individual y masiva de XML','Asociación de PDF','Complementos de pago','Consulta fiscal','CFDI relacionados','Vinculación con expedientes','Descarga autorizada e historial'],documentacion:'Evidencia técnica disponible; análisis funcional integral pendiente',evidencia:'Cada CFDI debe registrarse una sola vez por UUID y hash; los demás módulos crean vínculos, no copias.'});
-  cfdi('07.2.1','07.2 Procesos','Validación y vinculación fiscal',{responsable:'Cristian',estado:'Segunda etapa',alcance:'Segunda etapa',opciones:['Validación estructural','Consulta ante SAT','Detección de duplicados','Vinculación con afectación, orden y pago','Vinculación con viáticos y gastos a comprobar','Control de complementos','CFDI sustituidos o cancelados','Integración del expediente digital']});
-  cfdi('07.3.1','07.3 Informes','Control y auditoría CFDI',{responsable:'Cristian',estado:'Segunda etapa',alcance:'Segunda etapa',opciones:['CFDI inválidos o cancelados','Duplicados o reutilizados','Comprobantes sin vincular','Complementos pendientes','Expedientes incompletos','Diferencias entre CFDI, afectación y pago','Trazabilidad y auditoría documental']});
+  cfdi('07.1.1','07.1 Registro','Bóveda CFDI',{perfil:'cfg',f2:55,rutas:['/cfg/documentos','/cfdi/boveda'],responsable:'Cristian',estado:'Segunda etapa',alcance:'Transversal para Tesorería, Contabilidad, Cuentas por Pagar, Materiales y procesos que reciben comprobantes fiscales',opciones:['Descarga Básica Portal SAT (por Fechas, Retenciones y Folio Fiscal UUID hasta 2,000 XML)','Descarga Masiva SAT Web Service SOAP v1.5 con e.firma (hasta 200,000 XML y 1,000,000 Metadata)','Almacén CFDI con filtros por 29 complementos SAT, Solo Egresos y estado','Carga manual individual/masiva de XML y PDF','Herramientas Plus: Compatibilidad CFDI (3.2/3.3/4.0) y AntiCaptchas'],documento:'07_repositorio_cfdi/07.1.1-boveda-cfdi.html',documentacion:'Documentado',evidencia:'Cada CFDI se registra una sola vez por UUID y SHA-256 en cfdi.boveda_comprobantes; incluye galería de 9 pantallas de referencia del Administrador XML preconfigurado.'});
+  cfdi('07.2.1','07.2 Procesos','Validación y vinculación fiscal',{responsable:'Cristian',estado:'Segunda etapa',alcance:'Segunda etapa',opciones:['Validación estructural XSD 3.3/4.0 y criptográfica CSD/PAC','Verificación de estatus en tiempo real ante SAT ([Verificar estatus])','Relacionar UUIDs ([Relacionar UUIDs]: Notas de crédito 01, Sustitución 04, Anticipos 07 y REP 2.0)','Cruce automático contra listado EFOS Art. 69-B CFF y vigencia de Opinión 32-D / CSF','Bandeja de Solicitudes de cancelación (Buzón Tributario 72 h — Art. 29-A CFF)','Vinculación polimórfica con CXP, Materiales, Viáticos, Fondo Fijo, Contabilidad y Tesorería'],documento:'07_repositorio_cfdi/07.2.1-validacion-vinculacion-fiscal.html',documentacion:'Documentado'});
+  cfdi('07.3.1','07.3 Informes','Control y auditoría CFDI',{responsable:'Cristian',estado:'Segunda etapa',alcance:'Segunda etapa',opciones:['AUD-01: CFDI inválidos, cancelados o que cambiaron de Vigente a Cancelado','AUD-02: Intentos de duplicidad o reutilización de UUID','AUD-03: Comprobantes en Almacén sin vincular (Huérfanos)','AUD-04: Facturas PPD pagadas sin Complemento de Pago REP 2.0','AUD-05: Conciliación Triple (Metadata .txt SAT vs. Bóveda XML vs. Pólizas Contables)','AUD-06: Pre-armado automático de cédula DIOT desde CFDI pagados (enlace 05.3.4)','AUD-07: Exportar a Excel Sabana Analítica XML (.xlsx) para ORFIS/ASF'],documento:'07_repositorio_cfdi/07.3.1-control-auditoria-cfdi.html',documentacion:'Documentado'});
 
   const rm = (id,sub,nombre,datos={}) => agregar(id,'08 Materiales',sub.replace(/^05\./, '08.'),nombre,{
     perfil:datos.rutas?.length ? (datos.perfil || 'rm') : null,
@@ -476,6 +476,31 @@
   rm('08.3.3','08.3 Procedimientos de Contratacion','Licitacion publica',{documentacion:'Documentado; desarrollo integral pendiente'});
   rm('08.3.4','08.3 Procedimientos de Contratacion','Formalizacion, recepcion y devengado',{opciones:['Formalizacion y comprometido','Recepcion, CFDI y devengado']});
   rm('08.4.1','08.4 Reportes e Informes','Seguimiento de adquisiciones',{opciones:['Programa anual','Seguimiento de requerimientos','Cuadro comparativo','Seguimiento de procedimientos','Pedidos y contratos','Recepciones y CFDI','Trazabilidad y auditoria']});
+
+  // Actualización documental del 29-10-2026; sin atribuir rutas ni desarrollo real.
+  agregar('09.1.1', '09 Gestión Documental y Archivo', '09.1 Catálogos Archivísticos', 'Cuadro de Clasificación Archivística', {
+    estado: 'Pendiente de desarrollo', alcance: 'Piloto DGA–2530–Contabilidad; modelo general versionado',
+    documento: '09_gestion_documental/09.1.1-cgca.html',
+    documentacion: 'Documentado; referencia institucional contrastada, vigencia operativa por ratificar',
+    evidencia: '29-10-2026: CGCA pp.31–32; 4 series/12 subseries. Sin rutas ni despliegue acreditado.'
+  });
+  modulos[modulos.length - 1].fecha_corte = '2026-10-29';
+  agregar('09.1.2', '09 Gestión Documental y Archivo', '09.1 Catálogos Archivísticos', 'Catálogo de Disposición Documental', {
+    estado: 'Pendiente de desarrollo', alcance: 'Piloto DGA–2530–Contabilidad; reglas por versión',
+    documento: '09_gestion_documental/09.1.2-cadido.html',
+    documentacion: 'Documentado; referencia institucional contrastada, vigencia operativa por ratificar',
+    evidencia: '29-10-2026: CADIDO pp.36–37; 2/8 años y Archivo Histórico. Sin defaults de baja ni despliegue acreditado.'
+  });
+  modulos[modulos.length - 1].fecha_corte = '2026-10-29';
+  agregar('09.2.4', '09 Gestión Documental y Archivo', '09.2 Registro y Operación', 'Control de Archivo · Registro y Digitalización', {
+    estado: 'Pendiente de desarrollo',
+    alcance: 'Piloto DGA–2530–Contabilidad confirmado; modelo general con instrumentos versionados',
+    documento: '09_gestion_documental/09.2.4-control-archivo.html',
+    documentacion: 'Documentado como especificación inicial; validación institucional pendiente',
+    opciones: ['Enlace Digital de Documentos', 'Impresión de Marbetes', 'Ubicación Física de los Documentos', 'Ubicación de Documentos Anteriores', 'Registro de Anexos', 'Buscar Documentos en Archivo', 'Eliminar Documentos: cancelación o solicitud de baja', 'Cambio de Marbetes y Reubicación'],
+    evidencia: '29-10-2026: recalibración CGCA/CADIDO/PADA/XLV; 4 series y 12 subseries, 2/8 años, destino histórico; inventarios, transferencias y préstamos. Cotización 2018 histórica. Sin despliegue acreditado.'
+  });
+  modulos[modulos.length - 1].fecha_corte = '2026-10-29';
 
   const responsablesTesoreria = {
     '04 Ingresos': 'Daryl',

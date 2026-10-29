@@ -43,6 +43,15 @@
     </div>
 
     <!-- 1. Descripción General -->
+    <div class="callout info" style="margin-bottom:18px;border-left:4px solid #c8962e;background:#faf3e0;padding:14px 18px;border-radius:6px;">
+      <strong>📌 Actualización Arquitectónica (Octubre 2026 — Sistema 07 · Repositorio CFDI / Administrador de XML):</strong>
+      La especificación integral DOC-08 de este módulo fue promovida al sistema transversal <strong>07 · Repositorio CFDI</strong>, integrando la Descarga Básica (Fechas, Retenciones, UUID), Descarga Masiva SAT Web Service (hasta 200,000 XML), Almacén CFDI con <code>[Relacionar UUIDs]</code> y Herramientas Plus (<code>XMLs</code>, <code>Metadata</code>, <code>DIOT</code>, <code>Solicitudes de cancelación</code>, <code>Compatibilidad CFDI</code> y monitoreo <code>EFOS 69-B</code>):
+      <ul style="margin-top:6px;margin-bottom:0;">
+        <li><a href="../07_repositorio_cfdi/07.1.1-boveda-cfdi.html"><strong>07.1.1 Bóveda CFDI y Administrador de Descarga Masiva XML</strong></a></li>
+        <li><a href="../07_repositorio_cfdi/07.2.1-validacion-vinculacion-fiscal.html"><strong>07.2.1 Validación y Vinculación Fiscal (Relacionar UUIDs, EFOS 69-B y Buzón)</strong></a></li>
+        <li><a href="../07_repositorio_cfdi/07.3.1-control-auditoria-cfdi.html"><strong>07.3.1 Control y Auditoría CFDI (Conciliación Metadata, Pre-DIOT y Sabana Excel)</strong></a></li>
+      </ul>
+    </div>
     <div class="doc-section">
       <div class="section-title"><span class="section-num">1</span> Descripción General</div>
       <p>La Bóveda Digital CFDI es el repositorio central del SIAF-PJEV donde convergen todos los Comprobantes Fiscales Digitales por Internet (XML y PDF) cargados por las áreas operativas (Materiales, Servicios Generales, etc.) o descargados masivamente del SAT. El módulo analiza el XML, extrae su UUID, RFC y montos, validando que no se registren comprobantes falsos o cancelados, enlazándolos definitivamente a la póliza contable correspondiente.</p>

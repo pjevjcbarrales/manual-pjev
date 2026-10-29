@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07.1.1 Bóveda CFDI, Almacén y Descarga SAT — Manual de Desarrollo SIAF-PJEV</title>
+<link rel="stylesheet" href="../shared.css">
+<style>
+  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
+  .code-wrap {
+    background: var(--code-bg, #111c11); color: var(--code-text, #a8d8a8);
+    border-radius: 8px; font-family: var(--font-mono); font-size: 12.5px;
+    padding: 18px 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 20px;
+  }
+  .code-wrap pre, .code-wrap code {
+    margin: 0; padding: 0; background: transparent !important;
+    font-family: inherit !important; font-size: inherit !important; color: inherit !important;
+  }
+  .mod-header-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mod-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .badge-a { background:var(--pjev-success-bg); color:var(--pjev-success-text); border:1px solid var(--pjev-success-borde); }
+  .badge-s { background:var(--pjev-info-bg);    color:var(--pjev-info-text);    border:1px solid var(--pjev-info-borde); }
+  .badge-w { background:var(--pjev-warning-bg); color:var(--pjev-warning-text); border:1px solid var(--pjev-warning-borde); }
+  .badge-c { background:#f3e8ff; color:#6b21a8; border:1px solid #d8b4fe; }
+
+  .method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:var(--font-mono); }
+  .method.get    { background:#e8f5e9; color:#1b5e20; }
+  .method.post   { background:#e3f2fd; color:#0d47a1; }
+  .method.put    { background:#fff3e0; color:#e65100; }
+  .method.delete { background:#fdecea; color:#991b1b; }
+  .method.patch  { background:#f3e8ff; color:#6b21a8; }
+
+  .wf-tabs, .sp-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
+  .wf-tab, .sp-tab { padding: 8px 14px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
+  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
+  .wf-panel, .sp-panel { display: none; }
+  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.25s ease; }
+
+  .wf-box { border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; background:var(--pjev-blanco); margin-bottom:16px; }
+  .wf-bar { background:var(--pjev-blanco); border-bottom:1px solid var(--pjev-borde); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .wf-bar-label { font-size:11px; font-weight:700; color:var(--pjev-verde-oscuro); text-transform:uppercase; letter-spacing:0.6px; }
+  .wf-svg-area { background:#f8fafc; padding:16px; overflow-x:auto; text-align:center; }
+
+  /* Responsive Table Container with Sticky Headers (modern-web-guidance: responsive-table) */
+  .table-wrapper {
+    overflow: auto;
+    max-inline-size: 100%;
+    max-block-size: min(560px, 80vh);
+    container-type: inline-size;
+    border-radius: 6px;
+    margin-bottom: 14px;
+  }
+  .table-wrapper:focus-visible { outline: 3px solid var(--pjev-dorado); outline-offset: 2px; }
+  .table-wrapper table { border-collapse: separate; border-spacing: 0; width: 100%; }
+  .table-wrapper thead { position: sticky; inset-block-start: 0; z-index: 2; }
+  .table-wrapper tbody th { position: sticky; inset-inline-start: 0; background: #ffffff; z-index: 1; text-align: left; }
+
+  .nat-badge { font-size:9px; font-weight:700; padding:2px 7px; border-radius:4px; text-transform:uppercase; display:inline-block; }
+  .nat-norm { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+  .nat-inst { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+  .nat-tech { background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+
+  .ref-gallery { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-top:14px; }
+  .ref-card { background:#fff; border:1px solid var(--pjev-borde); border-radius:8px; overflow:hidden; }
+  .ref-card img { width:100%; height:auto; display:block; border-bottom:1px solid var(--pjev-borde); }
+  .ref-card-cap { padding:10px 12px; font-size:11.5px; color:var(--pjev-texto); line-height:1.45; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div style="position: fixed; top: 20px; right: 45px; display: flex; gap: 10px; z-index: 9999;">
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro);" onclick="window.location.reload()">⟳ Refrescar</button>
+  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro);" onclick="window.print()">🖨 Imprimir</button>
+</div>
+
+<div class="doc-main-inner">
+
+  <!-- BREADCRUMB -->
+  <div class="elem-breadcrumb">
+    <a href="../index.html">Inicio</a> ›
+    <span>07 · Repositorio CFDI</span> ›
+    <span>07.1 · Registro</span> ›
+    <span>07.1.1 Bóveda CFDI, Almacén y Descarga SAT</span>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="elem-header">
+    <div>
+      <div class="elem-id">07.1.1</div>
+      <h1 class="elem-title">Bóveda CFDI, Almacén y Descarga SAT (Administrador de XML)</h1>
+      <p class="elem-desc">Repositorio central e interfaz de extracción automatizada de Comprobantes Fiscales Digitales por Internet (CFDI 4.0, Retenciones 2.0, Complementos de Pago y Nómina) y Metadata del SAT para el Poder Judicial del Estado de Veracruz. Integra Descarga Directa (hasta 2,000 XMLs), SAT Web Service con e.firma (hasta 200,000 XMLs / 1,000,000 Metadata), Almacén con relación automática de UUIDs y Herramientas Plus.</p>
+      <div class="mod-header-badges">
+        <span class="mod-badge badge-w">Segunda Etapa — Especificación Funcional y Técnica Completa</span>
+        <span class="mod-badge badge-c">Tipo: Módulo Compuesto y Motor Batch / SOAP SAT</span>
+        <span class="mod-badge badge-s">Responsable: Cristian</span>
+        <span class="elem-tag" style="font-size:10px;">Ruta Frontend: <code style="font-family:var(--font-mono);font-size:10px;">/cfdi/boveda</code> · <code style="font-family:var(--font-mono);font-size:10px;">/cfg/documentos</code></span>
+        <span class="elem-tag" style="font-size:10px;">API: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/cfdi/boveda</code></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. DESCRIPCIÓN GENERAL -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">1</span> Descripción General</div>
+    <p>El módulo <strong>07.1.1 Bóveda CFDI, Almacén y Descarga SAT (Administrador de XML)</strong> es el punto único de entrada, resguardo y consulta de todos los comprobantes fiscales digitales (<code>.xml</code>, su representación impresa <code>.pdf</code> y los paquetes de <code>Metadata .txt</code>) tanto <strong>Recibidos</strong> de proveedores, contratistas, arrendadores y prestadores de servicios, como <strong>Emitidos</strong> por el Poder Judicial del Estado de Veracruz (recibos de nómina timbrados, ingresos propios, arrendamientos y reintegros).</p>
+    <p>Su arquitectura resuelve cuatro necesidades críticas de operación fiscal y gubernamental:</p>
+    <ul style="font-size:13px; line-height:1.7; color:var(--pjev-texto); margin:10px 0 14px 20px;">
+      <li><strong>1. Descarga de CFDIs en Doble Canal Oficial del SAT:</strong>
+        <br>— <em>Descarga Básica (Consulta Directa / Portal SAT):</em> Opera en tres pestañas (<strong>Fechas</strong>, <strong>Retenciones</strong> y <strong>Folio Fiscal UUID</strong>) para recuperaciones inmediatas de hasta <strong>2,000 XMLs por consulta/día</strong>, mostrando en tiempo real el conteo de comprobantes vigentes (<code>V</code>) y cancelados (<code>C</code>).
+        <br>— <em>Módulo SAT Web Service (Descarga Masiva Asíncrona SOAP v1.5 con e.firma):</em> Diseñado para volúmenes superiores a 20,000 XMLs o más de 500 emisiones por segundo (ej. nómina quincenal o cierres trimestrales), permitiendo recuperar <strong>hasta 200,000 archivos XML</strong> o <strong>hasta 1,000,000 de registros de Metadata</strong> por petición firmada con la <code>e.firma</code> institucional.
+      </li>
+      <li><strong>2. Almacén CFDI Inteligente con Relación Automática de UUIDs:</strong> Todos los XML descargados o cargados manualmente se indexan una sola vez por su <code>UUID</code> y huella criptográfica <code>SHA-256</code>. Incorpora la acción <strong><code>[Relacionar UUIDs]</code></strong> para armar automáticamente el árbol entre facturas <code>PPD</code>, Complementos de Pago (<code>REP 2.0</code>), Notas de Crédito (<code>TipoRelacion 01</code>) y CFDI sustituidos (<code>TipoRelacion 04</code>), así como los botones directos <strong><code>[Exportar a Excel]</code></strong>, <strong><code>[Verificar estatus]</code></strong> (detectando facturas que cambiaron de vigentes a canceladas) y <strong><code>[Consultar]</code></strong>.</li>
+      <li><strong>3. Herramientas Plus de Ingesta y Normalización:</strong> Incluye utilidades integradas para importar lotes de <strong>XMLs externos</strong> y convertirlos a Excel/PDF, convertir archivos <strong><code>.txt</code> de Metadata del SAT a Excel</strong> conciliándolos contra el almacén, resolver retos de consulta (<strong>AntiCaptchas</strong>) y validar la <strong>Compatibilidad de Precisión Decimal</strong> frente a las partidas presupuestales y contables.</li>
+      <li><strong>4. Vínculo Transversal sin Copias Duplicadas:</strong> Ningún módulo operativo (Recursos Materiales, Cuentas por Pagar, Tesorería, Ingresos o Contabilidad) almacena copias aisladas de un XML; todos referencian el registro canónico de `cfdi.boveda_comprobantes`.</li>
+    </ul>
+  </div>
+
+  <!-- 2. MARCO NORMATIVO Y NATURALEZA DE LAS REGLAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">2</span> Marco Normativo y Distinción de Reglas</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:12px;">Conforme a las directrices de arquitectura del SIAF-PJEV, se distingue expresamente entre requisito normativo, regla institucional del PJEV y propuesta tecnológica / referente funcional externo:</p>
+
+    <div tabindex="0" role="region" aria-label="Marco normativo y naturaleza de las reglas" class="table-wrapper">
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th style="width:15%;">Naturaleza</th>
+            <th style="width:27%;">Norma / Instrumento / Fuente</th>
+            <th style="width:58%;">Obligación y Consecuencia Técnica en el SIAF-PJEV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="nat-badge nat-norm">Requisito Normativo</span></th>
+            <td><strong>Código Fiscal de la Federación (CFF)</strong> · Arts. 29, 29-A y 30; <strong>Anexo 20 RMF (CFDI 4.0)</strong></td>
+            <td>Obligación de recibir, validar y conservar los CFDI en su formato original <code>.xml</code> como único comprobante fiscalmente válido durante los plazos de ley, verificando sello digital, RFC receptor del PJEV, régimen fiscal, uso del CFDI y desglose de impuestos.</td>
+          </tr>
+          <tr>
+            <th><span class="nat-badge nat-norm">Requisito Normativo</span></th>
+            <td><strong>Lineamientos Técnicos del Web Service de Descarga Masiva del SAT (v1.5)</strong></td>
+            <td>Establece el protocolo SOAP autenticado exclusivamente con <strong>e.firma (FIEL)</strong> vigente en 3 etapas (<code>Autenticación/Solicitud</code>, <code>Verificación</code> y <code>Descarga</code>), con tope de <strong>200,000 XMLs por petición</strong>, <strong>1,000,000 de registros en Metadata</strong>, ventana de respuesta de hasta 72 horas y vigencia de descarga de paquetes <code>.zip</code> por 72 horas (máximo 2 descargas por paquete).</td>
+          </tr>
+          <tr>
+            <th><span class="nat-badge nat-norm">Requisito Normativo</span></th>
+            <td><strong>LGCG Arts. 4 (fracc. XIV–XVII), 42 y 43</strong> y <strong>Acuerdos CONAC (Momentos del Egreso)</strong></td>
+            <td>Toda póliza de devengado y pago debe estar respaldada por su documentación comprobatoria y justificativa identificada por <code>UUID</code>. <strong>Regla crítica CONAC:</strong> La descarga o carga de un CFDI en la Bóveda <strong>no detona por sí sola el momento contable del Devengado</strong>; el devengado exige la recepción conforme del bien, servicio o estimación de obra en Recursos Materiales (<code>08.3.4</code>) o la autorización del trámite en Cuentas por Pagar (<code>05.2.1</code>).</td>
+          </tr>
+          <tr>
+            <th><span class="nat-badge nat-inst">Regla Institucional</span></th>
+            <td><strong>Manual Específico de Procedimientos de Recursos Financieros y Recursos Materiales PJEV (Feb 2023)</strong></td>
+            <td>En los procedimientos de <em>Recepción y revisión de gastos</em> (pág. 124), <em>Adquisiciones</em>, <em>Entradas de Almacén</em> y <em>Alta de Activo Fijo</em>, el área revisora debe cotejar que los conceptos, cantidades e importes del CFDI coincidan con el pedido, contrato, vale de entrada o resguardo patrimonial antes de autorizar el pago.</td>
+          </tr>
+          <tr>
+            <th><span class="nat-badge nat-tech">Propuesta Tecnológica</span></th>
+            <td><strong>Referente funcional externo de interfaz:</strong> Módulo de Descarga, Almacén, Web Service y Herramientas (Onefacture v4.0.9 / Video <code>Vl4qRXLMxmM</code> y <a href="../docs/ESPECIFICACION_REPOSITORIO_CFDI_ADMINISTRADOR_XML_PJEV.md">Especificación Fuente</a>)</td>
+            <td>Organización de la interfaz en 3 pestañas de búsqueda (<code>Fechas</code>, <code>Retenciones</code>, <code>Folio fiscal UUID</code>), banner preventivo del límite de 2,000 XMLs vs. 200,000 XMLs en Web Service, botón <code>[Relacionar UUIDs]</code>, selector de los 29 complementos del SAT, filtro <code>Solo Egresos</code>, tríada de acciones (<code>Exportar a excel</code>, <code>Verificar estatus</code>, <code>Consultar</code>) y utilidades de conversión de Metadata <code>.txt</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3. MODALIDADES OPERATIVAS DE DESCARGA, ALMACÉN Y HERRAMIENTAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">3</span> Modalidades Operativas de Descarga, Almacén y Herramientas Plus</div>
+    <p>El módulo <code>07.1.1</code> integra cuatro áreas funcionales acopladas a un mismo repositorio PostgreSQL (<code>cfdi.boveda_comprobantes</code>):</p>
+
+    <div tabindex="0" role="region" aria-label="Comparativa de componentes del módulo 07.1.1" class="table-wrapper">
+      <table class="props-table">
+        <thead>
+          <tr>
+            <th style="width:18%;">Sub-módulo / Vista</th>
+            <th style="width:22%;">Opciones y Pestañas</th>
+            <th style="width:30%;">Parámetros de Entrada y Filtros</th>
+            <th style="width:30%;">Comportamiento y Salida en SIAF-PJEV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><strong>3.1 Descarga CFDI (Básica / Portal SAT)</strong></th>
+            <td>
+              • Pestaña 1: <code>Fechas</code><br>
+              • Pestaña 2: <code>Retenciones</code><br>
+              • Pestaña 3: <code>Folio fiscal (UUID)</code>
+            </td>
+            <td>
+              • Razón Social y RFC del Ente (PJEV)<br>
+              • Rango <code>Inicio</code> y <code>Fin</code> (<code>dd/mm/aaaa</code>)<br>
+              • <code>Complemento</code> (Todos o específico)<br>
+              • <code>RFC receptor / emisor (Opcional)</code><br>
+              • <code>Estatus</code> (<code>TODOS</code>, <code>VIGENTES</code>, <code>CANCELADOS</code>)<br>
+              • Radio: <code>Emitidos</code> / <code>Recibidos</code><br>
+              • En UUID: Radio <code>Solo uno</code> / <code>Varios</code> y checkbox <code>¿Son retenciones?</code>
+            </td>
+            <td>
+              Ejecuta la consulta directa al SAT con resolución automatizada de reto visual (<code>AntiCaptchas</code>). Muestra cronómetro en vivo (<code>Tiempo: 00:11:15</code>), bitácora por día consultado, contadores <code>Total vigentes (V)</code> y <code>Total cancelados (C)</code>, y guarda automáticamente los XML en el Almacén. Si detecta el tope de <strong>2,000 XMLs</strong>, sugiere usar <strong>SAT Web Service</strong>.
+            </td>
+          </tr>
+          <tr>
+            <th><strong>3.2 SAT Web Service (Descarga Masiva FIEL)</strong></th>
+            <td>
+              • Solicitud asíncrona SOAP<br>
+              • Monitor de Peticiones Registradas
+            </td>
+            <td>
+              • Entidad configurada con <strong>e.firma (FIEL)</strong><br>
+              • Fecha y hora <code>Inicio</code> (<code>dd/mm/aaaa hh:mm</code>)<br>
+              • Fecha y hora <code>Fin</code> (<code>dd/mm/aaaa hh:mm</code>)<br>
+              • <code>Tipo de CFDI</code>: <code>Emitidos</code> / <code>Recibidos</code><br>
+              • Checkbox: <code>¿Son retenciones?</code><br>
+              • Botón: <code>[Solicitar CFDI y Metadata]</code>
+            </td>
+            <td>
+              Recomendado para más de <strong>20,000 XMLs</strong> o más de <strong>500 por segundo</strong> (hasta <strong>200,000 XMLs</strong> o <strong>1,000,000 Metadata</strong> por petición). Registra el <code>IdSolicitud</code> del SAT; permite actualizar estatus cada 2 horas (plazo SAT de horas hasta 3 días) y, al pasar a <code>Terminada</code>, descarga los paquetes <code>.zip</code> y los optimiza e indexa en el Almacén.
+            </td>
+          </tr>
+          <tr>
+            <th><strong>3.3 Almacén CFDI</strong></th>
+            <td>
+              • Pestañas: <code>Fechas</code>, <code>Retenciones</code>, <code>Folio fiscal (UUID)</code><br>
+              • Acción superior: <code>[Relacionar UUIDs]</code>
+            </td>
+            <td>
+              • Rango <code>Inicio</code> y <code>Fin</code><br>
+              • <code>Complemento</code>: Selector múltiple de los <strong>29 complementos del SAT</strong><br>
+              • <code>RFC emisor (Opcional)</code><br>
+              • <code>Estatus</code> (<code>VIGENTES</code>, <code>CANCELADOS</code>, <code>TODOS</code>)<br>
+              • Radio <code>Emitidos</code> / <code>Recibidos</code><br>
+              • Checkbox: <code>Solo Egresos</code> (Notas de crédito)
+            </td>
+            <td>
+              Ofrece tres acciones operativas diferenciadas:<br>
+              1) <strong><code>[Exportar a excel]</code></strong>: descarga masiva directa sin saturar el navegador.<br>
+              2) <strong><code>[Verificar estatus]</code></strong>: valida en lote qué CFDIs <strong>cambiaron de vigentes a cancelados</strong> en el SAT.<br>
+              3) <strong><code>[Consultar]</code></strong>: abre el grid de resultados con visor XML/PDF y estado de vinculación en SIAF-PJEV.
+            </td>
+          </tr>
+          <tr>
+            <th><strong>3.4 Herramientas Plus</strong></th>
+            <td>
+              • <code>XMLs</code> (Lector local)<br>
+              • <code>Metadata</code> (Conversor <code>.txt</code>)<br>
+              • <code>Compatibilidad CFDI</code><br>
+              • <code>AntiCaptchas</code>
+            </td>
+            <td>
+              • Carga Drag &amp; Drop de archivos <code>.xml</code> o <code>.zip</code> locales<br>
+              • Carga de archivos <code>.txt</code> de Metadata bajados del portal del SAT<br>
+              • Reglas de redondeo y tolerancia decimal (2 decimales)
+            </td>
+            <td>
+              Permite incorporar XMLs históricos que ya tenía la institución, convertir a Excel los archivos <code>.txt</code> de Metadata del SAT cruzándolos contra la bóveda para identificar comprobantes faltantes, y normalizar diferencias de centavos por truncamiento/redondeo de impuestos para las pólizas contables.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. ACTORES Y PERMISOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">4</span> Actores, Roles y Segregación de Funciones</div>
+    <div tabindex="0" role="region" aria-label="Actores y permisos del módulo 07.1.1" class="table-wrapper">
+      <table class="props-table">
+        <thead>
+          <tr><th>Rol Institucional</th><th>Nivel</th><th>Acciones Permitidas</th><th>Restricciones y Segregación</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><strong>Administrador Fiscal (Subdirección de Recursos Financieros / Contabilidad)</strong></th>
+            <td>Nivel 2</td>
+            <td>Configurar credenciales de consulta y resguardo de e.firma institucional en bóveda criptográfica; ejecutar descargas masivas por Portal y SAT Web Service; ejecutar <code>[Relacionar UUIDs]</code> y <code>[Verificar estatus]</code> masivo.</td>
+            <td>La llave privada (<code>.key</code>) y su contraseña se procesan exclusivamente en memoria del servidor backend; jamás se exponen ni descargan en el navegador del cliente.</td>
+          </tr>
+          <tr>
+            <th><strong>Analista Operativo (Adquisiciones / Almacén / CxP / Viáticos / Ingresos)</strong></th>
+            <td>Nivel 3</td>
+            <td>Cargar archivos <code>.xml</code> y <code>.pdf</code> de trámites específicos, descargar por <code>Folio fiscal (UUID)</code>, consultar el Almacén CFDI y vincular comprobantes vigentes a sus expedientes.</td>
+            <td>No puede eliminar ni desactivar un CFDI que ya se encuentre vinculado a una recepción, entrada de almacén, afectación de gasto, orden de pago o póliza contable.</td>
+          </tr>
+          <tr>
+            <th><strong>Órgano Interno de Control / Auditoría / ORFIS</strong></th>
+            <td>Nivel 4</td>
+            <td>Consultar el Almacén CFDI, exportar sabanas en Excel/PDF, cotejar archivos de Metadata <code>.txt</code> y verificar la integridad <code>SHA-256</code> y vigencia SAT.</td>
+            <td>Acceso de solo lectura estricta; sin permisos de carga ni modificación de vínculos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. MODELO DE DATOS Y DICCIONARIO DE CAMPOS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">5</span> Modelo de Datos y Diccionario de Campos (Esquema <code>cfdi</code>)</div>
+    <p>El almacenamiento se estructura en el esquema <code>cfdi</code> de PostgreSQL. Cada archivo binario (<code>.xml</code>, <code>.pdf</code>, <code>.txt</code>) se registra en <code>archivos.documento</code> con su hash <code>SHA-256</code>, mientras que sus nodos fiscales estructurados se persisten en las siguientes cinco tablas:</p>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showDBTab('db1',this)">5.1 cfdi.boveda_comprobantes</button>
+      <button class="sp-tab" onclick="showDBTab('db2',this)">5.2 cfdi.boveda_comprobantes_conceptos</button>
+      <button class="sp-tab" onclick="showDBTab('db3',this)">5.3 cfdi.boveda_comprobantes_impuestos</button>
+      <button class="sp-tab" onclick="showDBTab('db4',this)">5.4 cfdi.peticiones_descarga_sat</button>
+      <button class="sp-tab" onclick="showDBTab('db5',this)">5.5 cfdi.metadata_sat_registros</button>
+    </div>
+
+    <!-- TABLA 1 -->
+    <div id="db-db1" class="sp-panel active">
+      <div tabindex="0" role="region" aria-label="Diccionario de campos cfdi.boveda_comprobantes" class="table-wrapper">
+        <table class="props-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción y Regla de Validación</th></tr></thead>
+          <tbody>
+            <tr><th><code>cfdi_id</code></th><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador interno único del comprobante en la bóveda.</td></tr>
+            <tr><th><code>uuid</code></th><td><code>UUID UNIQUE</code></td><td>No</td><td>Folio Fiscal oficial del Timbre Fiscal Digital (36 caracteres, único en toda la bóveda).</td></tr>
+            <tr><th><code>f_entidad_id</code> / <code>ejercicio</code></th><td><code>INTEGER</code></td><td>No</td><td>Entidad del PJEV y ejercicio fiscal correspondiente a la fecha de emisión/aplicación.</td></tr>
+            <tr><th><code>direccion_flujo</code></th><td><code>VARCHAR(12)</code></td><td>No</td><td><code>RECIBIDO</code> (Proveedores/Contratistas/Viáticos) o <code>EMITIDO</code> (Nómina/Ingresos PJEV).</td></tr>
+            <tr><th><code>es_retencion</code></th><td><code>BOOLEAN</code></td><td>No</td><td><code>true</code> si corresponde a un CFDI de Retenciones e Información de Pagos 2.0.</td></tr>
+            <tr><th><code>version_cfdi</code></th><td><code>VARCHAR(5)</code></td><td>No</td><td>Versión del estándar Anexo 20 (<code>4.0</code>, <code>3.3</code>, <code>2.0</code> para retenciones).</td></tr>
+            <tr><th><code>tipo_comprobante</code></th><td><code>CHAR(1)</code></td><td>No</td><td><code>I</code> (Ingreso), <code>E</code> (Egreso / Nota de crédito), <code>P</code> (Pago REP 2.0), <code>N</code> (Nómina), <code>T</code> (Traslado).</td></tr>
+            <tr><th><code>serie</code> / <code>folio</code></th><td><code>VARCHAR(25) / VARCHAR(40)</code></td><td>Sí</td><td>Serie y folio comercial asignados por el emisor.</td></tr>
+            <tr><th><code>fecha_emision</code> / <code>fecha_timbrado</code></th><td><code>TIMESTAMPTZ</code></td><td>No</td><td>Fechas oficiales del nodo <code>Comprobante</code> y <code>TimbreFiscalDigital</code>.</td></tr>
+            <tr><th><code>rfc_emisor</code> / <code>nombre_emisor</code></th><td><code>VARCHAR(13) / VARCHAR(300)</code></td><td>No</td><td>RFC y Razón Social del emisor; indexado para cruce con <code>01.3.1 Proveedores</code> y listas 69-B.</td></tr>
+            <tr><th><code>regimen_fiscal_emisor</code></th><td><code>VARCHAR(5)</code></td><td>No</td><td>Clave del SAT del régimen fiscal del emisor (ej. <code>601</code>, <code>612</code>, <code>626</code> RESICO).</td></tr>
+            <tr><th><code>rfc_receptor</code> / <code>nombre_receptor</code></th><td><code>VARCHAR(13) / VARCHAR(300)</code></td><td>No</td><td>RFC y nombre del receptor (validado contra el RFC oficial del PJEV en recibidos).</td></tr>
+            <tr><th><code>uso_cfdi</code></th><td><code>VARCHAR(5)</code></td><td>No</td><td>Clave de uso del CFDI (ej. <code>G03</code> Gastos en general, <code>CP01</code> Pagos, <code>CN01</code> Nómina).</td></tr>
+            <tr><th><code>metodo_pago</code> / <code>forma_pago</code></th><td><code>VARCHAR(5) / VARCHAR(5)</code></td><td>Sí</td><td><code>PUE</code> o <code>PPD</code>; forma de pago (<code>03</code> Transferencia, <code>02</code> Cheque, <code>99</code> Por definir).</td></tr>
+            <tr><th><code>moneda</code> / <code>tipo_cambio</code></th><td><code>VARCHAR(5) / NUMERIC(18,6)</code></td><td>No</td><td>Código ISO de moneda (<code>MXN</code>, <code>USD</code>) y tipo de cambio.</td></tr>
+            <tr><th><code>subtotal</code> / <code>descuento</code></th><td><code>NUMERIC(18,2)</code></td><td>No</td><td>Subtotal antes de impuestos y descuento total acumulado.</td></tr>
+            <tr><th><code>total_traslados</code> / <code>total_retenciones</code></th><td><code>NUMERIC(18,2)</code></td><td>No</td><td>Suma de impuestos trasladados (IVA/IEPS) y retenidos (ISR/IVA/Locales).</td></tr>
+            <tr><th><code>total</code></th><td><code>NUMERIC(18,2)</code></td><td>No</td><td>Monto total del comprobante fiscal.</td></tr>
+            <tr><th><code>complemento_codigo</code></th><td><code>VARCHAR(40)</code></td><td>No</td><td>Identificador del complemento entre los 29 del SAT (<code>NINGUNO</code>, <code>PAGOS_20</code>, <code>NOMINA_12</code>, <code>IMPLOCAL</code>, etc.).</td></tr>
+            <tr><th><code>estatus_sat</code></th><td><code>VARCHAR(20)</code></td><td>No</td><td><code>VIGENTE</code>, <code>CANCELADO</code>, <code>EN_PROCESO_CANCELACION</code>.</td></tr>
+            <tr><th><code>cambio_a_cancelado</code></th><td><code>BOOLEAN</code></td><td>No</td><td><code>true</code> cuando <code>[Verificar estatus]</code> detecta que un CFDI antes vigente pasó a cancelado.</td></tr>
+            <tr><th><code>fecha_ultima_verificacion_sat</code></th><td><code>TIMESTAMPTZ</code></td><td>Sí</td><td>Marca de tiempo de la última consulta al servicio de vigencia del SAT.</td></tr>
+            <tr><th><code>estatus_efos_69b</code></th><td><code>VARCHAR(25)</code></td><td>No</td><td><code>SIN_INCIDENCIA</code>, <code>PRESUNTO</code>, <code>DESVIRTUADO</code>, <code>DEFINITIVO</code>, <code>SENTENCIA_FAVORABLE</code>.</td></tr>
+            <tr><th><code>estado_vinculacion</code></th><td><code>VARCHAR(25)</code></td><td>No</td><td><code>DISPONIBLE</code>, <code>VINCULADO_PARCIAL</code>, <code>VINCULADO_TOTAL</code>, <code>BLOQUEADO_FISCAL</code>.</td></tr>
+            <tr><th><code>f_doc_xml_id</code> / <code>f_doc_pdf_id</code></th><td><code>UUID FK</code></td><td>No / Sí</td><td>Referencias a <code>archivos.documento(id)</code> para el binario XML y el PDF asociado.</td></tr>
+            <tr><th><code>hash_sha256_xml</code></th><td><code>CHAR(64) UNIQUE</code></td><td>No</td><td>Huella criptográfica SHA-256 del archivo XML original timbrado.</td></tr>
+            <tr><th><code>origen_carga</code></th><td><code>VARCHAR(25)</code></td><td>No</td><td><code>DESCARGA_PORTAL</code>, <code>SAT_WEBSERVICE</code>, <code>CARGA_MANUAL</code>, <code>HERRAMIENTA_XML</code>.</td></tr>
+            <tr><th><code>estatus_registro</code> / Auditoría</th><td><code>SMALLINT / VARCHAR / TIMESTAMPTZ</code></td><td>No</td><td>Soft-delete obligatorio (<code>1=Activo, 0=Inactivo</code>) y campos <code>usuario_c, fecha_c, usuario_m, fecha_m</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-wrap">
+<pre><code>CREATE SCHEMA IF NOT EXISTS cfdi;
+
+CREATE TABLE cfdi.boveda_comprobantes (
+    cfdi_id BIGSERIAL PRIMARY KEY,
+    uuid UUID NOT NULL UNIQUE,
+    f_entidad_id INTEGER NOT NULL DEFAULT 1,
+    ejercicio INTEGER NOT NULL,
+    direccion_flujo VARCHAR(12) NOT NULL CHECK (direccion_flujo IN ('RECIBIDO', 'EMITIDO')),
+    es_retencion BOOLEAN NOT NULL DEFAULT false,
+    version_cfdi VARCHAR(5) NOT NULL DEFAULT '4.0',
+    tipo_comprobante CHAR(1) NOT NULL CHECK (tipo_comprobante IN ('I', 'E', 'P', 'N', 'T', 'R')),
+    serie VARCHAR(25),
+    folio VARCHAR(40),
+    fecha_emision TIMESTAMPTZ NOT NULL,
+    fecha_timbrado TIMESTAMPTZ NOT NULL,
+    rfc_emisor VARCHAR(13) NOT NULL,
+    nombre_emisor VARCHAR(300) NOT NULL,
+    regimen_fiscal_emisor VARCHAR(5) NOT NULL,
+    rfc_receptor VARCHAR(13) NOT NULL,
+    nombre_receptor VARCHAR(300) NOT NULL,
+    regimen_fiscal_receptor VARCHAR(5),
+    domicilio_fiscal_receptor VARCHAR(5),
+    uso_cfdi VARCHAR(5) NOT NULL,
+    metodo_pago VARCHAR(5),
+    forma_pago VARCHAR(5),
+    moneda VARCHAR(5) NOT NULL DEFAULT 'MXN',
+    tipo_cambio NUMERIC(18,6) NOT NULL DEFAULT 1.000000,
+    subtotal NUMERIC(18,2) NOT NULL DEFAULT 0.00,
+    descuento NUMERIC(18,2) NOT NULL DEFAULT 0.00,
+    total_traslados NUMERIC(18,2) NOT NULL DEFAULT 0.00,
+    total_retenciones NUMERIC(18,2) NOT NULL DEFAULT 0.00,
+    total NUMERIC(18,2) NOT NULL,
+    complemento_codigo VARCHAR(40) NOT NULL DEFAULT 'NINGUNO',
+    rfc_pac_certificador VARCHAR(13),
+    estatus_sat VARCHAR(25) NOT NULL DEFAULT 'VIGENTE'
+        CHECK (estatus_sat IN ('VIGENTE', 'CANCELADO', 'EN_PROCESO_CANCELACION')),
+    estatus_cancelabilidad VARCHAR(50),
+    fecha_cancelacion_sat TIMESTAMPTZ,
+    cambio_a_cancelado BOOLEAN NOT NULL DEFAULT false,
+    fecha_ultima_verificacion_sat TIMESTAMPTZ DEFAULT clock_timestamp(),
+    estatus_efos_69b VARCHAR(25) NOT NULL DEFAULT 'SIN_INCIDENCIA'
+        CHECK (estatus_efos_69b IN ('SIN_INCIDENCIA', 'PRESUNTO', 'DESVIRTUADO', 'DEFINITIVO', 'SENTENCIA_FAVORABLE')),
+    estado_vinculacion VARCHAR(25) NOT NULL DEFAULT 'DISPONIBLE'
+        CHECK (estado_vinculacion IN ('DISPONIBLE', 'VINCULADO_PARCIAL', 'VINCULADO_TOTAL', 'BLOQUEADO_FISCAL')),
+    diferencia_precision_decimal NUMERIC(10,6) NOT NULL DEFAULT 0.000000,
+    f_doc_xml_id UUID NOT NULL,
+    f_doc_pdf_id UUID NULL,
+    hash_sha256_xml CHAR(64) NOT NULL UNIQUE,
+    origen_carga VARCHAR(25) NOT NULL DEFAULT 'DESCARGA_PORTAL'
+        CHECK (origen_carga IN ('DESCARGA_PORTAL', 'SAT_WEBSERVICE', 'CARGA_MANUAL', 'HERRAMIENTA_XML')),
+    f_peticion_descarga_id BIGINT NULL,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ
+);
+
+CREATE INDEX idx_boveda_cfdi_fechas ON cfdi.boveda_comprobantes (ejercicio, fecha_emision, direccion_flujo);
+CREATE INDEX idx_boveda_cfdi_emisor ON cfdi.boveda_comprobantes (rfc_emisor, estatus_sat);
+CREATE INDEX idx_boveda_cfdi_complemento ON cfdi.boveda_comprobantes (complemento_codigo, tipo_comprobante);</code></pre>
+      </div>
+    </div>
+
+    <!-- TABLA 2: CONCEPTOS -->
+    <div id="db-db2" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE TABLE cfdi.boveda_comprobantes_conceptos (
+    concepto_id BIGSERIAL PRIMARY KEY,
+    f_cfdi_id BIGINT NOT NULL REFERENCES cfdi.boveda_comprobantes(cfdi_id) ON DELETE RESTRICT,
+    numero_renglon SMALLINT NOT NULL,
+    clave_prod_serv VARCHAR(10) NOT NULL,   -- Clave SAT vinculable con CUCOP / COG
+    no_identificacion VARCHAR(100),
+    cantidad NUMERIC(18,6) NOT NULL,
+    clave_unidad VARCHAR(10) NOT NULL,
+    unidad VARCHAR(50),
+    descripcion TEXT NOT NULL,
+    valor_unitario NUMERIC(18,6) NOT NULL,
+    importe NUMERIC(18,6) NOT NULL,
+    descuento NUMERIC(18,6) NOT NULL DEFAULT 0,
+    objeto_imp VARCHAR(5) NOT NULL DEFAULT '02',
+    f_cucop_sugerido VARCHAR(20),
+    f_cog_sugerido VARCHAR(10),
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ
+);</code></pre>
+      </div>
+    </div>
+
+    <!-- TABLA 3: IMPUESTOS -->
+    <div id="db-db3" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE TABLE cfdi.boveda_comprobantes_impuestos (
+    impuesto_id BIGSERIAL PRIMARY KEY,
+    f_cfdi_id BIGINT NOT NULL REFERENCES cfdi.boveda_comprobantes(cfdi_id) ON DELETE RESTRICT,
+    f_concepto_id BIGINT NULL REFERENCES cfdi.boveda_comprobantes_conceptos(concepto_id) ON DELETE RESTRICT,
+    tipo_afectacion VARCHAR(15) NOT NULL CHECK (tipo_afectacion IN ('TRASLADO', 'RETENCION', 'LOCAL_TRASLADO', 'LOCAL_RETENCION')),
+    impuesto_clave VARCHAR(10) NOT NULL,    -- 001=ISR, 002=IVA, 003=IEPS, LOCAL=5 al millar/Hospedaje
+    tipo_factor VARCHAR(12) NOT NULL DEFAULT 'Tasa', -- Tasa, Cuota, Exento
+    tasa_o_cuota NUMERIC(12,6) NOT NULL DEFAULT 0,
+    base_calculo NUMERIC(18,2) NOT NULL DEFAULT 0,
+    importe NUMERIC(18,2) NOT NULL DEFAULT 0,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ
+);</code></pre>
+      </div>
+    </div>
+
+    <!-- TABLA 4: PETICIONES DESCARGA SAT -->
+    <div id="db-db4" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE TABLE cfdi.peticiones_descarga_sat (
+    peticion_id BIGSERIAL PRIMARY KEY,
+    f_entidad_id INTEGER NOT NULL DEFAULT 1,
+    rfc_contribuyente VARCHAR(13) NOT NULL,
+    canal_descarga VARCHAR(20) NOT NULL CHECK (canal_descarga IN ('PORTAL_BASICA', 'SAT_WEBSERVICE')),
+    modalidad_busqueda VARCHAR(20) NOT NULL CHECK (modalidad_busqueda IN ('FECHAS', 'RETENCIONES', 'UUID', 'METADATA')),
+    id_solicitud_sat VARCHAR(64) UNIQUE,    -- Folio devuelto por el Web Service SOAP del SAT
+    fecha_inicio TIMESTAMPTZ NOT NULL,
+    fecha_fin TIMESTAMPTZ NOT NULL,
+    direccion_flujo VARCHAR(12) NOT NULL CHECK (direccion_flujo IN ('RECIBIDO', 'EMITIDO')),
+    es_retencion BOOLEAN NOT NULL DEFAULT false,
+    complemento_filtro VARCHAR(40) DEFAULT 'TODOS',
+    rfc_contraparte_filtro VARCHAR(13),
+    estatus_filtro VARCHAR(20) DEFAULT 'TODOS',
+    uuids_solicitados JSONB,                -- Cuando modalidad_busqueda = 'UUID' (Solo uno o Varios)
+    estatus_peticion VARCHAR(25) NOT NULL DEFAULT 'EN_PROCESO'
+        CHECK (estatus_peticion IN ('ACEPTADA', 'EN_PROCESO', 'TERMINADA', 'LIMITE_2000_ALCANZADO', 'RECHAZADA', 'VENCIDA')),
+    total_encontrados INTEGER NOT NULL DEFAULT 0,
+    total_vigentes INTEGER NOT NULL DEFAULT 0,
+    total_cancelados INTEGER NOT NULL DEFAULT 0,
+    total_guardados_almacen INTEGER NOT NULL DEFAULT 0,
+    paquetes_zip_sat JSONB DEFAULT '[]'::jsonb,
+    tiempo_ejecucion_seg INTEGER DEFAULT 0,
+    bitacora_consola TEXT,
+    fecha_ultima_consulta_ws TIMESTAMPTZ,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ
+);</code></pre>
+      </div>
+    </div>
+
+    <!-- TABLA 5: METADATA SAT -->
+    <div id="db-db5" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE TABLE cfdi.metadata_sat_registros (
+    metadata_id BIGSERIAL PRIMARY KEY,
+    f_peticion_id BIGINT REFERENCES cfdi.peticiones_descarga_sat(peticion_id) ON DELETE RESTRICT,
+    uuid UUID NOT NULL UNIQUE,
+    rfc_emisor VARCHAR(13) NOT NULL,
+    nombre_emisor VARCHAR(300),
+    rfc_receptor VARCHAR(13) NOT NULL,
+    nombre_receptor VARCHAR(300),
+    rfc_pac VARCHAR(13),
+    fecha_emision TIMESTAMPTZ NOT NULL,
+    fecha_certificacion_sat TIMESTAMPTZ NOT NULL,
+    monto NUMERIC(18,2) NOT NULL,
+    efecto_comprobante CHAR(1) NOT NULL,
+    estatus_metadata SMALLINT NOT NULL,     -- 1 = Vigente, 0 = Cancelado
+    fecha_cancelacion TIMESTAMPTZ NULL,
+    existe_xml_en_boveda BOOLEAN NOT NULL DEFAULT false,
+    f_cfdi_id BIGINT NULL REFERENCES cfdi.boveda_comprobantes(cfdi_id),
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL,
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ
+);</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. STORED PROCEDURES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures PostgreSQL)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      Ubicados inmediatamente después del modelo de datos conforme al estándar SIAF-PJEV, todos los SPs operan bajo <code>SECURITY DEFINER</code>, <code>SET search_path = cfdi, archivos, cxp, public</code> y retornan el sobre estándar JSONB <code>{ "error": 0, "mensaje": "OK", "data": {...} }</code>:
+    </p>
+
+    <div class="sp-tabs">
+      <button class="sp-tab active" onclick="showSP('sp1',this)">6.1 cfdi.fn_leer_boveda_cfdi</button>
+      <button class="sp-tab" onclick="showSP('sp2',this)">6.2 cfdi.fn_crud_boveda_cfdi</button>
+      <button class="sp-tab" onclick="showSP('sp3',this)">6.3 cfdi.fn_crud_peticion_descarga_sat</button>
+      <button class="sp-tab" onclick="showSP('sp4',this)">6.4 cfdi.fn_relacionar_uuids_almacen</button>
+    </div>
+
+    <!-- SP 1 -->
+    <div id="sp-sp1" class="sp-panel active">
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cfdi.fn_leer_boveda_cfdi(
+    p_usuario VARCHAR(50),
+    p_ejercicio INTEGER,
+    p_modalidad VARCHAR(20) DEFAULT 'FECHAS', -- 'FECHAS', 'RETENCIONES', 'UUID'
+    p_fecha_inicio DATE DEFAULT NULL,
+    p_fecha_fin DATE DEFAULT NULL,
+    p_direccion VARCHAR(12) DEFAULT NULL,     -- 'RECIBIDO', 'EMITIDO'
+    p_complemento VARCHAR(40) DEFAULT 'TODOS',
+    p_rfc_contraparte VARCHAR(13) DEFAULT NULL,
+    p_estatus_sat VARCHAR(25) DEFAULT 'TODOS',
+    p_solo_egresos BOOLEAN DEFAULT false,
+    p_uuids TEXT[] DEFAULT NULL,
+    p_page INTEGER DEFAULT 1,
+    p_limit INTEGER DEFAULT 50
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cfdi, archivos, public
+AS $$
+DECLARE
+    v_offset INTEGER := GREATEST((COALESCE(p_page, 1) - 1) * COALESCE(p_limit, 50), 0);
+    v_total BIGINT;
+    v_vigentes BIGINT;
+    v_cancelados BIGINT;
+    v_cambio_cancelado BIGINT;
+    v_registros JSONB;
+BEGIN
+    SELECT
+        COUNT(*),
+        COUNT(*) FILTER (WHERE c.estatus_sat = 'VIGENTE'),
+        COUNT(*) FILTER (WHERE c.estatus_sat = 'CANCELADO'),
+        COUNT(*) FILTER (WHERE c.cambio_a_cancelado = true)
+    INTO v_total, v_vigentes, v_cancelados, v_cambio_cancelado
+    FROM cfdi.boveda_comprobantes c
+    WHERE c.estatus_registro = 1
+      AND (p_ejercicio IS NULL OR c.ejercicio = p_ejercicio)
+      AND (p_modalidad &lt;&gt; 'RETENCIONES' OR c.es_retencion = true)
+      AND (p_fecha_inicio IS NULL OR c.fecha_emision::date &gt;= p_fecha_inicio)
+      AND (p_fecha_fin IS NULL OR c.fecha_emision::date &lt;= p_fecha_fin)
+      AND (p_direccion IS NULL OR c.direccion_flujo = p_direccion)
+      AND (p_complemento IS NULL OR p_complemento = 'TODOS' OR c.complemento_codigo = p_complemento)
+      AND (p_rfc_contraparte IS NULL OR p_rfc_contraparte = '' OR c.rfc_emisor ILIKE '%' || p_rfc_contraparte || '%' OR c.rfc_receptor ILIKE '%' || p_rfc_contraparte || '%')
+      AND (p_estatus_sat IS NULL OR p_estatus_sat = 'TODOS' OR c.estatus_sat = p_estatus_sat)
+      AND (NOT COALESCE(p_solo_egresos, false) OR c.tipo_comprobante = 'E')
+      AND (p_uuids IS NULL OR c.uuid::text = ANY(p_uuids));
+
+    SELECT COALESCE(jsonb_agg(fila), '[]'::jsonb)
+    INTO v_registros
+    FROM (
+        SELECT
+            c.cfdi_id AS "cfdiId",
+            c.uuid AS "uuid",
+            c.direccion_flujo AS "direccionFlujo",
+            c.es_retencion AS "esRetencion",
+            c.tipo_comprobante AS "tipoComprobante",
+            c.serie AS "serie",
+            c.folio AS "folio",
+            c.fecha_emision AS "fechaEmision",
+            c.rfc_emisor AS "rfcEmisor",
+            c.nombre_emisor AS "nombreEmisor",
+            c.rfc_receptor AS "rfcReceptor",
+            c.uso_cfdi AS "usoCfdi",
+            c.metodo_pago AS "metodoPago",
+            c.forma_pago AS "formaPago",
+            c.subtotal AS "subtotal",
+            c.total_traslados AS "totalTraslados",
+            c.total_retenciones AS "totalRetenciones",
+            c.total AS "total",
+            c.complemento_codigo AS "complementoCodigo",
+            c.estatus_sat AS "estatusSat",
+            c.cambio_a_cancelado AS "cambioACancelado",
+            c.estatus_efos_69b AS "estatusEfos69b",
+            c.estado_vinculacion AS "estadoVinculacion",
+            c.f_doc_xml_id AS "docXmlId",
+            c.f_doc_pdf_id AS "docPdfId"
+        FROM cfdi.boveda_comprobantes c
+        WHERE c.estatus_registro = 1
+          AND (p_ejercicio IS NULL OR c.ejercicio = p_ejercicio)
+          AND (p_modalidad &lt;&gt; 'RETENCIONES' OR c.es_retencion = true)
+          AND (p_fecha_inicio IS NULL OR c.fecha_emision::date &gt;= p_fecha_inicio)
+          AND (p_fecha_fin IS NULL OR c.fecha_emision::date &lt;= p_fecha_fin)
+          AND (p_direccion IS NULL OR c.direccion_flujo = p_direccion)
+          AND (p_complemento IS NULL OR p_complemento = 'TODOS' OR c.complemento_codigo = p_complemento)
+          AND (p_rfc_contraparte IS NULL OR p_rfc_contraparte = '' OR c.rfc_emisor ILIKE '%' || p_rfc_contraparte || '%' OR c.rfc_receptor ILIKE '%' || p_rfc_contraparte || '%')
+          AND (p_estatus_sat IS NULL OR p_estatus_sat = 'TODOS' OR c.estatus_sat = p_estatus_sat)
+          AND (NOT COALESCE(p_solo_egresos, false) OR c.tipo_comprobante = 'E')
+          AND (p_uuids IS NULL OR c.uuid::text = ANY(p_uuids))
+        ORDER BY c.fecha_emision DESC, c.cfdi_id DESC
+        OFFSET v_offset LIMIT COALESCE(p_limit, 50)
+    ) fila;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', 'OK',
+        'data', jsonb_build_object(
+            'total', v_total,
+            'totalVigentes', v_vigentes,
+            'totalCancelados', v_cancelados,
+            'cambiosACancelado', v_cambio_cancelado,
+            'registros', v_registros
+        )
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 2 -->
+    <div id="sp-sp2" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cfdi.fn_crud_boveda_cfdi(
+    p_accion SMALLINT,          -- 1=Insertar/Indexar XML, 2=Asociar PDF/Actualizar estatus SAT, 3=Baja lógica
+    p_usuario VARCHAR(50),
+    p_payload JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cfdi, archivos, public
+AS $$
+DECLARE
+    v_uuid UUID := (p_payload-&gt;&gt;'uuid')::UUID;
+    v_cfdi_id BIGINT;
+    v_estado_vinc VARCHAR(25);
+    v_estatus_prev VARCHAR(25);
+BEGIN
+    IF p_accion = 1 THEN
+        -- Verificar unicidad estricta por UUID o Hash SHA-256
+        SELECT cfdi_id INTO v_cfdi_id
+        FROM cfdi.boveda_comprobantes
+        WHERE uuid = v_uuid OR hash_sha256_xml = (p_payload-&gt;&gt;'hashSha256Xml');
+
+        IF v_cfdi_id IS NOT NULL THEN
+            RETURN jsonb_build_object(
+                'error', -1,
+                'mensaje', format('El comprobante con UUID %s ya se encuentra almacenado en la Bóveda (ID: %s).', v_uuid, v_cfdi_id),
+                'data', jsonb_build_object('cfdiId', v_cfdi_id, 'duplicado', true)
+            );
+        END IF;
+
+        INSERT INTO cfdi.boveda_comprobantes (
+            uuid, f_entidad_id, ejercicio, direccion_flujo, es_retencion, version_cfdi,
+            tipo_comprobante, serie, folio, fecha_emision, fecha_timbrado,
+            rfc_emisor, nombre_emisor, regimen_fiscal_emisor,
+            rfc_receptor, nombre_receptor, regimen_fiscal_receptor, domicilio_fiscal_receptor,
+            uso_cfdi, metodo_pago, forma_pago, moneda, tipo_cambio,
+            subtotal, descuento, total_traslados, total_retenciones, total,
+            complemento_codigo, estatus_sat, f_doc_xml_id, f_doc_pdf_id,
+            hash_sha256_xml, origen_carga, f_peticion_descarga_id, usuario_c
+        ) VALUES (
+            v_uuid,
+            COALESCE((p_payload-&gt;&gt;'entidadId')::INTEGER, 1),
+            (p_payload-&gt;&gt;'ejercicio')::INTEGER,
+            COALESCE(p_payload-&gt;&gt;'direccionFlujo', 'RECIBIDO'),
+            COALESCE((p_payload-&gt;&gt;'esRetencion')::BOOLEAN, false),
+            COALESCE(p_payload-&gt;&gt;'versionCfdi', '4.0'),
+            (p_payload-&gt;&gt;'tipoComprobante')::CHAR(1),
+            p_payload-&gt;&gt;'serie',
+            p_payload-&gt;&gt;'folio',
+            (p_payload-&gt;&gt;'fechaEmision')::TIMESTAMPTZ,
+            (p_payload-&gt;&gt;'fechaTimbrado')::TIMESTAMPTZ,
+            UPPER(TRIM(p_payload-&gt;&gt;'rfcEmisor')),
+            p_payload-&gt;&gt;'nombreEmisor',
+            COALESCE(p_payload-&gt;&gt;'regimenFiscalEmisor', '601'),
+            UPPER(TRIM(p_payload-&gt;&gt;'rfcReceptor')),
+            p_payload-&gt;&gt;'nombreReceptor',
+            p_payload-&gt;&gt;'regimenFiscalReceptor',
+            p_payload-&gt;&gt;'domicilioFiscalReceptor',
+            COALESCE(p_payload-&gt;&gt;'usoCfdi', 'G03'),
+            p_payload-&gt;&gt;'metodoPago',
+            p_payload-&gt;&gt;'formaPago',
+            COALESCE(p_payload-&gt;&gt;'moneda', 'MXN'),
+            COALESCE((p_payload-&gt;&gt;'tipoCambio')::NUMERIC, 1.0),
+            COALESCE((p_payload-&gt;&gt;'subtotal')::NUMERIC, 0.0),
+            COALESCE((p_payload-&gt;&gt;'descuento')::NUMERIC, 0.0),
+            COALESCE((p_payload-&gt;&gt;'totalTraslados')::NUMERIC, 0.0),
+            COALESCE((p_payload-&gt;&gt;'totalRetenciones')::NUMERIC, 0.0),
+            (p_payload-&gt;&gt;'total')::NUMERIC,
+            COALESCE(p_payload-&gt;&gt;'complementoCodigo', 'NINGUNO'),
+            COALESCE(p_payload-&gt;&gt;'estatusSat', 'VIGENTE'),
+            (p_payload-&gt;&gt;'docXmlId')::UUID,
+            (p_payload-&gt;&gt;'docPdfId')::UUID,
+            p_payload-&gt;&gt;'hashSha256Xml',
+            COALESCE(p_payload-&gt;&gt;'origenCarga', 'DESCARGA_PORTAL'),
+            (p_payload-&gt;&gt;'peticionDescargaId')::BIGINT,
+            p_usuario
+        ) RETURNING cfdi_id INTO v_cfdi_id;
+
+        RETURN jsonb_build_object(
+            'error', 0,
+            'mensaje', 'Los XML se guardaron correctamente en almacén.',
+            'data', jsonb_build_object('cfdiId', v_cfdi_id, 'uuid', v_uuid)
+        );
+
+    ELSIF p_accion = 2 THEN
+        SELECT estatus_sat INTO v_estatus_prev
+        FROM cfdi.boveda_comprobantes
+        WHERE cfdi_id = (p_payload-&gt;&gt;'cfdiId')::BIGINT AND estatus_registro = 1;
+
+        UPDATE cfdi.boveda_comprobantes
+        SET f_doc_pdf_id = COALESCE((p_payload-&gt;&gt;'docPdfId')::UUID, f_doc_pdf_id),
+            estatus_sat = COALESCE(p_payload-&gt;&gt;'estatusSat', estatus_sat),
+            cambio_a_cancelado = CASE
+                WHEN v_estatus_prev = 'VIGENTE' AND (p_payload-&gt;&gt;'estatusSat') = 'CANCELADO' THEN true
+                ELSE cambio_a_cancelado
+            END,
+            fecha_ultima_verificacion_sat = clock_timestamp(),
+            usuario_m = p_usuario,
+            fecha_m = clock_timestamp()
+        WHERE cfdi_id = (p_payload-&gt;&gt;'cfdiId')::BIGINT AND estatus_registro = 1
+        RETURNING cfdi_id INTO v_cfdi_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Estatus y metadatos del CFDI actualizados.', 'data', jsonb_build_object('cfdiId', v_cfdi_id));
+
+    ELSIF p_accion = 3 THEN
+        SELECT estado_vinculacion INTO v_estado_vinc
+        FROM cfdi.boveda_comprobantes
+        WHERE cfdi_id = (p_payload-&gt;&gt;'cfdiId')::BIGINT;
+
+        IF v_estado_vinc IN ('VINCULADO_PARCIAL', 'VINCULADO_TOTAL') THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'Restricción de integridad: No se puede dar de baja un CFDI que ya está vinculado a un expediente o póliza.', 'data', NULL);
+        END IF;
+
+        UPDATE cfdi.boveda_comprobantes
+        SET estatus_registro = 0, usuario_m = p_usuario, fecha_m = clock_timestamp()
+        WHERE cfdi_id = (p_payload-&gt;&gt;'cfdiId')::BIGINT;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'CFDI inactivado lógicamente.', 'data', NULL);
+    END IF;
+
+    RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no reconocida.', 'data', NULL);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 3 -->
+    <div id="sp-sp3" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cfdi.fn_crud_peticion_descarga_sat(
+    p_accion SMALLINT,          -- 1=Registrar petición (Portal o WebService), 2=Actualizar avance/estatus
+    p_usuario VARCHAR(50),
+    p_payload JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cfdi, public
+AS $$
+DECLARE
+    v_peticion_id BIGINT;
+    v_canal VARCHAR(20) := COALESCE(p_payload-&gt;&gt;'canalDescarga', 'PORTAL_BASICA');
+    v_encontrados INTEGER := COALESCE((p_payload-&gt;&gt;'totalEncontrados')::INTEGER, 0);
+BEGIN
+    IF p_accion = 1 THEN
+        INSERT INTO cfdi.peticiones_descarga_sat (
+            f_entidad_id, rfc_contribuyente, canal_descarga, modalidad_busqueda,
+            id_solicitud_sat, fecha_inicio, fecha_fin, direccion_flujo,
+            es_retencion, complemento_filtro, rfc_contraparte_filtro,
+            estatus_filtro, uuids_solicitados, estatus_peticion, usuario_c
+        ) VALUES (
+            COALESCE((p_payload-&gt;&gt;'entidadId')::INTEGER, 1),
+            UPPER(TRIM(p_payload-&gt;&gt;'rfcContribuyente')),
+            v_canal,
+            COALESCE(p_payload-&gt;&gt;'modalidadBusqueda', 'FECHAS'),
+            p_payload-&gt;&gt;'idSolicitudSat',
+            (p_payload-&gt;&gt;'fechaInicio')::TIMESTAMPTZ,
+            (p_payload-&gt;&gt;'fechaFin')::TIMESTAMPTZ,
+            COALESCE(p_payload-&gt;&gt;'direccionFlujo', 'RECIBIDO'),
+            COALESCE((p_payload-&gt;&gt;'esRetencion')::BOOLEAN, false),
+            COALESCE(p_payload-&gt;&gt;'complementoFiltro', 'TODOS'),
+            p_payload-&gt;&gt;'rfcContraparteFiltro',
+            COALESCE(p_payload-&gt;&gt;'estatusFiltro', 'TODOS'),
+            p_payload-&gt;'uuidsSolicitados',
+            CASE WHEN v_canal = 'SAT_WEBSERVICE' THEN 'ACEPTADA' ELSE 'EN_PROCESO' END,
+            p_usuario
+        ) RETURNING peticion_id INTO v_peticion_id;
+
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Petición de descarga registrada.', 'data', jsonb_build_object('peticionId', v_peticion_id));
+
+    ELSIF p_accion = 2 THEN
+        UPDATE cfdi.peticiones_descarga_sat
+        SET estatus_peticion = CASE
+                WHEN v_canal = 'PORTAL_BASICA' AND v_encontrados &gt;= 2000 THEN 'LIMITE_2000_ALCANZADO'
+                ELSE COALESCE(p_payload-&gt;&gt;'estatusPeticion', estatus_peticion)
+            END,
+            total_encontrados = COALESCE((p_payload-&gt;&gt;'totalEncontrados')::INTEGER, total_encontrados),
+            total_vigentes = COALESCE((p_payload-&gt;&gt;'totalVigentes')::INTEGER, total_vigentes),
+            total_cancelados = COALESCE((p_payload-&gt;&gt;'totalCancelados')::INTEGER, total_cancelados),
+            total_guardados_almacen = COALESCE((p_payload-&gt;&gt;'totalGuardadosAlmacen')::INTEGER, total_guardados_almacen),
+            paquetes_zip_sat = COALESCE(p_payload-&gt;'paquetesZipSat', paquetes_zip_sat),
+            tiempo_ejecucion_seg = COALESCE((p_payload-&gt;&gt;'tiempoEjecucionSeg')::INTEGER, tiempo_ejecucion_seg),
+            bitacora_consola = COALESCE(p_payload-&gt;&gt;'bitacoraConsola', bitacora_consola),
+            fecha_ultima_consulta_ws = clock_timestamp(),
+            usuario_m = p_usuario,
+            fecha_m = clock_timestamp()
+        WHERE peticion_id = (p_payload-&gt;&gt;'peticionId')::BIGINT
+        RETURNING peticion_id INTO v_peticion_id;
+
+        IF v_canal = 'PORTAL_BASICA' AND v_encontrados &gt;= 2000 THEN
+            RETURN jsonb_build_object(
+                'error', -1,
+                'mensaje', 'LÍMITE DE DESCARGA DE LOS 2,000 XMLs alcanzado: utilice el módulo SAT Web Service que permite la descarga de hasta 200,000 XMLs por petición.',
+                'data', jsonb_build_object('peticionId', v_peticion_id, 'limiteAlcanzado', true)
+            );
+        END IF;
+
+        RETURN jsonb_build_object(
+            'error', 0,
+            'mensaje', format('Se descargaron %s de %s CFDIs. Los XML se guardaron correctamente en almacén.', COALESCE((p_payload-&gt;&gt;'totalGuardadosAlmacen')::INTEGER, 0), v_encontrados),
+            'data', jsonb_build_object('peticionId', v_peticion_id)
+        );
+    END IF;
+
+    RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción inválida.', 'data', NULL);
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+
+    <!-- SP 4 -->
+    <div id="sp-sp4" class="sp-panel">
+      <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION cfdi.fn_relacionar_uuids_almacen(
+    p_usuario VARCHAR(50),
+    p_ejercicio INTEGER
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = cfdi, public
+AS $$
+DECLARE
+    v_relaciones_resueltas INTEGER := 0;
+BEGIN
+    -- Enlaza automáticamente los UUID origen y destino que ya fueron descargados al almacén
+    UPDATE cfdi.boveda_comprobantes_relaciones r
+    SET f_cfdi_relacionado_id = c_dest.cfdi_id,
+        relacion_resuelta = true,
+        usuario_m = p_usuario,
+        fecha_m = clock_timestamp()
+    FROM cfdi.boveda_comprobantes c_dest
+    WHERE r.uuid_relacionado = c_dest.uuid
+      AND r.f_cfdi_relacionado_id IS NULL
+      AND c_dest.estatus_registro = 1;
+
+    GET DIAGNOSTICS v_relaciones_resueltas = ROW_COUNT;
+
+    RETURN jsonb_build_object(
+        'error', 0,
+        'mensaje', format('Proceso completado: se establecieron %s nuevas relaciones entre UUIDs en el Almacén CFDI.', v_relaciones_resueltas),
+        'data', jsonb_build_object('relacionesResueltas', v_relaciones_resueltas)
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
+END;
+$$;</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. SERVICIOS API REST (SWAGGER / NESTJS) -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">7</span> Servicios API REST (Especificación Swagger / NestJS)</div>
+    <div tabindex="0" role="region" aria-label="Endpoints REST del módulo 07.1.1" class="table-wrapper">
+      <table class="props-table">
+        <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>Payload / Query Params</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code class="method get">GET</code></td><td><code>/api/v1/cfdi/boveda</code></td><td>Query: <code>{ modalidad, inicio, fin, direccion, complemento, rfc, estatus, soloEgresos, page, limit }</code></td><td>Consulta paginada del Almacén CFDI (pestañas Fechas, Retenciones y UUID).</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/boveda/descarga-basica</code></td><td>Body: <code>DescargaBasicaSatDto</code></td><td>Inicia corrida de descarga directa del portal SAT (hasta 2,000 XMLs) con guardado automático en almacén.</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/boveda/web-service/solicitar</code></td><td>Body: <code>SolicitarWebServiceSatDto</code></td><td>Firma con e.firma (FIEL) y envía petición SOAP al SAT Web Service (hasta 200,000 XMLs o 1M Metadata).</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/boveda/web-service/:peticionId/verificar</code></td><td>Param: <code>peticionId</code></td><td>Consulta el estatus de la solicitud en el SAT y, si está terminada, descarga e indexa los paquetes <code>.zip</code> en almacén.</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/boveda/relacionar-uuids</code></td><td>Body: <code>{ ejercicio: number }</code></td><td>Ejecuta <code>cfdi.fn_relacionar_uuids_almacen</code> para enlazar facturas PPD, REP 2.0 y notas de crédito.</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/boveda/verificar-estatus-lote</code></td><td>Body: <code>FiltroAlmacenDto</code></td><td>Acción del botón <code>[Verificar estatus]</code>: identifica los CFDIs que cambiaron de vigentes a cancelados.</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/boveda/exportar-excel</code></td><td>Body: <code>FiltroAlmacenDto</code></td><td>Acción del botón <code>[Exportar a excel]</code>: genera sabana <code>.xlsx</code> directa de alto volumen desde los XML del almacén.</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/boveda/herramientas/importar-metadata</code></td><td><code>Multipart/Form-Data</code> (Archivo <code>.txt</code> / <code>.zip</code>)</td><td>Convierte a Excel e indexa los archivos <code>.txt</code> de Metadata del SAT en <code>cfdi.metadata_sat_registros</code>.</td></tr>
+          <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cfdi/boveda/upload-manual</code></td><td><code>Multipart/Form-Data</code> (<code>.xml</code> + <code>.pdf</code>)</td><td>Carga manual o por la herramienta <code>XMLs</code> con parseo DOM Anexo 20 y cálculo de <code>SHA-256</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 style="color:var(--pjev-verde-oscuro); margin:16px 0 8px;">Controlador NestJS: <code>boveda-cfdi.controller.ts</code></h4>
+    <div class="code-wrap">
+<pre><code>import { Controller, Get, Post, Param, Body, Query, UploadedFiles, UseInterceptors, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '../configuracion/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../configuracion/auth/guards/roles.guard';
+import { MinRol } from '../configuracion/auth/decorators/min-rol.decorator';
+import { BovedaCfdiService } from './boveda-cfdi.service';
+
+@ApiTags('07 Repositorio CFDI / 07.1.1 Bóveda, Almacén y Descarga SAT')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('cfdi/boveda')
+export class BovedaCfdiController {
+  constructor(private readonly service: BovedaCfdiService) {}
+
+  @Get()
+  @MinRol(4)
+  @ApiOperation({ summary: 'Consultar Almacén CFDI por Fechas, Retenciones o Folio Fiscal (UUID)' })
+  consultarAlmacen(@Query() query: any, @Req() req: any) {
+    return this.service.consultarAlmacen(query, req.user);
+  }
+
+  @Post('descarga-basica')
+  @MinRol(3)
+  @ApiOperation({ summary: 'Ejecutar descarga básica de CFDIs (Fechas, Retenciones o UUID) hasta 2,000 XMLs' })
+  iniciarDescargaBasica(@Body() dto: any, @Req() req: any) {
+    return this.service.iniciarDescargaBasica(dto, req.user);
+  }
+
+  @Post('web-service/solicitar')
+  @MinRol(2)
+  @ApiOperation({ summary: 'Solicitar paquete masivo al SAT Web Service con e.firma (hasta 200,000 XMLs o 1M Metadata)' })
+  solicitarWebService(@Body() dto: any, @Req() req: any) {
+    return this.service.solicitarWebServiceSat(dto, req.user);
+  }
+
+  @Post('web-service/:peticionId/verificar')
+  @MinRol(2)
+  @ApiOperation({ summary: 'Verificar estatus de solicitud en SAT Web Service y optimizar paquetes .ZIP en Almacén' })
+  verificarSolicitudWs(@Param('peticionId') peticionId: string, @Req() req: any) {
+    return this.service.verificarYOptimizarEnAlmacen(Number(peticionId), req.user);
+  }
+
+  @Post('relacionar-uuids')
+  @MinRol(3)
+  @ApiOperation({ summary: 'Relacionar todos los XMLs descargados en el Almacén estableciendo vínculos entre sus UUIDs' })
+  relacionarUuids(@Body('ejercicio') ejercicio: number, @Req() req: any) {
+    return this.service.relacionarUuidsAlmacen(ejercicio, req.user);
+  }
+
+  @Post('verificar-estatus-lote')
+  @MinRol(3)
+  @ApiOperation({ summary: 'Validar el estatus de los CFDIs que cambiaron de vigentes a cancelados' })
+  verificarEstatusLote(@Body() filtro: any, @Req() req: any) {
+    return this.service.verificarEstatusLote(filtro, req.user);
+  }
+
+  @Post('upload-manual')
+  @MinRol(3)
+  @UseInterceptors(FilesInterceptor('archivos', 50))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Cargar lotes de archivos .XML y .PDF o convertir Metadata .TXT del SAT' })
+  cargarArchivos(@UploadedFiles() archivos: Express.Multer.File[], @Body() meta: any, @Req() req: any) {
+    return this.service.procesarCargaManual(archivos, meta, req.user);
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 8. REGLAS DE NEGOCIO -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">8</span> Reglas de Negocio y Controles Fiscales / CONAC</div>
+    <div tabindex="0" role="region" aria-label="Reglas de negocio de Bóveda CFDI" class="table-wrapper">
+      <table class="props-table">
+        <thead><tr><th>Código</th><th>Regla de Negocio</th><th>Naturaleza</th><th>Efecto en Sistema</th></tr></thead>
+        <tbody>
+          <tr>
+            <th><strong>RN-CFDI-01</strong></th>
+            <td><strong>Unicidad Absoluta por UUID y Hash SHA-256:</strong> Cada comprobante fiscal se almacena una sola vez en <code>cfdi.boveda_comprobantes</code>.</td>
+            <td><span class="nat-badge nat-norm">Normativo / Técnico</span></td>
+            <td>Si una descarga masiva o carga manual incluye un XML ya existente, el sistema omite duplicar el binario, actualiza únicamente su fecha de verificación SAT y previene doble pago.</td>
+          </tr>
+          <tr>
+            <th><strong>RN-CFDI-02</strong></th>
+            <td><strong>Límite de 2,000 XMLs en Descarga Básica vs. 200,000 en SAT Web Service:</strong> En consultas directas del portal, el SAT impone un tope de 2,000 XMLs por petición.</td>
+            <td><span class="nat-badge nat-tech">Regla Técnica SAT</span></td>
+            <td>Cuando el contador alcanza 2,000 registros o el volumen supera 20,000 XMLs (&gt;500/seg), el sistema despliega el aviso preventivo y redirige la solicitud al motor <strong>SAT Web Service con FIEL</strong>.</td>
+          </tr>
+          <tr>
+            <th><strong>RN-CFDI-03</strong></th>
+            <td><strong>Separación entre Recepción de CFDI y Momento Contable del Devengado:</strong> Guardar un XML en el Almacén CFDI no genera póliza contable ni compromiso/devengo presupuestal.</td>
+            <td><span class="nat-badge nat-norm">Requisito CONAC</span></td>
+            <td>El momento contable del Devengado (Matriz A.1) solo se detona cuando existe recepción conforme del bien, servicio u obra (<code>08.3.4</code>) y autorización en <code>05.2.1 Afectación del Gasto</code>.</td>
+          </tr>
+          <tr>
+            <th><strong>RN-CFDI-04</strong></th>
+            <td><strong>Detección de Cambio de Vigente a Cancelado (<code>[Verificar estatus]</code>):</strong> Todo lote en el Almacén puede revalidarse contra el SAT antes de exportar o pagar.</td>
+            <td><span class="nat-badge nat-inst">Control Interno PJEV</span></td>
+            <td>Si un CFDI previamente <code>VIGENTE</code> aparece como <code>CANCELADO</code>, se activa la bandera <code>cambio_a_cancelado = true</code>, se bloquea su pago en Tesorería y se emite alerta a Contabilidad.</td>
+          </tr>
+          <tr>
+            <th><strong>RN-CFDI-05</strong></th>
+            <td><strong>Relación Automática de UUIDs (<code>[Relacionar UUIDs]</code>):</strong> El sistema inspecciona los nodos <code>cfdi:CfdiRelacionados</code> y <code>pago20:DoctoRelacionado</code> de todos los XML descargados.</td>
+            <td><span class="nat-badge nat-tech">Propuesta Tecnológica</span></td>
+            <td>Construye el grafo bidireccional entre facturas origen, notas de crédito (<code>Solo Egresos</code>), sustituciones y complementos de recepción de pagos (<code>REP 2.0</code>).</td>
+          </tr>
+          <tr>
+            <th><strong>RN-CFDI-06</strong></th>
+            <td><strong>Normalización de Precisión Decimal (Compatibilidad Contable):</strong> Algunos emisores timbran conceptos con hasta 6 decimales cuya suma difiere por centavos al redondear a 2 decimales.</td>
+            <td><span class="nat-badge nat-tech">Propuesta Tecnológica</span></td>
+            <td>La herramienta de compatibilidad calcula y registra <code>diferencia_precision_decimal</code> para permitir el cuadre a 2 decimales en pólizas sin modificar jamás el archivo <code>.xml</code> original firmado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 9. WIREFRAMES INTERACTIVOS Y GALERÍA DE REFERENCIA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">9</span> Diseño de Interfaces (Wireframes SVG Interactivos y Capturas de Referencia)</div>
+    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
+      A continuación se presentan las 5 vistas canónicas adaptadas al estándar visual del SIAF-PJEV, seguidas del bloque desplegable con las 9 pantallas de referencia originales:
+    </p>
+
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showWF('wf1',this)">1. Descarga CFDI · Fechas (Límite 2,000 XMLs)</button>
+      <button class="wf-tab" onclick="showWF('wf2',this)">2. Descarga CFDI · Retenciones y Folio UUID</button>
+      <button class="wf-tab" onclick="showWF('wf3',this)">3. Almacén CFDI (Relacionar UUIDs y 3 Acciones)</button>
+      <button class="wf-tab" onclick="showWF('wf4',this)">4. SAT Web Service (Hasta 200,000 XMLs con FIEL)</button>
+      <button class="wf-tab" onclick="showWF('wf5',this)">5. Herramientas Plus (XMLs, Metadata .TXT, Compatibilidad)</button>
+    </div>
+
+    <!-- WF 1: DESCARGA POR FECHAS -->
+    <div id="wf-wf1" class="wf-panel active">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">07.1.1 Descarga de CFDIs — Pestaña 1: Buscar por Fechas</span>
+          <span style="font-size:11px; color:#64748b;">Consulta directa al SAT · Guardado automático en Almacén</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 980 430" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:'Segoe UI',system-ui,sans-serif;">
+            <rect width="980" height="430" fill="#ffffff" rx="6" stroke="#cbd5e1"/>
+            <!-- Banner Límite 2000 XMLs -->
+            <rect x="20" y="16" width="940" height="46" rx="5" fill="#d99b26"/>
+            <text x="34" y="35" font-size="11" font-weight="bold" fill="#ffffff">LÍMITE DE DESCARGA DE LOS 2,000 XMLs:</text>
+            <text x="262" y="35" font-size="11" fill="#fffbeb">En caso de que aparezca el mensaje del límite de los 2,000 XMLs, tendrás que volver a realizar la descarga</text>
+            <text x="34" y="51" font-size="11" fill="#fffbeb">al día siguiente o segmentar fechas, o utilizar nuestro módulo SAT Web Service que permite la descarga de hasta 200,000 XMLs por petición.</text>
+
+            <!-- Encabezado y botón Cambiar Entidad -->
+            <text x="20" y="88" font-size="18" font-weight="bold" fill="#183125">Descarga de CFDIs</text>
+            <rect x="830" y="70" width="130" height="28" rx="4" fill="#1d4ed8"/>
+            <text x="895" y="88" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Cambiar RFC / Fondo</text>
+
+            <!-- Pestañas Buscar por -->
+            <text x="20" y="122" font-size="11" fill="#64748b">Buscar por:</text>
+            <rect x="85" y="102" width="80" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <line x1="85" y1="102" x2="165" y2="102" stroke="#183125" stroke-width="3"/>
+            <text x="125" y="121" font-size="11" font-weight="bold" fill="#183125" text-anchor="middle">Fechas</text>
+
+            <rect x="172" y="104" width="95" height="28" rx="4" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="219" y="122" font-size="11" fill="#64748b" text-anchor="middle">Retenciones</text>
+
+            <rect x="274" y="104" width="125" height="28" rx="4" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="336" y="122" font-size="11" fill="#64748b" text-anchor="middle">Folio fiscal (UUID)</text>
+            <line x1="20" y1="132" x2="960" y2="132" stroke="#e2e8f0"/>
+
+            <!-- Fila 1 de Campos -->
+            <text x="20" y="154" font-size="11" font-weight="bold" fill="#334155">Razón social</text>
+            <text x="20" y="176" font-size="12" fill="#0f172a">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+            <line x1="20" y1="184" x2="310" y2="184" stroke="#cbd5e1"/>
+
+            <text x="330" y="154" font-size="11" font-weight="bold" fill="#334155">RFC</text>
+            <text x="330" y="176" font-size="12" font-family="monospace" font-weight="bold" fill="#0f172a">PJE000101AAA</text>
+            <line x1="330" y1="184" x2="500" y2="184" stroke="#cbd5e1"/>
+
+            <text x="530" y="154" font-size="11" font-weight="bold" fill="#334155">Inicio:</text>
+            <rect x="530" y="160" width="200" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="542" y="179" font-size="11" fill="#334155">01/10/2026</text>
+
+            <text x="750" y="154" font-size="11" font-weight="bold" fill="#334155">Fin:</text>
+            <rect x="750" y="160" width="210" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="762" y="179" font-size="11" fill="#334155">31/10/2026</text>
+
+            <!-- Fila 2 de Campos -->
+            <text x="20" y="212" font-size="11" font-weight="bold" fill="#334155">Complemento:</text>
+            <rect x="20" y="218" width="280" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="32" y="237" font-size="11" fill="#334155">Todos (29 complementos SAT)</text>
+            <text x="285" y="237" font-size="10" fill="#64748b">▼</text>
+
+            <text x="330" y="212" font-size="11" font-weight="bold" fill="#334155">RFC emisor / receptor (Opcional):</text>
+            <rect x="330" y="218" width="290" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="342" y="237" font-size="11" fill="#94a3b8">Filtrar por RFC de proveedor o servidor público...</text>
+
+            <text x="650" y="212" font-size="11" font-weight="bold" fill="#334155">Estatus:</text>
+            <rect x="650" y="218" width="310" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="662" y="237" font-size="11" fill="#334155">TODOS (Vigentes y Cancelados)</text>
+            <text x="942" y="237" font-size="10" fill="#64748b">▼</text>
+
+            <!-- Fila 3: Radio Emitidos / Recibidos + Botón Iniciar descarga -->
+            <text x="20" y="276" font-size="11" font-weight="bold" fill="#334155">Emitidos:</text>
+            <circle cx="82" cy="272" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+
+            <text x="160" y="276" font-size="11" font-weight="bold" fill="#334155">Recibidos:</text>
+            <circle cx="228" cy="272" r="6" fill="#2563eb" stroke="#2563eb" stroke-width="1.5"/>
+            <circle cx="228" cy="272" r="2.5" fill="#ffffff"/>
+
+            <rect x="810" y="256" width="150" height="32" rx="4" fill="#166534"/>
+            <text x="885" y="276" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Iniciar descarga ⚙</text>
+
+            <!-- Barra de Destino y Tiempo -->
+            <text x="20" y="308" font-size="11" fill="#475569">Destino Bóveda: <tspan font-family="monospace">archivos.documento / cfdi.boveda_comprobantes (2026/10)</tspan></text>
+            <text x="760" y="308" font-size="11" font-weight="bold" fill="#334155">Tiempo: 00:00:36</text>
+            <line x1="20" y1="316" x2="960" y2="316" stroke="#e2e8f0"/>
+
+            <!-- Consola de Ejecución y Resultado -->
+            <rect x="20" y="328" width="680" height="82" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+            <text x="32" y="348" font-size="11" font-family="monospace" fill="#334155">Consultado 01/OCT/2026 - 31/OCT/2026: V(13) C(0)...</text>
+            <text x="32" y="368" font-size="11" font-family="monospace" font-weight="bold" fill="#166534">✓ Se descargaron 13 de 13 CFDIs</text>
+            <text x="32" y="388" font-size="11" font-family="monospace" fill="#0f172a">✓ Los XML se guardaron correctamente en almacén (SHA-256 verificado)</text>
+
+            <rect x="720" y="328" width="240" height="82" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+            <text x="840" y="355" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">Resumen de Lote</text>
+            <text x="840" y="376" font-size="12" font-weight="bold" fill="#0f172a" text-anchor="middle">Total vigentes (V): 13</text>
+            <text x="840" y="396" font-size="12" font-weight="bold" fill="#991b1b" text-anchor="middle">Total cancelados (C): 0</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF 2: RETENCIONES Y FOLIO FISCAL UUID -->
+    <div id="wf-wf2" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">07.1.1 Descarga de CFDIs — Pestañas 2 y 3: Retenciones y Folio Fiscal (UUID)</span>
+          <span style="font-size:11px; color:#64748b;">Descarga puntual de 1 o varios UUIDs y CFDI de Retenciones 2.0</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 980 320" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:'Segoe UI',system-ui,sans-serif;">
+            <rect width="980" height="320" fill="#ffffff" rx="6" stroke="#cbd5e1"/>
+            <!-- Pestañas -->
+            <text x="20" y="38" font-size="11" fill="#64748b">Buscar por:</text>
+            <rect x="85" y="20" width="80" height="28" rx="4" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="125" y="38" font-size="11" fill="#64748b" text-anchor="middle">Fechas</text>
+
+            <rect x="172" y="20" width="95" height="28" rx="4" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="219" y="38" font-size="11" fill="#64748b" text-anchor="middle">Retenciones</text>
+
+            <rect x="274" y="18" width="125" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <line x1="274" y1="18" x2="399" y2="18" stroke="#183125" stroke-width="3"/>
+            <text x="336" y="37" font-size="11" font-weight="bold" fill="#183125" text-anchor="middle">Folio fiscal (UUID)</text>
+            <line x1="20" y1="48" x2="960" y2="48" stroke="#e2e8f0"/>
+
+            <!-- Controles de Folio Fiscal UUID -->
+            <text x="20" y="76" font-size="11" font-weight="bold" fill="#334155">Razón social</text>
+            <text x="20" y="96" font-size="12" fill="#0f172a">PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+
+            <text x="330" y="76" font-size="11" font-weight="bold" fill="#334155">RFC</text>
+            <text x="330" y="96" font-size="12" font-family="monospace" font-weight="bold" fill="#0f172a">PJE000101AAA</text>
+
+            <text x="520" y="76" font-size="11" font-weight="bold" fill="#334155">Número de UUIDs a descargar:</text>
+            <text x="530" y="98" font-size="11" fill="#334155">Solo uno:</text>
+            <circle cx="590" cy="94" r="6" fill="#ffffff" stroke="#94a3b8"/>
+            <text x="640" y="98" font-size="11" font-weight="bold" fill="#183125">Varios:</text>
+            <circle cx="688" cy="94" r="6" fill="#2563eb"/>
+            <circle cx="688" cy="94" r="2.5" fill="#ffffff"/>
+
+            <text x="790" y="76" font-size="11" font-weight="bold" fill="#334155">¿Son retenciones?:</text>
+            <text x="800" y="98" font-size="11" fill="#334155">No:</text>
+            <rect x="825" y="87" width="13" height="13" rx="2" fill="#ffffff" stroke="#94a3b8"/>
+
+            <!-- Textarea para captura de UUIDs -->
+            <text x="20" y="130" font-size="11" font-weight="bold" fill="#334155">Lista de Folios Fiscales (UUIDs) a recuperar del SAT (uno por línea):</text>
+            <rect x="20" y="138" width="940" height="90" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+            <text x="32" y="160" font-size="11" font-family="monospace" fill="#0f172a">5B4A8E12-90C1-4D22-8F10-001122334455</text>
+            <text x="32" y="180" font-size="11" font-family="monospace" fill="#0f172a">9C8D7F01-33A2-4E89-B102-998877665544</text>
+            <text x="32" y="200" font-size="11" font-family="monospace" fill="#0f172a">A1B2C3D4-E5F6-4789-8012-3456789ABCDE</text>
+
+            <!-- Emitidos / Recibidos y Botón -->
+            <text x="20" y="262" font-size="11" font-weight="bold" fill="#334155">Emitidos:</text>
+            <circle cx="82" cy="258" r="6" fill="#ffffff" stroke="#94a3b8"/>
+            <text x="160" y="262" font-size="11" font-weight="bold" fill="#334155">Recibidos:</text>
+            <circle cx="228" cy="258" r="6" fill="#2563eb"/>
+            <circle cx="228" cy="258" r="2.5" fill="#ffffff"/>
+
+            <rect x="810" y="242" width="150" height="32" rx="4" fill="#166534"/>
+            <text x="885" y="262" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Iniciar descarga</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF 3: ALMACÉN CFDI -->
+    <div id="wf-wf3" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">07.1.1 Almacén CFDI — Relación de UUIDs, Verificación de Estatus y Consulta</span>
+          <span style="font-size:11px; color:#64748b;">Referencia: Captura 06 Almacén CFDI</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 980 420" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:'Segoe UI',system-ui,sans-serif;">
+            <rect width="980" height="420" fill="#ffffff" rx="6" stroke="#cbd5e1"/>
+            <text x="20" y="42" font-size="20" font-weight="bold" fill="#334155">Almacén CFDI</text>
+
+            <!-- Banner Azul Relacionar UUIDs -->
+            <rect x="520" y="14" width="440" height="54" rx="5" fill="#3b97d3"/>
+            <text x="534" y="35" font-size="11" fill="#ffffff">Relaciona todos los XMLs (Que fueron <tspan font-weight="bold">descargados con el programa</tspan>).</text>
+            <text x="534" y="52" font-size="11" fill="#ffffff">Estableciendo relaciones entre sus UUIDs para facilitar futuras consultas.</text>
+            <rect x="842" y="25" width="106" height="30" rx="4" fill="#10b981"/>
+            <text x="895" y="44" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="middle">Relacionar UUIDs</text>
+
+            <!-- Pestañas Buscar por -->
+            <text x="20" y="102" font-size="11" fill="#64748b">Buscar por:</text>
+            <rect x="85" y="82" width="80" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="125" y="101" font-size="11" font-weight="bold" fill="#183125" text-anchor="middle">Fechas</text>
+            <rect x="172" y="84" width="95" height="28" rx="4" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="219" y="102" font-size="11" fill="#64748b" text-anchor="middle">Retenciones</text>
+            <rect x="274" y="84" width="125" height="28" rx="4" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="336" y="102" font-size="11" fill="#64748b" text-anchor="middle">Folio fiscal (UUID)</text>
+            <line x1="20" y1="112" x2="960" y2="112" stroke="#e2e8f0"/>
+
+            <!-- Filtros Almacén -->
+            <text x="20" y="136" font-size="11" font-weight="bold" fill="#334155">Entidad / Unidad para consultar sus CFDIs</text>
+            <rect x="20" y="144" width="490" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="32" y="163" font-size="11" fill="#334155">PJE000101AAA · PODER JUDICIAL DEL ESTADO DE VERACRUZ</text>
+
+            <text x="530" y="136" font-size="11" font-weight="bold" fill="#334155">Inicio:</text>
+            <rect x="530" y="144" width="200" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="542" y="163" font-size="11" fill="#334155">01/10/2026</text>
+
+            <text x="750" y="136" font-size="11" font-weight="bold" fill="#334155">Fin:</text>
+            <rect x="750" y="144" width="210" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="762" y="163" font-size="11" fill="#334155">31/10/2026</text>
+
+            <!-- Fila 2 Filtros -->
+            <text x="20" y="196" font-size="11" font-weight="bold" fill="#334155">Complemento:</text>
+            <rect x="20" y="204" width="300" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="32" y="223" font-size="11" fill="#334155">29 Todos seleccionados!</text>
+            <text x="302" y="223" font-size="10" fill="#64748b">▼</text>
+
+            <text x="340" y="196" font-size="11" font-weight="bold" fill="#334155">RFC emisor (Opcional):</text>
+            <rect x="340" y="204" width="300" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="352" y="223" font-size="11" fill="#94a3b8">RFC emisor</text>
+
+            <text x="660" y="196" font-size="11" font-weight="bold" fill="#334155">Estatus:</text>
+            <rect x="660" y="204" width="300" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="672" y="223" font-size="11" fill="#334155">VIGENTES</text>
+            <text x="942" y="223" font-size="10" fill="#64748b">▼</text>
+
+            <!-- Emitidos / Recibidos / Solo Egresos -->
+            <text x="20" y="264" font-size="11" font-weight="bold" fill="#334155">Emitidos:</text>
+            <circle cx="82" cy="260" r="6" fill="#ffffff" stroke="#94a3b8"/>
+            <text x="200" y="264" font-size="11" font-weight="bold" fill="#334155">Recibidos:</text>
+            <circle cx="268" cy="260" r="6" fill="#2563eb"/>
+            <circle cx="268" cy="260" r="2.5" fill="#ffffff"/>
+            <text x="480" y="264" font-size="11" font-weight="bold" fill="#334155">Solo Egresos (Notas de crédito):</text>
+            <rect x="665" y="253" width="13" height="13" rx="2" fill="#ffffff" stroke="#94a3b8"/>
+
+            <!-- 3 Botones Principales con su Descripción -->
+            <rect x="130" y="295" width="120" height="34" rx="4" fill="#2563eb"/>
+            <text x="190" y="316" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Exportar a excel</text>
+            <text x="190" y="348" font-size="10" fill="#64748b" text-anchor="middle">Exporta los datos de XMLs descargados</text>
+            <text x="190" y="362" font-size="10" fill="#64748b" text-anchor="middle">permitiendo una <tspan font-weight="bold" fill="#334155">mayor cantidad</tspan> de XMLs</text>
+            <text x="190" y="376" font-size="10" fill="#64748b" text-anchor="middle">que exportando desde la consulta.</text>
+
+            <rect x="430" y="295" width="120" height="34" rx="4" fill="#eab308"/>
+            <text x="490" y="316" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Verificar estatus</text>
+            <text x="490" y="348" font-size="10" fill="#64748b" text-anchor="middle">Valida el estatus de los CFDIs que</text>
+            <text x="490" y="362" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">cambiaron de vigentes a cancelados</text>
+            <text x="490" y="376" font-size="10" fill="#64748b" text-anchor="middle">para obtener reportes actualizados.</text>
+
+            <rect x="730" y="295" width="110" height="34" rx="4" fill="#10b981"/>
+            <text x="785" y="316" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Consultar</text>
+            <text x="785" y="348" font-size="10" fill="#64748b" text-anchor="middle">Muestra la lista de XMLs en almacén</text>
+            <text x="785" y="362" font-size="10" fill="#64748b" text-anchor="middle">para visualizar PDF/XML, validar</text>
+            <text x="785" y="376" font-size="10" fill="#64748b" text-anchor="middle">estatus y vincular a expedientes SIAF.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF 4: SAT WEB SERVICE -->
+    <div id="wf-wf4" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">07.1.1 SAT Web Service — Descarga Masiva Asíncrona con e.firma (FIEL)</span>
+          <span style="font-size:11px; color:#64748b;">Hasta 200,000 XMLs o 1,000,000 de registros Metadata por petición</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 980 410" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:'Segoe UI',system-ui,sans-serif;">
+            <rect width="980" height="410" fill="#ffffff" rx="6" stroke="#cbd5e1"/>
+            <text x="20" y="34" font-size="16" font-weight="bold" fill="#183125">SAT Web Service (Descarga Masiva SOAP v1.5)</text>
+
+            <!-- Banner Informativo -->
+            <rect x="20" y="46" width="940" height="54" rx="5" fill="#fff7ed" stroke="#fed7aa"/>
+            <text x="32" y="66" font-size="10.5" fill="#9a3412"><tspan font-weight="bold">IMPORTANTE:</tspan> Esta opción es recomendable si tienes que descargar una <tspan font-weight="bold">cantidad elevada de XMLs (Más de 20,000 o más de 500 en un segundo)</tspan>.</text>
+            <text x="32" y="83" font-size="10.5" fill="#9a3412">El proceso en el SAT puede tardar <tspan font-weight="bold">hasta 3 días (normalmente unas cuantas horas)</tspan>. Actualiza el estatus cada 2 horas hasta que permita optimizar en almacén.</text>
+
+            <!-- Card de Solicitud -->
+            <rect x="20" y="112" width="940" height="145" rx="6" fill="#ffffff" stroke="#e2e8f0"/>
+            <text x="36" y="136" font-size="11" font-weight="bold" fill="#2563eb">Selecciona entidad / RFC (Solo se muestran los configurados con e.firma / FIEL vigente):</text>
+            <rect x="36" y="144" width="520" height="30" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+            <text x="48" y="163" font-size="11" fill="#0f172a">PJE000101AAA · PODER JUDICIAL DEL ESTADO DE VERACRUZ (FIEL Vigente)</text>
+
+            <text x="36" y="194" font-size="11" font-weight="bold" fill="#334155">Inicio (Fecha y Hora):</text>
+            <rect x="36" y="200" width="250" height="28" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+            <text x="48" y="218" font-size="11" fill="#334155">01/10/2026 00:00:00</text>
+
+            <text x="306" y="194" font-size="11" font-weight="bold" fill="#334155">Fin (Fecha y Hora):</text>
+            <rect x="306" y="200" width="250" height="28" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+            <text x="318" y="218" font-size="11" fill="#334155">31/10/2026 23:59:59</text>
+
+            <text x="580" y="218" font-size="11" font-weight="bold" fill="#334155">Tipo de CFDI: Emitidos ( ) · Recibidos (●)</text>
+            <text x="815" y="218" font-size="11" font-weight="bold" fill="#334155">¿Son retenciones? [ ]</text>
+
+            <rect x="690" y="144" width="250" height="32" rx="4" fill="#183125"/>
+            <text x="815" y="164" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Solicitar CFDI y Metadata</text>
+
+            <!-- Tabla de Peticiones -->
+            <rect x="20" y="270" width="940" height="125" rx="6" fill="#ffffff" stroke="#e2e8f0"/>
+            <rect x="20" y="270" width="940" height="30" rx="6" fill="#183125"/>
+            <text x="36" y="289" font-size="10.5" font-weight="bold" fill="#ffffff">Solicitado (ID SAT)</text>
+            <text x="240" y="289" font-size="10.5" font-weight="bold" fill="#ffffff">Tipo</text>
+            <text x="410" y="289" font-size="10.5" font-weight="bold" fill="#ffffff">Fechas de solicitud</text>
+            <text x="640" y="289" font-size="10.5" font-weight="bold" fill="#ffffff">Estatus SAT</text>
+            <text x="810" y="289" font-size="10.5" font-weight="bold" fill="#ffffff">Acciones</text>
+
+            <!-- Fila 1 -->
+            <text x="36" y="322" font-size="11" font-family="monospace" fill="#0f172a">f8d3a910-4b2c-411e-9a01</text>
+            <text x="240" y="322" font-size="11" fill="#334155">Recibidos · CFDI XML</text>
+            <text x="410" y="322" font-size="11" fill="#334155">01/10/2026 al 31/10/2026</text>
+            <rect x="635" y="308" width="95" height="20" rx="10" fill="#dcfce7"/>
+            <text x="682" y="322" font-size="10" font-weight="bold" fill="#166534" text-anchor="middle">TERMINADA (3 ZIP)</text>
+            <rect x="780" y="306" width="165" height="24" rx="4" fill="#10b981"/>
+            <text x="862" y="322" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Optimizar en Almacén</text>
+            <line x1="20" y1="336" x2="960" y2="336" stroke="#f1f5f9"/>
+
+            <!-- Fila 2 -->
+            <text x="36" y="362" font-size="11" font-family="monospace" fill="#0f172a">c2b1e409-7a11-489f-8c12</text>
+            <text x="240" y="362" font-size="11" fill="#334155">Emitidos · Nómina (48,500 XML)</text>
+            <text x="410" y="362" font-size="11" fill="#334155">01/10/2026 al 15/10/2026</text>
+            <rect x="635" y="348" width="95" height="20" rx="10" fill="#fef3c7"/>
+            <text x="682" y="362" font-size="10" font-weight="bold" fill="#92400e" text-anchor="middle">EN PROCESO</text>
+            <rect x="780" y="346" width="165" height="24" rx="4" fill="#2563eb"/>
+            <text x="862" y="362" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">↻ Actualizar estatus</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- WF 5: HERRAMIENTAS PLUS -->
+    <div id="wf-wf5" class="wf-panel">
+      <div class="wf-box">
+        <div class="wf-bar">
+          <span class="wf-bar-label">07.1.1 Herramientas Plus — Utilidades que trabajan con tus XML y con los trámites del SAT</span>
+          <span style="font-size:11px; color:#64748b;">Referencia: Captura 07 Herramientas</span>
+        </div>
+        <div class="wf-svg-area">
+          <svg viewBox="0 0 980 330" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:'Segoe UI',system-ui,sans-serif;">
+            <rect width="980" height="330" fill="#f8fafc" rx="6" stroke="#cbd5e1"/>
+            <text x="24" y="36" font-size="18" font-weight="bold" fill="#0f172a">Herramientas de Procesamiento XML y Metadata SAT</text>
+            <text x="24" y="54" font-size="11.5" fill="#64748b">Utilidades integradas para importar XML históricos, convertir Metadata .txt del SAT y homologar precisión decimal contable.</text>
+
+            <!-- Card 1: XMLs -->
+            <rect x="24" y="72" width="455" height="110" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+            <rect x="42" y="90" width="36" height="36" rx="6" fill="#eff6ff"/>
+            <text x="60" y="114" font-size="16" font-weight="bold" fill="#2563eb" text-anchor="middle">XML</text>
+            <text x="92" y="106" font-size="14" font-weight="bold" fill="#0f172a">XMLs (Importador y Conversor Local)</text>
+            <text x="92" y="126" font-size="11.5" fill="#475569">Trae los XML que ya tienes en carpetas o ZIP, míralos, indexa</text>
+            <text x="92" y="142" font-size="11.5" fill="#475569">en Bóveda y sácalos a Excel o representación impresa PDF.</text>
+            <rect x="390" y="142" width="72" height="28" rx="5" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="426" y="160" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="middle">Abrir ›</text>
+
+            <!-- Card 2: Metadata -->
+            <rect x="500" y="72" width="455" height="110" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+            <rect x="518" y="90" width="36" height="36" rx="6" fill="#eff6ff"/>
+            <text x="536" y="114" font-size="15" font-weight="bold" fill="#2563eb" text-anchor="middle">TXT</text>
+            <text x="568" y="106" font-size="14" font-weight="bold" fill="#0f172a">Metadata (.TXT del Portal SAT a Excel)</text>
+            <text x="568" y="126" font-size="11.5" fill="#475569">Convierte a Excel los archivos .txt de metadata que bajas del</text>
+            <text x="568" y="142" font-size="11.5" fill="#475569">portal del SAT y concilia qué XML faltan por descargar en Bóveda.</text>
+            <rect x="866" y="142" width="72" height="28" rx="5" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="902" y="160" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="middle">Abrir ›</text>
+
+            <!-- Fila inferior de utilidades conectadas con 07.2.1 y 07.3.1 -->
+            <rect x="24" y="200" width="931" height="110" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+            <text x="42" y="224" font-size="11" font-weight="bold" fill="#183125">UTILIDADES FISCALES TRANSVERSALES INTEGRADAS EN SIAF-PJEV:</text>
+
+            <text x="42" y="250" font-size="11.5" fill="#0f172a">• <tspan font-weight="bold">Pre-Armado DIOT desde CFDI:</tspan> Calcula bases de IVA acreditable y retenido sin capturar proveedor por proveedor (Enlace con <tspan font-family="monospace">05.3.4</tspan>).</text>
+            <text x="42" y="272" font-size="11.5" fill="#0f172a">• <tspan font-weight="bold">Solicitudes de Cancelación y Buzón Tributario:</tspan> Consulta avisos del SAT y acepta/rechaza cancelaciones en lote (Enlace con <tspan font-family="monospace">07.2.1</tspan>).</text>
+            <text x="42" y="294" font-size="11.5" fill="#0f172a">• <tspan font-weight="bold">Compatibilidad CFDI (Precisión Decimal):</tspan> Ajusta redondeos de centavos para cuadrar con Pólizas Contables sin alterar el XML firmado.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- GALERÍA DESPLEGABLE DE CAPTURAS DE REFERENCIA -->
+    <details style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:8px; padding:14px 18px; margin-top:16px;">
+      <summary style="cursor:pointer; font-weight:700; color:var(--pjev-verde-oscuro); font-size:13px;">
+        📷 Ver las 9 pantallas de referencia originales proporcionadas para el diseño (Descarga, Almacén, SAT Web Service y Herramientas Plus)
+      </summary>
+      <div class="ref-gallery">
+        <div class="ref-card">
+          <img src="referencias/01-descarga-fechas.png" alt="Referencia 1: Descarga de CFDIs por Fechas y límite de 2,000 XMLs" loading="lazy">
+          <div class="ref-card-cap"><strong>1. Descarga por Fechas:</strong> Límite preventivo de 2,000 XMLs, filtros por Complemento, RFC receptor opcional, Estatus y consola en vivo.</div>
+        </div>
+        <div class="ref-card">
+          <img src="referencias/02-descarga-retenciones.png" alt="Referencia 2: Descarga de CFDIs por Retenciones" loading="lazy">
+          <div class="ref-card-cap"><strong>2. Pestaña Retenciones:</strong> Búsqueda especializada de CFDI de Retenciones e Información de Pagos.</div>
+        </div>
+        <div class="ref-card">
+          <img src="referencias/03-descarga-folio-fiscal-uuid.png" alt="Referencia 3: Descarga por Folio Fiscal UUID" loading="lazy">
+          <div class="ref-card-cap"><strong>3. Pestaña Folio Fiscal (UUID):</strong> Descarga de un solo UUID o varios en lote, con indicador de retenciones.</div>
+        </div>
+        <div class="ref-card">
+          <img src="referencias/04-resultado-almacen-cfdi.png" alt="Referencia 4: Confirmación de guardado en almacén" loading="lazy">
+          <div class="ref-card-cap"><strong>4. Confirmación de Almacenamiento:</strong> Conteo final de CFDIs descargados y guardados automáticamente en almacén.</div>
+        </div>
+        <div class="ref-card">
+          <img src="referencias/05-sat-web-service-200k.png" alt="Referencia 5: Capacidad SAT Web Service 200,000 XMLs" loading="lazy">
+          <div class="ref-card-cap"><strong>5. Capacidad SAT Web Service:</strong> Recuperación de hasta 200,000 XML por consulta masiva.</div>
+        </div>
+        <div class="ref-card">
+          <img src="referencias/06-almacen-cfdi-relacionar-uuids.png" alt="Referencia 6: Almacén CFDI con Relacionar UUIDs y 3 botones" loading="lazy">
+          <div class="ref-card-cap"><strong>6. Almacén CFDI:</strong> Botón <code>[Relacionar UUIDs]</code>, 29 complementos, filtro <code>Solo Egresos</code> y acciones <code>Exportar a excel</code>, <code>Verificar estatus</code> y <code>Consultar</code>.</div>
+        </div>
+        <div class="ref-card">
+          <img src="referencias/07-herramientas-xml-metadata-diot.png" alt="Referencia 7: Herramientas Plus XMLs, Metadata, DIOT, Cancelaciones y Compatibilidad" loading="lazy">
+          <div class="ref-card-cap"><strong>7. Herramientas Plus:</strong> Utilidades de XMLs, conversión de Metadata <code>.txt</code>, DIOT, Solicitudes de cancelación, AntiCaptchas, Compatibilidad decimal y Buzón.</div>
+        </div>
+        <div class="ref-card">
+          <img src="referencias/08-sat-web-service-solicitudes.png" alt="Referencia 8: Consola de solicitudes SAT Web Service con FIEL" loading="lazy">
+          <div class="ref-card-cap"><strong>8. Consola SAT Web Service:</strong> Solicitud de CFDI y Metadata con FIEL para volúmenes &gt;20,000 XMLs (plazo hasta 3 días) y tabla de peticiones.</div>
+        </div>
+        <div class="ref-card">
+          <img src="referencias/09-alcance-funcional-modulos.png" alt="Referencia 9: Matriz de capacidades básicas y avanzadas" loading="lazy">
+          <div class="ref-card-cap"><strong>9. Matriz de Capacidades:</strong> Resumen de funciones de descarga, almacén, constancias (CSF, CIF, 32-D), monitoreo EFOS 69-B y Web Service.</div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 10. INTERFACES CON OTROS SISTEMAS -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">10</span> Interfaces con Presupuesto, Contabilidad, CxP, Tesorería, Recursos Materiales y Archivo</div>
+    <div tabindex="0" role="region" aria-label="Interfaces inter-módulos de Bóveda CFDI" class="table-wrapper">
+      <table class="props-table">
+        <thead><tr><th>Sistema / Módulo</th><th>Interfaz Técnica</th><th>Regla de Integración Normativa y Operativa</th></tr></thead>
+        <tbody>
+          <tr>
+            <th><strong>02 · Presupuesto</strong> (<code>02.1.4</code>, <code>02.2.10</code>)</th>
+            <td>Validación contra contrato y suficiencia</td>
+            <td>Coteja que el <code>rfc_emisor</code> y los montos del CFDI correspondan con el contrato registrado y el saldo comprometido antes de autorizar el devengo.</td>
+          </tr>
+          <tr>
+            <th><strong>03 · Contabilidad</strong> (<code>03.2.1</code>, <code>03.2.2</code>)</th>
+            <td>Enlace de <code>UUID</code> en pólizas</td>
+            <td>Asocia el <code>uuid</code> y el ajuste de compatibilidad decimal a cada movimiento contable de Diario, Egresos e Ingresos para auditoría ORFIS/CONAC.</td>
+          </tr>
+          <tr>
+            <th><strong>04 · Ingresos</strong> (<code>04.2.1</code>)</th>
+            <td>CFDI Emitidos por el PJEV</td>
+            <td>Sincroniza los comprobantes emitidos por el PJEV (arrendamientos, productos, aprovechamientos) con su devengo y recaudación bancaria.</td>
+          </tr>
+          <tr>
+            <th><strong>05 · Cuentas por Pagar</strong> (<code>05.1.1</code>, <code>05.2.1</code>, <code>05.2.4</code>, <code>05.3.4</code>)</th>
+            <td>Checklist documental, Viáticos y DIOT</td>
+            <td>Provee el selector de facturas vigentes para <code>05.2.1 Afectación del Gasto</code> y <code>05.2.4 Comprobación de Gastos</code>, e inyecta el desglose de IVA para armar la <code>05.3.4 DIOT</code> sin captura manual.</td>
+          </tr>
+          <tr>
+            <th><strong>06 · Pagos / Tesorería</strong> (<code>06.2.2</code>)</th>
+            <td>Control de método <code>PUE</code> vs <code>PPD</code></td>
+            <td>En pagos de facturas <code>PPD</code>, exige y relaciona mediante <code>[Relacionar UUIDs]</code> el Complemento de Recepción de Pagos (<code>REP 2.0</code>).</td>
+          </tr>
+          <tr>
+            <th><strong>08 · Recursos Materiales</strong> (Adquisiciones, Almacén, Activo Fijo y Obra)</th>
+            <td>Recepción, Entrada a Almacén y Alta Patrimonial</td>
+            <td>Vincula los conceptos del XML (<code>ClaveProdServ</code>, cantidad, valor unitario, serie) con la Entrada de Almacén (Cap. 2000), el Alta Patrimonial de bienes muebles/tecnológicos (Cap. 5000) y las Estimaciones de Obra (Cap. 6000).</td>
+          </tr>
+          <tr>
+            <th><strong>09 · Gestión Documental</strong> (<code>09.2.1</code>, <code>09.2.4</code>)</th>
+            <td>Custodia archivística (Serie <code>2530.3</code>)</td>
+            <td>Almacena el binario en <code>archivos.documento</code> con huella <code>SHA-256</code> y lo integra al expediente de póliza dentro del Archivo de Trámite de Contabilidad (<code>2530.3</code>).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 11. CASOS DE PRUEBA -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">11</span> Casos de Prueba (Validación QA)</div>
+    <div tabindex="0" role="region" aria-label="Casos de prueba QA del módulo 07.1.1" class="table-wrapper">
+      <table class="props-table">
+        <thead><tr><th>ID</th><th>Escenario</th><th>Acción / Entrada</th><th>Resultado Esperado</th></tr></thead>
+        <tbody>
+          <tr><th><strong>CP-BV-01</strong></th><td>Descarga básica por Fechas exitosa</td><td>Seleccionar rango <code>01/10/2026</code> a <code>31/10/2026</code>, Recibidos, Estatus Todos y pulsar <code>[Iniciar descarga]</code>.</td><td>El sistema descarga los 13 XMLs, calcula su <code>SHA-256</code>, los inserta en <code>cfdi.boveda_comprobantes</code> y muestra <em>"Se descargaron 13 de 13 CFDIs — Los XML se guardaron correctamente en almacén"</em>.</td></tr>
+          <tr><th><strong>CP-BV-02</strong></th><td>Alerta de límite de 2,000 XMLs</td><td>Ejecutar descarga básica en un periodo que excede 2,000 comprobantes.</td><td>Retorna código <code>-1</code> con estatus <code>LIMITE_2000_ALCANZADO</code> e invita a utilizar el módulo <strong>SAT Web Service</strong>.</td></tr>
+          <tr><th><strong>CP-BV-03</strong></th><td>Solicitud masiva por SAT Web Service con FIEL</td><td>Solicitar 48,500 XMLs de nómina emitida usando e.firma vigente y pulsar <code>[Solicitar CFDI y Metadata]</code>.</td><td>Registra el <code>id_solicitud_sat</code> en la tabla de peticiones, permite actualizar estatus cada 2 horas y, al terminar, optimiza e indexa los paquetes <code>.zip</code> en el Almacén.</td></tr>
+          <tr><th><strong>CP-BV-04</strong></th><td>Relación automática de UUIDs en Almacén</td><td>Pulsar <code>[Relacionar UUIDs]</code> en la vista de Almacén CFDI.</td><td>Ejecuta <code>cfdi.fn_relacionar_uuids_almacen</code> y enlaza automáticamente las facturas <code>PPD</code> con sus complementos de pago <code>REP 2.0</code> y notas de crédito.</td></tr>
+          <tr><th><strong>CP-BV-05</strong></th><td>Detección de cambio de Vigente a Cancelado</td><td>Pulsar <code>[Verificar estatus]</code> en Almacén sobre un lote previamente descargado.</td><td>Marca <code>cambio_a_cancelado = true</code> en los CFDIs que fueron cancelados posteriormente en el SAT y actualiza el reporte Excel.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 12. HISTORIAL DE VERSIONES -->
+  <div class="doc-section">
+    <div class="section-title"><span class="section-num">12</span> Historial de Versiones</div>
+    <div tabindex="0" role="region" aria-label="Historial de versiones" class="table-wrapper">
+      <table class="props-table">
+        <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción del Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <th><code>2.0.0</code></th>
+            <td>2026-10-29</td>
+            <td>Julio César Barrales Flores / Cristian</td>
+            <td>Especificación integral de <code>07.1.1 Bóveda CFDI, Almacén y Descarga SAT</code>: incorporación de Descarga Básica en 3 pestañas (Fechas, Retenciones, UUID), módulo SAT Web Service con FIEL (hasta 200,000 XMLs y 1M Metadata), Almacén con <code>[Relacionar UUIDs]</code> y 3 acciones principales, Herramientas Plus (XMLs, Metadata <code>.txt</code>, Compatibilidad decimal), modelo de datos en esquema <code>cfdi</code>, SPs, controlador NestJS y 9 pantallas de referencia.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showWF(wfId, btn) {
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('wf-' + wfId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showSP(spId, btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const section = parent.parentElement;
+    section.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('sp-' + spId);
+    if (panel) panel.classList.add('active');
+  }
+
+  function showDBTab(tabId, btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const section = parent.parentElement;
+    section.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('db-' + tabId);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+</body>
+</html>
