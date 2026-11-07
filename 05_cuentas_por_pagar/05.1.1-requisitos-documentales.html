@@ -69,7 +69,7 @@
     <div>
       <div class="elem-id">05.1.1</div>
       <h1 class="elem-title">Requisitos Documentales (Matriz Checklist de Soportes de Gasto)</h1>
-      <p class="elem-desc">Catálogo maestro y matriz de exigibilidad que tipifica los comprobantes fiscales, contratos, actas y formatos obligatorios que deben integrarse al expediente digital antes de autorizar y devengar cualquiera de los 12 procedimientos canónicos de gasto en el SIAF-PJEV.</p>
+      <p class="elem-desc">Catálogo maestro (21 tipos de documento soporte) y matriz de exigibilidad homologada con el Manual Específico de Procedimientos de la Subdirección de Recursos Financieros (Feb 2023), agrupada en los 4 Procedimientos Generales de Tesorería (1. Pago directo, 2. Pago derivado de un pedido, 3. Gasto a comprobar, 4. No afecta presupuesto) y sus 20 subprocedimientos operativos.</p>
       <div class="mod-header-badges">
         <span class="mod-badge badge-a">Modo A — Catálogo Simple Parametrizado</span>
         <span class="mod-badge badge-s">Fase 2: Ejecución del Gasto</span>
@@ -82,8 +82,8 @@
   <!-- 1. DESCRIPCIÓN GENERAL -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-    <p>En la administración pública estatal, el reconocimiento contable y presupuestario del <strong>Devengado (LGCG Art. 4 Fracc. XVI)</strong> exige que el ente público cuente con el respaldo documental fidedigno que acredite la recepción conforme de los bienes, la prestación efectiva de los servicios o el cumplimiento de los términos de una comisión oficial. Históricamente, en el PJEV esta verificación se realizaba mediante revisiones manuales en papel descritas en el procedimiento <em>"Recepción y revisión de gastos"</em> de la Subdirección de Recursos Financieros.</p>
-    <p>El módulo <strong>05.1.1 Requisitos Documentales</strong> traslada esta normatividad a una matriz relacional inteligente. Permite a los administradores del sistema parametrizar, por cada uno de los <strong>12 procedimientos de afectación del gasto</strong> (<code>NOMINA</code>, <code>ARRENDAMIENTO</code>, <code>SERVICIOS_BASICOS</code>, <code>COMPRA_PEDIDO</code>, <code>OBRA_PUBLICA</code>, <code>COMPROBACION_VIATICOS</code>, etc.), qué documentos soporte son <strong>Obligatorios</strong>, <strong>Condicionales</strong> u <strong>Opcionales</strong>. Esta matriz alimenta automáticamente el componente <code>SiafExpedienteDigitalMin</code> en la captura de <code>05.2.1 Afectación del Gasto</code>, impidiendo que un trámite avance en el workflow si no cuenta con el expediente digital íntegro y validado fiscalmente.</p>
+    <p>En la administración pública estatal, el reconocimiento contable y presupuestario del <strong>Devengado (LGCG Art. 4 Fracc. XVI)</strong>, así como la liquidación de pasivos extrapresupuestales y el otorgamiento/comprobación de recursos rotatorios, exigen que el ente público cuente con el respaldo documental fidedigno que acredite la recepción conforme de los bienes, la prestación efectiva de los servicios, el cumplimiento de una comisión oficial o la determinación de retenciones a terceros. Históricamente, en el PJEV esta verificación se realizaba mediante revisiones manuales en papel descritas en los 23 procedimientos de Tesorería y Oficina de Caja del <em>Manual Específico de Procedimientos de la Subdirección de Recursos Financieros (Febrero 2023)</em>.</p>
+    <p>El módulo <strong>05.1.1 Requisitos Documentales</strong> traslada esta normatividad a una matriz relacional inteligente estructurada en <strong>4 Procedimientos Generales</strong> (que corresponden a las dos grandes vías operativas de Tesorería: <strong>Solicitud de Pago Directo [Presupuestal]</strong> con sus modalidades <em>1. Pago directo</em>, <em>2. Pago derivado de un pedido</em> y <em>3. Gasto a comprobar</em>, y <strong>Solicitud de No Afecta Presupuesto [Extrapresupuestal]</strong> como <em>4. No afecta presupuesto</em>) desglosados en <strong>20 subprocedimientos canónicos</strong>. Esta matriz alimenta automáticamente el componente <code>SiafExpedienteDigitalMin</code> en la captura de <code>05.2.1 Afectación del Gasto</code> y <code>05.2.2 Orden de Pago</code>, impidiendo que un trámite avance hacia <code>Registro de Pagos</code> en Caja si no cuenta con el expediente digital íntegro y validado fiscalmente.</p>
   </div>
 
   <!-- 2. MARCO NORMATIVO -->
@@ -95,22 +95,22 @@
         <tr>
           <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
           <td>Art. 4 Fracc. XVI, Art. 9 y Art. 67</td>
-          <td>Obliga a registrar el momento contable del devengado respaldado invariablemente por los documentos que lo justifiquen y comprueben conforme a los lineamientos del CONAC.</td>
+          <td>Obliga a registrar el momento contable del devengado y pagado respaldado invariablemente por los documentos justificativos y comprobatorios conforme a los lineamientos del CONAC.</td>
         </tr>
         <tr>
           <td><strong>Manual Específico de Procedimientos de Recursos Financieros PJEV (Feb 2023)</strong></td>
-          <td>Procedimientos: Recepción y revisión de gastos (pág. 124), Pago a contratistas de obra (pág. 155), Comprobación de viáticos (pág. 159), Integración de documentación soporte (pág. 186)</td>
-          <td>Establece el listado taxativo de comprobantes para pagos con contrato, adjudicación directa, adquisiciones con entrada a almacén, obra pública, viáticos y arrendamientos.</td>
+          <td>Afectación de nómina (págs. 57-63), Recepción y revisión de gastos (págs. 96-99), Viáticos (págs. 106-108 y 163-164), Servicios básicos (pág. 111), Sujetos a comprobar (págs. 117-119), Arrendamientos (págs. 125-128), Terceros institucionales (págs. 136 y 234), Correos de México (pág. 144), Obra pública (págs. 150-151), Honorarios (pág. 156), Fideicomisos (pág. 160)</td>
+          <td>Establece el listado taxativo de comprobantes originales, firmas, sellos y verificaciones para pagos directos, pedidos con almacén, contratos, obra pública, gastos a comprobar y terceros institucionales.</td>
         </tr>
         <tr>
           <td><strong>Código Fiscal de la Federación (CFF) y Resolución Miscelánea Fiscal</strong></td>
           <td>Art. 29 y 29-A (Anexo 20 SAT)</td>
-          <td>Exige la verificación informática del CFDI (XML timbrado, vigencia en el SAT, RFC emisor no listado en el Art. 69-B del CFF y coherencia de método de pago PUE/PPD).</td>
+          <td>Exige la verificación informática del CFDI (XML timbrado v4.0, vigencia en el SAT, RFC emisor no listado en el Art. 69-B del CFF y control de Complementos de Recepción de Pagos PPD).</td>
         </tr>
         <tr>
           <td><strong>Código Financiero para el Estado de Veracruz</strong></td>
           <td>Art. 183 y aplicables</td>
-          <td>Dispone la exigencia de la Opinión de Cumplimiento de Obligaciones Fiscales Estatales ante la SEFIPLAN para proveedores y contratistas con operaciones en la entidad.</td>
+          <td>Dispone la exigencia de la Constancia de Cumplimiento de Obligaciones Fiscales Estatales ante la SEFIPLAN para proveedores y contratistas con domicilio o actividad en el Estado de Veracruz.</td>
         </tr>
       </tbody>
     </table>
@@ -118,16 +118,16 @@
 
   <!-- 3. CATÁLOGO INSTITUCIONAL DE DOCUMENTOS SOPORTE -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">3</span> Catálogo Maestro de Documentos Soporte (16 Tipos Oficiales)</div>
-    <p>A partir del inventario normativo de los procedimientos de la Subdirección de Recursos Financieros y Recursos Materiales, se tipifican los siguientes 16 documentos requeridos en el SIAF-PJEV:</p>
+    <div class="section-title"><span class="section-num">3</span> Catálogo Maestro de Documentos Soporte (21 Tipos Oficiales)</div>
+    <p>A partir del inventario normativo completo del Manual de Procedimientos de la Subdirección de Recursos Financieros (Feb 2023) y Recursos Materiales, se tipifican los siguientes 21 documentos requeridos en el SIAF-PJEV:</p>
 
     <table class="props-table">
       <thead>
         <tr>
-          <th style="width:12%;">Código</th>
+          <th style="width:13%;">Código</th>
           <th style="width:25%;">Nombre del Documento</th>
           <th style="width:15%;">Emisor / Origen</th>
-          <th style="width:12%;">Formato Válido</th>
+          <th style="width:11%;">Formato Válido</th>
           <th style="width:36%;">Descripción y Regla de Validación</th>
         </tr>
       </thead>
@@ -135,114 +135,149 @@
         <tr>
           <td><code>DOC-SOL-PAG</code></td>
           <td><strong>Tarjeta / Oficio de Solicitud de Pago</strong></td>
-          <td>Área Solicitante (Juzgado / DGA)</td>
+          <td>Área Solicitante / SRH / Infraestructura</td>
           <td>PDF firmado</td>
-          <td>Documento oficial de petición con firma autógrafa o e.firma del titular solicitante y justificación del gasto.</td>
+          <td>Tarjeta de solicitud de pago, oficio de petición o formato Solicitud-comprobación de recursos firmado por el titular del área solicitante (y Vo.Bo. de DGA cuando aplique).</td>
         </tr>
         <tr>
           <td><code>DOC-CFD-XML</code></td>
           <td><strong>Comprobante Fiscal Digital (CFDI - XML)</strong></td>
-          <td>Proveedor / Empleado / Arrendador</td>
+          <td>Proveedor / Arrendador / Contratista</td>
           <td>XML (v4.0)</td>
-          <td>Archivo XML timbrado por PAC autorizado. Se valida estructura, cadena digital y sellos contra el webservice del SAT.</td>
+          <td>Archivo XML timbrado (Ingreso o Complemento de Pago PPD Tipo P). Se valida estructura, importes, retenciones y sellos contra el webservice del SAT.</td>
         </tr>
         <tr>
           <td><code>DOC-CFD-PDF</code></td>
           <td><strong>Representación Impresa CFDI (PDF)</strong></td>
           <td>Proveedor / Empleado</td>
           <td>PDF</td>
-          <td>Copia legible del comprobante para visualización rápida del analista con sello de recepción y visto bueno.</td>
+          <td>Factura impresa firmada por el jefe de área (y con justificación del gasto al reverso en gastos directos, consumibles y fondo revolvente, págs. 96-97).</td>
         </tr>
         <tr>
           <td><code>DOC-VAL-SAT</code></td>
           <td><strong>Verificación de Validación SAT</strong></td>
-          <td>SIAF Bóveda / SAT</td>
+          <td>SIAF Bóveda / Portal SAT</td>
           <td>JSON / PDF Acuse</td>
-          <td>Constancia automatizada generada por el SIAF que acredita estatus "VIGENTE" y ausencia de RFC en listas 69-B.</td>
+          <td>Constancia de verificación del CFDI en un tanto por cada factura que acredita estatus "VIGENTE" en el SAT y ausencia de RFC en listas 69-B.</td>
         </tr>
         <tr>
           <td><code>DOC-OPI-SAT</code></td>
           <td><strong>Opinión de Cumplimiento SAT (32-D)</strong></td>
-          <td>SAT (Proveedor)</td>
+          <td>SAT (Proveedor / Contratista)</td>
           <td>PDF Oficial</td>
-          <td>Constancia positiva no mayor a 30 días naturales. Obligatoria en contrataciones y compras mayores a $300,000 MXN.</td>
+          <td>Constancia positiva de cumplimiento de obligaciones fiscales federales vigente (no mayor a 30 días naturales). Obligatoria en contratos y obra pública (pág. 96).</td>
         </tr>
         <tr>
           <td><code>DOC-OPI-SEF</code></td>
           <td><strong>Constancia de Cumplimiento SEFIPLAN</strong></td>
           <td>SEFIPLAN Veracruz</td>
           <td>PDF Oficial</td>
-          <td>Constancia estatal de no adeudos fiscales emitida por el Gobierno del Estado para proveedores con domicilio local.</td>
+          <td>Constancia de cumplimiento de obligaciones fiscales estatales emitida por la SEFIPLAN cuando el proveedor o contratista sea del Estado de Veracruz (pág. 96).</td>
         </tr>
         <tr>
           <td><code>DOC-CON-TRA</code></td>
           <td><strong>Contrato o Convenio Formalizado</strong></td>
           <td>Dirección de Asuntos Jurídicos</td>
           <td>PDF con firmas</td>
-          <td>Contrato bilateral o convenio modificatorio que respalda la relación jurídica, vigencia, montos y penalizaciones.</td>
+          <td>Copia del contrato de adquisiciones, servicios, arrendamiento de inmuebles, obra pública o convenio con terceros institucionales vigente en el ejercicio.</td>
         </tr>
         <tr>
           <td><code>DOC-ORD-PED</code></td>
           <td><strong>Pedido u Orden de Servicio</strong></td>
           <td>Subdirección de Recursos Materiales</td>
           <td>PDF Foliado</td>
-          <td>Instrumento de adquisición derivado de adjudicación directa o licitación, especificando renglones del CUCOP.</td>
+          <td>Copia de la Orden de servicio o Pedido derivado de adjudicación directa, invitación o licitación con las firmas requeridas (pág. 96).</td>
         </tr>
         <tr>
           <td><code>DOC-ENT-ALM</code></td>
           <td><strong>Entrada y Remisión de Almacén</strong></td>
           <td>Oficina de Almacén PJEV</td>
           <td>PDF Sellado</td>
-          <td>Constancia física de ingreso de bienes al inventario institucional, con sello húmedo oficial de ALMACÉN.</td>
+          <td>Entrada de Almacén en un tanto con el sello oficial de ALMACÉN, cuyo importe debe cuadrar con las facturas (pág. 96).</td>
         </tr>
         <tr>
           <td><code>DOC-VAL-ENT</code></td>
           <td><strong>Vale de Entrada de Materiales</strong></td>
-          <td>Almacén / Custodio</td>
+          <td>Almacén / Jefe de Área</td>
           <td>PDF Firmado</td>
-          <td>Vale suscrito por el responsable del almacén que certifica que los bienes corresponden en cantidad y calidad a la factura.</td>
+          <td>Vale de entrada en un tanto firmado por el jefe de área y almacén que certifica recepción conforme en cantidad y calidad (pág. 96).</td>
         </tr>
         <tr>
           <td><code>DOC-ALT-INV</code></td>
           <td><strong>Cédula de Alta de Inventario (Activo Fijo)</strong></td>
-          <td>Control de Inventarios</td>
+          <td>Control de Inventarios / Activo Fijo</td>
           <td>PDF con Folios</td>
-          <td>Obligatorio para Capítulo 5000 (Mobiliario, cómputo, vehículos). Incluye número de inventario asignado al bien.</td>
+          <td>Alta de inventario en un tanto obligatoria para bienes muebles, inmuebles e intangibles del Capítulo 5000, cuadrando con el monto de la factura (pág. 96).</td>
         </tr>
         <tr>
           <td><code>DOC-OFI-COM</code></td>
-          <td><strong>Oficio de Comisión Oficial (Anexo 5)</strong></td>
+          <td><strong>Oficio de Comisión Oficial</strong></td>
           <td>Titular del Órgano / DGA</td>
           <td>PDF Firmado</td>
-          <td>Comisión de servicio autorizada con fechas, destino, objetivo institucional y autorización de viáticos.</td>
+          <td>Copia del Oficio de comisión autorizando fechas, lugar y motivo para el otorgamiento o comprobación de viáticos (págs. 97, 108 y 163).</td>
         </tr>
         <tr>
           <td><code>DOC-INF-COM</code></td>
           <td><strong>Informe Pormenorizado de Actividades</strong></td>
-          <td>Servidor Comisionado</td>
+          <td>Servidor Público Comisionado</td>
           <td>PDF Firmado</td>
-          <td>Relación circunstanciada de las actividades desarrolladas en la comisión oficial con visto bueno del superior.</td>
+          <td>Relación circunstanciada de las actividades realizadas en la comisión oficial con visto bueno del superior jerárquico.</td>
         </tr>
         <tr>
           <td><code>DOC-FMT-CMP</code></td>
-          <td><strong>Formato de Comprobación de Gastos (Anexo 6)</strong></td>
-          <td>Comisionado / Tesorería</td>
-          <td>Excel / PDF</td>
-          <td>Desglose de facturas de hospedaje, alimentos, peajes y cálculo matemático de saldo a favor o a reintegrar.</td>
+          <td><strong>Formato de Comprobación de Recurso / Reposición de Fondos</strong></td>
+          <td>Comisionado / Administrador de Fondo</td>
+          <td>Excel / PDF Firmado</td>
+          <td>Formato Comprobación de recurso (desglose de facturas de viáticos o sujetos a comprobar y diferencia a reintegrar, págs. 118 y 164) o Formato de reposición de fondos revolventes (pág. 97).</td>
         </tr>
         <tr>
           <td><code>DOC-EST-OBR</code></td>
-          <td><strong>Carátula y Estimación de Obra Aprobada</strong></td>
-          <td>Supervisión de Obra Pública</td>
+          <td><strong>Carátula, Estimación de Obra y/o Acta de Finiquito</strong></td>
+          <td>Depto. de Infraestructura y Supervisión</td>
           <td>PDF / Cédula</td>
-          <td>Estimación por avance físico-financiero firmada por el contratista, supervisor de obra y director de infraestructura.</td>
+          <td>Estimación por avance físico-financiero o finiquito aprobado, con cálculo de amortización de anticipo y retención del 5 al millar del ORFIS (págs. 150-151).</td>
         </tr>
         <tr>
           <td><code>DOC-LIN-SAT</code></td>
-          <td><strong>Línea de Captura SAT / Cédula Terceros</strong></td>
-          <td>SAT / IPE / Aseguradoras</td>
+          <td><strong>Línea de Captura SAT / Formato OVH / Cédula Terceros</strong></td>
+          <td>SAT / SEFIPLAN (OVH) / IPE / SRH</td>
           <td>PDF / Línea</td>
-          <td>Línea de captura para entero de ISR nómina quincenal o cédula de liquidación mensual a terceros institucionales.</td>
+          <td>Línea de captura vigente del SAT (ISR), formato OVH de SEFIPLAN (3% Nómina) o cédula de autodeterminación de descuentos de terceros institucionales (págs. 136 y 234).</td>
+        </tr>
+        <tr>
+          <td><code>DOC-REC-SIM</code></td>
+          <td><strong>Recibo Simple / Recibo de Sujeto a Comprobar</strong></td>
+          <td>Área Solicitante / Tesorería</td>
+          <td>PDF Firmado</td>
+          <td>Recibo simple original firmado por el jefe de área y por la persona que recibe y ejecutará el recurso en anticipos de viáticos y sujetos a comprobar (págs. 97, 108 y 118).</td>
+        </tr>
+        <tr>
+          <td><code>DOC-REL-POS</code></td>
+          <td><strong>Relación de Piezas Depositadas (Servicio Postal)</strong></td>
+          <td>Correos de México (SEPOMEX)</td>
+          <td>PDF Original</td>
+          <td>Relación original que detalla cantidad de piezas, peso, importe unitario y monto total de envíos desglosado por organización: TSJ, CJ y TCA (pág. 144).</td>
+        </tr>
+        <tr>
+          <td><code>DOC-EDO-CTA</code></td>
+          <td><strong>Estado de Cuenta Fiduciario / Bancario</strong></td>
+          <td>Institución Fiduciaria / SRH</td>
+          <td>PDF Oficial</td>
+          <td>Copia del estado de cuenta mensual emitido por el banco fiduciario para registrar los gastos y movimientos de los Fideicomisos de Administración e Inversión (pág. 160).</td>
+        </tr>
+        <tr>
+          <td><code>DOC-RES-NOM</code></td>
+          <td><strong>Resumen de Nómina y Archivos Electrónicos RH</strong></td>
+          <td>Subdirección de Recursos Humanos</td>
+          <td>PDF / TXT / Layout</td>
+          <td>Resumen quincenal de nómina básica, resumen mensual de compensación y prestaciones y archivos electrónicos con clave programática CONAC o layout de dispersión (págs. 57-63 y 198).</td>
+        </tr>
+        <tr>
+          <td><code>DOC-REC-ING</code></td>
+          <td><strong>Recibo de Caja de Ingreso / Ficha de Reintegro Bancario</strong></td>
+          <td>Oficina de Caja / Banco</td>
+          <td>PDF Sellado</td>
+          <td>Recibo de ingreso de recurso sellado por la Oficina de Caja o ficha de depósito bancario cuando el servidor público reintegra remanentes no ejercidos o pagos en demasía (págs. 118, 164 y 212).</td>
         </tr>
       </tbody>
     </table>
@@ -250,201 +285,118 @@
 
   <!-- 4. MATRIZ DE EXIGIBILIDAD POR PROCEDIMIENTO DE GASTO -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">4</span> Matriz de Exigibilidad por Procedimiento de Gasto (Checklist Canónico)</div>
-    <p>La siguiente matriz cruza los <strong>12 procedimientos canónicos</strong> de <code>cxp.catalogo_procedimientos_afectacion</code> con la documentación soporte. El motor transaccional del SIAF-PJEV evalúa esta matriz en tiempo real:</p>
+    <div class="section-title"><span class="section-num">4</span> Matriz de Exigibilidad por Procedimiento y Subprocedimiento (Cuadre Oficial PJEV)</div>
+    <p>La siguiente matriz estructura los <strong>20 subprocedimientos operativos</strong> agrupados en los <strong>4 Procedimientos Generales</strong> definidos para el SIAF-PJEV (<strong>1. Pago directo</strong>, <strong>2. Pago derivado de un pedido (materiales)</strong>, <strong>3. Gasto a comprobar</strong> y <strong>4. No afecta presupuesto</strong>). La tabla está formateada en texto limpio para permitir su copiado directo a documentos institucionales en Word:</p>
 
     <div style="overflow-x:auto;">
-      <table class="props-table" style="font-size:11px;">
+      <table class="props-table" style="font-size:11.5px; line-height:1.5;">
         <thead>
           <tr>
-            <th>Procedimiento de Gasto</th>
-            <th>Tipo Pago</th>
-            <th>Beneficiario</th>
-            <th>Documentos Obligatorios (Bloqueantes)</th>
-            <th>Documentos Condicionales / Opcionales</th>
+            <th style="width:18%;">Procedimiento</th>
+            <th style="width:24%;">Subprocedimiento</th>
+            <th style="width:58%;">Documentación requerida</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>NOMINA</strong><br><small style="color:var(--pjev-texto-muted);">Nómina quincenal y prestaciones</small></td>
-            <td><span class="mod-badge badge-s">1 · SP</span></td>
-            <td>EMPLEADO / UA</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-LIN-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">Cédula RH (Desglose retenciones)</span>
-              <span class="req-badge req-op">Resumen de dispersión bancaria</span>
-            </td>
+            <td>1. Pago directo</td>
+            <td>1.1 Gasto directo general, adjudicación directa sin pedido y reposición de consumibles (GASTO_DIRECTO_GENERAL)</td>
+            <td>Obligatorios: Tarjeta u Oficio de solicitud de pago original firmado por el jefe de área (DOC-SOL-PAG); Factura original CFDI en XML y PDF firmada por el jefe de área y con justificación del gasto al reverso (DOC-CFD-XML y DOC-CFD-PDF); Verificación de vigencia del CFDI ante el SAT (DOC-VAL-SAT). Condicionales: Alta de inventario que cuadre con el monto de la factura si es bien del Capítulo 5000 (DOC-ALT-INV); Opinión de cumplimiento SAT 32-D (DOC-OPI-SAT) y Constancia SEFIPLAN (DOC-OPI-SEF) cuando supere el monto normativo.</td>
           </tr>
           <tr>
-            <td><strong>ARRENDAMIENTO</strong><br><small style="color:var(--pjev-texto-muted);">Rentas de juzgados y sedes</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>PROVEEDOR</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-CON-TRA</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">DOC-OPI-SAT (Si excede umbral)</span>
-              <span class="req-badge req-op">Dictamen de justipreciación de renta</span>
-            </td>
+            <td>1. Pago directo</td>
+            <td>1.2 Servicios básicos: CFE, Agua, Telefonía e Internet (SERVICIOS_BASICOS)</td>
+            <td>Obligatorios: Tarjeta u Oficio de solicitud y cuadro de prorrateo por organización TSJ, CJ y TCA (DOC-SOL-PAG); Factura original CFDI en XML y PDF (DOC-CFD-XML y DOC-CFD-PDF); Verificación del CFDI en el SAT (DOC-VAL-SAT). Condicionales: Recibo original emitido por las comisiones de agua potable cuando el organismo operador no emite CFDI previo al pago.</td>
           </tr>
           <tr>
-            <td><strong>SERVICIOS_BASICOS</strong><br><small style="color:var(--pjev-texto-muted);">CFE, CAEV, Telefonía, Internet</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>PROVEEDOR</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">Recibo provisional (Caseta vigilancia agua)</span>
-              <span class="req-badge req-op">Relación de medidores institucionales</span>
-            </td>
+            <td>1. Pago directo</td>
+            <td>1.3 Servicio postal: Correos de México (CORREOS_MEXICO)</td>
+            <td>Obligatorios: Oficio o tarjeta de solicitud de pago (DOC-SOL-PAG); Relación de piezas depositadas original detallando cantidad de piezas, peso, importe por pieza y monto por organización TSJ, CJ y TCA (DOC-REL-POS); Factura original CFDI en XML y PDF concentradora (DOC-CFD-XML y DOC-CFD-PDF); Verificación del CFDI en el SAT (DOC-VAL-SAT).</td>
           </tr>
           <tr>
-            <td><strong>HONORARIOS</strong><br><small style="color:var(--pjev-texto-muted);">Servicios profesionales PF</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>PROVEEDOR</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-CON-TRA</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">DOC-OPI-SAT</span>
-              <span class="req-badge req-op">Entregable técnico / Informe mensual</span>
-            </td>
+            <td>1. Pago directo</td>
+            <td>1.4 Arrendamiento de bienes inmuebles (ARRENDAMIENTO)</td>
+            <td>Obligatorios: Oficio y Listado de rentas mensual emitido por Programación y Presupuesto (DOC-SOL-PAG); Copia del Contrato de arrendamiento o convenio modificatorio vigente enviado por Asuntos Jurídicos (DOC-CON-TRA); Factura o recibo de arrendamiento CFDI en XML y PDF con retenciones fiscales desglosadas (DOC-CFD-XML y DOC-CFD-PDF); Verificación del CFDI en el SAT (DOC-VAL-SAT). Condicionales: Opinión de cumplimiento SAT (DOC-OPI-SAT); Constancia SEFIPLAN (DOC-OPI-SEF); Oficio de solicitud de cambio de cuenta bancaria cuando aplique.</td>
           </tr>
           <tr>
-            <td><strong>TERCEROS_INST</strong><br><small style="color:var(--pjev-texto-muted);">Entero retenciones SAT, IPE, etc.</small></td>
-            <td><span class="mod-badge badge-s">1 · SP</span></td>
-            <td>TERCERO_INST</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-LIN-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">Cédula de determinación IPE/SAT</span>
-              <span class="req-badge req-op">Convenio institucional vigente</span>
-            </td>
+            <td>1. Pago directo</td>
+            <td>1.5 Honorarios y servicios profesionales (HONORARIOS)</td>
+            <td>Obligatorios: Tarjeta u Oficio de solicitud de pago firmado por el jefe de área (DOC-SOL-PAG); Copia del Contrato de prestación de servicios profesionales (DOC-CON-TRA); Factura CFDI en XML y PDF con retenciones de ISR e IVA (DOC-CFD-XML y DOC-CFD-PDF); Verificación del CFDI en el SAT (DOC-VAL-SAT). Condicionales: Opinión de cumplimiento SAT 32-D (DOC-OPI-SAT); Constancia SEFIPLAN (DOC-OPI-SEF); Entregable o informe técnico de actividades.</td>
           </tr>
           <tr>
-            <td><strong>GASTO_DIRECTO_GENERAL</strong><br><small style="color:var(--pjev-texto-muted);">Compras menores y directas</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>PROVEEDOR</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">DOC-ORD-PED (Si aplica orden)</span>
-              <span class="req-badge req-op">Justificación expresa al reverso</span>
-            </td>
+            <td>1. Pago directo</td>
+            <td>1.6 Registro de Nómina Bruta y Prestaciones Capítulo 1000 (NOMINA)</td>
+            <td>Obligatorios: Oficio de envío de la Subdirección de Recursos Humanos (DOC-SOL-PAG); Resumen quincenal de nómina básica y Resumen mensual de compensación y prestaciones impresos, firmados y sellados, junto con los archivos electrónicos de nómina básica, compensación, prestaciones y cheques cancelados por estructura programática CONAC (DOC-RES-NOM).</td>
           </tr>
           <tr>
-            <td><strong>COMPRA_PEDIDO</strong><br><small style="color:var(--pjev-texto-muted);">Adquisiciones Almacén / Pedido</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>PROVEEDOR</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-ORD-PED</span>
-              <span class="req-badge req-ob">DOC-ENT-ALM</span>
-              <span class="req-badge req-ob">DOC-VAL-ENT</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">DOC-OPI-SAT</span>
-              <span class="req-badge req-co">DOC-OPI-SEF</span>
-              <span class="req-badge req-co">DOC-ALT-INV (Si es Capítulo 5000)</span>
-            </td>
+            <td>1. Pago directo</td>
+            <td>1.7 Impuesto 3% sobre Nómina SEFIPLAN (IMPUESTO_3PCT_NOMINA)</td>
+            <td>Obligatorios: Oficio original de la Subdirección de Recursos Humanos donde indica el número de empleados y la base gravable del impuesto por organización (DOC-SOL-PAG); Formato y Línea de captura emitida en el portal de la Oficina Virtual de Hacienda OVH de SEFIPLAN (DOC-LIN-SAT).</td>
           </tr>
           <tr>
-            <td><strong>CONTRATO_SERVICIOS</strong><br><small style="color:var(--pjev-texto-muted);">Vigilancia, limpieza, sistemas</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>PROVEEDOR</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-CON-TRA</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-              <span class="req-badge req-ob">DOC-OPI-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">DOC-OPI-SEF</span>
-              <span class="req-badge req-op">Acta de conformidad del servicio mensual</span>
-            </td>
+            <td>1. Pago directo</td>
+            <td>1.8 Gastos y comisiones de Fideicomisos de Administración e Inversión (FIDEICOMISOS_GASTO)</td>
+            <td>Obligatorios: Oficio de solicitud o envío emitido por la Subdirección de Recursos Humanos o área responsable (DOC-SOL-PAG); Copia del Estado de cuenta bancario mensual emitido por la institución fiduciaria (DOC-EDO-CTA).</td>
           </tr>
           <tr>
-            <td><strong>OBRA_PUBLICA</strong><br><small style="color:var(--pjev-texto-muted);">Estimaciones, anticipo, finiquito</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>PROVEEDOR</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-CON-TRA</span>
-              <span class="req-badge req-ob">DOC-EST-OBR</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-              <span class="req-badge req-ob">DOC-OPI-SAT</span>
-              <span class="req-badge req-ob">DOC-OPI-SEF</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">Póliza de fianza de cumplimiento/anticipo</span>
-              <span class="req-badge req-co">Acta de entrega-recepción y finiquito</span>
-            </td>
+            <td>2. Pago derivado de un pedido (materiales)</td>
+            <td>2.1 Compra derivada de pedido con entrada a Almacén y Capítulo 5000 (COMPRA_PEDIDO)</td>
+            <td>Obligatorios: Tarjeta de solicitud de pago original firmada por el jefe de área (DOC-SOL-PAG); Copia de la Orden de servicio o Pedido con las firmas requeridas (DOC-ORD-PED); Entrada de Almacén en un tanto con el sello de ALMACÉN (DOC-ENT-ALM); Vale de entrada en un tanto firmado por el jefe de área (DOC-VAL-ENT); Factura original CFDI en XML y PDF firmada por el jefe de área y que cuadre con el monto de la entrada de almacén (DOC-CFD-XML y DOC-CFD-PDF); Verificación del CFDI en el SAT (DOC-VAL-SAT). Condicionales: Alta de inventario en un tanto que cuadre con la factura cuando sean bienes del Capítulo 5000 (DOC-ALT-INV); Opinión de cumplimiento SAT 32-D (DOC-OPI-SAT); Constancia SEFIPLAN para proveedores del estado (DOC-OPI-SEF).</td>
           </tr>
           <tr>
-            <td><strong>COMPROBACION_VIATICOS</strong><br><small style="color:var(--pjev-texto-muted);">Comisión oficial (Anexo 6)</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>EMPLEADO</td>
-            <td>
-              <span class="req-badge req-ob">DOC-OFI-COM</span>
-              <span class="req-badge req-ob">DOC-INF-COM</span>
-              <span class="req-badge req-ob">DOC-FMT-CMP</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">Ficha de reintegro bancario (si remanente)</span>
-              <span class="req-badge req-op">Tickets de caseta / pases de abordar (Anexo 8)</span>
-            </td>
+            <td>2. Pago derivado de un pedido (materiales)</td>
+            <td>2.2 Pago derivado de Contrato de adquisiciones o servicios generales (CONTRATO_SERVICIOS)</td>
+            <td>Obligatorios: Tarjeta u Oficio de solicitud de pago original firmado por el jefe de área (DOC-SOL-PAG); Copia del Contrato formalizado (DOC-CON-TRA); Factura original CFDI en XML y PDF firmada por el jefe de área (DOC-CFD-XML y DOC-CFD-PDF); Verificación del CFDI en el SAT (DOC-VAL-SAT); Constancia de opinión de cumplimiento de obligaciones fiscales ante el SAT en un tanto (DOC-OPI-SAT). Condicionales: Constancia de cumplimiento de obligaciones fiscales ante la SEFIPLAN en un tanto cuando el proveedor o contratista sea del Estado de Veracruz (DOC-OPI-SEF).</td>
           </tr>
           <tr>
-            <td><strong>SUJETOS_COMPROBAR</strong><br><small style="color:var(--pjev-texto-muted);">Gastos de operación juzgados (Anexo 15)</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>UNIDAD_ADMINISTRATIVA</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-FMT-CMP</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">Recibos de gastos menores justificados</span>
-              <span class="req-badge req-co">Ficha de reintegro a cuentas PJEV</span>
-            </td>
+            <td>2. Pago derivado de un pedido (materiales)</td>
+            <td>2.3 Obra pública: anticipo, estimación y finiquito (OBRA_PUBLICA)</td>
+            <td>Obligatorios: Tarjeta original de solicitud de pago a contratistas emitida por el Departamento de Infraestructura y Supervisión de Obra por organización (DOC-SOL-PAG); Copia del Contrato de Obra Pública (DOC-CON-TRA); Carátula y Estimación de obra aprobada o Acta de finiquito con amortización de anticipo y retención del 5 al millar (DOC-EST-OBR); Factura original CFDI en XML y PDF del contratista (DOC-CFD-XML y DOC-CFD-PDF); Verificación del CFDI en el SAT (DOC-VAL-SAT); Opinión de cumplimiento SAT 32-D (DOC-OPI-SAT); Constancia de cumplimiento SEFIPLAN (DOC-OPI-SEF). Condicionales: Pólizas de fianza de anticipo, cumplimiento y vicios ocultos; Formato dirigido al ORFIS y Factura CFDI emitida por el ORFIS por la retención del 5 al millar de supervisión y vigilancia.</td>
           </tr>
           <tr>
-            <td><strong>FONDO_REVOLVENTE</strong><br><small style="color:var(--pjev-texto-muted);">Reposición periódica caja chica</small></td>
-            <td><span class="mod-badge badge-a">2 · RM</span></td>
-            <td>UNIDAD_ADMINISTRATIVA</td>
-            <td>
-              <span class="req-badge req-ob">DOC-SOL-PAG</span>
-              <span class="req-badge req-ob">DOC-CFD-XML</span>
-              <span class="req-badge req-ob">DOC-VAL-SAT</span>
-            </td>
-            <td>
-              <span class="req-badge req-co">Formato de reposición de fondos firmado</span>
-              <span class="req-badge req-op">Bitácora de arqueo de caja chica</span>
-            </td>
+            <td>3. Gasto a comprobar</td>
+            <td>3.1 Viáticos Etapa A: Solicitud y otorgamiento de anticipo (ENTREGA_VIATICOS)</td>
+            <td>Obligatorios: Formato Solicitud-comprobación de recursos original señalando el número de cuenta bancaria del servidor público comisionado (DOC-SOL-PAG); Copia del Oficio de comisión autorizado (DOC-OFI-COM); Recibo simple original o Recibo de Sujeto a comprobar firmado por el jefe de área y por la persona comisionada (DOC-REC-SIM).</td>
+          </tr>
+          <tr>
+            <td>3. Gasto a comprobar</td>
+            <td>3.2 Viáticos Etapa B: Comprobación o reposición de gastos de viáticos (COMPROBACION_VIATICOS)</td>
+            <td>Obligatorios: Tarjeta de solicitud de pago original firmada por el jefe de área en caso de reposición (DOC-SOL-PAG); Copia del Oficio de comisión (DOC-OFI-COM); Informe de actividades de la comisión (DOC-INF-COM); Formato de Comprobación de recurso desglosando facturas y diferencia a reintegrar (DOC-FMT-CMP); Facturas originales CFDI en XML y PDF firmadas por el comisionado y su jefe de área, dentro de la fecha de la comisión y sin rebasar las tarifas del Manual de Viáticos (DOC-CFD-XML y DOC-CFD-PDF); Verificación de cada CFDI en el SAT (DOC-VAL-SAT). Condicionales: Recibo de ingreso de recurso o ficha de depósito sellada por la Oficina de Caja cuando exista reintegro de remanente no ejercido (DOC-REC-ING).</td>
+          </tr>
+          <tr>
+            <td>3. Gasto a comprobar</td>
+            <td>3.3 Sujetos a comprobar gastos diversos Etapa A: Entrega del recurso (SUJETOS_COMPROBAR_ANTICIPO)</td>
+            <td>Obligatorios: Oficio que justifique la solicitud del recurso firmado por el titular del área solicitante y con rúbrica de visto bueno del Director General de Administración, acompañado del formato Solicitud-comprobación de recursos señalando la partida presupuestal a afectar (DOC-SOL-PAG); Recibo simple original de Sujeto a comprobar firmado por el jefe de área y por la persona asignada para ejercer el gasto (DOC-REC-SIM).</td>
+          </tr>
+          <tr>
+            <td>3. Gasto a comprobar</td>
+            <td>3.4 Sujetos a comprobar gastos diversos Etapa B: Comprobación del gasto (SUJETOS_COMPROBAR)</td>
+            <td>Obligatorios: Formato Comprobación de recurso desglosando las facturas que respaldan el gasto otorgado en un plazo no mayor a tres días posteriores (DOC-FMT-CMP); Facturas originales CFDI en XML y PDF firmadas (DOC-CFD-XML y DOC-CFD-PDF); Verificación de cada CFDI en el SAT (DOC-VAL-SAT). Condicionales: Recibo de caja de ingreso de recurso o ficha de depósito bancario cuando exista devolución de efectivo sobrante (DOC-REC-ING).</td>
+          </tr>
+          <tr>
+            <td>3. Gasto a comprobar</td>
+            <td>3.5 Fondo revolvente: reposición periódica de caja chica (FONDO_REVOLVENTE)</td>
+            <td>Obligatorios: Tarjeta de solicitud de pago original firmada por el jefe de área sin rebasar el monto autorizado (DOC-SOL-PAG); Formato de reposición de fondos firmado por el encargado de administrar el Fondo revolvente (DOC-FMT-CMP); Facturas originales CFDI en XML y PDF firmadas por el interesado y por el administrador del Fondo revolvente, con justificación del gasto al reverso en apego a los Lineamientos de Fondos Revolventes (DOC-CFD-XML y DOC-CFD-PDF); Verificación de cada CFDI en el SAT (DOC-VAL-SAT).</td>
+          </tr>
+          <tr>
+            <td>4. No afecta presupuesto</td>
+            <td>4.1 Terceros institucionales SAT: entero de retenciones de ISR sueldos, honorarios y arrendamiento (TERCEROS_SAT_ISR)</td>
+            <td>Obligatorios: Oficio original de solicitud de pago emitido por la Subdirección de Recursos Humanos detallando el monto a pagar por organización, o cédula mensual de retenciones de Tesorería (DOC-SOL-PAG); Línea de captura vigente emitida por el portal del SAT (DOC-LIN-SAT).</td>
+          </tr>
+          <tr>
+            <td>4. No afecta presupuesto</td>
+            <td>4.2 Terceros institucionales: IPE, Sindicatos, Aseguradoras, Financieras, Farmacias, IMSS, SAR y Colegio de Jueces (TERCEROS_INST)</td>
+            <td>Obligatorios: Oficio original de solicitud de pago emitido por la Subdirección de Recursos Humanos detallando el monto a pagar por organización TSJ, CJ y TCA (DOC-SOL-PAG); Cédula de determinación o listado de descuentos quincenal, mensual o bimestral por institución (DOC-LIN-SAT). Condicionales: Copia del Convenio o contrato vigente celebrado por el PJEV con el tercero institucional (DOC-CON-TRA).</td>
+          </tr>
+          <tr>
+            <td>4. No afecta presupuesto</td>
+            <td>4.3 Dispersión de Nómina Neta y Pagos Mecanizados (NOMINA_NETA)</td>
+            <td>Obligatorios: Oficio de solicitud de traspaso y dispersión de recurso para el pago oportuno de las nóminas quincenales y pagos mecanizados emitido por la Subdirección de Recursos Humanos (DOC-SOL-PAG); Resumen o layout bancario de dispersión líquida por cuenta y organización (DOC-RES-NOM).</td>
+          </tr>
+          <tr>
+            <td>4. No afecta presupuesto</td>
+            <td>4.4 Recepción de Complementos de Pago de operaciones a crédito (COMPLEMENTO_PAGO_PPD)</td>
+            <td>Obligatorios: Comprobante Fiscal Digital CFDI de tipo Pago (Complemento de recepción de pagos PPD) en XML y PDF (DOC-CFD-XML y DOC-CFD-PDF); Verificación de vigencia del CFDI en el SAT (DOC-VAL-SAT); Antecedente y referencia al número de tarjeta y folio inicial con el que se registró la primera solicitud de pago (DOC-SOL-PAG).</td>
           </tr>
         </tbody>
       </table>
@@ -842,7 +794,7 @@ BEGIN
     END IF;
 
     -- Validar si requiere CFDI y no tiene cargado ninguno
-    IF v_proc NOT IN ('NOMINA', 'TERCEROS_INST') THEN
+    IF v_proc NOT IN ('NOMINA', 'NOMINA_NETA', 'TERCEROS_SAT_ISR', 'TERCEROS_INST', 'IMPUESTO_3PCT_NOMINA', 'FIDEICOMISOS_GASTO', 'ENTREGA_VIATICOS', 'SUJETOS_COMPROBAR_ANTICIPO') THEN
         IF NOT EXISTS (SELECT 1 FROM cxp.afectaciones_gasto_cfdi WHERE f_ag_id = p_ag_id AND estatus_registro = 1) THEN
             RETURN jsonb_build_object(
                 'error', -1,
@@ -1072,7 +1024,7 @@ export class RequisitosDocumentalesController {
             <rect width="960" height="380" fill="#f8fafc" rx="4"/>
             <!-- Header Bar -->
             <rect x="15" y="15" width="930" height="50" fill="#ffffff" stroke="#cbd5e1" rx="5"/>
-            <text x="30" y="44" font-size="13" font-weight="bold" fill="#183125">Catálogo de Requisitos Documentales (16 Tipos de Documentos)</text>
+            <text x="30" y="44" font-size="13" font-weight="bold" fill="#183125">Catálogo de Requisitos Documentales (21 Tipos de Documentos)</text>
             <rect x="680" y="25" width="110" height="30" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
             <text x="735" y="44" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">📥 Exportar</text>
             <rect x="800" y="25" width="130" height="30" fill="#183125" rx="4"/>
@@ -1346,6 +1298,12 @@ export class RequisitosDocumentalesController {
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Cambios Realizados</th></tr></thead>
       <tbody>
+        <tr>
+          <td><code>1.1.0</code></td>
+          <td>2026-11-06</td>
+          <td>Equipo SIAF-PJEV / Dix Consultoría</td>
+          <td>Homologación integral con el Manual Específico de Procedimientos de la Subdirección de Recursos Financieros (Feb 2023): ampliación a 21 tipos de documentos oficiales (incluyendo Recibo Simple de Sujeto a Comprobar, Relación de Piezas Depositadas de Correos de México, Estado de Cuenta Fiduciario, Resumen de Nómina RH y Recibo de Caja de Reintegro) y reestructuración de la Matriz de Exigibilidad en los 4 Procedimientos Generales (1. Pago directo, 2. Pago derivado de un pedido, 3. Gasto a comprobar, 4. No afecta presupuesto) y sus 20 subprocedimientos.</td>
+        </tr>
         <tr>
           <td><code>1.0.0</code></td>
           <td>2026-09-02</td>
