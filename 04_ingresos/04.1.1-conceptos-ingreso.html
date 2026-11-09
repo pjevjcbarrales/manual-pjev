@@ -55,11 +55,46 @@
       <h1 class="elem-title">Tipos y Subtipos de Trámite de Ingreso</h1>
       <p class="elem-desc">Catálogo institucional rector que parametriza las 4 macro-familias y 12 procedimientos operativos de ingreso. Alimenta el Asistente Visual (Wizard) del registro, autoconfigurando los requerimientos de captura, la contraparte, el CRI normativo y la pre-póliza en la Matriz de Conversión CONAC.</p>
       <div class="mod-header-badges">
-        <span class="mod-badge badge-a">Pendiente de desarrollo</span>
-        <span class="mod-badge badge-s">Análisis funcional canónico (DOC-08)</span>
+        <span class="mod-badge" style="background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; font-weight:bold;">⚠️ Centralizado en 03.1.2 Matriz de Conversión (v3.0)</span>
+        <span class="mod-badge badge-s">Tipo: Vista Funcional absorbida en Contabilidad</span>
         <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Daryl</span>
-        <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Alineado con Egresos (05.2.1)</span>
+        <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Esquema Unificado: contabilidad.matriz_grupos_tramite / procedimiento</span>
       </div>
+    </div>
+  </div>
+
+  <!-- BANNER DE SUSTITUCIÓN Y CENTRALIZACIÓN EN LA MATRIZ DE CONVERSIÓN 03.1.2 -->
+  <div style="background:#eff6ff; border:2px solid #3b82f6; border-radius:8px; padding:18px 22px; margin:20px 0 24px; box-shadow:0 2px 4px rgba(0,0,0,0.06);">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div style="flex:1; min-width:280px;">
+        <h3 style="margin:0 0 6px; font-size:14px; font-weight:800; color:#1e40af; display:flex; align-items:center; gap:8px;">
+          🏛️ Catálogo Reemplazado y Centralizado en 03.1.2 Matriz de Conversión (v3.0)
+        </h3>
+        <p style="margin:0 0 8px; font-size:12px; color:#1e3a8a; line-height:1.6;">
+          Conforme al plan de normalización arquitectónica del SIAF-PJEV, la tabla independiente <code>ingresos.cat_subtipos_tramite_ingreso</code> y la opción de menú <code>/caja/conceptos</code> <strong>YA NO APLICAN como catálogo separado en el esquema <code>ingresos</code></strong>. Los <strong>4 Grupos de Trámite de Ingreso (<code>mgt_id 11..14</code>)</strong> y sus <strong>14 Subprocedimientos Operativos (<code>mgp_id 1101..1402</code>)</strong> viven ahora de forma centralizada en <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> con discriminador <code>tipo_flujo = 'I'</code>.
+        </p>
+        <p style="margin:0; font-size:11px; color:#1d4ed8; font-weight:600;">
+          <strong>Instrucción para Daryl:</strong> El módulo <code>04.2.1 Registro de Ingresos</code> debe consumir directamente <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> (<code>tipo_flujo = 'I'</code>) para poblar el Wizard y resumir las reglas de <code>contabilidad.matriz_conversion_regla</code>. Se debe ejecutar el script de depuración inferior para dar de baja <code>ingresos.cat_subtipos_tramite_ingreso</code> y el módulo <code>mod_id = 70</code> en <code>nav.catalogo_modulos</code>.
+        </p>
+      </div>
+      <div style="align-self:center;">
+        <a href="../03_contabilidad/03.1.2-matriz-conversion.html" style="display:inline-flex; align-items:center; gap:6px; background:#1e40af; color:#ffffff; padding:10px 18px; border-radius:6px; font-size:12px; font-weight:700; text-decoration:none; box-shadow:0 2px 4px rgba(30,64,175,0.3); transition:all 0.2s;">
+          <span>👉 Ir a 03.1.2 Matriz de Conversión (Niveles 2 y 3)</span>
+        </a>
+      </div>
+    </div>
+    <div class="code-wrap" style="margin:12px 0 0; font-size:11.5px;">
+<pre><code>-- SCRIPT DE DEPURACIÓN PARA DARYL (BAJA DEL CATÁLOGO INDEPENDIENTE EN INGRESOS)
+-- 1. Desactivar la opción de menú independiente en nav.catalogo_modulos (/caja/conceptos)
+UPDATE nav.catalogo_modulos
+   SET estatus_registro = 0, usuario_m = 'MIGRACION_V3', fecha_m = clock_timestamp()
+ WHERE mod_id = 70 OR mod_ruta = '/caja/conceptos';
+
+-- 2. Eliminar funciones y tabla obsoleta en el esquema ingresos (sustituidas por contabilidad.matriz_grupos_*)
+DROP FUNCTION IF EXISTS ingresos.fn_crud_subtipos_tramite(VARCHAR, VARCHAR, JSONB) CASCADE;
+DROP FUNCTION IF EXISTS ingresos.fn_leer_subtipos_tramite(VARCHAR, SMALLINT) CASCADE;
+DROP FUNCTION IF EXISTS ingresos.fn_validar_subtipo_tramite(BIGINT) CASCADE;
+DROP TABLE IF EXISTS ingresos.cat_subtipos_tramite_ingreso CASCADE;</code></pre>
     </div>
   </div>
 
@@ -771,6 +806,12 @@ export class SubtiposTramiteIngresoController {
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción del Cambio</th></tr></thead>
       <tbody>
+        <tr style="background:#eff6ff;">
+          <td><code>v3.0.0</code></td>
+          <td>08/11/2026</td>
+          <td>Arquitectura SIAF-PJEV / Daryl</td>
+          <td><strong>Baja de catálogo independiente y centralización en Contabilidad (03.1.2):</strong> La tabla <code>ingresos.cat_subtipos_tramite_ingreso</code> queda obsoleta y es reemplazada por <code>contabilidad.matriz_grupos_tramite</code> (Grupos <code>11..14</code>, <code>tipo_flujo = 'I'</code>) y <code>contabilidad.matriz_grupos_procedimiento</code> (Subprocedimientos <code>1101..1402</code>). El módulo <code>04.2.1 Registro de Ingresos</code> lee directamente la Matriz de Conversión.</td>
+        </tr>
         <tr>
           <td><code>v2.1.0</code></td>
           <td>08/09/2026</td>

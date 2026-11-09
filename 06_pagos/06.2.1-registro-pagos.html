@@ -18,6 +18,9 @@
   .badge-s { background: var(--pjev-info-bg);    color: var(--pjev-info-text);    border: 1px solid var(--pjev-info-borde); }
   .badge-w { background: var(--pjev-warning-bg); color: var(--pjev-warning-text); border: 1px solid var(--pjev-warning-borde); }
 
+  .callout-box { border-left: 4px solid #0284c7; background: #f0f9ff; padding: 14px 18px; margin: 16px 0 24px; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .callout-title { font-size: 13px; font-weight: bold; color: #0369a1; margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+
   .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); }
   .method.get    { background: #e8f5e9; color: #1b5e20; }
   .method.post   { background: #e3f2fd; color: #0d47a1; }
@@ -60,29 +63,41 @@
   <div class="elem-header">
     <div>
       <div class="elem-id">06.2.1</div>
-      <h1 class="elem-title">Registro de Pagos (Bandeja Unificada y Dispersión Bancaria de Caja)</h1>
-      <p class="elem-desc">Módulo ejecutor de la Oficina de Caja del Departamento de Tesorería. Unifica en una sola interfaz la <strong>Bandeja de Solicitudes Autorizadas</strong> (provenientes de <code>05.2.1 Solicitud-Comprobación de Recurso</code> y <code>05.2.2 Solicitud de Pagos No Presupuestales</code>) y el <strong>Registro y Control del Pago Bancario</strong> (asignación de chequera, captura de referencia SPEI/Cheque, adjunción obligatoria del Comprobante Bancario ID 21 y generación automática de la Póliza de Egreso <code>PE</code> vía Matrices <code>13: A2_PAGADO_GASTOS</code> y <code>17: A3_EGRESO_NO_PRESUPUESTARIO</code>).</p>
+      <h1 class="elem-title">Registro de Pagos (Encabezado <code>ingresos.pagos</code>, Detalle <code>ingresos.pagos_movtos</code> y Pólizas de Egreso <code>PE</code>)</h1>
+      <p class="elem-desc">Módulo ejecutor de la Oficina de Caja (esquema <code>ingresos</code>) para el desembolso bancario de obligaciones. Opera en paridad simétrica con <code>04.2.1 Registro de Ingresos</code>: recibe las solicitudes autorizadas del módulo de <strong>Tesorería (<code>05.2.1 Solicitud-Comprobación de Recurso</code> y <code>05.2.2 Solicitud de Pagos No Presupuestales</code>)</strong>, correlaciona su encabezado (<strong><code>ingresos.pagos</code></strong>) y detalle (<strong><code>ingresos.pagos_movtos</code></strong>) con los movimientos de Egresos en la <strong>Matriz de Conversión 03.1.2 (<code>tipo_flujo = 'E'</code>, Matrices <code>13</code> y <code>17</code>)</strong>, y escribe en <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong> generando las <strong>Pólizas de Egresos (<code>PE</code>)</strong>.</p>
       <div class="mod-header-badges">
-        <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Bandeja + Ejecución de Pago)</span>
-        <span class="mod-badge badge-s">Oficina de Caja · Momentos Ejercido (8.2.6) y Pagado (8.2.7)</span>
-        <span class="mod-badge badge-w">Matrices 13 (A.2 Pagado) y 17 (A.3 Egreso No Presupuestario)</span>
-        <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/tesoreria/pagos</code></span>
+        <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Maestro-Detalle 1:N)</span>
+        <span class="mod-badge badge-s">v2.0.0 · Tablas: ingresos.pagos + ingresos.pagos_movtos ➔ ingresos.poliza (PE)</span>
+        <span class="mod-badge badge-w">Responsable: Daryl · Correlacionado con Tesorería (cxp) y Matriz 03.1.2 (13 y 17)</span>
+        <span class="elem-tag" style="font-size:10px;">Ruta Frontend: <code style="font-family:var(--font-mono);font-size:10px;">/caja/registro-pagos</code> · Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/ingresos/pagos</code></span>
       </div>
     </div>
   </div>
 
+  <!-- CALLOUT ARQUITECTÓNICO PARA DARYL -->
+  <div class="callout-box">
+    <div class="callout-title">📌 Simetría Arquitectónica en Caja (Esquema <code>ingresos</code>: Ingresos vs. Pagos)</div>
+    <p style="font-size:12px; color:#1e293b; margin:0 0 6px;">
+      En el esquema <code>ingresos</code> (sistema <strong>Caja</strong> asignado a Daryl), el submenú de <strong>Registro</strong> cuenta con dos opciones gemelas que comparten el mismo motor de pólizas local (<code>ingresos.poliza</code> e <code>ingresos.poliza_movtos</code>):
+    </p>
+    <ul style="font-size:12px; color:#1e293b; margin:0; padding-left:20px; line-height:1.6;">
+      <li><strong>1. Registro de Ingresos (<code>04.2.1</code>):</strong> Guarda en <code>ingresos.ingresos</code> + <code>ingresos.ingresos_movtos</code> (correlacionados con Grupos <code>11..14</code> y Subprocedimientos <code>1101..1402</code> de la Matriz) y escribe en <code>ingresos.poliza</code> + <code>ingresos.poliza_movtos</code> como <strong>Pólizas de Ingresos (<code>p_tipo = 'PI'</code>, <code>p_origen = 1</code>)</strong>.</li>
+      <li><strong>2. Registro de Pagos (<code>04.2.2 / 06.2.1</code>):</strong> Guarda en <code>ingresos.pagos</code> + <code>ingresos.pagos_movtos</code> (correlacionados con <code>cxp.afectaciones_gasto</code> / <code>cxp.ordenes_pago</code> de Tesorería y con los Grupos <code>1..4</code> y Subprocedimientos <code>101..404</code> de Egresos en la Matriz) y escribe en las mismas tablas <code>ingresos.poliza</code> + <code>ingresos.poliza_movtos</code> pero como <strong>Pólizas de Egresos (<code>p_tipo = 'PE'</code>, <code>p_origen = 2</code>)</strong>.</li>
+    </ul>
+  </div>
+
   <!-- 1. DESCRIPCIÓN GENERAL -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">1</span> Descripción General y Unificación Operativa</div>
+    <div class="section-title"><span class="section-num">1</span> Descripción General y Correlación con Tesorería y la Matriz de Conversión</div>
     <p>
-      Conforme a los procedimientos oficiales <code>DTE-001</code> a <code>DTE-018</code> del Manual Específico de Procedimientos del Departamento de Tesorería del PJEV, la <strong>Oficina de Caja</strong> recibe las solicitudes de egreso debidamente autorizadas y con póliza previa asentada para ejecutar la transferencia electrónica (SPEI / banca empresarial) o la emisión de cheque nominativo.
+      Conforme a los procedimientos oficiales <code>DTE-001</code> a <code>DTE-018</code> del Manual Específico de Procedimientos del Departamento de Tesorería del PJEV, la <strong>Oficina de Caja</strong> recibe las solicitudes de egreso debidamente autorizadas en el módulo de Tesorería (esquema <code>cxp</code>) para ejecutar la transferencia electrónica (SPEI / banca empresarial) o la emisión de cheque nominativo.
     </p>
     <p>
-      Para optimizar la experiencia del operador de Caja, el módulo <strong>06.2.1 Registro de Pagos</strong> consolida en una sola pantalla la bandeja de entrada de obligaciones pendientes de pago y el registro de liquidación bancaria, atendiendo los dos flujos emisores de Tesorería:
+      Al seleccionarse una solicitud pendiente en la bandeja de Caja, el sistema precarga su encabezado en <strong><code>ingresos.pagos</code></strong> y sus líneas/partidas en <strong><code>ingresos.pagos_movtos</code></strong>, conservando la llave compuesta de la Matriz de Conversión de Egresos (<code>f_matriz_id</code>, <code>f_matriz_grupo_id</code>, <code>f_matriz_grupo_procedimiento_id</code>, <code>f_matriz_regla_id</code>):
     </p>
     <ol style="font-size:13px; color:var(--pjev-texto); margin-left:20px; line-height:1.6;">
-      <li><strong>Solicitudes Presupuestarias desde <code>05.2.1 Solicitud-Comprobación de Recurso (Orden de Pago)</code>:</strong> Trámites de los Grupos <code>1. Pago directo</code>, <code>2. Pago derivado de un pedido (materiales)</code> y <code>3. Gasto a comprobar</code> en estado <code>APROBADA</code> (con excepción de la nómina concentrada que se dispersa vía <code>05.2.2</code>). Al pagarse en Caja, el motor ejecuta la <strong>Matriz 13 (<code>A2_PAGADO_GASTOS</code>)</strong>: cancela el pasivo (<code>2.1.1.x</code>) contra el banco (<code>1.1.1.2.xxxx</code>) y registra simultáneamente el Presupuesto Ejercido (<code>8.2.6</code>) y Pagado (<code>8.2.7</code>).</li>
-      <li><strong>Solicitudes No Presupuestarias desde <code>05.2.2 Solicitud de Pagos No Presupuestales</code>:</strong> Trámites del Grupo <code>4. No afecta presupuesto</code> en estado <code>AUTORIZADA</code> (con sus 3 firmas mancomunadas completas):
+      <li><strong>Solicitudes Presupuestarias desde <code>05.2.1 Solicitud-Comprobación de Recurso (Orden de Pago)</code> (<code>cxp.afectaciones_gasto</code> + <code>cxp.afectaciones_gasto_detalles</code>):</strong> Trámites de los Grupos <code>1. Pago directo</code>, <code>2. Pago derivado de un pedido (materiales)</code> y <code>3. Gasto a comprobar</code> en estado <code>APROBADA</code>. Al pagarse en Caja, cada movimiento en <code>ingresos.pagos_movtos</code> evalúa la <strong>Matriz 13 (<code>A2_PAGADO_GASTOS</code>)</strong>: cancela el pasivo devengado (<code>2.1.1.x</code>) contra la subcuenta contable de la chequera pagadora (<code>1.1.1.2.xxxx</code>) y registra simultáneamente el Presupuesto Ejercido (<code>8.2.6</code>) y Pagado (<code>8.2.7</code>).</li>
+      <li><strong>Solicitudes No Presupuestarias desde <code>05.2.2 Solicitud de Pagos No Presupuestales</code> (<code>cxp.ordenes_pago</code>):</strong> Trámites del Grupo <code>4. No afecta presupuesto</code> en estado <code>AUTORIZADA</code>:
         <br>• Si es <code>401 NOMINA_NETA_DISPERSION</code>, ejecuta la <strong>Matriz 13 (<code>A2_PAGADO_GASTOS</code>)</strong> cancelando <code>2.1.1.1.xxxx</code> contra Bancos y asentando el momento Pagado (<code>8.2.7</code>) de la nómina.
         <br>• Si es <code>402 ENTERO_RETENCIONES</code>, <code>403 PENSIONES_Y_GARANTIAS</code> o <code>404 APERTURA_FONDO_ANTICIPO</code>, ejecuta la <strong>Matriz 17 (<code>A3_EGRESO_NO_PRESUPUESTARIO</code>)</strong> mediante movimiento puro de cuentas de balance contra Bancos (cero afectación en cuentas <code>8.2.x</code>).
       </li>
@@ -93,7 +108,7 @@
   <div class="doc-section">
     <div class="section-title"><span class="section-num">2</span> Marco Normativo</div>
     <table class="props-table">
-      <thead><tr><th>Norma / Instrumento</th><th>Artículo / Procedimiento</th><th>Mandato y Criterio Técnico en el Módulo 06.2.1</th></tr></thead>
+      <thead><tr><th>Norma / Instrumento</th><th>Artículo / Procedimiento</th><th>Mandato y Criterio Técnico en el Módulo</th></tr></thead>
       <tbody>
         <tr>
           <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
@@ -116,48 +131,48 @@
 
   <!-- 3. MATRIZ DE CORRELACIÓN DE ORÍGENES Y MOMENTOS CONTABLES -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">3</span> Matriz de Correlación entre Módulos Emisores y Pólizas de Egreso en Caja</div>
+    <div class="section-title"><span class="section-num">3</span> Matriz de Correlación entre Tesorería (<code>cxp</code>), Matriz <code>03.1.2</code> y Pólizas de Egreso (<code>PE</code>) en <code>ingresos.poliza</code></div>
     <table class="props-table" style="font-size:11.5px;">
       <thead>
         <tr>
-          <th>Módulo Origen</th>
-          <th>Grupo y Subprocedimiento</th>
-          <th>Matriz Ejecutada en Caja (06.2.1)</th>
-          <th>Asiento Patrimonial (Debe / Haber)</th>
-          <th>Asiento Presupuestal (8.2.x)</th>
+          <th>Módulo Origen en Tesorería (<code>cxp</code>)</th>
+          <th>Grupo y Subprocedimiento (<code>03.1.2</code>)</th>
+          <th>Matriz Ejecutada en <code>ingresos.pagos</code></th>
+          <th>Asiento Patrimonial en <code>ingresos.poliza_movtos</code></th>
+          <th>Asiento Presupuestal en <code>ingresos.poliza_movtos</code></th>
         </tr>
       </thead>
       <tbody>
         <tr style="background:#fdfbf7;">
-          <td><strong>05.2.1 Solicitud-Comprobación de Recurso</strong></td>
+          <td><strong>05.2.1 Solicitud-Comprobación de Recurso</strong><br>(<code>cxp.afectaciones_gasto</code> + <code>detalles</code>)</td>
           <td>Grupos <code>1</code>, <code>2</code> y <code>3</code><br>(Subprocedimientos <code>102..303</code>)</td>
           <td><code>13 · A2_PAGADO_GASTOS</code></td>
           <td><strong>Cargo:</strong> <code>2.1.1.2.xxxx</code> / <code>2.1.1.3.xxxx</code> (Pasivo)<br><strong>Abono:</strong> <code>1.1.1.2.xxxx</code> (Chequera Pagadora)</td>
           <td><strong>Cargo:</strong> <code>8.2.6</code> y <code>8.2.7</code><br><strong>Abono:</strong> <code>8.2.5</code> y <code>8.2.6</code></td>
         </tr>
         <tr>
-          <td><strong>05.2.2 Solicitud de Pagos No Presupuestales</strong></td>
+          <td><strong>05.2.2 Solicitud de Pagos No Presupuestales</strong><br>(<code>cxp.ordenes_pago</code>)</td>
           <td>Grupo <code>4</code> · Subproc. <code>401</code><br>(<code>NOMINA_NETA_DISPERSION</code>)</td>
           <td><code>13 · A2_PAGADO_GASTOS</code></td>
           <td><strong>Cargo:</strong> <code>2.1.1.1.xxxx</code> (Remuneraciones x Pagar)<br><strong>Abono:</strong> <code>1.1.1.2.xxxx</code> (Chequera Nómina)</td>
           <td><strong>Cargo:</strong> <code>8.2.7</code> Pagado<br><strong>Abono:</strong> <code>8.2.5</code> Devengado</td>
         </tr>
         <tr style="background:#f0fdf4;">
-          <td><strong>05.2.2 Solicitud de Pagos No Presupuestales</strong></td>
+          <td><strong>05.2.2 Solicitud de Pagos No Presupuestales</strong><br>(<code>cxp.ordenes_pago</code>)</td>
           <td>Grupo <code>4</code> · Subproc. <code>402</code><br>(<code>ENTERO_RETENCIONES</code>)</td>
           <td><code>17 · A3_EGRESO_NO_PRESUPUESTARIO</code></td>
           <td><strong>Cargo:</strong> <code>2.1.1.7.xxxx</code> (Retenciones y Contrib.)<br><strong>Abono:</strong> <code>1.1.1.2.xxxx</code> (Chequera Pagadora)</td>
           <td><span class="mod-badge badge-s">CERO afectación presupuestal</span></td>
         </tr>
         <tr style="background:#f0fdf4;">
-          <td><strong>05.2.2 Solicitud de Pagos No Presupuestales</strong></td>
+          <td><strong>05.2.2 Solicitud de Pagos No Presupuestales</strong><br>(<code>cxp.ordenes_pago</code>)</td>
           <td>Grupo <code>4</code> · Subproc. <code>403</code><br>(<code>PENSIONES_Y_GARANTIAS</code>)</td>
           <td><code>17 · A3_EGRESO_NO_PRESUPUESTARIO</code></td>
           <td><strong>Cargo:</strong> <code>2.1.1.9.3000</code> / <code>2.1.6.1.xxxx</code><br><strong>Abono:</strong> <code>1.1.1.2.xxxx</code> (Chequera Pagadora)</td>
           <td><span class="mod-badge badge-s">CERO afectación presupuestal</span></td>
         </tr>
         <tr style="background:#f0fdf4;">
-          <td><strong>05.2.2 Solicitud de Pagos No Presupuestales</strong></td>
+          <td><strong>05.2.2 Solicitud de Pagos No Presupuestales</strong><br>(<code>cxp.ordenes_pago</code>)</td>
           <td>Grupo <code>4</code> · Subproc. <code>404</code><br>(<code>APERTURA_FONDO_ANTICIPO</code>)</td>
           <td><code>17 · A3_EGRESO_NO_PRESUPUESTARIO</code></td>
           <td><strong>Cargo:</strong> <code>1.1.2.3.xxxx</code> / <code>1.1.2.5.xxxx</code> (Deudores)<br><strong>Abono:</strong> <code>1.1.1.2.xxxx</code> (Chequera Pagadora)</td>
@@ -169,51 +184,83 @@
 
   <!-- 4. MODELO DE DATOS Y DICCIONARIO DE CAMPOS -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">4</span> Modelo de Datos y Diccionario de Campos (<code>tesoreria.pagos_ejecutados</code>)</div>
-    <table class="props-table">
-      <thead><tr><th>Campo</th><th>Tipo de Dato</th><th>Nulo</th><th>Descripción y Regla de Negocio</th></tr></thead>
+    <div class="section-title"><span class="section-num">4</span> Modelo de Datos Simplificado: <code>ingresos.pagos</code>, <code>ingresos.pagos_movtos</code>, <code>ingresos.poliza</code> e <code>ingresos.poliza_movtos</code></div>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">4.1 Encabezado del Pago en Caja (<code>ingresos.pagos</code>)</h3>
+    <table class="props-table" style="margin-bottom:20px;">
+      <thead><tr><th>Campo</th><th>Tipo de Dato</th><th>Nulo</th><th>Descripción y Correlación con Tesorería y Matriz</th></tr></thead>
       <tbody>
-        <tr><td><code>pago_id</code></td><td><code>UUID PK</code></td><td>NO</td><td>Identificador global único del pago ejecutado por Caja.</td></tr>
+        <tr><td><code>pag_id</code></td><td><code>UUID PK</code></td><td>NO</td><td>Identificador único global del pago ejecutado en Caja.</td></tr>
         <tr><td><code>ejercicio_fiscal</code></td><td><code>SMALLINT PK</code></td><td>NO</td><td>Ejercicio fiscal (llave de partición anual).</td></tr>
-        <tr><td><code>folio_pago</code></td><td><code>VARCHAR(20) UNIQUE</code></td><td>NO</td><td>Folio secuencial anual de Caja (ej. <code>PAG-2026-00085</code>).</td></tr>
+        <tr><td><code>folio_pago</code></td><td><code>VARCHAR(20) UNIQUE</code></td><td>NO</td><td>Folio secuencial anual de pago en Caja (ej. <code>PAG-2026-00085</code>).</td></tr>
         <tr><td><code>origen_tramite</code></td><td><code>VARCHAR(25)</code></td><td>NO</td><td><code>'PRESUPUESTAL_05_2_1'</code> o <code>'NO_PRESUPUESTAL_05_2_2'</code>.</td></tr>
         <tr><td><code>f_ag_id</code></td><td><code>UUID FK</code></td><td>SÍ</td><td>Referencia a <code>cxp.afectaciones_gasto(ag_id)</code> cuando proviene de <code>05.2.1</code>.</td></tr>
         <tr><td><code>f_op_id</code></td><td><code>UUID FK</code></td><td>SÍ</td><td>Referencia a <code>cxp.ordenes_pago(op_id)</code> cuando proviene de <code>05.2.2</code>.</td></tr>
-        <tr><td><code>f_matriz_final_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Matriz de liquidación ejecutada: <code>13 (A2_PAGADO_GASTOS)</code> o <code>17 (A3_EGRESO_NO_PRESUPUESTARIO)</code>.</td></tr>
-        <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Grupo de trámite (<code>1..4</code> en <code>contabilidad.matriz_grupos_tramite</code>).</td></tr>
-        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Subprocedimiento operativo (<code>101..404</code> en <code>contabilidad.matriz_grupos_procedimiento</code>).</td></tr>
-        <tr><td><code>f_chequera_id</code></td><td><code>INTEGER FK</code></td><td>NO</td><td>Cuenta bancaria pagadora en <code>config.catalogo_cuentas_bancarias</code> (vinculada a su subcuenta contable <code>1.1.1.2.xxxx</code>).</td></tr>
-        <tr><td><code>medio_pago</code></td><td><code>VARCHAR(20)</code></td><td>NO</td><td><code>'SPEI'</code>, <code>'TRANSFERENCIA_MISMO_BANCO'</code>, <code>'CHEQUE_NOMINATIVO'</code>, <code>'LINEA_CAPTURA'</code>.</td></tr>
+        <tr><td><code>f_matriz_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Matriz de liquidación ejecutada en <code>contabilidad.matriz_conversion</code>: <code>13 (A2_PAGADO_GASTOS)</code> o <code>17 (A3_EGRESO_NO_PRESUPUESTARIO)</code>.</td></tr>
+        <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Grupo de trámite de egreso (<code>1..4</code> en <code>contabilidad.matriz_grupos_tramite</code>).</td></tr>
+        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Subprocedimiento operativo de egreso (<code>101..404</code> en <code>contabilidad.matriz_grupos_procedimiento</code>).</td></tr>
+        <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>NO</td><td><code>TRUE</code> cuando ejecuta Matriz <code>13</code> (momentos <code>8.2.6</code> y <code>8.2.7</code>); <code>FALSE</code> cuando ejecuta Matriz <code>17</code>.</td></tr>
+        <tr><td><code>f_chequera_id</code></td><td><code>INTEGER FK</code></td><td>NO</td><td>Cuenta bancaria pagadora en <code>config.catalogo_cuentas_bancarias(cb_id)</code> (vinculada a su subcuenta contable <code>1.1.1.2.xxxx</code>).</td></tr>
+        <tr><td><code>medio_pago</code></td><td><code>VARCHAR(25)</code></td><td>NO</td><td><code>'SPEI'</code>, <code>'TRANSFERENCIA_MISMO_BANCO'</code>, <code>'CHEQUE_NOMINATIVO'</code>, <code>'LINEA_CAPTURA'</code>.</td></tr>
         <tr><td><code>referencia_bancaria</code></td><td><code>VARCHAR(60)</code></td><td>NO</td><td>Clave de rastreo SPEI (30 caracteres), folio de transferencia o número de cheque.</td></tr>
-        <tr><td><code>fecha_pago</code></td><td><code>TIMESTAMPTZ</code></td><td>NO</td><td>Fecha y hora real de dispersión en banca electrónica.</td></tr>
-        <tr><td><code>importe_pagado</code></td><td><code>NUMERIC(18,2)</code></td><td>NO</td><td>Monto líquido efectivamente desembolsado de la cuenta bancaria.</td></tr>
+        <tr><td><code>fecha_pago</code></td><td><code>DATE</code></td><td>NO</td><td>Fecha efectiva de dispersión en banca electrónica.</td></tr>
+        <tr><td><code>concepto</code></td><td><code>VARCHAR(500)</code></td><td>NO</td><td>Concepto general del pago (glosa para la Póliza de Egresos <code>PE</code>).</td></tr>
+        <tr><td><code>importe_total_pago</code></td><td><code>NUMERIC(18,2)</code></td><td>NO</td><td>Monto total líquido desembolsado (cuadra al centavo con <code>SUM(pagos_movtos.importe_pagado)</code>).</td></tr>
         <tr><td><code>f_expediente_doc21_id</code></td><td><code>UUID</code></td><td>NO</td><td>Documento obligatorio en expediente digital: <strong>ID 21 Comprobante Bancario de Pago / Dispersión</strong>.</td></tr>
-        <tr><td><code>f_poliza_egreso_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Póliza de Egreso (<code>PE</code>) generada síncronamente en <code>contabilidad.poliza</code>.</td></tr>
+        <tr><td><code>p_poliza_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Apuntador a la <strong>Póliza de Egreso (<code>PE</code>)</strong> generada en <code>ingresos.poliza(p_id)</code> (la cual a su vez apunta a <code>contabilidad.poliza</code>).</td></tr>
         <tr><td><code>estatus_pago</code></td><td><code>VARCHAR(20)</code></td><td>NO</td><td><code>PENDIENTE</code>, <code>PROGRAMADO</code>, <code>PAGADO</code>, <code>CANCELADO</code>.</td></tr>
       </tbody>
     </table>
 
-    <div class="code-wrap" style="margin-top:14px;">
-<pre><code>-- ESTRUCTURA DDL PARTICIONADA: tesoreria.pagos_ejecutados
-CREATE SCHEMA IF NOT EXISTS tesoreria;
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">4.2 Detalle de Movimientos del Pago (<code>ingresos.pagos_movtos</code>)</h3>
+    <table class="props-table" style="margin-bottom:20px;">
+      <thead><tr><th>Campo</th><th>Tipo de Dato</th><th>Nulo</th><th>Descripción y Correlación con Movimientos de Egresos</th></tr></thead>
+      <tbody>
+        <tr><td><code>pagm_id</code></td><td><code>UUID PK</code></td><td>NO</td><td>Identificador único de la línea de movimiento del pago.</td></tr>
+        <tr><td><code>f_pag_id</code></td><td><code>UUID FK</code></td><td>NO</td><td>Referencia al encabezado padre en <code>ingresos.pagos(pag_id)</code>.</td></tr>
+        <tr><td><code>ejercicio_fiscal</code></td><td><code>SMALLINT PK</code></td><td>NO</td><td>Ejercicio fiscal (llave de partición anual).</td></tr>
+        <tr><td><code>numero_linea</code></td><td><code>SMALLINT</code></td><td>NO</td><td>Número secuencial del movimiento dentro del pago (<code>1..N</code>).</td></tr>
+        <tr><td><code>f_agd_id</code></td><td><code>UUID</code></td><td>SÍ</td><td>Referencia al movimiento origen en Tesorería (<code>cxp.afectaciones_gasto_detalles(agd_id)</code>).</td></tr>
+        <tr><td><code>f_matriz_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Matriz aplicada a la línea: <code>13 (A2_PAGADO_GASTOS)</code> o <code>17 (A3_EGRESO_NO_PRESUPUESTARIO)</code>.</td></tr>
+        <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Grupo de egreso (<code>1..4</code>).</td></tr>
+        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Subprocedimiento de egreso (<code>101..404</code>).</td></tr>
+        <tr><td><code>f_matriz_regla_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Regla específica en <code>contabilidad.matriz_conversion_regla(mcr_id)</code> que rige el asiento de pago.</td></tr>
+        <tr><td><code>f_centro_costo_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Centro de costo / Unidad Administrativa del gasto.</td></tr>
+        <tr><td><code>f_clave_presupuestal_id</code></td><td><code>BIGINT</code></td><td>SÍ</td><td>Clave presupuestal afectada en los momentos Ejercido (<code>8.2.6</code>) y Pagado (<code>8.2.7</code>); <code>NULL</code> cuando <code>f_matriz_id = 17</code>.</td></tr>
+        <tr><td><code>f_cog_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Partida específica del Clasificador por Objeto del Gasto (<code>01.2.4</code>); <code>NULL</code> cuando <code>f_matriz_id = 17</code>.</td></tr>
+        <tr><td><code>f_fuente_fin_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Fuente de financiamiento CONAC.</td></tr>
+        <tr><td><code>cuenta_contable_cargo</code></td><td><code>VARCHAR(30)</code></td><td>NO</td><td>Cuenta contable de pasivo (<code>2.1.1.x</code>) o deudores (<code>1.1.2.x</code>) que se carga/liquida con el pago.</td></tr>
+        <tr><td><code>cuenta_contable_abono</code></td><td><code>VARCHAR(30)</code></td><td>NO</td><td>Subcuenta contable de bancos (<code>1.1.1.2.xxxx</code>) asociada a la chequera pagadora seleccionada.</td></tr>
+        <tr><td><code>concepto_linea</code></td><td><code>VARCHAR(300)</code></td><td>SÍ</td><td>Descripción específica del movimiento pagado.</td></tr>
+        <tr><td><code>importe_pagado</code></td><td><code>NUMERIC(18,2)</code></td><td>NO</td><td>Importe pagado en la línea (<code>&gt; 0</code>).</td></tr>
+      </tbody>
+    </table>
 
-CREATE TABLE IF NOT EXISTS tesoreria.pagos_ejecutados (
-    pago_id UUID NOT NULL DEFAULT gen_random_uuid(),
+    <div class="code-wrap" style="margin-top:14px;">
+<pre><code>-- =============================================================================
+-- ESTRUCTURA DDL PARTICIONADA EN ESQUEMA ingresos:
+-- ingresos.pagos + ingresos.pagos_movtos (Escriben PE en ingresos.poliza)
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS ingresos.pagos (
+    pag_id UUID NOT NULL DEFAULT gen_random_uuid(),
     ejercicio_fiscal SMALLINT NOT NULL,
     folio_pago VARCHAR(20) NOT NULL,
     origen_tramite VARCHAR(25) NOT NULL CHECK (origen_tramite IN ('PRESUPUESTAL_05_2_1', 'NO_PRESUPUESTAL_05_2_2')),
     f_ag_id UUID,
     f_op_id UUID,
-    f_matriz_final_id BIGINT NOT NULL CHECK (f_matriz_final_id IN (13, 17)),
+    f_matriz_id BIGINT NOT NULL CHECK (f_matriz_id IN (13, 17)),
     f_matriz_grupo_id SMALLINT NOT NULL,
     f_matriz_grupo_procedimiento_id SMALLINT NOT NULL,
-    f_chequera_id INT NOT NULL REFERENCES config.catalogo_cuentas_bancarias(cb_id),
-    medio_pago VARCHAR(25) NOT NULL DEFAULT 'SPEI',
+    afecta_presupuesto BOOLEAN NOT NULL DEFAULT TRUE,
+    f_chequera_id INTEGER NOT NULL,
+    medio_pago VARCHAR(25) NOT NULL DEFAULT 'SPEI'
+        CHECK (medio_pago IN ('SPEI', 'TRANSFERENCIA_MISMO_BANCO', 'CHEQUE_NOMINATIVO', 'LINEA_CAPTURA')),
     referencia_bancaria VARCHAR(60) NOT NULL,
-    fecha_pago TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
-    importe_pagado NUMERIC(18,2) NOT NULL CHECK (importe_pagado > 0),
+    fecha_pago DATE NOT NULL DEFAULT CURRENT_DATE,
+    concepto VARCHAR(500) NOT NULL,
+    importe_total_pago NUMERIC(18,2) NOT NULL CHECK (importe_total_pago > 0),
     f_expediente_doc21_id UUID NOT NULL,
-    f_poliza_egreso_id BIGINT REFERENCES contabilidad.poliza(p_id),
+    p_poliza_id INTEGER, -- FK a ingresos.poliza(p_id) con p_tipo = 'PE' y p_origen = 2
     estatus_pago VARCHAR(20) NOT NULL DEFAULT 'PAGADO'
         CHECK (estatus_pago IN ('PENDIENTE', 'PROGRAMADO', 'PAGADO', 'CANCELADO')),
     estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
@@ -221,29 +268,62 @@ CREATE TABLE IF NOT EXISTS tesoreria.pagos_ejecutados (
     fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     usuario_m VARCHAR(50),
     fecha_m TIMESTAMPTZ,
-    CONSTRAINT pk_tesoreria_pagos PRIMARY KEY (pago_id, ejercicio_fiscal),
-    CONSTRAINT uq_tesoreria_folio_pago UNIQUE (ejercicio_fiscal, folio_pago)
+    CONSTRAINT pk_ingresos_pagos PRIMARY KEY (pag_id, ejercicio_fiscal),
+    CONSTRAINT uq_ingresos_folio_pago UNIQUE (ejercicio_fiscal, folio_pago)
 ) PARTITION BY LIST (ejercicio_fiscal);
 
-CREATE TABLE IF NOT EXISTS tesoreria.pagos_ejecutados_2026
-    PARTITION OF tesoreria.pagos_ejecutados FOR VALUES IN (2026);</code></pre>
+CREATE TABLE IF NOT EXISTS ingresos.pagos_2026 PARTITION OF ingresos.pagos FOR VALUES IN (2026);
+CREATE TABLE IF NOT EXISTS ingresos.pagos_2027 PARTITION OF ingresos.pagos FOR VALUES IN (2027);
+
+CREATE TABLE IF NOT EXISTS ingresos.pagos_movtos (
+    pagm_id UUID NOT NULL DEFAULT gen_random_uuid(),
+    f_pag_id UUID NOT NULL,
+    ejercicio_fiscal SMALLINT NOT NULL,
+    numero_linea SMALLINT NOT NULL DEFAULT 1,
+    f_agd_id UUID,
+    f_matriz_id BIGINT NOT NULL CHECK (f_matriz_id IN (13, 17)),
+    f_matriz_grupo_id SMALLINT NOT NULL,
+    f_matriz_grupo_procedimiento_id SMALLINT NOT NULL,
+    f_matriz_regla_id BIGINT NOT NULL,
+    f_centro_costo_id INTEGER,
+    f_clave_presupuestal_id BIGINT,
+    f_cog_id INTEGER,
+    f_fuente_fin_id INTEGER,
+    cuenta_contable_cargo VARCHAR(30) NOT NULL,
+    cuenta_contable_abono VARCHAR(30) NOT NULL,
+    concepto_linea VARCHAR(300),
+    importe_pagado NUMERIC(18,2) NOT NULL CHECK (importe_pagado > 0),
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL DEFAULT 'SISTEMA',
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ,
+    CONSTRAINT pk_ingresos_pagos_movtos PRIMARY KEY (pagm_id, ejercicio_fiscal),
+    CONSTRAINT fk_ingresos_pagos_movtos_padre FOREIGN KEY (f_pag_id, ejercicio_fiscal)
+        REFERENCES ingresos.pagos (pag_id, ejercicio_fiscal) ON DELETE CASCADE,
+    CONSTRAINT fk_ingresos_pagos_movtos_regla FOREIGN KEY (f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id, f_matriz_regla_id)
+        REFERENCES contabilidad.matriz_conversion_regla (f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id, mcr_id)
+) PARTITION BY LIST (ejercicio_fiscal);
+
+CREATE TABLE IF NOT EXISTS ingresos.pagos_movtos_2026 PARTITION OF ingresos.pagos_movtos FOR VALUES IN (2026);
+CREATE TABLE IF NOT EXISTS ingresos.pagos_movtos_2027 PARTITION OF ingresos.pagos_movtos FOR VALUES IN (2027);</code></pre>
     </div>
   </div>
 
   <!-- 5. STORED PROCEDURES -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">5</span> Procedimientos Almacenados (Stored Procedures en Esquema <code>tesoreria</code>)</div>
+    <div class="section-title"><span class="section-num">5</span> Procedimientos Almacenados (Stored Procedures en Esquema <code>ingresos</code>)</div>
 
     <div class="sp-tabs">
-      <button class="sp-tab active" onclick="showSP('sppag1',this)">5.1 fn_leer_bandeja_pagos_caja</button>
-      <button class="sp-tab" onclick="showSP('sppag2',this)">5.2 fn_ejecutar_pago_y_poliza</button>
+      <button class="sp-tab active" onclick="showSP('sppag1',this)">5.1 ingresos.fn_leer_bandeja_pagos</button>
+      <button class="sp-tab" onclick="showSP('sppag2',this)">5.2 ingresos.fn_abc_pagos_y_poliza_egreso</button>
     </div>
 
     <div id="sp-sppag1" class="sp-panel active">
-      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Consulta Unificada de Bandeja y Pagos Realizados: <code>tesoreria.fn_leer_bandeja_pagos_caja</code></h4>
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Consulta Unificada de Bandeja de Tesorería y Pagos Ejecutados: <code>ingresos.fn_leer_bandeja_pagos</code></h4>
       <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION tesoreria.fn_leer_bandeja_pagos_caja(
-    p_ejercicio INTEGER,
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_bandeja_pagos(
+    p_ejercicio SMALLINT,
     p_estatus_filtro VARCHAR DEFAULT NULL, -- 'PENDIENTE_CAJA', 'PAGADO'
     p_origen_filtro VARCHAR DEFAULT NULL,  -- 'PRESUPUESTAL_05_2_1', 'NO_PRESUPUESTAL_05_2_2'
     p_chequera_id INTEGER DEFAULT NULL,
@@ -252,60 +332,58 @@ CREATE TABLE IF NOT EXISTS tesoreria.pagos_ejecutados_2026
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = tesoreria, cxp, contabilidad, config, public
+SET search_path = ingresos, cxp, contabilidad, config, public
 AS $$
 DECLARE
     v_data JSONB;
 BEGIN
     WITH bandeja_unificada AS (
-        -- 1. Solicitudes Presupuestales Aprobadas desde 05.2.1 (Grupos 1, 2 y 3 excepto 101 Nómina que dispersa en 05.2.2)
+        -- 1. Solicitudes Presupuestales Aprobadas desde 05.2.1 (cxp.afectaciones_gasto)
         SELECT
             ag.ag_id AS tramite_id,
             'PRESUPUESTAL_05_2_1'::VARCHAR AS origen_tramite,
             ag.folio AS folio_origen,
             ag.fecha_elaboracion AS fecha_solicitud,
-            ag.f_matriz_grupo_id AS grupo_id,
-            g.mgt_titulo AS grupo_titulo,
-            ag.f_matriz_grupo_procedimiento_id AS procedimiento_id,
-            p.mgp_nombre AS procedimiento_nombre,
-            13::BIGINT AS matriz_final_id,
+            13::BIGINT AS f_matriz_id,
+            ag.tipo_pago AS f_matriz_grupo_id,
+            ag.subtipo_pago AS f_matriz_grupo_procedimiento_id,
+            TRUE AS afecta_presupuesto,
             ag.concepto,
-            (ag.importe_total_pago - ag.importe_retenciones) AS importe_liquido,
-            CASE WHEN pag.pago_id IS NOT NULL THEN 'PAGADO' ELSE 'PENDIENTE_CAJA' END AS estatus_caja,
+            ag.importe_total_pago AS importe_liquido,
+            CASE WHEN pag.pag_id IS NOT NULL THEN 'PAGADO' ELSE 'PENDIENTE_CAJA' END AS estatus_caja,
+            pag.pag_id,
             pag.folio_pago,
             pag.referencia_bancaria,
-            pag.f_poliza_egreso_id
+            pag.p_poliza_id
         FROM cxp.afectaciones_gasto ag
-        JOIN contabilidad.matriz_grupos_tramite g ON g.mgt_id = ag.f_matriz_grupo_id
-        JOIN contabilidad.matriz_grupos_procedimiento p ON p.mgp_id = ag.f_matriz_grupo_procedimiento_id
-        LEFT JOIN tesoreria.pagos_ejecutados pag ON pag.f_ag_id = ag.ag_id AND pag.ejercicio_fiscal = ag.ejercicio_fiscal AND pag.estatus_registro = 1
+        LEFT JOIN ingresos.pagos pag
+          ON pag.f_ag_id = ag.ag_id AND pag.ejercicio_fiscal = ag.ejercicio_fiscal AND pag.estatus_registro = 1
         WHERE ag.ejercicio_fiscal = p_ejercicio
           AND ag.estatus_workflow = 'APROBADA'
-          AND ag.f_matriz_grupo_procedimiento_id <> 101
           AND ag.estatus_registro = 1
 
         UNION ALL
 
-        -- 2. Solicitudes de Pagos No Presupuestales Autorizadas desde 05.2.2 (Grupo 4: 401..404)
+        -- 2. Solicitudes de Pagos No Presupuestales Autorizadas desde 05.2.2 (cxp.ordenes_pago)
         SELECT
             op.op_id AS tramite_id,
             'NO_PRESUPUESTAL_05_2_2'::VARCHAR AS origen_tramite,
             op.folio_op AS folio_origen,
             op.fecha_programada AS fecha_solicitud,
-            4::SMALLINT AS grupo_id,
-            '4. No afecta presupuesto'::VARCHAR AS grupo_titulo,
-            op.f_matriz_grupo_procedimiento_id AS procedimiento_id,
-            p.mgp_nombre AS procedimiento_nombre,
-            p.f_matriz_final_id AS matriz_final_id,
-            'Solicitud No Presupuestal · ' || op.tipo_orden AS concepto,
+            17::BIGINT AS f_matriz_id,
+            4::SMALLINT AS f_matriz_grupo_id,
+            402::SMALLINT AS f_matriz_grupo_procedimiento_id,
+            FALSE AS afecta_presupuesto,
+            'Solicitud No Presupuestal · ' || op.folio_op AS concepto,
             op.importe_neto AS importe_liquido,
-            CASE WHEN op.estatus_workflow = 'PAGADA' THEN 'PAGADO' ELSE 'PENDIENTE_CAJA' END AS estatus_caja,
+            CASE WHEN pag.pag_id IS NOT NULL OR op.estatus_workflow = 'PAGADA' THEN 'PAGADO' ELSE 'PENDIENTE_CAJA' END AS estatus_caja,
+            pag.pag_id,
             pag.folio_pago,
             pag.referencia_bancaria,
-            op.f_poliza_egreso_id
+            pag.p_poliza_id
         FROM cxp.ordenes_pago op
-        JOIN contabilidad.matriz_grupos_procedimiento p ON p.mgp_id = op.f_matriz_grupo_procedimiento_id
-        LEFT JOIN tesoreria.pagos_ejecutados pag ON pag.f_op_id = op.op_id AND pag.ejercicio_fiscal = op.ejercicio_fiscal AND pag.estatus_registro = 1
+        LEFT JOIN ingresos.pagos pag
+          ON pag.f_op_id = op.op_id AND pag.ejercicio_fiscal = op.ejercicio_fiscal AND pag.estatus_registro = 1
         WHERE op.ejercicio_fiscal = p_ejercicio
           AND op.estatus_workflow IN ('AUTORIZADA', 'PAGADA')
           AND op.estatus_registro = 1
@@ -324,27 +402,32 @@ $$;</code></pre>
     </div>
 
     <div id="sp-sppag2" class="sp-panel">
-      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Ejecución del Pago Bancario y Póliza de Egreso (Matriz 13 o 17): <code>tesoreria.fn_ejecutar_pago_y_poliza</code></h4>
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Guardado en <code>ingresos.pagos</code> + <code>ingresos.pagos_movtos</code> y Generación de Póliza de Egreso (<code>PE</code>) en <code>ingresos.poliza</code>: <code>ingresos.fn_abc_pagos_y_poliza_egreso</code></h4>
       <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION tesoreria.fn_ejecutar_pago_y_poliza(
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_abc_pagos_y_poliza_egreso(
     p_usuario VARCHAR,
-    p_ejercicio INTEGER,
+    p_ejercicio SMALLINT,
     p_datos JSONB
 )
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = tesoreria, cxp, contabilidad, config, public
+SET search_path = ingresos, cxp, contabilidad, config, public
 AS $$
 DECLARE
-    v_pago_id UUID := gen_random_uuid();
+    v_pag_id UUID := gen_random_uuid();
     v_folio_pago VARCHAR(20);
     v_origen VARCHAR(25) := p_datos->>'origen_tramite';
     v_chequera_id INT := (p_datos->>'chequera_id')::INT;
     v_doc21_id UUID := (p_datos->>'expediente_doc21_id')::UUID;
-    v_matriz_final_id BIGINT;
-    v_poliza_id BIGINT;
-    v_folio_pe VARCHAR(20);
+    v_matriz_id BIGINT := COALESCE((p_datos->>'f_matriz_id')::BIGINT, 13);
+    v_grupo_id SMALLINT := (p_datos->>'f_matriz_grupo_id')::SMALLINT;
+    v_proc_id SMALLINT := (p_datos->>'f_matriz_grupo_procedimiento_id')::SMALLINT;
+    v_poliza_local_id INTEGER;
+    v_poliza_conta_id INTEGER;
+    v_folio_pe VARCHAR(25);
+    v_mov RECORD;
+    v_orden INTEGER := 0;
 BEGIN
     -- 1. Validar que se haya adjuntado el Comprobante Bancario de Pago / Dispersión (Requisito ID 21)
     IF v_doc21_id IS NULL THEN
@@ -354,56 +437,132 @@ BEGIN
     -- 2. Generar folio de Caja PAG-YYYY-XXXXX
     SELECT 'PAG-' || p_ejercicio || '-' || LPAD((COALESCE(MAX(SUBSTRING(folio_pago FROM 10)::INTEGER), 0) + 1)::TEXT, 5, '0')
       INTO v_folio_pago
-      FROM tesoreria.pagos_ejecutados WHERE ejercicio_fiscal = p_ejercicio;
+      FROM ingresos.pagos WHERE ejercicio_fiscal = p_ejercicio;
 
-    -- 3. Determinar Matriz Final (13 = A2_PAGADO_GASTOS, 17 = A3_EGRESO_NO_PRESUPUESTARIO)
-    v_matriz_final_id := COALESCE((p_datos->>'matriz_final_id')::BIGINT, 13);
+    -- 3. Insertar encabezado en ingresos.pagos
+    INSERT INTO ingresos.pagos (
+        pag_id, ejercicio_fiscal, folio_pago, origen_tramite,
+        f_ag_id, f_op_id, f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id,
+        afecta_presupuesto, f_chequera_id, medio_pago, referencia_bancaria, fecha_pago,
+        concepto, importe_total_pago, f_expediente_doc21_id, estatus_pago, usuario_c
+    ) VALUES (
+        v_pag_id, p_ejercicio, v_folio_pago, v_origen,
+        (p_datos->>'ag_id')::UUID, (p_datos->>'op_id')::UUID,
+        v_matriz_id, v_grupo_id, v_proc_id,
+        (v_matriz_id = 13), v_chequera_id,
+        COALESCE(p_datos->>'medio_pago', 'SPEI'),
+        p_datos->>'referencia_bancaria',
+        COALESCE((p_datos->>'fecha_pago')::DATE, CURRENT_DATE),
+        p_datos->>'concepto',
+        (p_datos->>'importe_total_pago')::NUMERIC,
+        v_doc21_id, 'PAGADO', p_usuario
+    );
 
-    -- 4. Generar Póliza de Egreso (PE) sustituyendo el placeholder bancario por la cuenta contable de la chequera
+    -- 4. Insertar detalle de movimientos en ingresos.pagos_movtos
+    INSERT INTO ingresos.pagos_movtos (
+        f_pag_id, ejercicio_fiscal, numero_linea, f_agd_id,
+        f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id, f_matriz_regla_id,
+        f_centro_costo_id, f_clave_presupuestal_id, f_cog_id, f_fuente_fin_id,
+        cuenta_contable_cargo, cuenta_contable_abono, concepto_linea, importe_pagado, usuario_c
+    )
+    SELECT
+        v_pag_id, p_ejercicio, COALESCE((x->>'numero_linea')::SMALLINT, 1), (x->>'f_agd_id')::UUID,
+        v_matriz_id, v_grupo_id, v_proc_id, (x->>'f_matriz_regla_id')::BIGINT,
+        (x->>'f_centro_costo_id')::INT, (x->>'f_clave_presupuestal_id')::BIGINT, (x->>'f_cog_id')::INT, (x->>'f_fuente_fin_id')::INT,
+        x->>'cuenta_contable_cargo', x->>'cuenta_contable_abono', x->>'concepto_linea', (x->>'importe_pagado')::NUMERIC, p_usuario
+    FROM jsonb_array_elements(p_datos->'movimientos') AS x;
+
+    -- 5. Generar Póliza de Egreso (PE) en contabilidad.poliza e ingresos.poliza (p_origen = 2)
     SELECT 'PE-' || p_ejercicio || '-' || LPAD((COALESCE(MAX(SUBSTRING(p_numero FROM 9)::INTEGER), 0) + 1)::TEXT, 5, '0')
       INTO v_folio_pe
-      FROM contabilidad.poliza WHERE p_ejercicio = p_ejercicio AND p_tipo = 'PE';
+      FROM ingresos.poliza WHERE p_ejercicio = p_ejercicio AND p_tipo = 'PE';
 
     INSERT INTO contabilidad.poliza (
         p_tipo, p_subtipo, p_numero, p_ejercicio, p_fecha, p_descripcion,
         p_afecta, estatus_registro, usuario_c, fecha_c
     ) VALUES (
-        'PE', 'CAJA', v_folio_pe, p_ejercicio, CURRENT_DATE,
-        'Pago bancario ejecutado en Caja · Folio ' || v_folio_pago || ' · Ref. SPEI/Cheque: ' || (p_datos->>'referencia_bancaria'),
+        'PE', 'PAGO_CAJA', v_folio_pe, p_ejercicio, CURRENT_DATE,
+        'Pago bancario ejecutado en Caja · Folio ' || v_folio_pago || ' · Ref: ' || (p_datos->>'referencia_bancaria'),
         1, 1, p_usuario, clock_timestamp()
-    ) RETURNING p_id INTO v_poliza_id;
+    ) RETURNING p_id INTO v_poliza_conta_id;
 
-    -- 5. Registrar el pago en tesoreria.pagos_ejecutados
-    INSERT INTO tesoreria.pagos_ejecutados (
-        pago_id, ejercicio_fiscal, folio_pago, origen_tramite,
-        f_ag_id, f_op_id, f_matriz_final_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id,
-        f_chequera_id, medio_pago, referencia_bancaria, importe_pagado,
-        f_expediente_doc21_id, f_poliza_egreso_id, estatus_pago, usuario_c
+    INSERT INTO ingresos.poliza (
+        p_tipo, p_subtipo, p_numero, p_ejercicio, p_fecha, p_descripcion,
+        p_afecta, p_origen, p_origen_uuid, p_poliza_id, estatus_registro, usuario_c, fecha_c
     ) VALUES (
-        v_pago_id, p_ejercicio, v_folio_pago, v_origen,
-        (p_datos->>'ag_id')::UUID, (p_datos->>'op_id')::UUID,
-        v_matriz_final_id,
-        (p_datos->>'matriz_grupo_id')::SMALLINT,
-        (p_datos->>'matriz_grupo_procedimiento_id')::SMALLINT,
-        v_chequera_id,
-        COALESCE(p_datos->>'medio_pago', 'SPEI'),
-        p_datos->>'referencia_bancaria',
-        (p_datos->>'importe_pagado')::NUMERIC,
-        v_doc21_id, v_poliza_id, 'PAGADO', p_usuario
-    );
+        'PE', 'PAGO_CAJA', v_folio_pe, p_ejercicio, CURRENT_DATE,
+        'Pago bancario ejecutado en Caja · Folio ' || v_folio_pago || ' · Ref: ' || (p_datos->>'referencia_bancaria'),
+        1, 2, v_pag_id, v_poliza_conta_id, 1, p_usuario, clock_timestamp()
+    ) RETURNING p_id INTO v_poliza_local_id;
 
-    -- 6. Si proviene de 05.2.2, actualizar estatus_workflow a PAGADA
+    -- 6. Expandir asientos en ingresos.poliza_movtos desde ingresos.pagos_movtos + contabilidad.matriz_conversion_movimiento
+    FOR v_mov IN
+        SELECT
+            pm.*,
+            mcm.mcm_ambito,
+            mcm.mcm_naturaleza,
+            CASE
+                WHEN mcm.mcm_es_placeholder_banco THEN pm.cuenta_contable_abono
+                WHEN mcm.mcm_naturaleza = 'D' AND mcm.mcm_ambito = 'C' THEN pm.cuenta_contable_cargo
+                WHEN mcm.mcm_naturaleza = 'H' AND mcm.mcm_ambito = 'C' THEN pm.cuenta_contable_abono
+                ELSE mcm.mcm_cuenta_codigo
+            END AS cuenta_final,
+            mcm.mcm_cuenta_nombre
+        FROM ingresos.pagos_movtos pm
+        JOIN contabilidad.matriz_conversion_movimiento mcm
+          ON mcm.f_matriz_id = pm.f_matriz_id
+         AND mcm.f_matriz_grupo_id = pm.f_matriz_grupo_id
+         AND mcm.f_matriz_grupo_procedimiento_id = pm.f_matriz_grupo_procedimiento_id
+         AND mcm.f_matriz_regla_id = pm.f_matriz_regla_id
+        WHERE pm.f_pag_id = v_pag_id
+          AND pm.ejercicio_fiscal = p_ejercicio
+          AND pm.estatus_registro = 1
+          AND mcm.estatus_registro = 1
+        ORDER BY pm.numero_linea, mcm.mcm_orden
+    LOOP
+        v_orden := v_orden + 1;
+
+        INSERT INTO ingresos.poliza_movtos (
+            pm_poliza_id, pm_ejercicio, pm_orden, pm_ambito, pm_cc_id, pm_centro_costo_id,
+            pm_nivel1, pm_nivel2, pm_nivel3, pm_nivel4, pm_nivel5,
+            pm_debe, pm_haber, pm_fuente_fin_id, pm_cp_id,
+            pm_observacion, usuario_c
+        ) VALUES (
+            v_poliza_local_id, p_ejercicio, v_orden, v_mov.mcm_ambito, v_mov.f_centro_costo_id, v_mov.f_centro_costo_id,
+            SPLIT_PART(v_mov.cuenta_final, '.', 1),
+            SPLIT_PART(v_mov.cuenta_final, '.', 2),
+            SPLIT_PART(v_mov.cuenta_final, '.', 3),
+            SPLIT_PART(v_mov.cuenta_final, '.', 4),
+            SPLIT_PART(v_mov.cuenta_final, '.', 5),
+            CASE WHEN v_mov.mcm_naturaleza = 'D' THEN v_mov.importe_pagado ELSE 0 END,
+            CASE WHEN v_mov.mcm_naturaleza = 'H' THEN v_mov.importe_pagado ELSE 0 END,
+            v_mov.f_fuente_fin_id, v_mov.f_clave_presupuestal_id,
+            COALESCE(v_mov.concepto_linea, v_mov.mcm_cuenta_nombre), p_usuario
+        );
+    END LOOP;
+
+    -- 7. Vincular la póliza PE en ingresos.pagos y actualizar cxp.ordenes_pago si aplica
+    UPDATE ingresos.pagos
+       SET p_poliza_id = v_poliza_local_id
+     WHERE pag_id = v_pag_id AND ejercicio_fiscal = p_ejercicio;
+
     IF (p_datos->>'op_id') IS NOT NULL THEN
         UPDATE cxp.ordenes_pago
-           SET estatus_workflow = 'PAGADA', f_poliza_egreso_id = v_poliza_id,
+           SET estatus_workflow = 'PAGADA', f_poliza_egreso_id = v_poliza_conta_id,
                usuario_m = p_usuario, fecha_m = clock_timestamp()
          WHERE op_id = (p_datos->>'op_id')::UUID AND ejercicio_fiscal = p_ejercicio;
     END IF;
 
     RETURN jsonb_build_object(
         'error', 0,
-        'mensaje', 'Pago registrado exitosamente y Póliza de Egreso generada.',
-        'data', jsonb_build_object('pago_id', v_pago_id, 'folio_pago', v_folio_pago, 'poliza_egreso_id', v_poliza_id, 'folio_poliza', v_folio_pe)
+        'mensaje', 'Pago registrado exitosamente en ingresos.pagos / ingresos.pagos_movtos y Póliza de Egreso (PE) generada en ingresos.poliza.',
+        'data', jsonb_build_object(
+            'pag_id', v_pag_id,
+            'folio_pago', v_folio_pago,
+            'poliza_local_id', v_poliza_local_id,
+            'poliza_contabilidad_id', v_poliza_conta_id,
+            'folio_poliza', v_folio_pe
+        )
     );
 END;
 $$;</code></pre>
@@ -416,21 +575,21 @@ $$;</code></pre>
     <div class="section-title"><span class="section-num">6</span> Reglas de Negocio de la Oficina de Caja</div>
     <div style="display:flex; flex-direction:column; gap:10px;">
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-PAG-01 · Bandeja Única de Solicitudes Autorizadas</strong>
+        <strong style="color:var(--pjev-verde-oscuro);">RN-PAG-01 · Correlación Estricta con Tesorería (<code>cxp</code>) y la Matriz de Conversión (<code>03.1.2</code>)</strong>
         <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          La Oficina de Caja únicamente puede ejecutar desembolsos sobre trámites que hayan alcanzado el estatus <code>APROBADA</code> en <code>05.2.1</code> o <code>AUTORIZADA</code> (con las 3 firmas mancomunadas) en <code>05.2.2</code>.
+          Todo registro en <code>ingresos.pagos</code> e <code>ingresos.pagos_movtos</code> debe estar correlacionado con una solicitud autorizada en Tesorería (<code>f_ag_id</code> de <code>05.2.1</code> o <code>f_op_id</code> de <code>05.2.2</code>) y conservar la llave compuesta de la Matriz de Conversión de Egresos (<code>f_matriz_id [13 o 17]</code>, <code>f_matriz_grupo_id [1..4]</code>, <code>f_matriz_grupo_procedimiento_id [101..404]</code> y <code>f_matriz_regla_id</code>).
         </p>
       </div>
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-PAG-02 · Bloqueo Estricto sin Comprobante Bancario de Pago / Dispersión (ID 21)</strong>
+        <strong style="color:var(--pjev-verde-oscuro);">RN-PAG-02 · Escritura de Pólizas de Egresos (<code>PE</code>) en <code>ingresos.poliza</code> e <code>ingresos.poliza_movtos</code></strong>
+        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
+          Al igual que <code>ingresos.ingresos</code> escribe <strong>Pólizas de Ingresos (<code>PI</code>, <code>p_origen = 1</code>)</strong> en <code>ingresos.poliza</code> e <code>ingresos.poliza_movtos</code>, los desembolsos de <code>ingresos.pagos</code> escriben en esas mismas tablas locales como <strong>Pólizas de Egresos (<code>PE</code>, <code>p_origen = 2</code>)</strong> y se replican en <code>contabilidad.poliza</code> y <code>contabilidad.poliza_movtos</code>.
+        </p>
+      </div>
+      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
+        <strong style="color:var(--pjev-verde-oscuro);">RN-PAG-03 · Bloqueo Estricto sin Comprobante Bancario de Pago / Dispersión (ID 21)</strong>
         <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
           Ningún registro de pago puede cerrarse como <code>PAGADO</code> ni detonar su póliza de egreso si el operador de Caja no adjunta en el expediente digital el archivo PDF/XML del <strong>Comprobante Bancario de Pago / Dispersión (CEP SPEI o talón de cheque firmado, ID 21 en <code>05.1.1</code>)</strong>.
-        </p>
-      </div>
-      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-PAG-03 · Sustitución Dinámica de la Cuenta Contable Bancaria (1.1.1.2.xxxx)</strong>
-        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          Tanto en la Matriz <code>13 (A2_PAGADO_GASTOS)</code> como en la Matriz <code>17 (A3_EGRESO_NO_PRESUPUESTARIO)</code>, el abono contable toma dinámicamente la subcuenta <code>1.1.1.2.xxxx</code> asociada en el catálogo <code>01.4.2 Chequeras</code> a la cuenta bancaria pagadora seleccionada por Caja.
         </p>
       </div>
     </div>
@@ -441,8 +600,8 @@ $$;</code></pre>
     <div class="section-title"><span class="section-num">7</span> Propuesta Visual de Interfaz (Wireframes Nativos)</div>
 
     <div class="wf-tabs">
-      <button class="wf-tab active" onclick="showWF('wfpag1',this)">1. Pantalla Unificada: Bandeja y Registro de Pagos</button>
-      <button class="wf-tab" onclick="showWF('wfpag2',this)">2. Modal Complejo [Registrar Dispersión + Comprobante ID 21]</button>
+      <button class="wf-tab active" onclick="showWF('wfpag1',this)">1. Pantalla Unificada: Bandeja y Registro de Pagos (ingresos.pagos)</button>
+      <button class="wf-tab" onclick="showWF('wfpag2',this)">2. Modal Complejo [Registrar Dispersión + Detalle pagos_movtos + Póliza PE]</button>
     </div>
 
     <!-- WF 1: BANDEJA UNIFICADA -->
@@ -450,23 +609,23 @@ $$;</code></pre>
       <div class="wf-box">
         <div class="wf-bar">
           <span class="wf-bar-label">06.2.1 Pantalla Principal · Registro de Pagos (Bandeja Unificada de Caja)</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Recibe de 05.2.1 (Presupuestal) y 05.2.2 (No Presupuestal)</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Correlacionado con 05.2.1 (Presupuestal) y 05.2.2 (No Presupuestal)</span>
         </div>
         <div class="wf-svg-area">
           <svg viewBox="0 0 960 520" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
             <rect width="960" height="520" fill="#f8fafc" rx="6" stroke="#cbd5e1"/>
             <rect width="960" height="42" fill="#183125" rx="6"/>
             <text x="20" y="26" font-size="13" font-weight="bold" fill="#ffffff">SIAF-PJEV</text>
-            <text x="95" y="26" font-size="11" fill="#cbd5e1">| Oficina de Caja · Departamento de Tesorería</text>
+            <text x="95" y="26" font-size="11" fill="#cbd5e1">| Oficina de Caja (Esquema ingresos) · Registro de Pagos</text>
             <rect x="780" y="10" width="160" height="22" fill="#2d4a3b" rx="4"/>
             <text x="860" y="25" font-size="10" fill="#ffffff" text-anchor="middle">Ejercicio: 2026 · Cajero</text>
 
-            <text x="20" y="66" font-size="10" fill="#64748b">06 · Pagos  /  06.2 Registro  /  <tspan font-weight="bold" fill="#183125">06.2.1 Registro de Pagos</tspan></text>
-            <text x="20" y="88" font-size="16" font-weight="bold" fill="#183125">Registro y Control de Pagos (Bandeja de Caja)</text>
+            <text x="20" y="66" font-size="10" fill="#64748b">Caja  /  Registro  /  <tspan font-weight="bold" fill="#183125">06.2.1 Registro de Pagos</tspan></text>
+            <text x="20" y="88" font-size="16" font-weight="bold" fill="#183125">Registro de Pagos (ingresos.pagos + ingresos.pagos_movtos)</text>
 
             <!-- Filtros Rápidos -->
             <rect x="20" y="102" width="920" height="72" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            <text x="35" y="122" font-size="9" font-weight="bold" fill="#475569">ORIGEN DE LA SOLICITUD</text>
+            <text x="35" y="122" font-size="9" font-weight="bold" fill="#475569">ORIGEN EN TESORERÍA (CXP)</text>
             <rect x="35" y="128" width="220" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
             <text x="45" y="145" font-size="10" fill="#1e293b">Todos (05.2.1 Ppto + 05.2.2 No Ppto) ▼</text>
 
@@ -527,7 +686,7 @@ $$;</code></pre>
             <text x="685" y="306" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$310,000.00</text>
             <text x="765" y="306" font-size="9" font-family="monospace" fill="#166534" text-anchor="middle">17 (A.3)</text>
             <rect x="800" y="294" width="70" height="16" fill="#dcfce7" rx="8"/>
-            <text x="835" y="306" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">PAGADO</text>
+            <text x="835" y="306" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">PAGADO (PE)</text>
             <text x="905" y="306" font-size="10" fill="#0284c7" text-anchor="middle">👁 📖</text>
           </svg>
         </div>
@@ -538,14 +697,14 @@ $$;</code></pre>
     <div id="wf-wfpag2" class="wf-panel">
       <div class="wf-box">
         <div class="wf-bar">
-          <span class="wf-bar-label">06.2.1 Modal Complejo · Ejecución de Dispersión Bancaria y Adjunto ID 21</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Detona Póliza PE en Matriz 13 (A.2) o Matriz 17 (A.3)</span>
+          <span class="wf-bar-label">06.2.1 Modal Complejo · Ejecución de Pago (ingresos.pagos + ingresos.pagos_movtos ➔ ingresos.poliza PE)</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">Escribe Póliza de Egreso (PE) en ingresos.poliza y contabilidad.poliza</span>
         </div>
         <div class="wf-svg-area">
           <svg viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
             <rect width="920" height="420" fill="#ffffff" rx="8" stroke="#cbd5e1"/>
             <rect width="920" height="44" fill="#183125" rx="8"/>
-            <text x="25" y="27" font-size="13" font-weight="bold" fill="#ffffff">Registrar Pago Bancario · Solicitud AG-2026-00142</text>
+            <text x="25" y="27" font-size="13" font-weight="bold" fill="#ffffff">Registrar Pago Bancario · Solicitud AG-2026-00142 (Grupo 1 · Subproc. 102)</text>
 
             <rect x="25" y="60" width="870" height="150" fill="#f8fafc" stroke="#cbd5e1" rx="6"/>
             <text x="45" y="85" font-size="10" font-weight="bold" fill="#475569">CHEQUERA PAGADORA INSTITUCIONAL (1.1.1.2.xxxx) *</text>
@@ -569,7 +728,7 @@ $$;</code></pre>
             <text x="485" y="170" font-size="9.5" font-weight="bold" fill="#15803d">✓ cep_spei_20260905_inmobiliaria.pdf (Cargado en Expediente)</text>
 
             <rect x="25" y="225" width="870" height="120" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            <text x="40" y="248" font-size="11" font-weight="bold" fill="#183125">Previsualización de Póliza de Egreso (Matriz 13: A2_PAGADO_GASTOS)</text>
+            <text x="40" y="248" font-size="11" font-weight="bold" fill="#183125">Previsualización de Póliza de Egreso (PE) en ingresos.poliza + ingresos.poliza_movtos (Matriz 13)</text>
             <text x="40" y="272" font-size="9.5" font-family="monospace" fill="#334155">CARGO  2.1.1.2.0001 Proveedores por Pagar a Corto Plazo ............. $19,066.67</text>
             <text x="40" y="292" font-size="9.5" font-family="monospace" fill="#0284c7">ABONO  1.1.1.2.0101 Bancos / Banamex Cta. 482910 .................... $19,066.67</text>
             <text x="40" y="315" font-size="9.5" font-family="monospace" fill="#15803d">SIMULTÁNEO PRESUPUESTAL: 8.2.6 Ejercido y 8.2.7 Pagado .............. $23,200.00</text>
@@ -588,11 +747,17 @@ $$;</code></pre>
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Cambios Realizados</th></tr></thead>
       <tbody>
+        <tr style="background:#eff6ff;">
+          <td><code>2.0.0</code></td>
+          <td>2026-11-08</td>
+          <td>Arquitectura SIAF-PJEV / Daryl</td>
+          <td><strong>Estandarización de Tablas en Esquema <code>ingresos</code> (<code>ingresos.pagos</code> + <code>ingresos.pagos_movtos</code> ➔ <code>ingresos.poliza</code>):</strong> Se estructura el registro de pagos bajo el par maestro-detalle <code>ingresos.pagos</code> e <code>ingresos.pagos_movtos</code>, correlacionado con los movimientos de Egresos en la Matriz de Conversión (<code>13 A2_PAGADO_GASTOS</code> y <code>17 A3_EGRESO_NO_PRESUPUESTARIO</code>) y con el módulo de Tesorería (<code>cxp.afectaciones_gasto</code> y <code>cxp.ordenes_pago</code>), escribiendo sus asientos como <strong>Pólizas de Egresos (<code>PE</code>)</strong> en <code>ingresos.poliza</code> e <code>ingresos.poliza_movtos</code>.</td>
+        </tr>
         <tr>
           <td><code>1.0.0</code></td>
           <td>2026-11-08</td>
           <td>Arquitectura SIAF-PJEV / Dix Consultoría</td>
-          <td>Unificación de <em>Bandeja de pagos</em> y <em>Registro y control de pagos</em> en la opción única <strong>06.2.1 Registro de Pagos</strong> (Oficina de Caja). Integración con <code>05.2.1 Solicitud-Comprobación de Recurso</code> (Matriz <code>13 A2_PAGADO_GASTOS</code>) y <code>05.2.2 Solicitud de Pagos No Presupuestales</code> (Matriz <code>17 A3_EGRESO_NO_PRESUPUESTARIO</code> y Matriz <code>13</code> para nómina neta).</td>
+          <td>Unificación de <em>Bandeja de pagos</em> y <em>Registro y control de pagos</em> en la opción única de <strong>Registro de Pagos</strong> (Oficina de Caja).</td>
         </tr>
       </tbody>
     </table>

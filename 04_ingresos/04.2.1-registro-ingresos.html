@@ -50,45 +50,42 @@
   <!-- BREADCRUMB -->
   <div class="elem-breadcrumb">
     <a href="../index.html">Manual Dev</a> ›
-    <span>04 · Ingresos</span> ›
+    <span>04 · Ingresos (Caja)</span> ›
     <span>04.2 · Registro</span> ›
-    <span>04.2.1 Registro y devengo de ingresos</span>
+    <span>04.2.1 Registro de ingresos</span>
   </div>
 
   <!-- ENCABEZADO -->
   <div class="elem-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <div class="elem-id">04.2.1</div>
-      <h1 class="elem-title">Registro y Devengo de Ingresos (Solicitud, Partidas y Devengo)</h1>
-      <p class="elem-desc">Módulo transaccional de Ingresos para la solicitud y devengo institucional. Articulado en un Asistente Visual (Wizard Modal de Clasificación de 4 familias y 12 subtipos), captura sustantiva del oficio de ministración con doble archivo físico firmado y acuse, apertura de techo presupuestal desglosado por órganos y capítulos en grid PJEV-UI con cuadre al centavo, y formalización del momento contable DEVENGADO (Matriz CONAC 03.1.2 B.1), canalizándose a Tesorería en 04.2.2.</p>
+      <h1 class="elem-title">Registro de Ingresos (Encabezado <code>ingresos.ingresos</code>, Detalle <code>ingresos.ingresos_movtos</code> y Pólizas <code>PI</code>)</h1>
+      <p class="elem-desc">Módulo transaccional unificado para el registro de ingresos de la Oficina de Caja. Lee directamente los Procedimientos (Grupos <code>11..14</code>) y Subprocedimientos (<code>1101..1402</code>) de la <strong>Matriz de Conversión 03.1.2 (<code>tipo_flujo = 'I'</code>)</strong> para resumir las reglas contables y presupuestales aplicables, almacena la operación en el par simplificado <strong><code>ingresos.ingresos</code></strong> (encabezado) e <strong><code>ingresos.ingresos_movtos</code></strong> (detalle), y genera automáticamente las <strong>Pólizas de Ingresos (<code>PI</code>)</strong> en <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong> (homologadas con <code>cxp.poliza</code> y sincronizadas con <code>contabilidad.poliza</code>).</p>
       <div class="mod-header-badges">
         <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Maestro-Detalle 1:N)</span>
-        <span class="mod-badge badge-s">Fase 1: Ejecución del Ingreso</span>
+        <span class="mod-badge badge-s">v3.0.0 · Esquema Simplificado de Ingresos y Pólizas PI</span>
         <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Daryl</span>
-        <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Contabilidad Subyacente (Matriz CONAC 03.1.2)</span>
-        <span class="mod-badge" style="background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe;">Wizard Modal (Paso 0)</span>
-        <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/ingresos</code></span>
+        <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Lee Matriz 03.1.2 (Grupos 11..14 / Subproc. 1101..1402)</span>
+        <span class="elem-tag" style="font-size:10px;">Ruta Frontend: <code style="font-family:var(--font-mono);font-size:10px;">/caja/registro-ingresos</code> · Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/ingresos</code></span>
       </div>
     </div>
   </div>
 
-  <!-- CALLOUT DE DELIMITACIÓN ARQUITECTÓNICA -->
-  <div class="callout-box">
-    <div class="callout-title">📌 Arquitectura de Captura: Formulario Compuesto, Doble Archivo Físico Firmado y Grid PJEV-UI</div>
-    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
-      <strong>1. Formulario Compuesto (Maestro-Detalle):</strong> Siguiendo el estándar canónico de SIAF-PJEV y la experiencia de Egresos (<code>05.2.1</code>), la captura se organiza en dos niveles: un <strong>Encabezado Maestro</strong> (datos generales, importe total y sustento documental) y una sección de <strong>Movimientos Presupuestales</strong> (partidas distribuidas en un grid interactivo de la <code>PJEV-UI</code>).
+  <!-- CALLOUT DE REESTRUCTURACIÓN DE BASE DE DATOS PARA DARYL -->
+  <div class="callout-box" style="border-left-color:#0284c7; background:#f0f9ff;">
+    <div class="callout-title" style="color:#0369a1;">🛠️ Guía de Reestructuración de Base de Datos para Daryl (Esquema <code>ingresos</code> v3.0)</div>
+    <p style="font-size:12px; color:#1e293b; margin:0 0 8px;">
+      Para alinear el módulo de Caja/Ingresos con la <strong>Matriz de Conversión v3.0 (<code>03.1.2</code>)</strong> y el módulo de <strong>Tesorería (<code>cxp</code>)</strong>, se simplifica y normaliza por completo el esquema <code>ingresos</code>:
     </p>
-    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
-      <strong>2. Carga Obligatoria de los Dos Archivos Físicos Firmados:</strong> Para satisfacer la comprobación fiscal y de auditoría interna/ORFIS, el encabezado exige adjuntar los dos documentos fuente digitalizados:
-      (1) <em>Oficio de Solicitud DGA a SEFIPLAN</em> con sello de acuse oficial de recepción (ej. <code>Of. DGA/0367/2026</code>); y
-      (2) <em>Formato Oficial de Solicitud / Orden de Cobro</em> debidamente signado por los funcionarios autorizadores (Elaboró, Solicitante DGA, Vo. Bo. Egresos, Directora General de Programación y Presupuesto, Jefa de Ordenes de Pago y Tesorera).
-    </p>
-    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
-      <strong>3. Modal de Captura de Movimientos y Clave Programática:</strong> Las partidas del grid no se capturan escribiendo cadenas alfanuméricas complejas. Al pulsar <code>[+ Agregar Partida]</code>, se despliega un <strong>Modal de la PJEV-UI</strong> donde el usuario únicamente selecciona el <strong>Órgano Jurisdiccional</strong> (TSJ, TCA, TDJ, OAJ) y el <strong>Capítulo de Gasto</strong> (1000, 2000, 3000, 6000), el sistema autocompleta la clave SEFIPLAN (<code>41300X...</code>) y la referencia de Caja (<code>1 OPE-X</code> o <code>1 NOM-X</code>), y el capturista sólo digita el importe.
-    </p>
-    <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
-      <strong>4. Cuadre Obligatorio Estricto (Oficio vs. Orden de Cobro):</strong> El sistema valida en tiempo real que <code>Σ Importes de Movimientos = Importe Total del Encabezado</code> (Diferencia = $0.00). Si existe alguna discrepancia, el botón de formalización permanece bloqueado para garantizar que el devengo contable subyacente (Matriz B.1) sea matemáticamente exacto.
-    </p>
+    <ul style="font-size:12px; color:#1e293b; margin:0 0 8px; padding-left:20px; line-height:1.6;">
+      <li><strong>1. Catálogos que se conservan vs. Catálogos que ya no aplican:</strong>
+        Se conservan intactos <code>ingresos.cat_motivos_ajuste</code> (<code>04.1.2</code>) e <code>ingresos.cat_claves_presupuestales_sefiplan</code> (<code>04.1.3</code>).
+        <strong>Se elimina <code>ingresos.cat_subtipos_tramite_ingreso</code> (<code>04.1.1</code>)</strong> porque todos los procedimientos (<code>11..14</code>) y subprocedimientos (<code>1101..1402</code>) viven ahora en <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> con <code>tipo_flujo = 'I'</code>. Las cuentas bancarias se leen de <code>config.catalogo_cuentas_bancarias</code> (<code>01.4.2</code>).</li>
+      <li><strong>2. Dos únicas opciones en <code>04.2 · Registro</code> (Ingresos y Egresos de Caja):</strong>
+        <br>• <strong><code>04.2.1 Registro de ingresos</code>:</strong> Opera sobre <strong><code>ingresos.ingresos</code></strong> (encabezado) e <strong><code>ingresos.ingresos_movtos</code></strong> (detalle), leyendo las reglas de ingreso en la Matriz (<code>14, 15, 16, 18</code>) y generando <strong>Pólizas de Ingresos (<code>PI</code>)</strong> en <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong>.
+        <br>• <strong><code>04.2.2 Registro de pagos</code> (sincronizado con <code>06.2.1</code>):</strong> Opera sobre <strong><code>ingresos.pagos</code></strong> (encabezado) e <strong><code>ingresos.pagos_movtos</code></strong> (detalle), correlacionados con Tesorería (<code>cxp.afectaciones_gasto</code> y <code>cxp.ordenes_pago</code>) y las matrices de egreso (<code>13</code> y <code>17</code>), generando <strong>Pólizas de Egresos (<code>PE</code>)</strong> en las mismas tablas <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong>.</li>
+      <li><strong>3. Eliminación de tablas fragmentadas antiguas:</strong> Se dan de baja (<code>DROP TABLE</code>) las tablas dispersas <code>registro_ingreso</code>, <code>registro_ingreso_deposito</code>, <code>registro_ingreso_distribucion</code>, <code>registro_ingreso_documento</code>, <code>registro_ingreso_evento</code>, <code>registro_ingreso_poliza_devengo</code>, <code>registro_ministracion</code> y <code>registro_ministracion_movimiento</code>.</li>
+    </ul>
   </div>
 
   <!-- 1. DESCRIPCIÓN GENERAL -->
@@ -214,222 +211,478 @@
 
   <!-- 5. ESTRUCTURA Y MODELO DE DATOS -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">5</span> Estructura de Datos y Diccionario de Campos</div>
+    <div class="section-title"><span class="section-num">5</span> Modelo de Datos Simplificado del Esquema <code>ingresos</code> (Homologado con <code>cxp</code> y Matriz <code>03.1.2</code>)</div>
 
-    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.1 Encabezado del Ingreso (<code>ingresos.ingresos_encabezado</code>)</h3>
-    <table class="props-table" style="margin-bottom: 20px;">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Mapeo con Formato Oficial</th></tr></thead>
-      <tbody>
-        <tr><td><code>ingreso_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí</td><td>Identificador único interno del registro de ingreso en el SIAF-PJEV.</td></tr>
-        <tr><td><code>folio_interno</code></td><td><code>VARCHAR(25)</code></td><td>Sí (Sistema)</td><td>Folio correlativo institucional (ej. <code>ING-2026-0045</code>). Null en borrador inicial.</td></tr>
-        <tr><td><code>subtipo_tramite_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al catálogo <code>04.1.1</code> (ej. <code>MIN_ESTATAL_ORD</code>, determina la Matriz CONAC).</td></tr>
-        <tr><td><code>clave_orden</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Clave identificadora de la orden de pago asentada en el formato (ej. <code>01-06-2026</code> o <code>02-06-2026</code>).</td></tr>
-        <tr><td><code>tramite_sefiplan</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Número de trámite oficial asignado por SEFIPLAN (ej. <code>2026-011</code> para 1a Ministración).</td></tr>
-        <tr><td><code>oficio_soporte</code></td><td><code>VARCHAR(80)</code></td><td>Sí</td><td>Número de oficio institucional enviado a SEFIPLAN que ampara la solicitud (ej. <code>Of. DGA/0367/2026</code>).</td></tr>
-        <tr><td><code>archivo_oficio_solicitud_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td><strong>Archivo Físico 1:</strong> Referencia al repositorio documental del PDF digitalizado del Oficio DGA a SEFIPLAN con sello de acuse de recepción oficial de Oficialía de Partes.</td></tr>
-        <tr><td><code>nombre_archivo_oficio</code></td><td><code>VARCHAR(255)</code></td><td>Sí</td><td>Nombre del archivo cargado del oficio con acuse (ej. <code>Oficio_DGA_0367_2026_Acuse.pdf</code>).</td></tr>
-        <tr><td><code>archivo_orden_firmada_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td><strong>Archivo Físico 2:</strong> Referencia al PDF digitalizado del Formato Oficial de Solicitud de Recursos / Orden de Cobro debidamente signada con firmas autógrafas colegiadas (Elaboró, Solicitante DGA, Vo. Bo. Egresos, Directora General de Programación y Presupuesto, Jefa de Ordenes de Pago y Tesorera).</td></tr>
-        <tr><td><code>nombre_archivo_orden</code></td><td><code>VARCHAR(255)</code></td><td>Sí</td><td>Nombre del archivo cargado de la orden firmada (ej. <code>Orden_Cobro_02_06_2026_Firmas_Colegiadas.pdf</code>).</td></tr>
-        <tr><td><code>ejercicio_fiscal</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Año presupuestal activo (ej. <code>2026</code>).</td></tr>
-        <tr><td><code>periodo</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Mes presupuestal de afectación (1 a 12, ej. <code>6</code> para Junio).</td></tr>
-        <tr><td><code>fecha_elaboracion</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha de emisión de la orden de pago (ej. <code>28/05/2026</code>).</td></tr>
-        <tr><td><code>fecha_esperada</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha límite requerida para el depósito bancario (ej. <code>05/06/2026</code> según oficio).</td></tr>
-        <tr><td><code>tipo_solicitud</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Modalidad oficial: <code>SUJETO_A_COMPROBAR</code> | <code>PAGO_DIRECTO</code> | <code>FONDO_REVOLVENTE</code>.</td></tr>
-        <tr><td><code>denominacion_concepto</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Descripción formal del trámite (ej. <em>1a. MINISTRACIÓN DEL MES DE JUNIO 2026 GASTOS DE OPERACIÓN</em>).</td></tr>
-        <tr><td><code>rfc_ente</code></td><td><code>VARCHAR(13)</code></td><td>Sí</td><td>Registro Federal de Contribuyentes institucional (<code>PJE970419FZ2</code> - Poder Judicial).</td></tr>
-        <tr><td><code>instruccion_abono_cuenta</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Cuenta bancaria estipulada para recibir el abono (ej. <code>0126144101</code> BBVA "MINISTRACION 2026"). Selección obligatoria del catálogo institucional <code>04.1.4 Cuentas Bancarias Recaudadoras</code>.</td></tr>
-        <tr><td><code>origen_depositante</code></td><td><code>VARCHAR(200)</code></td><td>Sí</td><td>Ente pagador responsable (<code>Secretaría de Finanzas y Planeación - SEFIPLAN</code>).</td></tr>
-        <tr><td><code>importe_total</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td><strong>Importe Total Maestro:</strong> Techo total de la ministración (ej. <code>$ 21,157,862.50</code>). Debe coincidir exactamente con la sumatoria de las partidas de movimientos.</td></tr>
-        <tr><td><code>saldo_pendiente</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto pendiente por recaudar. Se extingue al conciliar con extracto bancario.</td></tr>
-        <tr><td><code>estatus</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>ENVIADO</code> | <code>OBSERVADO</code> | <code>DEVENGADO</code> | <code>PARCIAL</code> | <code>RECAUDADO</code> | <code>CANCELADO</code>.</td></tr>
-      </tbody>
-    </table>
-
-    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.2 Distribución Presupuestaria Multilínea — Movimientos PJEV-UI (<code>ingresos.ingresos_distribucion</code>)</h3>
-    <table class="props-table" style="margin-bottom: 20px;">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Mapeo con Modal PJEV-UI</th></tr></thead>
-      <tbody>
-        <tr><td><code>distribucion_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí</td><td>Identificador único del renglón presupuestal.</td></tr>
-        <tr><td><code>ingreso_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia a la orden de ingreso padre en <code>ingresos_encabezado</code>.</td></tr>
-        <tr><td><code>organo_beneficiario_id</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Identificador del Órgano Judicial Beneficiario (1: TSJ, 2: TCA, 3: TDJ, 4: OAJ). Seleccionado en Modal PJEV-UI.</td></tr>
-        <tr><td><code>organo_beneficiario</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Denominación oficial del órgano (Tribunal Superior de Justicia, Tribunal de Conciliación y Arbitraje, etc.).</td></tr>
-        <tr><td><code>capitulo_gasto</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Capítulo de gasto (<code>1000</code> Servicios Personales, <code>2000</code> Materiales y Suministros, <code>3000</code> Servicios Generales, <code>6000</code> Inversión Pública). Seleccionado en Modal PJEV-UI.</td></tr>
-        <tr><td><code>descripcion_capitulo</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Nombre formal del capítulo presupuestal.</td></tr>
-        <tr><td><code>clave_presupuestal_sefiplan</code></td><td><code>VARCHAR(120)</code></td><td>Sí</td><td><strong>Estructura Programática Estatal (11 Segmentos):</strong> Clave SEFIPLAN resuelta automáticamente por el sistema vía el servicio <code>/resolver</code> del catálogo <code>04.1.3 Claves Presupuestales y Carteras SEFIPLAN</code> al seleccionar Órgano y Capítulo (ej. <code>413001.21113001001.121.GZR.5.U.430.Y.1502126.1.000184001</code>).</td></tr>
-        <tr><td><code>referencia_caja</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td><strong>Nemotécnico Interno de Caja:</strong> Código abreviado autocompletado desde el catálogo <code>04.1.3</code> para control de Tesorería (ej. <code>1 OPE-1</code>, <code>1 OPE-2</code>, <code>1 NOM-1</code>, <code>1 OPE-7</code>, <code>1 OPE-8</code>).</td></tr>
-        <tr><td><code>fuente_financiamiento_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Fuente oficial de financiamiento (ej. <code>1114 / 111 Recursos Fiscales Ordinarios</code>).</td></tr>
-        <tr><td><code>importe_distribuido</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto asignado al renglón presupuestal. La sumatoria de todos los renglones (<code>Σ importe_distribuido</code>) debe cuadrar al centavo contra <code>importe_total</code> para habilitar la formalización.</td></tr>
-      </tbody>
-    </table>
-
-    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.3 Bitácora de Trazabilidad y Mensajes de Workflow (<code>ingresos.ingreso_historial</code>)</h3>
-    <table class="props-table" style="margin-bottom: 20px;">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Propósito de Auditoría</th></tr></thead>
-      <tbody>
-        <tr><td><code>historial_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí (Auto)</td><td>Identificador correlativo autoincrementable del evento.</td></tr>
-        <tr><td><code>f_ingreso_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al trámite de ingreso en <code>ingresos.ingresos_encabezado</code>.</td></tr>
-        <tr><td><code>estado_anterior</code></td><td><code>VARCHAR(25)</code></td><td>Sí</td><td>Estatus en el que se encontraba el trámite antes del cambio (ej. <code>BORRADOR</code>, <code>ENVIADO</code>).</td></tr>
-        <tr><td><code>estado_nuevo</code></td><td><code>VARCHAR(25)</code></td><td>Sí</td><td>Nuevo estatus alcanzado (ej. <code>ENVIADO</code>, <code>OBSERVADO</code>, <code>DEVENGADO</code>).</td></tr>
-        <tr><td><code>accion_realizada</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Acción ejecutada: <code>ENVIAR</code>, <code>FORMALIZAR</code>, <code>REGRESAR</code>, <code>RECHAZAR</code>, <code>CANCELAR</code>, <code>AJUSTAR</code>.</td></tr>
-        <tr><td><code>observaciones</code></td><td><code>VARCHAR(1000)</code></td><td>Sí</td><td><strong>Mensaje o justificación institucional:</strong> Texto capturado obligatoriamente en el modal de workflow.</td></tr>
-        <tr><td><code>fecha_envio</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha formal de operación/envío asentada por el usuario.</td></tr>
-        <tr><td><code>usuario_accion</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Cuenta institucional del usuario que ejecutó la acción de workflow.</td></tr>
-        <tr><td><code>fecha_accion</code></td><td><code>TIMESTAMP</code></td><td>Sí (Servidor)</td><td>Fecha y hora exacta de registro en PostgreSQL (<code>clock_timestamp()</code>) para auditoría forense.</td></tr>
-      </tbody>
-    </table>
-
-    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.4 Registro de Comprobantes Bancarios y Depósitos (<code>ingresos.ingresos_depositos</code>)</h3>
-    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
-      Almacena el registro simplificado de cada depósito bancario asociado a la orden devengada, vinculando el banco elegido, datos del comprobante y el documento digital probatorio adjunto (Principio KISS).
+    <p style="font-size:13px; color:var(--pjev-texto); margin-bottom:14px;">
+      El esquema <code>ingresos</code> se estructura con <strong>2 catálogos propios vigentes</strong> (<code>cat_motivos_ajuste</code> y <code>cat_claves_presupuestales_sefiplan</code>) y <strong>6 tablas operativas canónicas particionadas por ejercicio fiscal</strong>: el par de ingresos (<code>ingresos.ingresos</code> + <code>ingresos.ingresos_movtos</code>), el par de pagos (<code>ingresos.pagos</code> + <code>ingresos.pagos_movtos</code>, documentado en <code>04.2.2 / 06.2.1</code>) y el par contable espejo (<code>ingresos.poliza</code> + <code>ingresos.poliza_movtos</code>, idéntico a <code>cxp.poliza</code> y <code>cxp.poliza_movtos</code>).
     </p>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.1 Encabezado Maestro de Ingresos (<code>ingresos.ingresos</code>)</h3>
     <table class="props-table" style="margin-bottom: 20px;">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Propósito Operativo</th></tr></thead>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción y Correlación con Matriz 03.1.2</th></tr></thead>
       <tbody>
-        <tr><td><code>deposito_id</code></td><td><code>BIGINT (PK)</code></td><td>Sí (Auto)</td><td>Identificador correlativo del comprobante bancario registrado.</td></tr>
-        <tr><td><code>ingreso_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia a la orden devengada en <code>ingresos.ingresos_encabezado</code>.</td></tr>
-        <tr><td><code>banco_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Institución bancaria seleccionada por el usuario (ej. <em>BBVA México, Santander, Banorte</em>).</td></tr>
-        <tr><td><code>cuenta_bancaria_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Cuenta receptora institucional PJEV seleccionada (ej. <code>0126144101 "MINISTRACION 2026"</code>).</td></tr>
-        <tr><td><code>fecha_operacion</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha de acreditación bancaria asentada en el comprobante (ej. <code>09/06/2026</code>).</td></tr>
-        <tr><td><code>tipo_movimiento</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Modalidad: <code>TRANSFERENCIA_SPEI</code>, <code>DEPOSITO_VENTANILLA</code>, <code>CHEQUE</code>.</td></tr>
-        <tr><td><code>referencia_bancaria</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Clave de rastreo SPEI o número de autorización bancaria (ej. <code>REFBNTC00316148</code>).</td></tr>
-        <tr><td><code>importe_depositado</code></td><td><code>DECIMAL(18,2)</code></td><td>Sí</td><td>Monto acreditado según el comprobante bancario (ej. <code>$ 21,157,862.50</code>).</td></tr>
-        <tr><td><code>archivo_documento_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Referencia al documento probatorio registrado (archivo PDF o imagen del comprobante).</td></tr>
-        <tr><td><code>nombre_archivo</code></td><td><code>VARCHAR(255)</code></td><td>Sí</td><td>Nombre del archivo cargado (ej. <code>comprobante_spei_09062026.pdf</code>).</td></tr>
-        <tr><td><code>poliza_recaudado_id</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>Póliza contable Matriz B.2 generada automáticamente de forma subyacente.</td></tr>
-        <tr><td><code>estatus_deposito</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td><code>CONCILIADO</code> | <code>APLICADO</code> | <code>CANCELADO</code>.</td></tr>
+        <tr><td><code>ing_id</code></td><td><code>UUID PK</code></td><td>NO</td><td>Identificador único global del trámite de ingreso.</td></tr>
+        <tr><td><code>ejercicio_fiscal</code></td><td><code>SMALLINT PK</code></td><td>NO</td><td>Ejercicio fiscal activo (llave de partición anual, ej. <code>2026</code>).</td></tr>
+        <tr><td><code>folio</code></td><td><code>VARCHAR(20) UNIQUE</code></td><td>NO</td><td>Folio secuencial anual del ingreso (ej. <code>ING-2026-00045</code>).</td></tr>
+        <tr><td><code>f_matriz_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Matriz de Conversión activa en <code>contabilidad.matriz_conversion</code>: <code>14 (B1_DEVENGADO_INGRESOS)</code>, <code>15 (B2_RECAUDADO_INGRESOS)</code>, <code>16 (B3_RECAUDADO_SIMULTANEO)</code> o <code>18 (B4_INGRESO_NO_PRESUPUESTARIO)</code>.</td></tr>
+        <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Procedimiento general en <code>contabilidad.matriz_grupos_tramite</code> (<code>tipo_flujo = 'I'</code>): <code>11 = MINISTRACIONES</code>, <code>12 = INGRESOS_PROPIOS</code>, <code>13 = REINTEGROS</code>, <code>14 = FONDOS_AJENOS</code>.</td></tr>
+        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Subprocedimiento específico en <code>contabilidad.matriz_grupos_procedimiento</code> (<code>1101..1402</code>).</td></tr>
+        <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>NO</td><td>Heredado del subprocedimiento: <code>TRUE</code> para Grupos 11 y 12 (Ley de Ingresos <code>8.1.x</code>); <code>FALSE</code> para Grupos 13 y 14 (Matriz 18).</td></tr>
+        <tr><td><code>periodo</code></td><td><code>SMALLINT</code></td><td>NO</td><td>Mes contable de afectación (<code>1..12</code>).</td></tr>
+        <tr><td><code>fecha_elaboracion</code></td><td><code>DATE</code></td><td>NO</td><td>Fecha de emisión o registro de la solicitud/ingreso.</td></tr>
+        <tr><td><code>fecha_deposito</code></td><td><code>DATE</code></td><td>SÍ</td><td>Fecha valor de acreditación en el estado de cuenta bancario.</td></tr>
+        <tr><td><code>f_cuenta_bancaria_id</code></td><td><code>INTEGER FK</code></td><td>NO</td><td>Cuenta bancaria recaudadora en <code>config.catalogo_cuentas_bancarias(cb_id)</code> (vinculada a su subcuenta contable <code>1.1.1.2.xxxx</code>).</td></tr>
+        <tr><td><code>clave_orden</code></td><td><code>VARCHAR(30)</code></td><td>SÍ</td><td>Clave de la orden de cobro SEFIPLAN (ej. <code>02-06-2026</code>).</td></tr>
+        <tr><td><code>tramite_sefiplan</code></td><td><code>VARCHAR(30)</code></td><td>SÍ</td><td>Número de trámite SEFIPLAN (ej. <code>2026-011</code>).</td></tr>
+        <tr><td><code>oficio_soporte</code></td><td><code>VARCHAR(60)</code></td><td>SÍ</td><td>Número de oficio institucional DGA (ej. <code>Of. DGA/0367/2026</code>).</td></tr>
+        <tr><td><code>referencia_bancaria</code></td><td><code>VARCHAR(60)</code></td><td>SÍ</td><td>Clave de rastreo SPEI, folio de depósito o autorización bancaria.</td></tr>
+        <tr><td><code>origen_depositante</code></td><td><code>VARCHAR(200)</code></td><td>NO</td><td>Contraparte o ente depositante (ej. <code>SEFIPLAN</code>, institución bancaria, servidor público).</td></tr>
+        <tr><td><code>f_ag_reintegro_id</code></td><td><code>UUID</code></td><td>SÍ</td><td>Vínculo opcional con <code>cxp.afectaciones_gasto(ag_id)</code> cuando se trata de reintegros (Grupo <code>13</code>: <code>1301..1303</code>).</td></tr>
+        <tr><td><code>concepto</code></td><td><code>VARCHAR(500)</code></td><td>NO</td><td>Concepto general institucional del ingreso (glosa para la Póliza de Ingresos <code>PI</code>).</td></tr>
+        <tr><td><code>importe_total</code></td><td><code>NUMERIC(18,2)</code></td><td>NO</td><td>Importe total maestro del ingreso (debe cuadrar con <code>SUM(ingresos_movtos.importe)</code>).</td></tr>
+        <tr><td><code>importe_recaudado</code></td><td><code>NUMERIC(18,2)</code></td><td>NO</td><td>Monto efectivamente acreditado en banco.</td></tr>
+        <tr><td><code>saldo_pendiente</code></td><td><code>NUMERIC(18,2)</code></td><td>NO</td><td>Saldo pendiente por recaudar (<code>importe_total - importe_recaudado</code>).</td></tr>
+        <tr><td><code>f_doc_oficio_id</code></td><td><code>BIGINT</code></td><td>SÍ</td><td>Archivo PDF del Oficio DGA con acuse en repositorio de archivos.</td></tr>
+        <tr><td><code>f_doc_orden_id</code></td><td><code>BIGINT</code></td><td>SÍ</td><td>Archivo PDF del Formato Orden de Cobro con firmas colegiadas.</td></tr>
+        <tr><td><code>f_doc_comprobante_banco_id</code></td><td><code>BIGINT</code></td><td>SÍ</td><td>Archivo PDF de la ficha o comprobante bancario de depósito.</td></tr>
+        <tr><td><code>p_poliza_devengo_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Apuntador a la póliza generada en <code>ingresos.poliza(p_id)</code> en el momento Devengado (Matriz 14).</td></tr>
+        <tr><td><code>p_poliza_recaudado_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Apuntador a la <strong>Póliza de Ingresos (<code>PI</code>)</strong> generada en <code>ingresos.poliza(p_id)</code> en el momento Recaudado (Matrices 15, 16 o 18).</td></tr>
+        <tr><td><code>estatus_workflow</code></td><td><code>VARCHAR(20)</code></td><td>NO</td><td><code>BORRADOR</code>, <code>DEVENGADO</code>, <code>PARCIAL</code>, <code>RECAUDADO</code>, <code>CANCELADO</code>.</td></tr>
+        <tr><td><code>f_motivo_ajuste_id</code></td><td><code>BIGINT FK</code></td><td>SÍ</td><td>Referencia a <code>ingresos.cat_motivos_ajuste(motivo_id)</code> (<code>04.1.2</code>) en caso de ajuste o cancelación.</td></tr>
       </tbody>
     </table>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.2 Detalle de Movimientos del Ingreso (<code>ingresos.ingresos_movtos</code>)</h3>
+    <table class="props-table" style="margin-bottom: 20px;">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción y Correlación con Reglas de la Matriz</th></tr></thead>
+      <tbody>
+        <tr><td><code>ingm_id</code></td><td><code>UUID PK</code></td><td>NO</td><td>Identificador único de la línea de movimiento de ingreso.</td></tr>
+        <tr><td><code>f_ing_id</code></td><td><code>UUID FK</code></td><td>NO</td><td>Referencia al encabezado padre en <code>ingresos.ingresos(ing_id)</code>.</td></tr>
+        <tr><td><code>ejercicio_fiscal</code></td><td><code>SMALLINT PK</code></td><td>NO</td><td>Ejercicio fiscal (llave de partición anual).</td></tr>
+        <tr><td><code>numero_linea</code></td><td><code>SMALLINT</code></td><td>NO</td><td>Orden secuencial del movimiento en el grid (<code>1..N</code>).</td></tr>
+        <tr><td><code>f_matriz_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Matriz de conversión aplicada a la línea (<code>14, 15, 16, 18</code>).</td></tr>
+        <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Grupo de procedimiento (<code>11..14</code>).</td></tr>
+        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Subprocedimiento operativo (<code>1101..1402</code>).</td></tr>
+        <tr><td><code>f_matriz_regla_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Regla específica en <code>contabilidad.matriz_conversion_regla(mcr_id)</code> que determina las cuentas contables y presupuestales del movimiento.</td></tr>
+        <tr><td><code>f_centro_costo_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Órgano Judicial / Centro de Costo beneficiario (TSJ, TCA, TDJ, OAJ).</td></tr>
+        <tr><td><code>capitulo_gasto</code></td><td><code>SMALLINT</code></td><td>SÍ</td><td>Capítulo presupuestal (<code>1000..6000</code>) para ministraciones SEFIPLAN.</td></tr>
+        <tr><td><code>f_clave_sefiplan_id</code></td><td><code>BIGINT FK</code></td><td>SÍ</td><td>Referencia a <code>ingresos.cat_claves_presupuestales_sefiplan(clave_sefiplan_id)</code> (<code>04.1.3</code>, clave de 11 segmentos y nemotécnico de Caja).</td></tr>
+        <tr><td><code>f_cri_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Rubro del Clasificador por Rubro de Ingresos (CRI <code>01.2.6</code>); <code>NULL</code> cuando <code>afecta_presupuesto = FALSE</code>.</td></tr>
+        <tr><td><code>f_fuente_fin_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Fuente de financiamiento CONAC.</td></tr>
+        <tr><td><code>cuenta_contable_cargo</code></td><td><code>VARCHAR(30)</code></td><td>NO</td><td>Cuenta contable de cargo resuelta por la Matriz o por la cuenta bancaria recaudadora (<code>1.1.2.2.xxxx</code> en devengo / <code>1.1.1.2.xxxx</code> en recaudado).</td></tr>
+        <tr><td><code>cuenta_contable_abono</code></td><td><code>VARCHAR(30)</code></td><td>NO</td><td>Cuenta contable de abono resuelta por la regla de la Matriz (<code>4.1.5.1.xxxx</code>, <code>1.1.2.2.xxxx</code> o <code>2.1.9.9.xxxx</code>).</td></tr>
+        <tr><td><code>concepto_linea</code></td><td><code>VARCHAR(300)</code></td><td>SÍ</td><td>Descripción específica de la partida o línea de ingreso.</td></tr>
+        <tr><td><code>importe</code></td><td><code>NUMERIC(18,2)</code></td><td>NO</td><td>Importe del movimiento (<code>&gt; 0</code>). La suma de líneas debe igualar <code>ingresos.importe_total</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:var(--pjev-verde-oscuro); font-size:13px; margin-bottom:8px;">5.3 Tablas Espejo de Pólizas en el Esquema <code>ingresos</code> (<code>ingresos.poliza</code> e <code>ingresos.poliza_movtos</code>)</h3>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Tal como opera Tesorería en el esquema <code>cxp</code> (<code>cxp.poliza</code> y <code>cxp.poliza_movtos</code>), el esquema <code>ingresos</code> cuenta con sus propias tablas locales de pólizas. Cuando provienen de <code>ingresos.ingresos</code> generan <strong>Pólizas de Ingresos (<code>p_tipo = 'PI'</code>, <code>p_origen = 1</code>)</strong>; cuando provienen de <code>ingresos.pagos</code> (ver <code>04.2.2 / 06.2.1</code>) generan <strong>Pólizas de Egresos (<code>p_tipo = 'PE'</code>, <code>p_origen = 2</code>)</strong>, sincronizándose en el mismo bloque transaccional con <code>contabilidad.poliza</code> y <code>contabilidad.poliza_movtos</code>.
+    </p>
+    <table class="props-table" style="margin-bottom: 16px;">
+      <thead><tr><th>Tabla</th><th>Columnas Clave (Homologadas 1:1 con <code>cxp.poliza</code> y <code>cxp.poliza_movtos</code>)</th><th>Uso en Ingresos (<code>04.2.1</code>) vs Pagos (<code>04.2.2 / 06.2.1</code>)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>ingresos.poliza</code></td>
+          <td><code>p_id</code>, <code>p_tipo</code> (<code>'PI'</code>, <code>'PE'</code>, <code>'DI'</code>), <code>p_subtipo</code>, <code>p_numero</code>, <code>p_ejercicio</code>, <code>p_fecha</code>, <code>p_descripcion</code>, <code>p_afecta</code>, <code>p_centro_costo_id</code>, <code>p_origen</code> (<code>1=INGRESOS</code>, <code>2=PAGOS</code>), <code>p_origen_uuid</code>, <code>p_poliza_id</code> (FK a <code>contabilidad.poliza</code>).</td>
+          <td>Almacena el encabezado de las <strong>Pólizas de Ingresos (<code>PI</code>)</strong> generadas desde <code>ingresos.ingresos</code> y de las <strong>Pólizas de Egresos (<code>PE</code>)</strong> generadas desde <code>ingresos.pagos</code>.</td>
+        </tr>
+        <tr>
+          <td><code>ingresos.poliza_movtos</code></td>
+          <td><code>pm_id</code>, <code>pm_poliza_id</code>, <code>pm_ejercicio</code>, <code>pm_orden</code>, <code>pm_ambito</code> (<code>'C'</code> Contable / <code>'P'</code> Presupuestal), <code>pm_cc_id</code>, <code>pm_nivel1..pm_nivel8</code>, <code>pm_empleado</code>, <code>pm_proveedor</code>, <code>pm_ua</code>, <code>pm_bene</code>, <code>pm_bene_inst</code>, <code>pm_debe</code>, <code>pm_haber</code>, <code>pm_fuente_fin_id</code>, <code>pm_cp_id</code>, <code>pm_cri_id</code>, <code>pm_observacion</code>.</td>
+          <td>Almacena los cargos y abonos patrimoniales (<code>1.1.1.2</code>, <code>1.1.2.2</code>, <code>4.x</code>, <code>2.1.1.x</code>) y presupuestales (<code>8.1.2</code>, <code>8.1.4</code>, <code>8.1.5</code> para ingresos; <code>8.2.5</code>, <code>8.2.6</code>, <code>8.2.7</code> para pagos) derivados de <code>contabilidad.matriz_conversion_movimiento</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 style="color:var(--pjev-verde-oscuro); margin:16px 0 8px;">5.4 Script DDL Completo de Reestructuración del Esquema <code>ingresos</code> (Para ejecutar por Daryl)</h4>
+    <div class="code-wrap">
+<pre><code>-- =============================================================================
+-- REESTRUCTURACIÓN INTEGRAL DEL ESQUEMA ingresos (v3.0)
+-- 1. Depuración de tablas obsoletas / fragmentadas
+-- =============================================================================
+DROP TABLE IF EXISTS ingresos.registro_ingreso_poliza_devengo CASCADE;
+DROP TABLE IF EXISTS ingresos.registro_ingreso_evento CASCADE;
+DROP TABLE IF EXISTS ingresos.registro_ingreso_documento CASCADE;
+DROP TABLE IF EXISTS ingresos.registro_ingreso_distribucion CASCADE;
+DROP TABLE IF EXISTS ingresos.registro_ingreso_deposito CASCADE;
+DROP TABLE IF EXISTS ingresos.registro_ingreso CASCADE;
+DROP TABLE IF EXISTS ingresos.registro_ministracion_movimiento CASCADE;
+DROP TABLE IF EXISTS ingresos.registro_ministracion CASCADE;
+DROP TABLE IF EXISTS ingresos.cat_subtipos_tramite_ingreso CASCADE;
+DROP TABLE IF EXISTS ingresos.cat_estatus_registro_ingreso CASCADE;
+DROP TABLE IF EXISTS ingresos.folio_consecutivo CASCADE;
+
+-- =============================================================================
+-- 2. Encabezado y Detalle de Pólizas Locales (Homologadas con cxp.poliza)
+--    Reciben tanto Pólizas de Ingresos (PI) como Pólizas de Egresos/Pagos (PE)
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS ingresos.poliza (
+    p_id SERIAL,
+    p_tipo VARCHAR(5) NOT NULL CHECK (p_tipo IN ('PI', 'PE', 'DI')),
+    p_subtipo VARCHAR(30),
+    p_numero VARCHAR(25) NOT NULL,
+    p_ejercicio INTEGER NOT NULL,
+    p_fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+    p_descripcion VARCHAR(500) NOT NULL,
+    p_afecta SMALLINT NOT NULL DEFAULT 1,
+    p_centro_costo_id INTEGER,
+    p_origen SMALLINT NOT NULL CHECK (p_origen IN (1, 2)), -- 1 = INGRESOS (04.2.1), 2 = PAGOS (04.2.2 / 06.2.1)
+    p_origen_uuid UUID NOT NULL,
+    p_poliza_id INTEGER, -- Referencia espejo a contabilidad.poliza(p_id)
+    estatus_registro SMALLINT NOT NULL DEFAULT 1,
+    usuario_c VARCHAR(50) NOT NULL DEFAULT 'SISTEMA',
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ,
+    CONSTRAINT pk_ingresos_poliza PRIMARY KEY (p_id, p_ejercicio)
+) PARTITION BY LIST (p_ejercicio);
+
+CREATE TABLE IF NOT EXISTS ingresos.poliza_2025 PARTITION OF ingresos.poliza FOR VALUES IN (2025);
+CREATE TABLE IF NOT EXISTS ingresos.poliza_2026 PARTITION OF ingresos.poliza FOR VALUES IN (2026);
+CREATE TABLE IF NOT EXISTS ingresos.poliza_2027 PARTITION OF ingresos.poliza FOR VALUES IN (2027);
+
+CREATE TABLE IF NOT EXISTS ingresos.poliza_movtos (
+    pm_id SERIAL,
+    pm_poliza_id INTEGER NOT NULL,
+    pm_ejercicio INTEGER NOT NULL,
+    pm_orden INTEGER NOT NULL DEFAULT 1,
+    pm_ambito CHAR(1) NOT NULL DEFAULT 'C' CHECK (pm_ambito IN ('C', 'P')),
+    pm_cc_id INTEGER,
+    pm_centro_costo_id INTEGER,
+    pm_nivel1 VARCHAR(10),
+    pm_nivel2 VARCHAR(10),
+    pm_nivel3 VARCHAR(10),
+    pm_nivel4 VARCHAR(10),
+    pm_nivel5 VARCHAR(10),
+    pm_nivel6 VARCHAR(10),
+    pm_nivel7 VARCHAR(10),
+    pm_nivel8 VARCHAR(10),
+    pm_empleado INTEGER,
+    pm_proveedor INTEGER,
+    pm_ua INTEGER,
+    pm_bene INTEGER,
+    pm_bene_inst INTEGER,
+    pm_debe NUMERIC(18,2) NOT NULL DEFAULT 0,
+    pm_haber NUMERIC(18,2) NOT NULL DEFAULT 0,
+    pm_fuente_fin_id INTEGER,
+    pm_cp_id BIGINT,
+    pm_cri_id INTEGER,
+    pm_tipo_servicio VARCHAR(50),
+    pm_factura VARCHAR(50),
+    pm_uuid_factura VARCHAR(50),
+    pm_mes_servicio INTEGER,
+    pm_observacion VARCHAR(500),
+    estatus_registro SMALLINT NOT NULL DEFAULT 1,
+    usuario_c VARCHAR(50) NOT NULL DEFAULT 'SISTEMA',
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ,
+    CONSTRAINT pk_ingresos_poliza_movtos PRIMARY KEY (pm_id, pm_ejercicio),
+    CONSTRAINT fk_ingresos_pm_poliza FOREIGN KEY (pm_poliza_id, pm_ejercicio)
+        REFERENCES ingresos.poliza (p_id, p_ejercicio) ON DELETE CASCADE
+) PARTITION BY LIST (pm_ejercicio);
+
+CREATE TABLE IF NOT EXISTS ingresos.poliza_movtos_2025 PARTITION OF ingresos.poliza_movtos FOR VALUES IN (2025);
+CREATE TABLE IF NOT EXISTS ingresos.poliza_movtos_2026 PARTITION OF ingresos.poliza_movtos FOR VALUES IN (2026);
+CREATE TABLE IF NOT EXISTS ingresos.poliza_movtos_2027 PARTITION OF ingresos.poliza_movtos FOR VALUES IN (2027);
+
+-- =============================================================================
+-- 3. Tablas Operativas de Ingresos: ingresos.ingresos + ingresos.ingresos_movtos
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS ingresos.ingresos (
+    ing_id UUID NOT NULL DEFAULT gen_random_uuid(),
+    ejercicio_fiscal SMALLINT NOT NULL,
+    folio VARCHAR(20) NOT NULL,
+    f_matriz_id BIGINT NOT NULL,
+    f_matriz_grupo_id SMALLINT NOT NULL,
+    f_matriz_grupo_procedimiento_id SMALLINT NOT NULL,
+    afecta_presupuesto BOOLEAN NOT NULL DEFAULT TRUE,
+    periodo SMALLINT NOT NULL CHECK (periodo BETWEEN 1 AND 12),
+    fecha_elaboracion DATE NOT NULL DEFAULT CURRENT_DATE,
+    fecha_deposito DATE,
+    f_cuenta_bancaria_id INTEGER NOT NULL,
+    clave_orden VARCHAR(30),
+    tramite_sefiplan VARCHAR(30),
+    oficio_soporte VARCHAR(60),
+    referencia_bancaria VARCHAR(60),
+    origen_depositante VARCHAR(200) NOT NULL,
+    f_ag_reintegro_id UUID,
+    concepto VARCHAR(500) NOT NULL,
+    importe_total NUMERIC(18,2) NOT NULL CHECK (importe_total > 0),
+    importe_recaudado NUMERIC(18,2) NOT NULL DEFAULT 0,
+    saldo_pendiente NUMERIC(18,2) NOT NULL DEFAULT 0,
+    f_doc_oficio_id BIGINT,
+    f_doc_orden_id BIGINT,
+    f_doc_comprobante_banco_id BIGINT,
+    p_poliza_devengo_id INTEGER,
+    p_poliza_recaudado_id INTEGER,
+    estatus_workflow VARCHAR(20) NOT NULL DEFAULT 'BORRADOR'
+        CHECK (estatus_workflow IN ('BORRADOR', 'DEVENGADO', 'PARCIAL', 'RECAUDADO', 'CANCELADO')),
+    f_motivo_ajuste_id BIGINT REFERENCES ingresos.cat_motivos_ajuste(motivo_id),
+    observaciones TEXT,
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL DEFAULT 'SISTEMA',
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ,
+    CONSTRAINT pk_ingresos_encabezado PRIMARY KEY (ing_id, ejercicio_fiscal),
+    CONSTRAINT uq_ingresos_folio UNIQUE (ejercicio_fiscal, folio),
+    CONSTRAINT fk_ingresos_matriz_proc FOREIGN KEY (f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id)
+        REFERENCES contabilidad.matriz_grupos_procedimiento (f_matriz_id, f_matriz_grupo_id, mgp_id)
+) PARTITION BY LIST (ejercicio_fiscal);
+
+CREATE TABLE IF NOT EXISTS ingresos.ingresos_2026 PARTITION OF ingresos.ingresos FOR VALUES IN (2026);
+CREATE TABLE IF NOT EXISTS ingresos.ingresos_2027 PARTITION OF ingresos.ingresos FOR VALUES IN (2027);
+
+CREATE TABLE IF NOT EXISTS ingresos.ingresos_movtos (
+    ingm_id UUID NOT NULL DEFAULT gen_random_uuid(),
+    f_ing_id UUID NOT NULL,
+    ejercicio_fiscal SMALLINT NOT NULL,
+    numero_linea SMALLINT NOT NULL DEFAULT 1,
+    f_matriz_id BIGINT NOT NULL,
+    f_matriz_grupo_id SMALLINT NOT NULL,
+    f_matriz_grupo_procedimiento_id SMALLINT NOT NULL,
+    f_matriz_regla_id BIGINT NOT NULL,
+    f_centro_costo_id INTEGER,
+    capitulo_gasto SMALLINT,
+    f_clave_sefiplan_id BIGINT REFERENCES ingresos.cat_claves_presupuestales_sefiplan(clave_sefiplan_id),
+    f_cri_id INTEGER,
+    f_fuente_fin_id INTEGER,
+    cuenta_contable_cargo VARCHAR(30) NOT NULL,
+    cuenta_contable_abono VARCHAR(30) NOT NULL,
+    concepto_linea VARCHAR(300),
+    importe NUMERIC(18,2) NOT NULL CHECK (importe > 0),
+    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
+    usuario_c VARCHAR(50) NOT NULL DEFAULT 'SISTEMA',
+    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    usuario_m VARCHAR(50),
+    fecha_m TIMESTAMPTZ,
+    CONSTRAINT pk_ingresos_movtos PRIMARY KEY (ingm_id, ejercicio_fiscal),
+    CONSTRAINT fk_ingresos_movtos_padre FOREIGN KEY (f_ing_id, ejercicio_fiscal)
+        REFERENCES ingresos.ingresos (ing_id, ejercicio_fiscal) ON DELETE CASCADE,
+    CONSTRAINT fk_ingresos_movtos_regla FOREIGN KEY (f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id, f_matriz_regla_id)
+        REFERENCES contabilidad.matriz_conversion_regla (f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id, mcr_id)
+) PARTITION BY LIST (ejercicio_fiscal);
+
+CREATE TABLE IF NOT EXISTS ingresos.ingresos_movtos_2026 PARTITION OF ingresos.ingresos_movtos FOR VALUES IN (2026);
+CREATE TABLE IF NOT EXISTS ingresos.ingresos_movtos_2027 PARTITION OF ingresos.ingresos_movtos FOR VALUES IN (2027);</code></pre>
+    </div>
   </div>
 
-  <!-- 6. PROCEDIMIENTOS ALMACENADOS (LEER Y ABC) -->
+  <!-- 6. PROCEDIMIENTOS ALMACENADOS (LEER MATRIZ, LEER INGRESOS, ABC Y GENERAR POLIZA PI) -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures en Esquema <code>ingresos</code>)</div>
     <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
-      Gobernanza transaccional en PostgreSQL bajo convención <code>SECURITY DEFINER</code>, <code>SET search_path</code> y respuesta estándar JSONB.
+      Los procedimientos almacenados leen directamente la jerarquía de 5 niveles de la Matriz de Conversión (<code>03.1.2</code>) para resumir las reglas aplicables al procedimiento/subprocedimiento elegido, persisten en <code>ingresos.ingresos</code> e <code>ingresos.ingresos_movtos</code>, y generan las <strong>Pólizas de Ingresos (<code>PI</code>)</strong> en <code>ingresos.poliza</code> e <code>ingresos.poliza_movtos</code>.
     </p>
 
-    <!-- 6.1 LEER INGRESO -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.1. Procedimiento LEER (<code>ingresos.fn_leer_ingreso</code>)</h4>
+    <!-- 6.1 RESUMEN DE PROCEDIMIENTOS Y REGLAS DESDE LA MATRIZ DE CONVERSIÓN -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.1. Lectura y Resumen de Procedimientos, Subprocedimientos y Reglas en la Matriz (<code>ingresos.fn_leer_matriz_procedimientos_ingreso</code>)</h4>
     <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_ingreso(
-    p_usuario VARCHAR,
-    p_ejercicio INTEGER,
-    p_periodo SMALLINT DEFAULT NULL,
-    p_subtipo_id BIGINT DEFAULT NULL,
-    p_estatus VARCHAR DEFAULT NULL,
-    p_buscar VARCHAR DEFAULT NULL,
-    p_ingreso_id BIGINT DEFAULT NULL,
-    p_limite INTEGER DEFAULT 50,
-    p_offset INTEGER DEFAULT 0
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_matriz_procedimientos_ingreso(
+    p_grupo_id SMALLINT DEFAULT NULL,
+    p_procedimiento_id SMALLINT DEFAULT NULL
 )
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ingresos, config, contabilidad, public
+SET search_path = ingresos, contabilidad, config, public
 AS $$
 DECLARE
     v_data JSONB;
 BEGIN
     SELECT jsonb_agg(
         jsonb_build_object(
-            'ingreso_id', i.ingreso_id,
-            'folio_interno', i.folio_interno,
-            'subtipo_tramite_id', i.subtipo_tramite_id,
-            'clave_subtipo', st.clave_subtipo,
-            'nombre_subtipo', st.nombre_subtipo,
-            'tipo_principal', st.tipo_principal,
+            'matriz_id', p.f_matriz_id,
+            'matriz_codigo', mc.mc_codigo,
+            'matriz_nombre', mc.mc_nombre,
+            'matriz_final_id', p.f_matriz_final_id,
+            'grupo_id', g.mgt_id,
+            'grupo_codigo', g.mgt_codigo,
+            'grupo_titulo', g.mgt_titulo,
+            'afecta_presupuesto', g.afecta_presupuesto,
+            'procedimiento_id', p.mgp_id,
+            'procedimiento_codigo', p.mgp_codigo,
+            'procedimiento_nombre', p.mgp_nombre,
+            'procedimiento_subtitulo', p.mgp_subtitulo,
+            'tipo_contraparte', p.mgp_tipo_beneficiario,
+            'icono', p.mgp_icono,
+            'badge', p.mgp_badge,
+            'resumen_reglas', COALESCE((
+                SELECT jsonb_agg(
+                    jsonb_build_object(
+                        'regla_id', r.mcr_id,
+                        'nombre_regla', r.mcr_nombre_regla,
+                        'cri_id', r.f_cri_id,
+                        'capitulo', r.mcr_capitulo,
+                        'movimientos_asiento', COALESCE((
+                            SELECT jsonb_agg(
+                                jsonb_build_object(
+                                    'orden', m.mcm_orden,
+                                    'ambito', m.mcm_ambito,
+                                    'naturaleza', m.mcm_naturaleza,
+                                    'cuenta_codigo', m.mcm_cuenta_codigo,
+                                    'cuenta_nombre', m.mcm_cuenta_nombre,
+                                    'es_placeholder_banco', m.mcm_es_placeholder_banco
+                                ) ORDER BY m.mcm_orden
+                            )
+                            FROM contabilidad.matriz_conversion_movimiento m
+                            WHERE m.f_matriz_id = r.f_matriz_id
+                              AND m.f_matriz_grupo_id = r.f_matriz_grupo_id
+                              AND m.f_matriz_grupo_procedimiento_id = r.f_matriz_grupo_procedimiento_id
+                              AND m.f_matriz_regla_id = r.mcr_id
+                              AND m.estatus_registro = 1
+                        ), '[]'::jsonb)
+                    ) ORDER BY r.mcr_id
+                )
+                FROM contabilidad.matriz_conversion_regla r
+                WHERE r.f_matriz_id = p.f_matriz_id
+                  AND r.f_matriz_grupo_id = p.f_matriz_grupo_id
+                  AND r.f_matriz_grupo_procedimiento_id = p.mgp_id
+                  AND r.estatus_registro = 1
+            ), '[]'::jsonb)
+        ) ORDER BY g.mgt_orden, p.mgp_orden
+    )
+    INTO v_data
+    FROM contabilidad.matriz_grupos_procedimiento p
+    JOIN contabilidad.matriz_grupos_tramite g
+      ON g.f_matriz_id = p.f_matriz_id AND g.mgt_id = p.f_matriz_grupo_id
+    JOIN contabilidad.matriz_conversion mc
+      ON mc.mc_id = p.f_matriz_id
+    WHERE g.tipo_flujo = 'I'
+      AND g.estatus_registro = 1
+      AND p.estatus_registro = 1
+      AND (p_grupo_id IS NULL OR g.mgt_id = p_grupo_id)
+      AND (p_procedimiento_id IS NULL OR p.mgp_id = p_procedimiento_id);
+
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', COALESCE(v_data, '[]'::jsonb));
+END;
+$$;</code></pre>
+    </div>
+
+    <!-- 6.2 LEER INGRESOS Y SUS MOVIMIENTOS -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.2. Consulta de Encabezado, Movimientos y Pólizas de Ingresos (<code>ingresos.fn_leer_ingresos</code>)</h4>
+    <div class="code-wrap">
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_ingresos(
+    p_ejercicio SMALLINT,
+    p_periodo SMALLINT DEFAULT NULL,
+    p_grupo_id SMALLINT DEFAULT NULL,
+    p_procedimiento_id SMALLINT DEFAULT NULL,
+    p_estatus VARCHAR DEFAULT NULL,
+    p_buscar VARCHAR DEFAULT NULL,
+    p_ing_id UUID DEFAULT NULL
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ingresos, contabilidad, config, public
+AS $$
+DECLARE
+    v_data JSONB;
+BEGIN
+    SELECT jsonb_agg(
+        jsonb_build_object(
+            'ing_id', i.ing_id,
+            'ejercicio_fiscal', i.ejercicio_fiscal,
+            'folio', i.folio,
+            'f_matriz_id', i.f_matriz_id,
+            'f_matriz_grupo_id', i.f_matriz_grupo_id,
+            'grupo_titulo', g.mgt_titulo,
+            'f_matriz_grupo_procedimiento_id', i.f_matriz_grupo_procedimiento_id,
+            'procedimiento_codigo', p.mgp_codigo,
+            'procedimiento_nombre', p.mgp_nombre,
+            'afecta_presupuesto', i.afecta_presupuesto,
+            'periodo', i.periodo,
+            'fecha_elaboracion', i.fecha_elaboracion,
+            'fecha_deposito', i.fecha_deposito,
+            'f_cuenta_bancaria_id', i.f_cuenta_bancaria_id,
             'clave_orden', i.clave_orden,
             'tramite_sefiplan', i.tramite_sefiplan,
             'oficio_soporte', i.oficio_soporte,
-            'archivo_oficio_solicitud_id', i.archivo_oficio_solicitud_id,
-            'nombre_archivo_oficio', i.nombre_archivo_oficio,
-            'archivo_orden_firmada_id', i.archivo_orden_firmada_id,
-            'nombre_archivo_orden', i.nombre_archivo_orden,
-            'tipo_solicitud', i.tipo_solicitud,
-            'denominacion_concepto', i.denominacion_concepto,
-            'rfc_ente', i.rfc_ente,
-            'instruccion_abono_cuenta', i.instruccion_abono_cuenta,
-            'ejercicio_fiscal', i.ejercicio_fiscal,
-            'periodo', i.periodo,
-            'fecha_elaboracion', i.fecha_elaboracion,
-            'fecha_esperada', i.fecha_esperada,
-            'fecha_operacion_bancaria', i.fecha_operacion_bancaria,
-            'referencia_externa', i.referencia_externa,
             'referencia_bancaria', i.referencia_bancaria,
             'origen_depositante', i.origen_depositante,
+            'concepto', i.concepto,
             'importe_total', i.importe_total,
+            'importe_recaudado', i.importe_recaudado,
             'saldo_pendiente', i.saldo_pendiente,
-            'cuenta_bancaria_id', i.cuenta_bancaria_id,
-            'estatus', i.estatus,
-            'observaciones', i.observaciones,
-            'prepoliza_cuadrada', COALESCE((SELECT bool_and(d.importe > 0) FROM ingresos.ingreso_prepoliza_detalles d WHERE d.ingreso_id = i.ingreso_id), false),
-            'lineas_distribucion', COALESCE((
+            'p_poliza_devengo_id', i.p_poliza_devengo_id,
+            'p_poliza_recaudado_id', i.p_poliza_recaudado_id,
+            'estatus_workflow', i.estatus_workflow,
+            'movimientos', COALESCE((
                 SELECT jsonb_agg(
                     jsonb_build_object(
-                        'distribucion_id', id.distribucion_id,
-                        'organo_beneficiario_id', id.organo_beneficiario_id,
-                        'organo_beneficiario', id.organo_beneficiario,
-                        'capitulo_gasto', id.capitulo_gasto,
-                        'descripcion_capitulo', id.descripcion_capitulo,
-                        'clave_presupuestal_sefiplan', id.clave_presupuestal_sefiplan,
-                        'referencia_caja', id.referencia_caja,
-                        'fuente_financiamiento_id', id.fuente_financiamiento_id,
-                        'importe_distribuido', id.importe_distribuido
-                    ) ORDER BY id.organo_beneficiario_id, id.capitulo_gasto
-                ) FROM ingresos.ingresos_distribucion id WHERE id.ingreso_id = i.ingreso_id
+                        'ingm_id', m.ingm_id,
+                        'numero_linea', m.numero_linea,
+                        'f_matriz_regla_id', m.f_matriz_regla_id,
+                        'f_centro_costo_id', m.f_centro_costo_id,
+                        'capitulo_gasto', m.capitulo_gasto,
+                        'f_clave_sefiplan_id', m.f_clave_sefiplan_id,
+                        'clave_programatica_11', cs.clave_programatica_11,
+                        'cuenta_caja_nemotecnico', cs.cuenta_caja_nemotecnico,
+                        'f_cri_id', m.f_cri_id,
+                        'f_fuente_fin_id', m.f_fuente_fin_id,
+                        'cuenta_contable_cargo', m.cuenta_contable_cargo,
+                        'cuenta_contable_abono', m.cuenta_contable_abono,
+                        'concepto_linea', m.concepto_linea,
+                        'importe', m.importe
+                    ) ORDER BY m.numero_linea
+                )
+                FROM ingresos.ingresos_movtos m
+                LEFT JOIN ingresos.cat_claves_presupuestales_sefiplan cs
+                  ON cs.clave_sefiplan_id = m.f_clave_sefiplan_id
+                WHERE m.f_ing_id = i.ing_id
+                  AND m.ejercicio_fiscal = i.ejercicio_fiscal
+                  AND m.estatus_registro = 1
             ), '[]'::jsonb),
-            'prepoliza_detalles', COALESCE((
+            'polizas', COALESCE((
                 SELECT jsonb_agg(
                     jsonb_build_object(
-                        'renglon', ip.renglon,
-                        'ambito', ip.ambito,
-                        'naturaleza', ip.naturaleza,
-                        'cuenta_puntos', ip.cuenta_puntos,
-                        'cuenta_nombre', ip.cuenta_nombre,
-                        'importe', ip.importe,
-                        'es_borrador', ip.es_borrador
-                    ) ORDER BY ip.renglon
-                ) FROM ingresos.ingreso_prepoliza_detalles ip WHERE ip.ingreso_id = i.ingreso_id
+                        'p_id', pol.p_id,
+                        'p_tipo', pol.p_tipo,
+                        'p_subtipo', pol.p_subtipo,
+                        'p_numero', pol.p_numero,
+                        'p_fecha', pol.p_fecha,
+                        'p_poliza_contabilidad_id', pol.p_poliza_id
+                    ) ORDER BY pol.p_id
+                )
+                FROM ingresos.poliza pol
+                WHERE pol.p_origen = 1
+                  AND pol.p_origen_uuid = i.ing_id
+                  AND pol.p_ejercicio = i.ejercicio_fiscal
+                  AND pol.estatus_registro = 1
             ), '[]'::jsonb)
-        ) ORDER BY i.ingreso_id DESC
+        ) ORDER BY i.fecha_elaboracion DESC, i.folio DESC
     )
     INTO v_data
-    FROM ingresos.ingresos_encabezado i
-    JOIN ingresos.cat_subtipos_tramite_ingreso st ON st.subtipo_tramite_id = i.subtipo_tramite_id
+    FROM ingresos.ingresos i
+    JOIN contabilidad.matriz_grupos_tramite g
+      ON g.f_matriz_id = i.f_matriz_id AND g.mgt_id = i.f_matriz_grupo_id
+    JOIN contabilidad.matriz_grupos_procedimiento p
+      ON p.f_matriz_id = i.f_matriz_id AND p.f_matriz_grupo_id = i.f_matriz_grupo_id AND p.mgp_id = i.f_matriz_grupo_procedimiento_id
     WHERE i.ejercicio_fiscal = p_ejercicio
+      AND i.estatus_registro = 1
       AND (p_periodo IS NULL OR i.periodo = p_periodo)
-      AND (p_subtipo_id IS NULL OR i.subtipo_tramite_id = p_subtipo_id)
-      AND (p_estatus IS NULL OR i.estatus = p_estatus)
-      AND (p_ingreso_id IS NULL OR i.ingreso_id = p_ingreso_id)
-      AND (p_buscar IS NULL OR (
-          i.folio_interno ILIKE '%' || p_buscar || '%' OR
-          i.origen_depositante ILIKE '%' || p_buscar || '%' OR
-          i.clave_orden ILIKE '%' || p_buscar || '%' OR
-          i.tramite_sefiplan ILIKE '%' || p_buscar || '%' OR
-          i.oficio_soporte ILIKE '%' || p_buscar || '%' OR
-          i.referencia_externa ILIKE '%' || p_buscar || '%'
-      ))
-      AND i.estatus != 'CANCELADO'
-    LIMIT p_limite OFFSET p_offset;
+      AND (p_grupo_id IS NULL OR i.f_matriz_grupo_id = p_grupo_id)
+      AND (p_procedimiento_id IS NULL OR i.f_matriz_grupo_procedimiento_id = p_procedimiento_id)
+      AND (p_estatus IS NULL OR i.estatus_workflow = p_estatus)
+      AND (p_ing_id IS NULL OR i.ing_id = p_ing_id)
+      AND (p_buscar IS NULL OR i.folio ILIKE '%' || p_buscar || '%' OR i.concepto ILIKE '%' || p_buscar || '%' OR COALESCE(i.oficio_soporte, '') ILIKE '%' || p_buscar || '%');
 
-    RETURN jsonb_build_object(
-        'error', 0,
-        'mensaje', 'Ingresos consultados exitosamente.',
-        'data', COALESCE(v_data, '[]'::jsonb)
-    );
-EXCEPTION WHEN OTHERS THEN
-    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error al consultar ingresos: ' || SQLERRM, 'data', NULL);
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', COALESCE(v_data, '[]'::jsonb));
 END;
 $$;</code></pre>
     </div>
 
-    <!-- 6.2 CRUD INGRESO CON PRE-POLIZA EN BORRADOR -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.2. Procedimiento CRUD (<code>ingresos.fn_crud_ingreso</code>)</h4>
+    <!-- 6.3 ABC DE INGRESOS Y GENERACIÓN DE PÓLIZA DE INGRESOS (PI) -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.3. Guardado Maestro-Detalle y Generación de Pólizas de Ingresos en <code>ingresos.poliza</code> e <code>ingresos.poliza_movtos</code> (<code>ingresos.fn_abc_ingresos</code> y <code>ingresos.fn_generar_poliza_ingreso</code>)</h4>
     <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_crud_ingreso(
-    p_accion VARCHAR,
+<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_generar_poliza_ingreso(
     p_usuario VARCHAR,
-    p_payload JSONB
+    p_ejercicio SMALLINT,
+    p_ing_id UUID,
+    p_matriz_ejecucion_id BIGINT -- 14 (Devengado), 15 (Recaudado), 16 (Simultáneo) o 18 (No Presupuestario)
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -437,400 +690,109 @@ SECURITY DEFINER
 SET search_path = ingresos, contabilidad, config, public
 AS $$
 DECLARE
-    v_id BIGINT;
-    v_folio VARCHAR(25);
-    v_subtipo RECORD;
     v_enc RECORD;
-    v_prepoliza JSONB;
-    v_asiento RECORD;
-    v_suma_distribuida DECIMAL(18,2);
+    v_tipo_poliza VARCHAR(5);
+    v_subtipo_poliza VARCHAR(30);
+    v_folio_poliza VARCHAR(25);
+    v_poliza_local_id INTEGER;
+    v_poliza_conta_id INTEGER;
+    v_mov RECORD;
+    v_orden INTEGER := 0;
 BEGIN
-    IF p_accion = 'GUARDAR_BORRADOR' THEN
-        -- 1. Obtener subtipo
-        SELECT * INTO v_subtipo 
-        FROM ingresos.cat_subtipos_tramite_ingreso 
-        WHERE subtipo_tramite_id = (p_payload->>'subtipo_tramite_id')::BIGINT;
+    SELECT * INTO v_enc
+      FROM ingresos.ingresos
+     WHERE ing_id = p_ing_id AND ejercicio_fiscal = p_ejercicio AND estatus_registro = 1;
 
-        -- 2. Insertar encabezado en BORRADOR (Formulario Maestro)
-        INSERT INTO ingresos.ingresos_encabezado (
-            subtipo_tramite_id, clave_orden, tramite_sefiplan, oficio_soporte,
-            archivo_oficio_solicitud_id, nombre_archivo_oficio,
-            archivo_orden_firmada_id, nombre_archivo_orden,
-            ejercicio_fiscal, periodo, fecha_elaboracion,
-            fecha_esperada, fecha_operacion_bancaria, tipo_solicitud,
-            denominacion_concepto, rfc_ente, instruccion_abono_cuenta,
-            referencia_externa, referencia_bancaria, origen_depositante,
-            importe_total, saldo_pendiente, cuenta_bancaria_id, observaciones,
-            estatus, usuario_c, fecha_c
-        ) VALUES (
-            v_subtipo.subtipo_tramite_id,
-            p_payload->>'clave_orden',
-            p_payload->>'tramite_sefiplan',
-            p_payload->>'oficio_soporte',
-            (p_payload->>'archivo_oficio_solicitud_id')::BIGINT,
-            p_payload->>'nombre_archivo_oficio',
-            (p_payload->>'archivo_orden_firmada_id')::BIGINT,
-            p_payload->>'nombre_archivo_orden',
-            (p_payload->>'ejercicio_fiscal')::INTEGER,
-            (p_payload->>'periodo')::SMALLINT,
-            COALESCE((p_payload->>'fecha_elaboracion')::DATE, CURRENT_DATE),
-            (p_payload->>'fecha_esperada')::DATE,
-            (p_payload->>'fecha_operacion_bancaria')::DATE,
-            COALESCE(p_payload->>'tipo_solicitud', 'SUJETO_A_COMPROBAR'),
-            p_payload->>'denominacion_concepto',
-            COALESCE(p_payload->>'rfc_ente', 'PJE970419FZ2'),
-            p_payload->>'instruccion_abono_cuenta',
-            p_payload->>'referencia_externa',
-            p_payload->>'referencia_bancaria',
-            p_payload->>'origen_depositante',
-            (p_payload->>'importe_total')::DECIMAL(18,2),
-            (p_payload->>'importe_total')::DECIMAL(18,2),
-            (p_payload->>'cuenta_bancaria_id')::BIGINT,
-            p_payload->>'observaciones',
-            'BORRADOR',
-            p_usuario, CURRENT_TIMESTAMP
-        ) RETURNING ingreso_id INTO v_id;
-
-        -- 3. Insertar partidas de movimientos por órgano y capítulo (Grid PJEV-UI)
-        IF p_payload ? 'distribucion' AND jsonb_typeof(p_payload->'distribucion') = 'array' THEN
-            INSERT INTO ingresos.ingresos_distribucion (
-                ingreso_id, organo_beneficiario_id, organo_beneficiario,
-                capitulo_gasto, descripcion_capitulo, clave_presupuestal_sefiplan,
-                referencia_caja, fuente_financiamiento_id, importe_distribuido
-            )
-            SELECT 
-                v_id,
-                (x->>'organo_beneficiario_id')::INTEGER,
-                x->>'organo_beneficiario',
-                COALESCE((x->>'capitulo_gasto')::INTEGER, 1000),
-                x->>'descripcion_capitulo',
-                x->>'clave_presupuestal_sefiplan',
-                x->>'referencia_caja',
-                COALESCE((x->>'fuente_financiamiento_id')::BIGINT, 1),
-                (x->>'importe_distribuido')::DECIMAL(18,2)
-            FROM jsonb_array_elements(p_payload->'distribucion') AS x;
-        END IF;
-
-        -- 4. Evaluar y persistir Pre-póliza en borrador con base en Matriz Oficial (03.1.2)
-        v_prepoliza := ingresos.fn_calcular_prepoliza_ingreso(
-            p_usuario,
-            v_subtipo.subtipo_tramite_id,
-            (p_payload->>'importe_total')::DECIMAL(18,2),
-            COALESCE(p_payload->'distribucion', '[]'::jsonb),
-            (p_payload->>'cuenta_bancaria_id')::BIGINT,
-            true
-        );
-
-        FOR v_asiento IN SELECT * FROM jsonb_to_recordset(v_prepoliza->'data'->'asientos') 
-            AS x(renglon INT, ambito CHAR(1), naturaleza CHAR(1), cuenta_puntos VARCHAR, cuenta_nombre VARCHAR, cargo DECIMAL(18,2), abono DECIMAL(18,2))
-        LOOP
-            INSERT INTO ingresos.ingreso_prepoliza_detalles (
-                ingreso_id, renglon, ambito, naturaleza, cuenta_puntos,
-                cuenta_nombre, importe, es_borrador
-            ) VALUES (
-                v_id, v_asiento.renglon, v_asiento.ambito, v_asiento.naturaleza,
-                v_asiento.cuenta_puntos, v_asiento.cuenta_nombre,
-                GREATEST(v_asiento.cargo, v_asiento.abono), true
-            );
-        END LOOP;
-
-        RETURN jsonb_build_object(
-            'error', 0,
-            'mensaje', 'Ingreso guardado en Modo Borrador con partidas y Pre-póliza resuelta.',
-            'data', jsonb_build_object('ingreso_id', v_id, 'estatus', 'BORRADOR')
-        );
-
-    ELSIF p_accion = 'FORMALIZAR' THEN
-        v_id := (p_payload->>'ingreso_id')::BIGINT;
-
-        -- 1. Validar existencia del registro
-        SELECT * INTO v_enc FROM ingresos.ingresos_encabezado WHERE ingreso_id = v_id;
-        IF v_enc.ingreso_id IS NULL THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'El trámite de ingreso no existe.');
-        END IF;
-
-        -- 2. Validar carga obligatoria de los dos archivos físicos firmados
-        IF v_enc.archivo_oficio_solicitud_id IS NULL OR v_enc.archivo_orden_firmada_id IS NULL THEN
-            RETURN jsonb_build_object(
-                'error', -1,
-                'mensaje', 'No se puede formalizar: Es obligatorio adjuntar tanto el Oficio DGA con sello de acuse SEFIPLAN como el Formato Oficial con firmas autógrafas colegiadas.'
-            );
-        END IF;
-
-        -- 3. Validar cuadre financiero estricto al centavo (Σ Movimientos = Importe Total)
-        SELECT COALESCE(SUM(importe_distribuido), 0) INTO v_suma_distribuida
-        FROM ingresos.ingresos_distribucion WHERE ingreso_id = v_id;
-
-        IF v_suma_distribuida <> v_enc.importe_total THEN
-            RETURN jsonb_build_object(
-                'error', -1,
-                'mensaje', 'Discrepancia de cuadre presupuestal: La suma de movimientos ($' || TO_CHAR(v_suma_distribuida, 'FM999,999,999.00') || 
-                           ') no coincide con el total del encabezado ($' || TO_CHAR(v_enc.importe_total, 'FM999,999,999.00') || 
-                           '). Diferencia: $' || TO_CHAR(v_enc.importe_total - v_suma_distribuida, 'FM999,999,999.00')
-            );
-        END IF;
-
-        -- 4. Asignar folio definitivo inmutable y transitar estado a DEVENGADO
-        v_folio := 'ING-' || TO_CHAR(CURRENT_DATE, 'YYYY') || '-' || LPAD(v_id::text, 4, '0');
-
-        UPDATE ingresos.ingresos_encabezado SET
-            folio_interno = v_folio,
-            estatus = CASE 
-                WHEN (SELECT momento_inicial FROM ingresos.cat_subtipos_tramite_ingreso st WHERE st.subtipo_tramite_id = v_enc.subtipo_tramite_id) = 'SIMULTANEO' THEN 'RECAUDADO'
-                ELSE 'DEVENGADO'
-            END,
-            usuario_m = p_usuario,
-            fecha_m = CURRENT_TIMESTAMP
-        WHERE ingreso_id = v_id;
-
-        -- 5. Póliza en firme (Matriz B.1 ejecutada de forma subyacente)
-        UPDATE ingresos.ingreso_prepoliza_detalles SET es_borrador = false WHERE ingreso_id = v_id;
-
-        RETURN jsonb_build_object(
-            'error', 0,
-            'mensaje', 'Ingreso formalizado y devengado exitosamente con folio ' || v_folio,
-            'data', jsonb_build_object('ingreso_id', v_id, 'folio', v_folio)
-        );
-
-    ELSIF p_accion = 'AGREGAR_MOVIMIENTO' THEN
-        v_id := (p_payload->>'ingreso_id')::BIGINT;
-
-        INSERT INTO ingresos.ingresos_distribucion (
-            ingreso_id, organo_beneficiario_id, organo_beneficiario,
-            capitulo_gasto, descripcion_capitulo, clave_presupuestal_sefiplan,
-            referencia_caja, fuente_financiamiento_id, importe_distribuido
-        ) VALUES (
-            v_id,
-            (p_payload->>'organo_beneficiario_id')::INTEGER,
-            p_payload->>'organo_beneficiario',
-            (p_payload->>'capitulo_gasto')::INTEGER,
-            p_payload->>'descripcion_capitulo',
-            p_payload->>'clave_presupuestal_sefiplan',
-            p_payload->>'referencia_caja',
-            COALESCE((p_payload->>'fuente_financiamiento_id')::BIGINT, 1),
-            (p_payload->>'importe_distribuido')::DECIMAL(18,2)
-        );
-
-        RETURN jsonb_build_object('error', 0, 'mensaje', 'Partida presupuestal agregada correctamente al grid.', 'data', jsonb_build_object('ingreso_id', v_id));
-
-    ELSIF p_accion = 'ELIMINAR_MOVIMIENTO' THEN
-        DELETE FROM ingresos.ingresos_distribucion 
-        WHERE distribucion_id = (p_payload->>'distribucion_id')::BIGINT;
-
-        RETURN jsonb_build_object('error', 0, 'mensaje', 'Partida presupuestal eliminada del grid.', 'data', NULL);
-
-    ELSIF p_accion = 'REGISTRAR_DEPOSITO' THEN
-        v_id := (p_payload->>'ingreso_id')::BIGINT;
-
-        -- 1. Insertar comprobante de depósito bancario registrado (KISS)
-        INSERT INTO ingresos.ingresos_depositos (
-            ingreso_id, banco_id, cuenta_bancaria_id, fecha_operacion,
-            tipo_movimiento, referencia_bancaria, importe_depositado,
-            archivo_documento_id, nombre_archivo, estatus_deposito,
-            usuario_c, fecha_c
-        ) VALUES (
-            v_id,
-            (p_payload->>'banco_id')::BIGINT,
-            (p_payload->>'cuenta_bancaria_id')::BIGINT,
-            COALESCE((p_payload->>'fecha_operacion')::DATE, CURRENT_DATE),
-            COALESCE(p_payload->>'tipo_movimiento', 'TRANSFERENCIA_SPEI'),
-            p_payload->>'referencia_bancaria',
-            (p_payload->>'importe_depositado')::DECIMAL(18,2),
-            (p_payload->>'archivo_documento_id')::BIGINT,
-            p_payload->>'nombre_archivo',
-            'CONCILIADO',
-            p_usuario, CURRENT_TIMESTAMP
-        );
-
-        -- 2. Disminuir saldo pendiente y transitar estatus a RECAUDADO si liquida
-        UPDATE ingresos.ingresos_encabezado SET
-            saldo_pendiente = GREATEST(0, saldo_pendiente - (p_payload->>'importe_depositado')::DECIMAL(18,2)),
-            estatus = CASE 
-                WHEN (saldo_pendiente - (p_payload->>'importe_depositado')::DECIMAL(18,2)) <= 0 THEN 'RECAUDADO' 
-                ELSE 'PARCIAL' 
-            END,
-            usuario_m = p_usuario,
-            fecha_m = CURRENT_TIMESTAMP
-        WHERE ingreso_id = v_id;
-
-        -- 3. Disparo subyacente de la Matriz CONAC B.2 (Recaudado en segundo plano)
-        RETURN jsonb_build_object(
-            'error', 0,
-            'mensaje', 'Depósito bancario y documento probatorio registrados exitosamente. Recaudación subyacente aplicada.',
-            'data', jsonb_build_object('ingreso_id', v_id, 'estatus', 'RECAUDADO')
-        );
+    IF v_enc.ing_id IS NULL THEN
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'No existe el registro de ingreso.');
     END IF;
 
-    RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no reconocida: ' || p_accion, 'data', NULL);
-END;
-$$;</code></pre>
-    </div>
+    -- Determinar tipo de póliza: PI (Póliza de Ingresos en recaudación 15, 16, 18) o DI (Diario en devengo previo 14)
+    v_tipo_poliza := CASE WHEN p_matriz_ejecucion_id = 14 THEN 'DI' ELSE 'PI' END;
+    v_subtipo_poliza := CASE
+        WHEN p_matriz_ejecucion_id = 14 THEN 'INGRESO_DEVENGADO'
+        WHEN p_matriz_ejecucion_id = 15 THEN 'INGRESO_RECAUDADO'
+        WHEN p_matriz_ejecucion_id = 16 THEN 'INGRESO_SIMULTANEO'
+        ELSE 'INGRESO_NO_PRESUPUESTAL'
+    END;
 
-    <!-- 6.3 LEER HISTORIAL Y MENSAJES DE WORKFLOW -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.3. Procedimiento LEER HISTORIAL (<code>ingresos.fn_leer_ingreso_historial</code>)</h4>
-    <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_leer_ingreso_historial(
-    p_ingreso_id BIGINT
-)
-RETURNS JSONB
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = ingresos, config, public
-AS $$
-DECLARE
-    v_data JSONB;
-BEGIN
-    SELECT jsonb_agg(
-        jsonb_build_object(
-            'historial_id', h.historial_id,
-            'ingreso_id', h.f_ingreso_id,
-            'accion', h.accion_realizada,
-            'estatus_anterior', h.estado_anterior,
-            'estatus_nuevo', h.estado_nuevo,
-            'observacion', h.observaciones,
-            'fecha_envio', h.fecha_envio,
-            'fecha_real', h.fecha_accion,
-            'usuario', h.usuario_accion
-        ) ORDER BY h.fecha_accion ASC
-    )
-    INTO v_data
-    FROM ingresos.ingreso_historial h
-    WHERE h.f_ingreso_id = p_ingreso_id;
+    SELECT v_tipo_poliza || '-' || p_ejercicio || '-' || LPAD((COALESCE(MAX(SUBSTRING(p_numero FROM 9)::INTEGER), 0) + 1)::TEXT, 5, '0')
+      INTO v_folio_poliza
+      FROM ingresos.poliza
+     WHERE p_ejercicio = p_ejercicio AND p_tipo = v_tipo_poliza;
 
-    RETURN jsonb_build_object(
-        'error', 0,
-        'mensaje', 'OK',
-        'data', COALESCE(v_data, '[]'::jsonb)
-    );
-EXCEPTION WHEN OTHERS THEN
-    RETURN jsonb_build_object('error', -2, 'mensaje', 'Error al leer historial: ' || SQLERRM, 'data', NULL);
-END;
-$$;</code></pre>
-    </div>
-
-    <!-- 6.4 TRANSICIÓN DE WORKFLOW CON REGISTRO DE MENSAJE -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">6.4. Procedimiento WORKFLOW Y TRANSICIÓN CON MENSAJE (<code>ingresos.fn_workflow_ingreso</code>)</h4>
-    <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION ingresos.fn_workflow_ingreso(
-    p_usuario VARCHAR,
-    p_ingreso_id BIGINT,
-    p_accion VARCHAR,
-    p_observaciones TEXT,
-    p_fecha_envio DATE DEFAULT CURRENT_DATE
-)
-RETURNS JSONB
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = ingresos, contabilidad, config, public
-AS $$
-DECLARE
-    v_estado_ant VARCHAR(25);
-    v_estado_nue VARCHAR(25);
-    v_folio VARCHAR(25);
-    v_momento VARCHAR(20);
-    v_total_enc DECIMAL(18,2);
-    v_arch_oficio BIGINT;
-    v_arch_orden BIGINT;
-    v_suma_distribuida DECIMAL(18,2);
-BEGIN
-    -- 1. Validar existencia del trámite
-    SELECT estatus, folio_interno, importe_total, archivo_oficio_solicitud_id, archivo_orden_firmada_id 
-    INTO v_estado_ant, v_folio, v_total_enc, v_arch_oficio, v_arch_orden
-    FROM ingresos.ingresos_encabezado WHERE ingreso_id = p_ingreso_id;
-
-    IF v_estado_ant IS NULL THEN
-        RETURN jsonb_build_object('error', -1, 'mensaje', 'El trámite de ingreso no existe.');
-    END IF;
-
-    -- 2. Validar mensaje institucional obligatorio
-    IF p_observaciones IS NULL OR LENGTH(TRIM(p_observaciones)) < 5 THEN
-        RETURN jsonb_build_object('error', -1, 'mensaje', 'Debe capturar un mensaje u observación que justifique la acción (mínimo 5 caracteres).');
-    END IF;
-
-    -- 3. Evaluar máquina de estados
-    IF p_accion = 'ENVIAR_REVISION' THEN
-        IF v_estado_ant NOT IN ('BORRADOR', 'OBSERVADO') THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en Borrador u Observados pueden enviarse a revisión.');
-        END IF;
-        v_estado_nue := 'ENVIADO';
-
-    ELSIF p_accion = 'REGRESAR_OBSERVADO' THEN
-        IF v_estado_ant <> 'ENVIADO' THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en estado ENVIADO pueden devolverse con observaciones.');
-        END IF;
-        v_estado_nue := 'OBSERVADO';
-
-    ELSIF p_accion = 'FORMALIZAR' THEN
-        IF v_estado_ant NOT IN ('BORRADOR', 'ENVIADO') THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'El trámite no se encuentra en estado apto para formalización.');
-        END IF;
-
-        -- Validar carga de los dos archivos físicos probatorios
-        IF v_arch_oficio IS NULL OR v_arch_orden IS NULL THEN
-            RETURN jsonb_build_object(
-                'error', -1,
-                'mensaje', 'No se puede formalizar: Es obligatorio adjuntar el Oficio DGA con acuse de SEFIPLAN y la Orden de Cobro debidamente firmada.'
-            );
-        END IF;
-
-        -- Validar cuadre financiero estricto de movimientos (Σ = Total)
-        SELECT COALESCE(SUM(importe_distribuido), 0) INTO v_suma_distribuida
-        FROM ingresos.ingresos_distribucion WHERE ingreso_id = p_ingreso_id;
-
-        IF v_suma_distribuida <> v_total_enc THEN
-            RETURN jsonb_build_object(
-                'error', -1,
-                'mensaje', 'Cuadre estricto fallido: La sumatoria de movimientos ($' || TO_CHAR(v_suma_distribuida, 'FM999,999,999.00') || 
-                           ') no cuadra con el encabezado ($' || TO_CHAR(v_total_enc, 'FM999,999,999.00') || 
-                           '). Diferencia: $' || TO_CHAR(v_total_enc - v_suma_distribuida, 'FM999,999,999.00')
-            );
-        END IF;
-
-        SELECT st.momento_inicial INTO v_momento
-        FROM ingresos.cat_subtipos_tramite_ingreso st
-        JOIN ingresos.ingresos_encabezado i ON i.subtipo_tramite_id = st.subtipo_tramite_id
-        WHERE i.ingreso_id = p_ingreso_id;
-
-        v_estado_nue := CASE WHEN v_momento = 'SIMULTANEO' THEN 'RECAUDADO' ELSE 'DEVENGADO' END;
-
-        IF v_folio IS NULL THEN
-            v_folio := 'ING-' || TO_CHAR(CURRENT_DATE, 'YYYY') || '-' || LPAD(p_ingreso_id::text, 4, '0');
-        END IF;
-
-        UPDATE ingresos.ingreso_prepoliza_detalles SET es_borrador = false WHERE ingreso_id = p_ingreso_id;
-
-    ELSIF p_accion = 'CANCELAR' THEN
-        IF v_estado_ant IN ('RECAUDADO', 'APLICADO') THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'Un ingreso recaudado requiere procedimiento de ajuste formal (04.1.2) y no cancelación directa.');
-        END IF;
-        v_estado_nue := 'CANCELADO';
-
-    ELSE
-        RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción de workflow no reconocida: ' || p_accion);
-    END IF;
-
-    -- 4. Actualizar encabezado del trámite
-    UPDATE ingresos.ingresos_encabezado SET
-        estatus = v_estado_nue,
-        folio_interno = COALESCE(folio_interno, v_folio),
-        usuario_m = p_usuario,
-        fecha_m = clock_timestamp()
-    WHERE ingreso_id = p_ingreso_id;
-
-    -- 5. Registrar en la bitácora de mensajes y trazabilidad
-    INSERT INTO ingresos.ingreso_historial (
-        f_ingreso_id, estado_anterior, estado_nuevo, accion_realizada,
-        observaciones, fecha_envio, usuario_accion, fecha_accion
+    -- 1. Insertar encabezado en contabilidad.poliza
+    INSERT INTO contabilidad.poliza (
+        p_tipo, p_subtipo, p_numero, p_ejercicio, p_fecha, p_descripcion,
+        p_afecta, estatus_registro, usuario_c, fecha_c
     ) VALUES (
-        p_ingreso_id, v_estado_ant, v_estado_nue, p_accion,
-        TRIM(p_observaciones), COALESCE(p_fecha_envio, CURRENT_DATE),
-        p_usuario, clock_timestamp()
-    );
+        v_tipo_poliza, v_subtipo_poliza, v_folio_poliza, p_ejercicio,
+        COALESCE(v_enc.fecha_deposito, v_enc.fecha_elaboracion),
+        'Ingreso ' || v_enc.folio || ' · ' || v_enc.concepto,
+        1, 1, p_usuario, clock_timestamp()
+    ) RETURNING p_id INTO v_poliza_conta_id;
+
+    -- 2. Insertar encabezado espejo en ingresos.poliza (homologado con cxp.poliza)
+    INSERT INTO ingresos.poliza (
+        p_tipo, p_subtipo, p_numero, p_ejercicio, p_fecha, p_descripcion,
+        p_afecta, p_origen, p_origen_uuid, p_poliza_id, estatus_registro, usuario_c, fecha_c
+    ) VALUES (
+        v_tipo_poliza, v_subtipo_poliza, v_folio_poliza, p_ejercicio,
+        COALESCE(v_enc.fecha_deposito, v_enc.fecha_elaboracion),
+        'Ingreso ' || v_enc.folio || ' · ' || v_enc.concepto,
+        1, 1, v_enc.ing_id, v_poliza_conta_id, 1, p_usuario, clock_timestamp()
+    ) RETURNING p_id INTO v_poliza_local_id;
+
+    -- 3. Recorrer ingresos.ingresos_movtos y expandir los asientos desde contabilidad.matriz_conversion_movimiento
+    FOR v_mov IN
+        SELECT
+            im.*,
+            mcm.mcm_ambito,
+            mcm.mcm_naturaleza,
+            CASE
+                WHEN mcm.mcm_es_placeholder_banco THEN im.cuenta_contable_cargo
+                WHEN mcm.mcm_naturaleza = 'D' AND mcm.mcm_ambito = 'C' THEN im.cuenta_contable_cargo
+                WHEN mcm.mcm_naturaleza = 'H' AND mcm.mcm_ambito = 'C' THEN im.cuenta_contable_abono
+                ELSE mcm.mcm_cuenta_codigo
+            END AS cuenta_final,
+            mcm.mcm_cuenta_nombre
+        FROM ingresos.ingresos_movtos im
+        JOIN contabilidad.matriz_conversion_movimiento mcm
+          ON mcm.f_matriz_id = p_matriz_ejecucion_id
+         AND mcm.f_matriz_grupo_id = im.f_matriz_grupo_id
+         AND mcm.f_matriz_grupo_procedimiento_id = im.f_matriz_grupo_procedimiento_id
+         AND mcm.f_matriz_regla_id = im.f_matriz_regla_id
+        WHERE im.f_ing_id = p_ing_id
+          AND im.ejercicio_fiscal = p_ejercicio
+          AND im.estatus_registro = 1
+          AND mcm.estatus_registro = 1
+        ORDER BY im.numero_linea, mcm.mcm_orden
+    LOOP
+        v_orden := v_orden + 1;
+
+        INSERT INTO ingresos.poliza_movtos (
+            pm_poliza_id, pm_ejercicio, pm_orden, pm_ambito, pm_cc_id, pm_centro_costo_id,
+            pm_nivel1, pm_nivel2, pm_nivel3, pm_nivel4, pm_nivel5,
+            pm_debe, pm_haber, pm_fuente_fin_id, pm_cp_id, pm_cri_id,
+            pm_observacion, usuario_c
+        ) VALUES (
+            v_poliza_local_id, p_ejercicio, v_orden, v_mov.mcm_ambito, v_mov.f_centro_costo_id, v_mov.f_centro_costo_id,
+            SPLIT_PART(v_mov.cuenta_final, '.', 1),
+            SPLIT_PART(v_mov.cuenta_final, '.', 2),
+            SPLIT_PART(v_mov.cuenta_final, '.', 3),
+            SPLIT_PART(v_mov.cuenta_final, '.', 4),
+            SPLIT_PART(v_mov.cuenta_final, '.', 5),
+            CASE WHEN v_mov.mcm_naturaleza = 'D' THEN v_mov.importe ELSE 0 END,
+            CASE WHEN v_mov.mcm_naturaleza = 'H' THEN v_mov.importe ELSE 0 END,
+            v_mov.f_fuente_fin_id, v_mov.f_clave_sefiplan_id, v_mov.f_cri_id,
+            COALESCE(v_mov.concepto_linea, v_mov.mcm_cuenta_nombre), p_usuario
+        );
+    END LOOP;
 
     RETURN jsonb_build_object(
         'error', 0,
-        'mensaje', 'Transición completada exitosamente a ' || v_estado_nue,
-        'data', jsonb_build_object('ingreso_id', p_ingreso_id, 'estado_nuevo', v_estado_nue, 'folio', v_folio)
+        'mensaje', 'Póliza de Ingresos generada exitosamente en ingresos.poliza y contabilidad.poliza.',
+        'data', jsonb_build_object('poliza_local_id', v_poliza_local_id, 'poliza_contabilidad_id', v_poliza_conta_id, 'folio_poliza', v_folio_poliza)
     );
 END;
 $$;</code></pre>
@@ -1866,6 +1828,12 @@ export class IngresosController {
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Descripción del Cambio</th></tr></thead>
       <tbody>
+        <tr style="background:#eff6ff;">
+          <td><code>v3.0.0</code></td>
+          <td>08/11/2026</td>
+          <td>Arquitectura SIAF-PJEV / Daryl</td>
+          <td><strong>Reestructuración y Simplificación de Base de Datos en el Esquema <code>ingresos</code>:</strong> (1) Baja definitiva de <code>ingresos.cat_subtipos_tramite_ingreso</code>, leyendo ahora directamente <code>contabilidad.matriz_grupos_tramite</code> (Grupos <code>11..14</code>, <code>tipo_flujo = 'I'</code>) y <code>contabilidad.matriz_grupos_procedimiento</code> (Subprocedimientos <code>1101..1402</code>) mediante <code>ingresos.fn_leer_matriz_procedimientos_ingreso</code> para resumir las reglas contables y presupuestales; (2) Sustitución de las tablas dispersas antiguas (<code>registro_ingreso*</code> y <code>registro_ministracion*</code>) por el par maestro-detalle <strong><code>ingresos.ingresos</code></strong> e <strong><code>ingresos.ingresos_movtos</code></strong>; (3) Creación de las tablas espejo <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong> (homologadas con <code>cxp.poliza</code> y <code>cxp.poliza_movtos</code>) para emitir las <strong>Pólizas de Ingresos (<code>PI</code>)</strong> desde <code>04.2.1</code> y las <strong>Pólizas de Egresos (<code>PE</code>)</strong> desde <code>04.2.2 / 06.2.1 Registro de Pagos</code>.</td>
+        </tr>
         <tr>
           <td><code>v2.5.0</code></td>
           <td>08/09/2026</td>
