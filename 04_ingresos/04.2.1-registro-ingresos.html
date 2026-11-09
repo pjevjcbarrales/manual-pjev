@@ -60,12 +60,12 @@
     <div>
       <div class="elem-id">04.2.1</div>
       <h1 class="elem-title">Registro de Ingresos (Encabezado <code>ingresos.ingresos</code>, Detalle <code>ingresos.ingresos_movtos</code> y Pólizas <code>PI</code>)</h1>
-      <p class="elem-desc">Módulo transaccional unificado para el registro de ingresos de la Oficina de Caja. Lee directamente los Procedimientos (Grupos <code>11..14</code>) y Subprocedimientos (<code>1101..1402</code>) de la <strong>Matriz de Conversión 03.1.2 (<code>tipo_flujo = 'I'</code>)</strong> para resumir las reglas contables y presupuestales aplicables, almacena la operación en el par simplificado <strong><code>ingresos.ingresos</code></strong> (encabezado) e <strong><code>ingresos.ingresos_movtos</code></strong> (detalle), y genera automáticamente las <strong>Pólizas de Ingresos (<code>PI</code>)</strong> en <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong> (homologadas con <code>cxp.poliza</code> y sincronizadas con <code>contabilidad.poliza</code>).</p>
+      <p class="elem-desc">Módulo transaccional unificado para el registro de ingresos de la Oficina de Caja. Lee directamente los Procedimientos (Grupos <code>5..8</code>) y Subprocedimientos (<code>501..505, 601..604, 701..703, 801..802</code>) de la <strong>Matriz de Conversión 03.1.2 (<code>mgt_ambito = 'I'</code>)</strong> para resumir las reglas contables y presupuestales aplicables, almacena la operación en el par simplificado <strong><code>ingresos.ingresos</code></strong> (encabezado) e <strong><code>ingresos.ingresos_movtos</code></strong> (detalle), y genera automáticamente las <strong>Pólizas de Ingresos (<code>PI</code>)</strong> en <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong> (homologadas con <code>cxp.poliza</code> y sincronizadas con <code>contabilidad.poliza</code>).</p>
       <div class="mod-header-badges">
         <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Maestro-Detalle 1:N)</span>
         <span class="mod-badge badge-s">v3.0.0 · Esquema Simplificado de Ingresos y Pólizas PI</span>
         <span class="mod-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Responsable: Daryl</span>
-        <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Lee Matriz 03.1.2 (Grupos 11..14 / Subproc. 1101..1402)</span>
+        <span class="mod-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">Lee Matriz 03.1.2 (Grupos 5..8 / Subproc. 501..802 / 139 Reglas)</span>
         <span class="elem-tag" style="font-size:10px;">Ruta Frontend: <code style="font-family:var(--font-mono);font-size:10px;">/caja/registro-ingresos</code> · Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/ingresos</code></span>
       </div>
     </div>
@@ -80,7 +80,7 @@
     <ul style="font-size:12px; color:#1e293b; margin:0 0 8px; padding-left:20px; line-height:1.6;">
       <li><strong>1. Catálogos que se conservan vs. Catálogos que ya no aplican:</strong>
         Se conservan intactos <code>ingresos.cat_motivos_ajuste</code> (<code>04.1.2</code>) e <code>ingresos.cat_claves_presupuestales_sefiplan</code> (<code>04.1.3</code>).
-        <strong>Se elimina <code>ingresos.cat_subtipos_tramite_ingreso</code> (<code>04.1.1</code>)</strong> porque todos los procedimientos (<code>11..14</code>) y subprocedimientos (<code>1101..1402</code>) viven ahora en <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> con <code>tipo_flujo = 'I'</code>. Las cuentas bancarias se leen de <code>config.catalogo_cuentas_bancarias</code> (<code>01.4.2</code>).</li>
+        <strong>Se elimina <code>ingresos.cat_subtipos_tramite_ingreso</code> (<code>04.1.1</code>)</strong> porque todos los procedimientos (<code>5..8</code>) y subprocedimientos (<code>501..505, 601..604, 701..703, 801..802</code>) viven ahora en <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> con <code>mgt_ambito = 'I'</code>. Las cuentas bancarias se leen de <code>config.catalogo_cuentas_bancarias</code> (<code>01.4.2</code>).</li>
       <li><strong>2. Dos únicas opciones en <code>04.2 · Registro</code> (Ingresos y Egresos de Caja):</strong>
         <br>• <strong><code>04.2.1 Registro de ingresos</code>:</strong> Opera sobre <strong><code>ingresos.ingresos</code></strong> (encabezado) e <strong><code>ingresos.ingresos_movtos</code></strong> (detalle), leyendo las reglas de ingreso en la Matriz (<code>14, 15, 16, 18</code>) y generando <strong>Pólizas de Ingresos (<code>PI</code>)</strong> en <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong>.
         <br>• <strong><code>04.2.2 Registro de pagos</code> (sincronizado con <code>06.2.1</code>):</strong> Opera sobre <strong><code>ingresos.pagos</code></strong> (encabezado) e <strong><code>ingresos.pagos_movtos</code></strong> (detalle), correlacionados con Tesorería (<code>cxp.afectaciones_gasto</code> y <code>cxp.ordenes_pago</code>) y las matrices de egreso (<code>13</code> y <code>17</code>), generando <strong>Pólizas de Egresos (<code>PE</code>)</strong> en las mismas tablas <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong>.</li>
@@ -225,8 +225,8 @@
         <tr><td><code>ejercicio_fiscal</code></td><td><code>SMALLINT PK</code></td><td>NO</td><td>Ejercicio fiscal activo (llave de partición anual, ej. <code>2026</code>).</td></tr>
         <tr><td><code>folio</code></td><td><code>VARCHAR(20) UNIQUE</code></td><td>NO</td><td>Folio secuencial anual del ingreso (ej. <code>ING-2026-00045</code>).</td></tr>
         <tr><td><code>f_matriz_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Matriz de Conversión activa en <code>contabilidad.matriz_conversion</code>: <code>14 (B1_DEVENGADO_INGRESOS)</code>, <code>15 (B2_RECAUDADO_INGRESOS)</code>, <code>16 (B3_RECAUDADO_SIMULTANEO)</code> o <code>18 (B4_INGRESO_NO_PRESUPUESTARIO)</code>.</td></tr>
-        <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Procedimiento general en <code>contabilidad.matriz_grupos_tramite</code> (<code>tipo_flujo = 'I'</code>): <code>11 = MINISTRACIONES</code>, <code>12 = INGRESOS_PROPIOS</code>, <code>13 = REINTEGROS</code>, <code>14 = FONDOS_AJENOS</code>.</td></tr>
-        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Subprocedimiento específico en <code>contabilidad.matriz_grupos_procedimiento</code> (<code>1101..1402</code>).</td></tr>
+        <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Procedimiento general en <code>contabilidad.matriz_grupos_tramite</code> (<code>mgt_ambito = 'I'</code>): <code>11 = MINISTRACIONES</code>, <code>12 = INGRESOS_PROPIOS</code>, <code>13 = REINTEGROS</code>, <code>14 = FONDOS_AJENOS</code>.</td></tr>
+        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Subprocedimiento específico en <code>contabilidad.matriz_grupos_procedimiento</code> (<code>501..505, 601..604, 701..703, 801..802</code>).</td></tr>
         <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>NO</td><td>Heredado del subprocedimiento: <code>TRUE</code> para Grupos 11 y 12 (Ley de Ingresos <code>8.1.x</code>); <code>FALSE</code> para Grupos 13 y 14 (Matriz 18).</td></tr>
         <tr><td><code>periodo</code></td><td><code>SMALLINT</code></td><td>NO</td><td>Mes contable de afectación (<code>1..12</code>).</td></tr>
         <tr><td><code>fecha_elaboracion</code></td><td><code>DATE</code></td><td>NO</td><td>Fecha de emisión o registro de la solicitud/ingreso.</td></tr>
@@ -262,7 +262,7 @@
         <tr><td><code>numero_linea</code></td><td><code>SMALLINT</code></td><td>NO</td><td>Orden secuencial del movimiento en el grid (<code>1..N</code>).</td></tr>
         <tr><td><code>f_matriz_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Matriz de conversión aplicada a la línea (<code>14, 15, 16, 18</code>).</td></tr>
         <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Grupo de procedimiento (<code>11..14</code>).</td></tr>
-        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Subprocedimiento operativo (<code>1101..1402</code>).</td></tr>
+        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>NO</td><td>Subprocedimiento operativo (<code>501..505, 601..604, 701..703, 801..802</code>).</td></tr>
         <tr><td><code>f_matriz_regla_id</code></td><td><code>BIGINT FK</code></td><td>NO</td><td>Regla específica en <code>contabilidad.matriz_conversion_regla(mcr_id)</code> que determina las cuentas contables y presupuestales del movimiento.</td></tr>
         <tr><td><code>f_centro_costo_id</code></td><td><code>INTEGER</code></td><td>SÍ</td><td>Órgano Judicial / Centro de Costo beneficiario (TSJ, TCA, TDJ, OAJ).</td></tr>
         <tr><td><code>capitulo_gasto</code></td><td><code>SMALLINT</code></td><td>SÍ</td><td>Capítulo presupuestal (<code>1000..6000</code>) para ministraciones SEFIPLAN.</td></tr>
@@ -429,8 +429,8 @@ CREATE TABLE IF NOT EXISTS ingresos.ingresos (
     fecha_m TIMESTAMPTZ,
     CONSTRAINT pk_ingresos_encabezado PRIMARY KEY (ing_id, ejercicio_fiscal),
     CONSTRAINT uq_ingresos_folio UNIQUE (ejercicio_fiscal, folio),
-    CONSTRAINT fk_ingresos_matriz_proc FOREIGN KEY (f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id)
-        REFERENCES contabilidad.matriz_grupos_procedimiento (f_matriz_id, f_matriz_grupo_id, mgp_id)
+    CONSTRAINT fk_ingresos_matriz_proc FOREIGN KEY (f_matriz_grupo_id, f_matriz_grupo_procedimiento_id)
+        REFERENCES contabilidad.matriz_grupos_procedimiento (matriz_grupo_id, matriz_grupo_procedimiento_id)
 ) PARTITION BY LIST (ejercicio_fiscal);
 
 CREATE TABLE IF NOT EXISTS ingresos.ingresos_2026 PARTITION OF ingresos.ingresos FOR VALUES IN (2026);
@@ -463,7 +463,7 @@ CREATE TABLE IF NOT EXISTS ingresos.ingresos_movtos (
     CONSTRAINT fk_ingresos_movtos_padre FOREIGN KEY (f_ing_id, ejercicio_fiscal)
         REFERENCES ingresos.ingresos (ing_id, ejercicio_fiscal) ON DELETE CASCADE,
     CONSTRAINT fk_ingresos_movtos_regla FOREIGN KEY (f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id, f_matriz_regla_id)
-        REFERENCES contabilidad.matriz_conversion_regla (f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id, mcr_id)
+        REFERENCES contabilidad.matriz_conversion_regla (matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id)
 ) PARTITION BY LIST (ejercicio_fiscal);
 
 CREATE TABLE IF NOT EXISTS ingresos.ingresos_movtos_2026 PARTITION OF ingresos.ingresos_movtos FOR VALUES IN (2026);
@@ -551,7 +551,7 @@ BEGIN
       ON g.f_matriz_id = p.f_matriz_id AND g.mgt_id = p.f_matriz_grupo_id
     JOIN contabilidad.matriz_conversion mc
       ON mc.mc_id = p.f_matriz_id
-    WHERE g.tipo_flujo = 'I'
+    WHERE g.mgt_ambito = 'I'
       AND g.estatus_registro = 1
       AND p.estatus_registro = 1
       AND (p_grupo_id IS NULL OR g.mgt_id = p_grupo_id)
@@ -1832,7 +1832,7 @@ export class IngresosController {
           <td><code>v3.0.0</code></td>
           <td>08/11/2026</td>
           <td>Arquitectura SIAF-PJEV / Daryl</td>
-          <td><strong>Reestructuración y Simplificación de Base de Datos en el Esquema <code>ingresos</code>:</strong> (1) Baja definitiva de <code>ingresos.cat_subtipos_tramite_ingreso</code>, leyendo ahora directamente <code>contabilidad.matriz_grupos_tramite</code> (Grupos <code>11..14</code>, <code>tipo_flujo = 'I'</code>) y <code>contabilidad.matriz_grupos_procedimiento</code> (Subprocedimientos <code>1101..1402</code>) mediante <code>ingresos.fn_leer_matriz_procedimientos_ingreso</code> para resumir las reglas contables y presupuestales; (2) Sustitución de las tablas dispersas antiguas (<code>registro_ingreso*</code> y <code>registro_ministracion*</code>) por el par maestro-detalle <strong><code>ingresos.ingresos</code></strong> e <strong><code>ingresos.ingresos_movtos</code></strong>; (3) Creación de las tablas espejo <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong> (homologadas con <code>cxp.poliza</code> y <code>cxp.poliza_movtos</code>) para emitir las <strong>Pólizas de Ingresos (<code>PI</code>)</strong> desde <code>04.2.1</code> y las <strong>Pólizas de Egresos (<code>PE</code>)</strong> desde <code>04.2.2 / 06.2.1 Registro de Pagos</code>.</td>
+          <td><strong>Reestructuración y Simplificación de Base de Datos en el Esquema <code>ingresos</code>:</strong> (1) Baja definitiva de <code>ingresos.cat_subtipos_tramite_ingreso</code>, leyendo ahora directamente <code>contabilidad.matriz_grupos_tramite</code> (Grupos <code>5..8</code>, <code>mgt_ambito = 'I'</code>) y <code>contabilidad.matriz_grupos_procedimiento</code> (Subprocedimientos <code>501..505, 601..604, 701..703, 801..802</code>) mediante <code>ingresos.fn_leer_matriz_procedimientos_ingreso</code> para resumir las reglas contables y presupuestales; (2) Sustitución de las tablas dispersas antiguas (<code>registro_ingreso*</code> y <code>registro_ministracion*</code>) por el par maestro-detalle <strong><code>ingresos.ingresos</code></strong> e <strong><code>ingresos.ingresos_movtos</code></strong>; (3) Creación de las tablas espejo <strong><code>ingresos.poliza</code></strong> e <strong><code>ingresos.poliza_movtos</code></strong> (homologadas con <code>cxp.poliza</code> y <code>cxp.poliza_movtos</code>) para emitir las <strong>Pólizas de Ingresos (<code>PI</code>)</strong> desde <code>04.2.1</code> y las <strong>Pólizas de Egresos (<code>PE</code>)</strong> desde <code>04.2.2 / 06.2.1 Registro de Pagos</code>.</td>
         </tr>
         <tr>
           <td><code>v2.5.0</code></td>

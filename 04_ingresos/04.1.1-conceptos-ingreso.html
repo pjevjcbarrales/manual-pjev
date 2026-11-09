@@ -71,10 +71,10 @@
           🏛️ Catálogo Reemplazado y Centralizado en 03.1.2 Matriz de Conversión (v3.0)
         </h3>
         <p style="margin:0 0 8px; font-size:12px; color:#1e3a8a; line-height:1.6;">
-          Conforme al plan de normalización arquitectónica del SIAF-PJEV, la tabla independiente <code>ingresos.cat_subtipos_tramite_ingreso</code> y la opción de menú <code>/caja/conceptos</code> <strong>YA NO APLICAN como catálogo separado en el esquema <code>ingresos</code></strong>. Los <strong>4 Grupos de Trámite de Ingreso (<code>mgt_id 11..14</code>)</strong> y sus <strong>14 Subprocedimientos Operativos (<code>mgp_id 1101..1402</code>)</strong> viven ahora de forma centralizada en <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> con discriminador <code>tipo_flujo = 'I'</code>.
+          Conforme al plan de normalización arquitectónica del SIAF-PJEV, la tabla independiente <code>ingresos.cat_subtipos_tramite_ingreso</code> y la opción de menú <code>/caja/conceptos</code> <strong>YA NO APLICAN como catálogo separado en el esquema <code>ingresos</code></strong>. Los <strong>4 Grupos de Trámite de Ingreso (<code>matriz_grupo_id 5..8</code>)</strong> y sus <strong>14 Subprocedimientos Operativos (<code>matriz_grupo_procedimiento_id 501..802</code>)</strong> viven ahora de forma centralizada en <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> con discriminador <code>mgt_ambito = 'I'</code>.
         </p>
         <p style="margin:0; font-size:11px; color:#1d4ed8; font-weight:600;">
-          <strong>Instrucción para Daryl:</strong> El módulo <code>04.2.1 Registro de Ingresos</code> debe consumir directamente <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> (<code>tipo_flujo = 'I'</code>) para poblar el Wizard y resumir las reglas de <code>contabilidad.matriz_conversion_regla</code>. Se debe ejecutar el script de depuración inferior para dar de baja <code>ingresos.cat_subtipos_tramite_ingreso</code> y el módulo <code>mod_id = 70</code> en <code>nav.catalogo_modulos</code>.
+          <strong>Instrucción para Daryl:</strong> El módulo <code>04.2.1 Registro de Ingresos</code> debe consumir directamente <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> (<code>mgt_ambito = 'I'</code>) para poblar el Wizard y resumir las reglas de <code>contabilidad.matriz_conversion_regla</code>. Se debe ejecutar el script de depuración inferior para dar de baja <code>ingresos.cat_subtipos_tramite_ingreso</code> y el módulo <code>mod_id = 70</code> en <code>nav.catalogo_modulos</code>.
         </p>
       </div>
       <div style="align-self:center;">
@@ -810,7 +810,7 @@ export class SubtiposTramiteIngresoController {
           <td><code>v3.0.0</code></td>
           <td>08/11/2026</td>
           <td>Arquitectura SIAF-PJEV / Daryl</td>
-          <td><strong>Baja de catálogo independiente y centralización en Contabilidad (03.1.2):</strong> La tabla <code>ingresos.cat_subtipos_tramite_ingreso</code> queda obsoleta y es reemplazada por <code>contabilidad.matriz_grupos_tramite</code> (Grupos <code>11..14</code>, <code>tipo_flujo = 'I'</code>) y <code>contabilidad.matriz_grupos_procedimiento</code> (Subprocedimientos <code>1101..1402</code>). El módulo <code>04.2.1 Registro de Ingresos</code> lee directamente la Matriz de Conversión.</td>
+          <td><strong>Baja de catálogo independiente y centralización en Contabilidad (03.1.2):</strong> La tabla <code>ingresos.cat_subtipos_tramite_ingreso</code> queda obsoleta y es reemplazada por <code>contabilidad.matriz_grupos_tramite</code> (Grupos <code>11..14</code>, <code>mgt_ambito = 'I'</code>) y <code>contabilidad.matriz_grupos_procedimiento</code> (Subprocedimientos <code>1101..1402</code>). El módulo <code>04.2.1 Registro de Ingresos</code> lee directamente la Matriz de Conversión.</td>
         </tr>
         <tr>
           <td><code>v2.1.0</code></td>
