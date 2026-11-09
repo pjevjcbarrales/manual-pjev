@@ -63,38 +63,45 @@
 
   <!-- CALLOUT DE HOMOLOGACIÓN DEL SISTEMA REAL -->
   <div class="callout-box">
-    <div class="callout-title">📌 Estado de Homologación con el Sistema Real (SIAF-PJEV)</div>
+    <div class="callout-title">📌 Estado de Homologación con el Sistema Real (SIAF-PJEV · Arquitectura Jerárquica v3.0)</div>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
-      <strong>1. Desacoplamiento del Esquema Antiguo:</strong> Se abandonó la tabla monolítica <code>config.matriz_conversion_3</code> en favor del modelo robusto normalizado en <code>contabilidad.matriz_conversion</code>, <code>matriz_conversion_regla</code>, <code>matriz_conversion_movimiento</code> y <code>matriz_conversion_aplicacion</code> (Migraciones 141, 144, 148, 149, 158, 168, 179 y 180).
+      <strong>1. Árbol Jerárquico de 5 Niveles en <code>contabilidad</code>:</strong> Se centralizó toda la pirámide de conversión dentro del esquema <code>contabilidad</code> mediante llaves foráneas compuestas identificadoras (<em>Identifying Composite Foreign Keys</em>):
+      <code>matriz_conversion (matriz_id)</code> ➔ <code>matriz_grupos_tramite (matriz_grupo_id)</code> ➔ <code>matriz_grupos_procedimiento (matriz_grupo_id, matriz_grupo_procedimiento_id)</code> ➔ <code>matriz_conversion_regla (matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id)</code> ➔ <code>matriz_conversion_movimiento (matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id, matriz_movimiento_id)</code>.
     </p>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
-      <strong>2. Ciclo de Vida de 4 Estados e Inmutabilidad:</strong> Toda versión opera bajo la máquina de estados <code>BORRADOR ➔ VALIDADA ➔ ACTIVA ➔ CERRADA</code>. Mediante el trigger <code>fn_matriz_conversion_proteger_version</code> y la restricción GiST de exclusión temporal sin solapamiento, las matrices fuera de borrador son inmutables para auditoría forense del ORFIS.
+      <strong>2. Unificación de Egresos (CxP) e Ingresos (CxC/Tesorería) y Eliminación de Tablas Puente:</strong> Los catálogos que antes estaban dispersos en <code>cxp.catalogo_grupos_tramite</code>, <code>cxp.catalogo_procedimientos_afectacion</code> e <code>ingresos.cat_subtipos_tramite_ingreso</code> ahora residen normalizados en <code>contabilidad.matriz_grupos_tramite</code> (8 grupos: 4 de Egresos y 4 de Ingresos) y <code>contabilidad.matriz_grupos_procedimiento</code> (20 subprocedimientos de Egresos del Manual SRF y 14 subprocedimientos de Ingresos). Esto elimina las tablas puente de desempate (<code>mapeo_procedimiento_operacion</code> y <code>matriz_regla_clasificacion_candidato</code>) y depura la matriz piloto obsoleta <code>DEV_OBLIGACION_SERVICIOS</code>.
+    </p>
+    <p style="font-size:12px; color:var(--pjev-texto); margin:0 0 6px;">
+      <strong>3. Cobertura Total Presupuestaria y Extrapresupuestaria (Cero <code>matriz_id = NULL</code>):</strong> Se incorporan las matrices <code>A3_EGRESO_NO_PRESUPUESTARIO</code> (<code>matriz_id = 17</code>) y <code>B4_INGRESO_NO_PRESUPUESTARIO</code> (<code>matriz_id = 18</code>) para gobernar el Grupo 4 de Egresos (<em>No afecta presupuesto</em>: entero de retenciones, devolución de garantías, fondos ajenos) y los Grupos 3 y 4 de Ingresos (<em>Reintegros</em> y <em>Depósitos no identificados / en custodia</em>).
     </p>
     <p style="font-size:12px; color:var(--pjev-texto); margin:0;">
-      <strong>3. Innovaciones Institucionales PJEV:</strong> 
-      a) <em>Capítulo 1000 Nómina:</em> Abona a la cuenta puente <code>2.1.1.9.1000.0001 (Nómina por Liquidar)</code> en la Matriz A.1 (Migración 179).
-      b) <em>Matriz A0 de Reclasificación de OP:</em> Formalizada para el momento Ejercido (<code>mc_id = 5</code>), traspasa de <code>2.1.1.9</code> a <code>2.1.1.1.xxxx (Remuneraciones por Pagar)</code> al autorizar la Orden de Pago (Migración 180).
-      c) <em>Simulador en Vivo:</em> Frontend y Backend integran simulación con aritmética escalada <code>BigInt</code> ($10^6$) para validar cuadre exacto a centavos antes de activación.
+      <strong>4. Ciclo de Vida de 4 Estados e Inmutabilidad:</strong> Toda versión opera bajo la máquina de estados <code>BORRADOR ➔ VALIDADA ➔ ACTIVA ➔ CERRADA</code>. Mediante el trigger <code>fn_matriz_conversion_proteger_version</code> y la restricción GiST de exclusión temporal sin solapamiento, las matrices fuera de borrador son inmutables para auditoría forense del ORFIS.
     </p>
   </div>
 
   <!-- 1. DESCRIPCIÓN GENERAL -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-    <p>La <strong>Matriz de Conversión</strong> es el núcleo de cálculo automático del principio de <strong>"Registro Único"</strong> mandateado por la Ley General de Contabilidad Gubernamental. Traduce de forma determinista y en tiempo real cada transacción presupuestaria capturada en los módulos operativos (Clasificador por Objeto del Gasto en Egresos y Clasificador por Rubro de Ingreso en Ingresos) a sus respectivos asientos contables patrimoniales (Cargos y Abonos) y de orden presupuestario (Cuentas Clase 8), eliminando la captura manual de cuentas contables por parte de los operadores.</p>
+    <p>La <strong>Matriz de Conversión</strong> es el núcleo de cálculo automático del principio de <strong>"Registro Único"</strong> mandatado por la Ley General de Contabilidad Gubernamental. Traduce de forma determinista y en tiempo real cada transacción presupuestaria o extrapresupuestaria capturada en los módulos operativos (Clasificador por Objeto del Gasto en Egresos, Clasificador por Rubro de Ingreso en Ingresos o Cuenta Contable de Balance en operaciones no presupuestarias) a sus respectivos asientos contables patrimoniales (Cargos y Abonos) y de orden presupuestario (Cuentas Clase 8), eliminando la captura manual de cuentas contables por parte de los operadores.</p>
     
-    <p>El subsistema no opera como una simple tabla de equivalencias fija, sino como un <strong>motor de derivación en dos niveles</strong>:</p>
+    <p>El subsistema se estructura como un <strong>árbol jerárquico normalizado en 5 niveles dentro del esquema <code>contabilidad</code></strong>, garantizando lectura directa e integridad referencial absoluta:</p>
+    <div class="code-wrap" style="margin-bottom:14px;">
+<pre><code>1. contabilidad.matriz_conversion               (matriz_id)                                                                     -- ¿En qué Momento / Familia CONAC estamos?
+ └── 2. contabilidad.matriz_grupos_tramite      (matriz_grupo_id)                                                               -- ¿Cuál de los 4 Grupos de Egresos o 4 de Ingresos es?
+      └── 3. contabilidad.matriz_grupos_procedimiento (matriz_grupo_id + matriz_grupo_procedimiento_id)                         -- ¿Qué Subprocedimiento específico es y qué ciclo de matrices sigue?
+           └── 4. contabilidad.matriz_conversion_regla     (matriz_id + matriz_grupo_id + matriz_grupo_procedimiento_id + matriz_regla_id) -- ¿Qué COG, CRI o Cuenta de Pasivo/Custodia se afecta?
+                └── 5. contabilidad.matriz_conversion_movimiento (matriz_id + matriz_grupo_id + matriz_grupo_procedimiento_id + matriz_regla_id + matriz_movimiento_id) -- ¿Qué Cargos (D) y Abonos (H) genera?</code></pre>
+    </div>
     <ul style="font-size:13px; line-height:1.6; padding-left:20px; margin-bottom:12px;">
-      <li><strong>Nivel Cabecera y Vigencia:</strong> Controla el ámbito (<code>E</code> Egresos, <code>I</code> Ingresos), la familia oficial CONAC (A.1, A.2, B.1, B.2, B.3) o Guía Contabilizadora, el momento contable asociado, el ejercicio fiscal, la versión y la vigencia con bloqueo GiST sin traslape.</li>
-      <li><strong>Nivel Reglas y Movimientos (Esquema <code>[Etiqueta : Caja]</code> con PJEV_UI):</strong> Estructura cada regla sobre <strong>4 dimensiones funcionales unívocas</strong> visibles en interfaz mediante controles nativos <code>SiafSelect</code> y <code>SiafInput</code> en formato de etiqueta superior y caja de valor enmarcada:
-        <ol style="margin-top:6px; margin-bottom:6px; padding-left:22px;">
-          <li><strong>Tipo de Procedimiento:</strong> En CxP agrupa por Grupos de Trámite (<code>Gasto Directo</code>, <code>Por Pedido / Contrato</code>, <code>Gastos por Comprobar y Fondos</code>); en CxC agrupa por Tipos de Movimiento (<code>Ministraciones SEFIPLAN</code>, <code>Derechos y Fondo Auxiliar</code>, <code>Rendimientos Financieros</code>, <code>Aprovechamientos y Reintegros</code>).</li>
-          <li><strong>Subtipo de Procedimiento:</strong> Procedimientos específicos de afectación en CxP (<code>NOMINA</code>, <code>ARRENDAMIENTO</code>, <code>SERVICIOS_BASICOS</code>, <code>HONORARIOS</code>, <code>TERCEROS_INST</code>, <code>GASTO_DIRECTO_GENERAL</code>, <code>COMPRA_PEDIDO</code>, <code>CONTRATO_SERVICIOS</code>, <code>OBRA_PUBLICA</code>, <code>COMPROBACION_VIATICOS</code>, <code>SUJETOS_COMPROBAR</code>, <code>FONDO_REVOLVENTE</code>) o conceptos institucionales en CxC (<code>MIN_ESTATAL_ORD</code>, <code>FONDO_AUXILIAR</code>, <code>REINTEGRO_PERSONAL</code>, etc.).</li>
-          <li><strong>Beneficiario:</strong> 6 niveles canónicos de afectación institucional (<code>Proveedor</code> con su subtipo por rango COG, <code>Empleado</code>, <code>Unidad Administrativa</code>, <code>Pensionados</code>, <code>Terceros Institucionales</code>, <code>Bienes Inmuebles</code>).</li>
-          <li><strong>Clasificador Presupuestario:</strong> <code>COG</code> de partida específica en Egresos y <code>CRI</code> en Ingresos, resolviendo automáticamente el catálogo sin captura manual de cuentas.</li>
-        </ol>
-        Genera la lista ordenada de submovimientos con origen de cuenta fijo o dinámico (por CRI/COG o momento 8.x) y fórmulas de importe (Total, Subtotal, IVA, Retenciones o Neto a Pagar).
+      <li><strong>Nivel 1 — Matriz de Conversión (<code>matriz_conversion</code>):</strong> Controla el ámbito (<code>E</code> Egresos, <code>I</code> Ingresos), la familia CONAC o institucional (<code>A1</code>, <code>A0</code>, <code>A2</code>, <code>A3</code> en Egresos; <code>B1</code>, <code>B2</code>, <code>B3</code>, <code>B4</code> en Ingresos), el momento contable asociado, el ejercicio fiscal, la versión y la vigencia con bloqueo GiST sin traslape.</li>
+      <li><strong>Nivel 2 — Grupos de Trámite (<code>matriz_grupos_tramite</code>):</strong> Clasifica la entrada operativa sin duplicarse por momento contable:
+        <ul style="margin-top:4px; margin-bottom:4px; padding-left:20px;">
+          <li><strong>En Egresos (<code>ambito = 'E'</code>):</strong> <code>1. Pago directo</code> (<code>DIRECTO</code>), <code>2. Pago derivado de un pedido (materiales)</code> (<code>PEDIDO</code>), <code>3. Gasto a comprobar</code> (<code>COMPROBAR</code>) y <code>4. No afecta presupuesto</code> (<code>EGR_NO_PRESUPUESTARIO</code>).</li>
+          <li><strong>En Ingresos (<code>ambito = 'I'</code>):</strong> <code>1. Ministraciones y Fondos</code> (<code>MINISTRACIONES</code>), <code>2. Ingresos Propios</code> (<code>PROPIOS</code>), <code>3. Reintegros</code> (<code>REINTEGROS</code>) y <code>4. Depósitos en Custodia / No Presupuestarios</code> (<code>ING_NO_PRESUPUESTARIO</code>).</li>
+        </ul>
       </li>
+      <li><strong>Nivel 3 — Procedimientos / Subtrámites (<code>matriz_grupos_procedimiento</code>):</strong> Contiene una sola vez cada uno de los <strong>20 subprocedimientos de Egresos</strong> (homologados al Manual de Procedimientos de la SRF) y los <strong>14 subprocedimientos de Ingresos</strong>, definiendo las llaves hacia las matrices de su ciclo de vida (<code>matriz_inicial_id</code> en devengado/recepción, <code>matriz_intermedia_id</code> en Orden de Pago si aplica, y <code>matriz_final_id</code> en pago/recaudación bancaria).</li>
+      <li><strong>Nivel 4 y 5 — Reglas y Movimientos con Llave Compuesta Identificadora:</strong> Tanto <code>matriz_conversion_regla</code> como <code>matriz_conversion_movimiento</code> portan la llave compuesta completa <code>(matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id)</code> respaldada por restricciones <code>FOREIGN KEY</code> compuestas. Esto permite consultar cualquier regla o asiento leyendo directamente sus 4 dimensiones sin <code>JOIN</code>s forzosos y con 0% de riesgo de inconsistencia entre grupos y procedimientos.</li>
     </ul>
   </div>
 
@@ -174,16 +181,16 @@
 
   <!-- 4. ESTRUCTURA INSTITUCIONAL DE MATRICES (CONAC + PJEV) -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">4</span> Catálogo Oficial de Matrices de Conversión PJEV (Ejercicio 2026)</div>
-    <p>El SIAF-PJEV administra tanto las matrices oficiales CONAC de devengado, ejercido y pagado, como la matriz institucional de reclasificación pasiva desarrollada para resolver la dispersión bancaria y la nómina:</p>
+    <div class="section-title"><span class="section-num">4</span> Catálogo Oficial de Matrices, Grupos y Procedimientos (Ejercicio 2026)</div>
+    <p>El SIAF-PJEV administra <strong>8 matrices de conversión</strong> en <code>contabilidad.matriz_conversion</code> (4 de Egresos y 4 de Ingresos), cubriendo tanto los momentos presupuestarios CONAC como los movimientos extrapresupuestarios de balance, retenciones, reintegros y depósitos en custodia:</p>
 
-    <table class="props-table" style="font-size:11px;">
+    <table class="props-table" style="font-size:11px; margin-bottom:20px;">
       <thead>
         <tr>
-          <th style="width:8%;">ID BD</th>
-          <th style="width:20%;">Clave Matriz</th>
-          <th style="width:12%;">Ámbito / Momento</th>
-          <th style="width:25%;">Nombre Institucional</th>
+          <th style="width:7%;"><code>matriz_id</code></th>
+          <th style="width:21%;">Clave Matriz</th>
+          <th style="width:14%;">Ámbito / Momento</th>
+          <th style="width:24%;">Nombre Institucional</th>
           <th>Tratamiento Contable y Presupuestario</th>
         </tr>
       </thead>
@@ -191,194 +198,383 @@
         <tr style="background:#fdfbf7;">
           <td><code>12</code></td>
           <td><code>A1_DEVENGADO_GASTOS</code></td>
-          <td><span class="mod-badge badge-a">E · Devengado (DEV)</span></td>
-          <td><strong>A.1 Devengado de Gastos — Adquisiciones y Servicios</strong></td>
-          <td>Reconoce gasto (5.x) o activo (1.2.x) al Debe vs Pasivo al Haber. <em>Capítulo 1000:</em> abona a la cuenta puente <code>2.1.1.9.1000.0001 (Nómina por Liquidar)</code>. Presupuesto: <code>8.2.5 DEV</code> al Haber vs <code>8.2.4 COM</code> al Debe.</td>
+          <td><span class="mod-badge badge-a">E · Devengado (4)</span></td>
+          <td><strong>A.1 Devengado de Gastos — Solicitud de Pago Directo / Pedido / Comprobar</strong></td>
+          <td>Reconoce gasto (<code>5.x</code>) o activo (<code>1.2.x</code>) al Debe vs Pasivo (<code>2.1.1.x</code>) al Haber en Tesorería. <em>Capítulo 1000:</em> abona a <code>2.1.1.9.1000.0001 (Nómina por Liquidar)</code>. Presupuesto: Cargo a <code>8.2.5 DEV</code> vs Abono a <code>8.2.4 COM</code>.</td>
         </tr>
         <tr style="background:#fdfbf7;">
           <td><code>22</code></td>
           <td><code>A0_RECLASIFICA_ORDEN_PAGO</code></td>
-          <td><span class="mod-badge badge-s">E · Ejercido (EJE)</span></td>
-          <td><strong>Reclasificación Pasiva de Órdenes de Pago (Institucional PJEV)</strong></td>
-          <td>Al autorizar la Orden de Pago (05.2.2), disminuye la bolsa puente concentradora (Cargo a <code>2.1.1.9.1000.0001</code>) y acredita el pasivo líquido exigible (Abono a <code>2.1.1.1.xxxx Remuneraciones por Pagar</code>). Presupuesto: <code>8.2.6 EJE</code> al Haber vs <code>8.2.5 DEV</code> al Debe.</td>
+          <td><span class="mod-badge badge-s">E · Ejercido (5)</span></td>
+          <td><strong>A.0 Reclasificación Pasiva de Órdenes de Pago (Institucional PJEV)</strong></td>
+          <td>Separa la nómina neta de las retenciones de terceros (Paso 2): Carga a <code>2.1.1.9.1000.0001</code> y abona a <code>2.1.1.1.xxxx (Remuneraciones por Pagar)</code> y <code>2.1.1.7.xxxx (Retenciones y Contribuciones por Pagar)</code>. Presupuesto: <code>8.2.6 EJE</code> vs <code>8.2.5 DEV</code>.</td>
         </tr>
         <tr style="background:#fdfbf7;">
           <td><code>13</code></td>
           <td><code>A2_PAGADO_GASTOS</code></td>
-          <td><span class="mod-badge badge-ok">E · Pagado (PAG)</span></td>
-          <td><strong>A.2 Pagado de Gastos — Desembolso a Proveedores</strong></td>
-          <td>Al liquidar en Tesorería (06.2.1), cancela el pasivo líquido (Cargo a <code>2.1.1.1</code> o <code>2.1.1.2</code>) y acredita la cuenta bancaria de salida (Abono a <code>1.1.1.2.xxxx Bancos</code>). Presupuesto: <code>8.2.7 PAG</code> al Haber vs <code>8.2.6 EJE</code> al Debe.</td>
+          <td><span class="mod-badge badge-ok">E · Pagado (6)</span></td>
+          <td><strong>A.2 Pagado de Gastos — Registro de Pagos en Caja</strong></td>
+          <td>Al liquidar en Caja, cancela el pasivo líquido (Cargo a <code>2.1.1.1</code>, <code>2.1.1.2</code> o <code>2.1.1.3</code>) y acredita la cuenta bancaria de salida (Abono a <code>1.1.1.2.xxxx Bancos</code>). Presupuesto: Cargo a <code>8.2.7 PAG</code> vs Abono a <code>8.2.6 EJE</code>.</td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>17</code></td>
+          <td><code>A3_EGRESO_NO_PRESUPUESTARIO</code></td>
+          <td><span class="mod-badge badge-c">E · Contable (N/A)</span></td>
+          <td><strong>A.3 Egresos No Presupuestarios — Pasivos de Terceros, Fondos y Anticipos</strong></td>
+          <td>Para trámites del Grupo 4 (<em>No afecta presupuesto</em>: entero de retenciones ISR/IPE/ISSSTE/Sindicatos, devolución de garantías, pensiones alimenticias, ministración de deudores por viáticos/fondo revolvente). Carga al pasivo/deudor y abona a Bancos sin tocar cuentas Clase 8.</td>
         </tr>
         <tr>
           <td><code>14</code></td>
           <td><code>B1_INGRESO_DEVENGADO</code></td>
-          <td><span class="mod-badge badge-a">I · Devengado (DEV)</span></td>
-          <td><strong>B.1 Ingreso Devengado — Ministraciones y Derechos</strong></td>
-          <td>Reconoce cuentas por cobrar (Cargo a <code>1.1.2.x</code>) contra ingresos de gestión o transferencias de SEFIPLAN (Abono a <code>4.x</code>). Presupuesto: <code>8.1.4 Ley de Ingresos Devengada</code>.</td>
+          <td><span class="mod-badge badge-a">I · Devengado (4)</span></td>
+          <td><strong>B.1 Ingreso Devengado — Ministraciones y Fondos Convenidos</strong></td>
+          <td>Reconoce cuentas por cobrar (Cargo a <code>1.1.2.x</code>) contra ingresos por participaciones/transferencias de SEFIPLAN o Federación (Abono a <code>4.x</code>). Presupuesto: <code>8.1.4 Ley de Ingresos Devengada</code> vs <code>8.1.2 Por Ejecutar</code>.</td>
         </tr>
         <tr>
           <td><code>15</code></td>
           <td><code>B2_INGRESO_RECAUDADO</code></td>
-          <td><span class="mod-badge badge-ok">I · Recaudado (REC)</span></td>
-          <td><strong>B.2 Ingreso Recaudado — Percepción Efectiva</strong></td>
-          <td>Entrada efectiva al banco receptor (Cargo a <code>1.1.1.2.xxxx</code>) contra cancelación de cuentas por cobrar (Abono a <code>1.1.2.x</code>). Presupuesto: <code>8.1.5 Ley de Ingresos Recaudada</code>.</td>
+          <td><span class="mod-badge badge-ok">I · Recaudado (6)</span></td>
+          <td><strong>B.2 Ingreso Recaudado — Percepción Efectiva de Devengados Previos</strong></td>
+          <td>Entrada efectiva al banco receptor (Cargo a <code>1.1.1.2.xxxx</code>) contra cancelación de cuentas por cobrar (Abono a <code>1.1.2.x</code>). Presupuesto: <code>8.1.5 Ley de Ingresos Recaudada</code> vs <code>8.1.4 Devengada</code>.</td>
         </tr>
         <tr>
           <td><code>16</code></td>
           <td><code>B3_INGRESO_SIMULTANEO</code></td>
-          <td><span class="mod-badge badge-c">I · Simultáneo (DEV+REC)</span></td>
-          <td><strong>B.3 Ingreso Simultáneo — Percepción en Caja Directa</strong></td>
-          <td>Entrada inmediata al banco (Cargo a <code>1.1.1.2.xxxx</code>) contra ingreso de gestión (Abono a <code>4.x</code>), registrando al mismo tiempo los momentos presupuestarios <code>8.1.4</code> y <code>8.1.5</code>.</td>
+          <td><span class="mod-badge badge-c">I · Simultáneo (4+6)</span></td>
+          <td><strong>B.3 Ingreso Simultáneo — Ingresos Propios y Derechos en Ventanilla/Banco</strong></td>
+          <td>Entrada inmediata al banco (Cargo a <code>1.1.1.2.xxxx</code>) contra ingreso de gestión (Abono a <code>4.x</code>), registrando simultáneamente los momentos presupuestarios <code>8.1.4 Devengado</code> y <code>8.1.5 Recaudado</code>.</td>
         </tr>
+        <tr>
+          <td><code>18</code></td>
+          <td><code>B4_INGRESO_NO_PRESUPUESTARIO</code></td>
+          <td><span class="mod-badge badge-s">I · Contable / Reintegro</span></td>
+          <td><strong>B.4 Ingresos No Presupuestarios — Reintegros y Depósitos en Custodia</strong></td>
+          <td>Gobierna los grupos <code>REINTEGROS</code> (devolución de anticipos, reintegros de nómina y viáticos que disminuyen deudores o revierten gasto) y <code>ING_NO_PRESUPUESTARIO</code> (depósitos no identificados y aclaraciones en pasivo en custodia <code>2.1.1.9</code>).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 4.1 TABLA DE LOS 8 GRUPOS DE TRÁMITE -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">4.1. Catálogo Maestro de Grupos de Trámite (<code>contabilidad.matriz_grupos_tramite</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Centraliza en <code>contabilidad</code> los 4 grandes grupos de Egresos (Tesorería/Caja) y los 4 grandes grupos de Ingresos, indicando si afectan presupuesto y cómo se agrupan en las pantallas operativas:
+    </p>
+    <table class="props-table" style="font-size:11px; margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th style="width:8%;"><code>matriz_grupo_id</code></th>
+          <th style="width:7%;">Ámbito</th>
+          <th style="width:20%;">Código de Grupo</th>
+          <th style="width:24%;">Título Institucional</th>
+          <th style="width:12%;">Afecta Presupuesto</th>
+          <th>Opción de Menú / Alcance Operativo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:#fdfbf7;">
+          <td><code>1</code></td>
+          <td><code>E</code></td>
+          <td><code>DIRECTO</code></td>
+          <td><strong>1. Pago directo</strong></td>
+          <td>Sí (<code>true</code>)</td>
+          <td><strong>Tesorería › Solicitud de pago directo:</strong> Nómina bruta, servicios básicos, arrendamientos, honorarios, impuestos, comisiones y gastos directos.</td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>2</code></td>
+          <td><code>E</code></td>
+          <td><code>PEDIDO</code></td>
+          <td><strong>2. Pago derivado de un pedido (materiales)</strong></td>
+          <td>Sí (<code>true</code>)</td>
+          <td><strong>Tesorería › Solicitud de pago directo:</strong> Adquisición de bienes por pedido/contrato, contratos de servicios y estimaciones/finiquitos de obra pública.</td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>3</code></td>
+          <td><code>E</code></td>
+          <td><code>COMPROBAR</code></td>
+          <td><strong>3. Gasto a comprobar</strong></td>
+          <td>Sí (<code>true</code>)</td>
+          <td><strong>Tesorería › Solicitud de pago directo:</strong> Comprobación de viáticos (Anexo 6), gastos sujetos a comprobar y reposición de fondo revolvente.</td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>4</code></td>
+          <td><code>E</code></td>
+          <td><code>EGR_NO_PRESUPUESTARIO</code></td>
+          <td><strong>4. No afecta presupuesto</strong></td>
+          <td>No (<code>false</code>)</td>
+          <td><strong>Tesorería › Solicitud de no afecta presupuesto:</strong> Nómina neta (OP), entero de retenciones a terceros e impuestos, pensiones alimenticias, devolución de garantías y apertura de fondos/viáticos.</td>
+        </tr>
+        <tr>
+          <td><code>5</code></td>
+          <td><code>I</code></td>
+          <td><code>MINISTRACIONES</code></td>
+          <td><strong>1. Ministraciones y Fondos Convenidos</strong></td>
+          <td>Sí (<code>true</code>)</td>
+          <td><strong>Ingresos › Registro de Ingresos:</strong> Ministración ordinaria estatal SEFIPLAN, extraordinaria, FASP federal y Justicia Laboral (Devengado previo <code>B1</code> ➔ Recaudado <code>B2</code>).</td>
+        </tr>
+        <tr>
+          <td><code>6</code></td>
+          <td><code>I</code></td>
+          <td><code>PROPIOS</code></td>
+          <td><strong>2. Ingresos Propios y Derechos</strong></td>
+          <td>Sí (<code>true</code>)</td>
+          <td><strong>Ingresos › Registro de Ingresos:</strong> Venta de bases de licitación, arrendamiento de espacios, rendimientos financieros y derechos/copias certificadas (Simultáneo <code>B3</code>).</td>
+        </tr>
+        <tr>
+          <td><code>7</code></td>
+          <td><code>I</code></td>
+          <td><code>REINTEGROS</code></td>
+          <td><strong>3. Reintegros Presupuestales y Deudores</strong></td>
+          <td>No (<code>false</code>)</td>
+          <td><strong>Ingresos › Registro de Ingresos:</strong> Devolución de anticipos de proveedores/contratistas, reintegro de nómina y reintegro de viáticos (Matriz <code>B4</code>).</td>
+        </tr>
+        <tr>
+          <td><code>8</code></td>
+          <td><code>I</code></td>
+          <td><code>ING_NO_PRESUPUESTARIO</code></td>
+          <td><strong>4. Depósitos en Custodia / No Presupuestarios</strong></td>
+          <td>No (<code>false</code>)</td>
+          <td><strong>Ingresos › Registro de Ingresos:</strong> Depósitos bancarios no identificados y aclaración/reclasificación de depósitos en custodia (Matriz <code>B4</code>).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 4.2 TABLA DE SUBPROCEDIMIENTOS Y SU CICLO DE MATRICES -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">4.2. Catálogo Unificado de Procedimientos / Subtrámites (<code>contabilidad.matriz_grupos_procedimiento</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Relaciona mediante llave compuesta <code>(matriz_grupo_id, matriz_grupo_procedimiento_id)</code> los <strong>20 subprocedimientos oficiales de Egresos</strong> y los <strong>14 subprocedimientos de Ingresos</strong> con las matrices que ejecutan en cada etapa de su ciclo:
+    </p>
+    <table class="props-table" style="font-size:11px;">
+      <thead>
+        <tr>
+          <th style="width:6%;">ID Proc.</th>
+          <th style="width:14%;">Grupo Padre (<code>matriz_grupo_id</code>)</th>
+          <th style="width:22%;">Código de Procedimiento</th>
+          <th style="width:26%;">Nombre del Subprocedimiento</th>
+          <th style="width:16%;">Matriz Inicial (Devengado / Recepción)</th>
+          <th style="width:16%;">Matriz Liquidación (Caja / Recaudación)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:#fdfbf7;"><td colspan="6" style="font-weight:bold; color:var(--pjev-verde-oscuro);">ÁMBITO EGRESOS (<code>E</code>) — 20 Subprocedimientos Oficiales del Manual SRF</td></tr>
+        <tr><td><code>101</code></td><td><code>1 · DIRECTO</code></td><td><code>NOMINA_BRUTA</code></td><td>1.1 Nómina Quincenal y Prestaciones (Nómina Bruta)</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>22 (A0_OP) ➔ 13 (A2)</code></td></tr>
+        <tr><td><code>102</code></td><td><code>1 · DIRECTO</code></td><td><code>ARRENDAMIENTO</code></td><td>1.2 Arrendamiento de Bienes Inmuebles</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>103</code></td><td><code>1 · DIRECTO</code></td><td><code>SERVICIOS_BASICOS</code></td><td>1.3 Servicios Básicos (CFE, Agua, Telefonía, Internet)</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>104</code></td><td><code>1 · DIRECTO</code></td><td><code>HONORARIOS</code></td><td>1.4 Honorarios Asimilados y Servicios Profesionales</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>105</code></td><td><code>1 · DIRECTO</code></td><td><code>IMPUESTOS_DERECHOS</code></td><td>1.5 Impuestos y Derechos Presupuestales (3% Nómina, Tenencias)</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>106</code></td><td><code>1 · DIRECTO</code></td><td><code>COMISIONES_BANCARIAS</code></td><td>1.6 Comisiones Bancarias e Intereses</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>107</code></td><td><code>1 · DIRECTO</code></td><td><code>LAUDOS_SENTENCIAS</code></td><td>1.7 Indemnizaciones, Laudos y Sentencias</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>108</code></td><td><code>1 · DIRECTO</code></td><td><code>AYUDAS_SUBSIDIOS</code></td><td>1.8 Ayudas Sociales, Becas y Capacitación Directa</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>109</code></td><td><code>1 · DIRECTO</code></td><td><code>GASTO_DIRECTO_GENERAL</code></td><td>1.9 Adquisiciones y Servicios Menores de Pago Directo</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>201</code></td><td><code>2 · PEDIDO</code></td><td><code>COMPRA_PEDIDO_ALMACEN</code></td><td>2.1 Pedido de Materiales y Suministros (Entrada a Almacén)</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>202</code></td><td><code>2 · PEDIDO</code></td><td><code>COMPRA_PEDIDO_ACTIVO</code></td><td>2.2 Pedido de Bienes Muebles e Intangibles (Activo Fijo)</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>203</code></td><td><code>2 · PEDIDO</code></td><td><code>CONTRATO_SERVICIOS</code></td><td>2.3 Contratos de Servicios Generales, Limpieza, Vigilancia y Manto.</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>204</code></td><td><code>2 · PEDIDO</code></td><td><code>OBRA_PUBLICA_ESTIMACION</code></td><td>2.4 Estimaciones y Finiquito de Obra Pública</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>301</code></td><td><code>3 · COMPROBAR</code></td><td><code>COMPROBACION_VIATICOS</code></td><td>3.1 Comprobación de Viáticos y Pasajes Oficiales (Anexo 6)</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>302</code></td><td><code>3 · COMPROBAR</code></td><td><code>SUJETOS_COMPROBAR</code></td><td>3.2 Comprobación de Gastos Sujetos a Comprobar</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>303</code></td><td><code>3 · COMPROBAR</code></td><td><code>FONDO_REVOLVENTE_REP</code></td><td>3.3 Reposición de Fondo Revolvente / Caja Chica</td><td><code>12 (A1_DEVENGADO)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>401</code></td><td><code>4 · EGR_NO_PRESUP</code></td><td><code>NOMINA_NETA_DISPERSION</code></td><td>4.1 Solicitud de Dispersión de Nómina Neta (Orden de Pago)</td><td><code>22 (A0_RECLASIFICA)</code></td><td><code>13 (A2_PAGADO)</code></td></tr>
+        <tr><td><code>402</code></td><td><code>4 · EGR_NO_PRESUP</code></td><td><code>ENTERO_RETENCIONES</code></td><td>4.2 Entero de Retenciones Fiscales e Institucionales (ISR, IPE, Sindicatos)</td><td><code>17 (A3_NO_PRESUP)</code></td><td><code>17 (A3_NO_PRESUP)</code></td></tr>
+        <tr><td><code>403</code></td><td><code>4 · EGR_NO_PRESUP</code></td><td><code>PENSIONES_Y_GARANTIAS</code></td><td>4.3 Pago de Pensiones Alimenticias y Devolución de Garantías</td><td><code>17 (A3_NO_PRESUP)</code></td><td><code>17 (A3_NO_PRESUP)</code></td></tr>
+        <tr><td><code>404</code></td><td><code>4 · EGR_NO_PRESUP</code></td><td><code>APERTURA_FONDO_ANTICIPO</code></td><td>4.4 Ministración Inicial de Fondo Revolvente y Anticipo de Viáticos</td><td><code>17 (A3_NO_PRESUP)</code></td><td><code>17 (A3_NO_PRESUP)</code></td></tr>
+        <tr style="background:#f8fafc;"><td colspan="6" style="font-weight:bold; color:var(--pjev-verde-oscuro);">ÁMBITO INGRESOS (<code>I</code>) — 14 Subprocedimientos Homologados</td></tr>
+        <tr><td><code>501</code></td><td><code>5 · MINISTRACIONES</code></td><td><code>MIN_ESTATAL_ORD</code></td><td>1.1 Ministración Ordinaria Estatal (SEFIPLAN Cap. 1000-5000)</td><td><code>14 (B1_DEVENGADO)</code></td><td><code>15 (B2_RECAUDADO)</code></td></tr>
+        <tr><td><code>502</code></td><td><code>5 · MINISTRACIONES</code></td><td><code>MIN_EXTRAORDINARIA</code></td><td>1.2 Ministración Extraordinaria Estatal</td><td><code>14 (B1_DEVENGADO)</code></td><td><code>15 (B2_RECAUDADO)</code></td></tr>
+        <tr><td><code>503</code></td><td><code>5 · MINISTRACIONES</code></td><td><code>CONVENIOS_FEDERALES</code></td><td>1.3 Fondos Federales Convenidos (General)</td><td><code>14 (B1_DEVENGADO)</code></td><td><code>15 (B2_RECAUDADO)</code></td></tr>
+        <tr><td><code>504</code></td><td><code>5 · MINISTRACIONES</code></td><td><code>FASP_FEDERAL</code></td><td>1.4 Ministración FASP Federal</td><td><code>14 (B1_DEVENGADO)</code></td><td><code>15 (B2_RECAUDADO)</code></td></tr>
+        <tr><td><code>505</code></td><td><code>5 · MINISTRACIONES</code></td><td><code>JUSTICIA_LABORAL</code></td><td>1.5 Ministración para Justicia Laboral</td><td><code>14 (B1_DEVENGADO)</code></td><td><code>15 (B2_RECAUDADO)</code></td></tr>
+        <tr><td><code>601</code></td><td><code>6 · PROPIOS</code></td><td><code>VENTA_BASES</code></td><td>2.1 Venta de Bases de Licitación Pública</td><td><code>16 (B3_SIMULTANEO)</code></td><td><code>16 (B3_SIMULTANEO)</code></td></tr>
+        <tr><td><code>602</code></td><td><code>6 · PROPIOS</code></td><td><code>ARRENDAMIENTOS_ESP</code></td><td>2.2 Arrendamiento de Espacios en Sedes Judiciales</td><td><code>16 (B3) ó 14 (B1)</code></td><td><code>16 (B3) ó 15 (B2)</code></td></tr>
+        <tr><td><code>603</code></td><td><code>6 · PROPIOS</code></td><td><code>RENDIMIENTOS_FIN</code></td><td>2.3 Rendimientos Financieros Bancarios</td><td><code>16 (B3_SIMULTANEO)</code></td><td><code>16 (B3_SIMULTANEO)</code></td></tr>
+        <tr><td><code>604</code></td><td><code>6 · PROPIOS</code></td><td><code>DERECHOS_PRODUCTOS</code></td><td>2.4 Derechos y Servicios Administrativos (Copias, Certificaciones)</td><td><code>16 (B3_SIMULTANEO)</code></td><td><code>16 (B3_SIMULTANEO)</code></td></tr>
+        <tr><td><code>701</code></td><td><code>7 · REINTEGROS</code></td><td><code>DEVOLUCION_ANTICIPO</code></td><td>3.1 Devolución de Anticipos no Amortizados (Proveedores/Contratistas)</td><td><code>18 (B4_NO_PRESUP)</code></td><td><code>18 (B4_NO_PRESUP)</code></td></tr>
+        <tr><td><code>702</code></td><td><code>7 · REINTEGROS</code></td><td><code>REINTEGRO_NOMINA</code></td><td>3.2 Reintegro de Nómina (Pagos Indebidos Cap. 1000)</td><td><code>18 (B4_NO_PRESUP)</code></td><td><code>18 (B4_NO_PRESUP)</code></td></tr>
+        <tr><td><code>703</code></td><td><code>7 · REINTEGROS</code></td><td><code>REINTEGRO_VIATICOS</code></td><td>3.3 Reintegro de Viáticos no Devengados en Comisión</td><td><code>18 (B4_NO_PRESUP)</code></td><td><code>18 (B4_NO_PRESUP)</code></td></tr>
+        <tr><td><code>801</code></td><td><code>8 · ING_NO_PRESUP</code></td><td><code>DEPOSITO_NO_ID</code></td><td>4.1 Depósito Bancario No Identificado (Pasivo en Custodia)</td><td><code>18 (B4_NO_PRESUP)</code></td><td><code>18 (B4_NO_PRESUP)</code></td></tr>
+        <tr><td><code>802</code></td><td><code>8 · ING_NO_PRESUP</code></td><td><code>ACLARACION_DEPOSITO</code></td><td>4.2 Aclaración y Reclasificación de Depósito en Custodia</td><td><code>18 (B4_NO_PRESUP)</code></td><td><code>14/15/16 (Definitiva)</code></td></tr>
       </tbody>
     </table>
   </div>
 
   <!-- 5. MODELO DE DATOS -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">5</span> Modelo de Datos y Diccionario de Campos</div>
+    <div class="section-title"><span class="section-num">5</span> Modelo de Datos Normalizado y Diccionario de Campos</div>
     <p>
-      El esquema <code>contabilidad</code> (con enlaces directos a <code>config</code> y <code>cxp</code>) estructura el ecosistema de matrices de conversión contable-presupuestaria a través de <strong>10 tablas interconectadas</strong>, organizadas en cuatro capas de arquitectura operativa y forense:
+      El esquema <code>contabilidad</code> concentra la totalidad de la jerarquía de conversión contable-presupuestaria en <strong>10 tablas interconectadas</strong>. Las 5 primeras conforman el <strong>árbol jerárquico con llaves foráneas compuestas identificadoras</strong> (eliminando la dispersión previa hacia <code>cxp</code> e <code>ingresos</code>), mientras que las 5 restantes brindan soporte de eventos, configuración anual, candidatos y evidencia forense inmutable:
     </p>
 
     <!-- MAPA RESUMEN DE LAS 10 TABLAS -->
     <div style="background:var(--pjev-gris-fondo); border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px; margin-bottom:18px;">
-      <div style="font-weight:700; color:var(--pjev-verde-oscuro); margin-bottom:8px; font-size:13px;">Ecosistema Relacional de Matrices en PostgreSQL (10 Tablas)</div>
+      <div style="font-weight:700; color:var(--pjev-verde-oscuro); margin-bottom:8px; font-size:13px;">Ecosistema Relacional de Matrices en PostgreSQL (Esquema <code>contabilidad</code>)</div>
       <table class="props-table" style="font-size:11.5px; margin:0;">
         <thead>
           <tr>
-            <th style="width:28%;">Capa Arquitectónica</th>
-            <th style="width:32%;">Tabla en PostgreSQL</th>
-            <th>Rol y Responsabilidad Funcional</th>
+            <th style="width:26%;">Capa Arquitectónica</th>
+            <th style="width:34%;">Tabla en PostgreSQL</th>
+            <th>Llave Primaria / Llave Foránea Compuesta y Responsabilidad</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td rowspan="3" style="font-weight:600; background:#fff;">1. Parametrización y Reglas Operativas</td>
+            <td rowspan="5" style="font-weight:600; background:#fff;">1. Árbol Jerárquico de Conversión (5 Niveles)</td>
             <td><code>contabilidad.matriz_conversion</code></td>
-            <td>Cabecera de matriz, momentos contables, vigencias, versión y control de concurrencia.</td>
+            <td><strong>PK:</strong> <code>matriz_id</code>. Cabecera de matriz CONAC o institucional (A1, A0, A2, A3, B1, B2, B3, B4), ámbito, momento, ejercicio y vigencia GiST.</td>
+          </tr>
+          <tr>
+            <td><code>contabilidad.matriz_grupos_tramite</code></td>
+            <td><strong>PK:</strong> <code>matriz_grupo_id</code>. Catálogo maestro de los 8 grupos de trámite (4 de Egresos y 4 de Ingresos) con indicador <code>afecta_presupuesto</code>.</td>
+          </tr>
+          <tr>
+            <td><code>contabilidad.matriz_grupos_procedimiento</code></td>
+            <td><strong>PK:</strong> <code>matriz_grupo_procedimiento_id</code> | <strong>UQ:</strong> <code>(matriz_grupo_id, matriz_grupo_procedimiento_id)</code>. Subprocedimientos de Egresos (20) e Ingresos (14) y sus matrices por etapa.</td>
           </tr>
           <tr>
             <td><code>contabilidad.matriz_conversion_regla</code></td>
-            <td>Condiciones de activación por perfil (Egreso/Ingreso), COG, CRI, tipo de gasto y clasificaciones.</td>
+            <td><strong>PK:</strong> <code>matriz_regla_id</code> | <strong>FK Compuesta:</strong> <code>(matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id)</code>. Regla específica por COG, CRI o Cuenta de Pasivo/Custodia.</td>
           </tr>
           <tr>
             <td><code>contabilidad.matriz_conversion_movimiento</code></td>
-            <td>Líneas contables patrimoniales (C) y presupuestarias (P), Debe/Haber y fórmulas de cálculo.</td>
+            <td><strong>PK:</strong> <code>matriz_movimiento_id</code> | <strong>FK Compuesta:</strong> <code>(matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id)</code>. Renglones de Cargo (D) y Abono (H), Contables (C) y Presupuestarios (P).</td>
           </tr>
           <tr style="background:#fcfdfc;">
             <td rowspan="2" style="font-weight:600; background:#fcfdfc;">2. Evidencia Forense de Aplicación</td>
             <td><code>contabilidad.matriz_conversion_aplicacion</code></td>
-            <td>Evidencia inmutable de ejecución automática, snapshot de insumos y fotografía de la regla.</td>
+            <td>Evidencia inmutable de ejecución automática con llave compuesta hacia la regla ejecutada y snapshot JSONB.</td>
           </tr>
           <tr style="background:#fcfdfc;">
             <td><code>contabilidad.matriz_conversion_aplicacion_movimiento</code></td>
             <td>Partidas individuales calculadas con alta precisión financiera (<code>NUMERIC(24,6)</code>).</td>
           </tr>
           <tr>
-            <td rowspan="2" style="font-weight:600; background:#fff;">3. Gobernanza y Candidatos</td>
+            <td rowspan="3" style="font-weight:600; background:#fff;">3. Gobernanza, Eventos y Candidatos</td>
+            <td><code>contabilidad.catalogo_eventos_matriz</code></td>
+            <td>Catálogo de hechos económicos disparadores (<code>OBLIGACION_RECONOCIDA</code>, <code>PAGO_PASIVO</code>, <code>ENTERO_RETENCION</code>, etc.).</td>
+          </tr>
+          <tr>
             <td><code>contabilidad.matriz_conversion_configuracion</code></td>
             <td>Parámetros globales anuales, cuenta contable de cuadre por redondeo y tolerancia de centavos.</td>
           </tr>
           <tr>
             <td><code>contabilidad.matriz_conversion_candidato</code></td>
-            <td>Buffer inteligente para detectar y promover cuentas contables reales desde catálogos sin inventar datos.</td>
-          </tr>
-          <tr style="background:#fcfdfc;">
-            <td rowspan="3" style="font-weight:600; background:#fcfdfc;">4. Homologación CxP y Auditoría</td>
-            <td><code>contabilidad.mapeo_procedimiento_operacion</code></td>
-            <td>Enlace unívoco entre los 12 procedimientos de CxP y los eventos de matriz contable.</td>
-          </tr>
-          <tr style="background:#fcfdfc;">
-            <td><code>contabilidad.matriz_regla_clasificacion_candidato</code></td>
-            <td>Resolución de ambigüedades cuando múltiples trámites administrativos comparten el mismo COG.</td>
-          </tr>
-          <tr style="background:#fcfdfc;">
-            <td><code>contabilidad.matriz_clasificacion_ejecucion</code></td>
-            <td>Bitácora inmutable de migración con hash criptográfico MD5 que certifica reglas validadas.</td>
+            <td>Buffer inteligente para detectar y promover cuentas contables reales desde catálogos institucionales.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <!-- 5.1 MATRIZ_CONVERSION -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">5.1. Cabecera de Matriz (<code>contabilidad.matriz_conversion</code>)</h4>
+    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">5.1. Nivel 1: Cabecera de Matriz (<code>contabilidad.matriz_conversion</code>)</h4>
     <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
-      Define la identidad funcional de cada matriz, su momento contable-presupuestario asociado, ejercicio y rango de vigencia temporal. Controlada por restricción GiST para evitar traslapes.
+      Raíz del árbol. Define la identidad funcional de cada matriz, su ámbito (<code>E</code>/<code>I</code>), su momento contable-presupuestario asociado, ejercicio y rango de vigencia temporal.
     </p>
     <table class="props-table">
       <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
       <tbody>
-        <tr><td><code>mcv_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único secuencial de la matriz en base de datos.</td></tr>
-        <tr><td><code>mcv_clave</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Clave nemotécnica única por ejercicio y versión (ej. <code>A1_DEVENGADO_GASTOS</code>, <code>A0_RECLASIFICA_ORDEN_PAGO</code>).</td></tr>
+        <tr><td><code>matriz_id</code> <small>(antes <code>mcv_id</code>)</small></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único secuencial de la matriz en base de datos.</td></tr>
+        <tr><td><code>mcv_clave</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Clave nemotécnica única por ejercicio y versión (ej. <code>A1_DEVENGADO_GASTOS</code>, <code>A3_EGRESO_NO_PRESUPUESTARIO</code>, <code>B4_INGRESO_NO_PRESUPUESTARIO</code>).</td></tr>
         <tr><td><code>mcv_nombre</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Nombre formal visible en el catálogo institucional.</td></tr>
         <tr><td><code>mcv_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>No</td><td>Descripción del alcance operativo y criterios contables aplicables.</td></tr>
         <tr><td><code>mcv_tipo_registro</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td><code>MATRIZ_CONVERSION_CONAC</code> o <code>GUIA_CONTABILIZADORA</code>.</td></tr>
-        <tr><td><code>mcv_familia_conac</code></td><td><code>VARCHAR(5)</code></td><td>No</td><td>Familia CONAC: <code>A1</code> | <code>A2</code> (Egresos), <code>B1</code> | <code>B2</code> | <code>B3</code> (Ingresos), <code>NULL</code> si es guía o institucional.</td></tr>
+        <tr><td><code>mcv_familia_conac</code></td><td><code>VARCHAR(5)</code></td><td>No</td><td>Familia CONAC/PJEV: <code>A1</code> | <code>A0</code> | <code>A2</code> | <code>A3</code> (Egresos), <code>B1</code> | <code>B2</code> | <code>B3</code> | <code>B4</code> (Ingresos).</td></tr>
         <tr><td><code>mcv_area_pjev</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Área responsable del Poder Judicial de la emisión de la matriz.</td></tr>
-        <tr><td><code>mcv_procedimiento_pjev</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Procedimiento administrativo asociado (ej. <code>RECEPCION_Y_REVISION_DE_GASTOS</code>, <code>DISPERSION_DE_NOMINA</code>).</td></tr>
-        <tr><td><code>mcv_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td>Ámbito presupuestal: <code>E</code> (Egresos) o <code>I</code> (Ingresos). Check <code>ck_mcv_ambito</code>.</td></tr>
-        <tr><td><code>mcv_momento_id</code></td><td><code>INTEGER (FK)</code></td><td>Sí</td><td>FK a <code>config.catalogo_momentos(mc_id)</code> (DEV, EJE, PAG, REC).</td></tr>
+        <tr><td><code>mcv_procedimiento_pjev</code></td><td><code>VARCHAR(250)</code></td><td>Sí</td><td>Procedimiento administrativo asociado.</td></tr>
+        <tr><td><code>mcv_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td>Ámbito: <code>E</code> (Egresos) o <code>I</code> (Ingresos). Check <code>ck_mcv_ambito</code>.</td></tr>
+        <tr><td><code>mcv_momento_id</code></td><td><code>INTEGER (FK)</code></td><td>No</td><td>FK a <code>config.catalogo_momentos(mc_id)</code> (<code>4</code> DEV, <code>5</code> EJE, <code>6</code> PAG/REC; <code>NULL</code> en matrices extrapresupuestarias <code>A3</code> y <code>B4</code>).</td></tr>
         <tr><td><code>mcv_ejercicio</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Ejercicio fiscal (2000 a 2100). Check <code>ck_mcv_ejercicio</code>.</td></tr>
         <tr><td><code>mcv_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Versión secuencial de la matriz (> 0). Default 1.</td></tr>
-        <tr><td><code>mcv_vigencia_inicio</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha de inicio de vigencia dentro del ejercicio fiscal.</td></tr>
-        <tr><td><code>mcv_vigencia_fin</code></td><td><code>DATE</code></td><td>Sí</td><td>Fecha de término de vigencia dentro del ejercicio fiscal (>= inicio).</td></tr>
+        <tr><td><code>mcv_vigencia_inicio</code> / <code>_fin</code></td><td><code>DATE</code></td><td>Sí</td><td>Rango de vigencia dentro del ejercicio fiscal.</td></tr>
         <tr><td><code>mcv_estado</code></td><td><code>VARCHAR(15)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>VALIDADA</code> | <code>ACTIVA</code> | <code>CERRADA</code>. Check <code>ck_mcv_estado</code>.</td></tr>
-        <tr><td><code>mcv_lock_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Control de concurrencia optimista (incrementa con cada UPDATE vía trigger). Check > 0.</td></tr>
+        <tr><td><code>mcv_lock_version</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Control de concurrencia optimista (incrementa con cada UPDATE vía trigger).</td></tr>
         <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Baja lógica (Soft delete).</td></tr>
-        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de creación institucional.</td></tr>
-        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de última modificación.</td></tr>
+        <tr><td><code>usuario_c</code> / <code>fecha_c</code> / <code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR / TIMESTAMPTZ</code></td><td>Sí/No</td><td>Campos estándar de auditoría institucional.</td></tr>
       </tbody>
     </table>
-    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
-      <em>Restricciones clave:</em> <code>uq_mcv_clave_version</code> (clave, ejercicio, versión), <code>ex_mcv_activa_sin_traslape</code> (exclusión GiST temporal que impide dos versiones activas traslapadas para la misma clave, ejercicio, momento y ámbito), y trigger <code>trg_matriz_conversion_proteger_version</code> (inmutabilidad estricta fuera de BORRADOR).
-    </div>
 
-    <!-- 5.2 MATRIZ_CONVERSION_REGLA -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.2. Reglas Condicionales y Enlace a Procedimientos (<code>contabilidad.matriz_conversion_regla</code>)</h4>
+    <!-- 5.2 MATRIZ_GRUPOS_TRAMITE -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.2. Nivel 2: Grupos de Trámite (<code>contabilidad.matriz_grupos_tramite</code>)</h4>
     <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
-      Alberga cada criterio de selección que determina qué regla disparar con base en el perfil, operación, COG, tipo de gasto y su homologación con los procedimientos de CxP (Migraciones 145, 148, 158 y 159).
+      Sustituye y unifica en <code>contabilidad</code> a <code>cxp.catalogo_grupos_tramite</code> y a la agrupación <code>tipo_principal</code> de Ingresos. Clasifica los trámites en 4 grupos de Egresos y 4 grupos de Ingresos.
     </p>
     <table class="props-table">
       <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
       <tbody>
-        <tr><td><code>mcr_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único de la regla contable.</td></tr>
-        <tr><td><code>mcr_matriz_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion(mcv_id)</code>.</td></tr>
-        <tr><td><code>mcr_clave</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Clave única dentro de la matriz (ej. <code>R_A1_11301_01</code>). Unique <code>uq_mcr_clave</code>.</td></tr>
+        <tr><td><code>matriz_grupo_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del grupo de trámite (<code>1..4</code> Egresos, <code>5..8</code> Ingresos).</td></tr>
+        <tr><td><code>mgt_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>E</code> = Egresos (Tesorería/Caja); <code>I</code> = Ingresos.</td></tr>
+        <tr><td><code>mgt_codigo</code></td><td><code>VARCHAR(30) (UQ)</code></td><td>Sí</td><td>Código único del grupo (<code>DIRECTO</code>, <code>PEDIDO</code>, <code>COMPROBAR</code>, <code>EGR_NO_PRESUPUESTARIO</code>, <code>MINISTRACIONES</code>, <code>PROPIOS</code>, <code>REINTEGROS</code>, <code>ING_NO_PRESUPUESTARIO</code>).</td></tr>
+        <tr><td><code>mgt_numero</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Número ordinal dentro de su ámbito (<code>1</code> a <code>4</code>).</td></tr>
+        <tr><td><code>mgt_titulo</code></td><td><code>VARCHAR(100)</code></td><td>Sí</td><td>Título visible en las tarjetas de selección (ej. <code>1. Pago directo</code>, <code>2. Pago derivado de un pedido (materiales)</code>).</td></tr>
+        <tr><td><code>mgt_subtitulo</code></td><td><code>VARCHAR(150)</code></td><td>No</td><td>Subtítulo descriptivo para la interfaz de usuario.</td></tr>
+        <tr><td><code>mgt_descripcion</code></td><td><code>VARCHAR(400)</code></td><td>No</td><td>Explicación funcional de los trámites comprendidos en el grupo.</td></tr>
+        <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>Sí</td><td><code>true</code> si devenga/recauda presupuesto (Grupos 1, 2, 3 de Egresos y 1, 2 de Ingresos); <code>false</code> si es extrapresupuestario o reintegro.</td></tr>
+        <tr><td><code>mgt_icono</code> / <code>mgt_permiso_requerido</code></td><td><code>VARCHAR(50)</code></td><td>No</td><td>Metadatos de presentación y control de acceso RBAC.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Inactivo.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 5.3 MATRIZ_GRUPOS_PROCEDIMIENTO -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.3. Nivel 3: Procedimientos / Subtrámites por Grupo (<code>contabilidad.matriz_grupos_procedimiento</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Hijo directo de <code>matriz_grupos_tramite</code>. Unifica en <code>contabilidad</code> los 20 subprocedimientos de Egresos y los 14 subtipos de Ingresos, y define explícitamente las matrices que utiliza cada procedimiento al iniciarse (devengado/recepción) y al liquidarse (pago/recaudación).
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>matriz_grupo_procedimiento_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del procedimiento/subtrámite.</td></tr>
+        <tr><td><code>matriz_grupo_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_grupos_tramite(matriz_grupo_id)</code>. Forma restricción única <code>uq_mgp_grupo_proc (matriz_grupo_id, matriz_grupo_procedimiento_id)</code>.</td></tr>
+        <tr><td><code>mgp_codigo</code></td><td><code>VARCHAR(40) (UQ)</code></td><td>Sí</td><td>Código canónico del subprocedimiento (ej. <code>NOMINA_BRUTA</code>, <code>ARRENDAMIENTO</code>, <code>COMPRA_PEDIDO_ALMACEN</code>, <code>MIN_ESTATAL_ORD</code>, <code>VENTA_BASES</code>).</td></tr>
+        <tr><td><code>mgp_nombre</code></td><td><code>VARCHAR(150)</code></td><td>Sí</td><td>Nombre oficial conforme al Manual de Procedimientos de la SRF.</td></tr>
+        <tr><td><code>mgp_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>No</td><td>Descripción operativa y documental del subprocedimiento.</td></tr>
+        <tr><td><code>matriz_inicial_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion(matriz_id)</code> aplicada en la primera etapa (<code>12</code> A1 Devengado, <code>17</code> A3 No Presup., <code>14</code> B1 Devengado, <code>16</code> B3 Simultáneo o <code>18</code> B4 No Presup.). <strong>Nunca es <code>NULL</code></strong>.</td></tr>
+        <tr><td><code>matriz_intermedia_id</code></td><td><code>BIGINT (FK)</code></td><td>No</td><td>FK a <code>contabilidad.matriz_conversion(matriz_id)</code> cuando existe etapa intermedia de Orden de Pago (<code>22</code> A0 Reclasificación).</td></tr>
+        <tr><td><code>matriz_final_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion(matriz_id)</code> aplicada al liquidar en Caja o recaudar en Bancos (<code>13</code> A2 Pagado, <code>17</code> A3, <code>15</code> B2 Recaudado, <code>16</code> B3 o <code>18</code> B4).</td></tr>
+        <tr><td><code>mgp_tipo_beneficiario</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Tipo de contraparte/beneficiario requerido (<code>PROVEEDOR</code>, <code>EMPLEADO</code>, <code>UNIDAD_ADMINISTRATIVA</code>, <code>BIEN_INMUEBLE</code>, <code>TERCERO_INSTITUCIONAL</code>, <code>ENTE_PUBLICO</code>, <code>BANCO</code>, <code>CIUDADANO</code>).</td></tr>
+        <tr><td><code>mgp_requiere_pedido</code> / <code>mgp_requiere_cfdi</code> / <code>mgp_requiere_oficio</code></td><td><code>BOOLEAN</code></td><td>Sí</td><td>Banderas de validación documental sincronizadas con <code>05.1.1 Requisitos Documentales</code> e Ingresos.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Inactivo.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 5.4 MATRIZ_CONVERSION_REGLA -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.4. Nivel 4: Reglas de Conversión con Llave Compuesta (<code>contabilidad.matriz_conversion_regla</code>)</h4>
+    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
+      Contiene la regla contable específica para cada combinación de <strong>Matriz + Grupo de Trámite + Procedimiento + Clasificador (COG / CRI / Cuenta de Pasivo)</strong>. Gracias a su llave foránea compuesta hacia <code>matriz_grupos_procedimiento</code>, ninguna regla queda huérfana ni en estado ambiguo.
+    </p>
+    <table class="props-table">
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
+      <tbody>
+        <tr><td><code>matriz_regla_id</code> <small>(antes <code>mcr_id</code>)</small></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único de la regla contable. Forma llave única compuesta <code>uq_mcr_arbol (matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id)</code>.</td></tr>
+        <tr><td><code>matriz_id</code> <small>(antes <code>mcr_matriz_id</code>)</small></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion(matriz_id)</code>.</td></tr>
+        <tr><td><code>matriz_grupo_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Parte 1 de la FK compuesta hacia <code>matriz_grupos_procedimiento(matriz_grupo_id, matriz_grupo_procedimiento_id)</code>.</td></tr>
+        <tr><td><code>matriz_grupo_procedimiento_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Parte 2 de la FK compuesta hacia <code>matriz_grupos_procedimiento(matriz_grupo_id, matriz_grupo_procedimiento_id)</code>.</td></tr>
+        <tr><td><code>mcr_evento_codigo</code></td><td><code>VARCHAR(50) (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.catalogo_eventos_matriz(cem_codigo)</code> (ej. <code>OBLIGACION_RECONOCIDA</code>, <code>PAGO_PASIVO</code>, <code>ENTERO_RETENCION</code>).</td></tr>
+        <tr><td><code>mcr_clave</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Clave única dentro de la matriz y procedimiento (ej. <code>R_A1_DIR_NOM_11301</code>).</td></tr>
         <tr><td><code>mcr_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>No</td><td>Descripción funcional del hecho económico evaluado.</td></tr>
-        <tr><td><code>mcr_tipo_operacion</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Operación homologada (<code>COMPRA_DIRECTA</code>, <code>NOMINA</code>, <code>ARRENDAMIENTO</code>, etc.).</td></tr>
-        <tr><td><code>mcr_procedimiento_codigo</code></td><td><code>VARCHAR(40) (FK)</code></td><td>No</td><td>FK a <code>cxp.catalogo_procedimientos_afectacion(cpa_codigo)</code> (Migración 158/159).</td></tr>
-        <tr><td><code>mcr_evento_codigo</code></td><td><code>VARCHAR(50) (FK)</code></td><td>No</td><td>FK a <code>contabilidad.catalogo_eventos_matriz(cem_codigo)</code> (ej. <code>OBLIGACION_RECONOCIDA</code>, <code>PAGO_PASIVO</code>).</td></tr>
-        <tr><td><code>mcr_clasificacion_estado</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td><code>DETERMINADA</code> | <code>AMBIGUA</code> | <code>FUERA_ALCANCE</code>. Check <code>ck_mcr_clasificacion_estado</code>.</td></tr>
-        <tr><td><code>mcr_clasificacion_motivo</code></td><td><code>VARCHAR(1000)</code></td><td>No</td><td>Justificación técnica del dictamen de clasificación o desempate.</td></tr>
-        <tr><td><code>mcr_perfil</code></td><td><code>VARCHAR(10)</code></td><td>Sí</td><td><code>EGRESO</code> o <code>INGRESO</code>. Default <code>EGRESO</code>.</td></tr>
-        <tr><td><code>mcr_nivel_afectacion</code></td><td><code>VARCHAR(40)</code></td><td>Cond.</td><td>En Egresos: <code>PROVEEDOR</code> | <code>EMPLEADO</code> | <code>BENEFICIARIO_PENSION_ALIMENTICIA</code> | <code>TERCERO_INSTITUCIONAL</code> | <code>BIEN_INMUEBLE</code>.</td></tr>
-        <tr><td><code>mcr_tipo_proveedor_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_subtipo_proveedor(psp_id)</code> (>0 si PROVEEDOR, 0 si otro nivel).</td></tr>
-        <tr><td><code>mcr_cog_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cog(cog_id)</code> (Requerido en egresos).</td></tr>
-        <tr><td><code>mcr_tipo_gasto</code></td><td><code>SMALLINT</code></td><td>Cond.</td><td>1 = Gasto Corriente, 2 = Gasto de Capital (Requerido en egresos).</td></tr>
-        <tr><td><code>mcr_tipo_ingreso</code></td><td><code>VARCHAR(40)</code></td><td>Cond.</td><td>En Ingresos: Familia de trámite (ej. <code>MINISTRACIONES</code>).</td></tr>
-        <tr><td><code>mcr_concepto_ingreso</code></td><td><code>VARCHAR(80)</code></td><td>Cond.</td><td>En Ingresos: Concepto institucional (ej. <code>MIN_ESTATAL_ORD</code>).</td></tr>
-        <tr><td><code>mcr_cri_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cri(cri_id)</code> (Requerido en ingresos).</td></tr>
+        <tr><td><code>mcr_perfil</code></td><td><code>VARCHAR(10)</code></td><td>Sí</td><td><code>EGRESO</code> o <code>INGRESO</code>.</td></tr>
+        <tr><td><code>mcr_nivel_afectacion</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Nivel de contraparte: <code>PROVEEDOR</code> | <code>EMPLEADO</code> | <code>BENEFICIARIO_PENSION_ALIMENTICIA</code> | <code>TERCERO_INSTITUCIONAL</code> | <code>BIEN_INMUEBLE</code> | <code>ENTE_PUBLICO</code> | <code>BANCO</code>.</td></tr>
+        <tr><td><code>mcr_tipo_proveedor_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_subtipo_proveedor(psp_id)</code> (>0 si es <code>PROVEEDOR</code>).</td></tr>
+        <tr><td><code>mcr_cog_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cog(cog_id)</code> (Obligatorio cuando el grupo es de Egresos y <code>afecta_presupuesto = true</code>).</td></tr>
+        <tr><td><code>mcr_cri_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_cri(cri_id)</code> (Obligatorio cuando el grupo es de Ingresos y <code>afecta_presupuesto = true</code>).</td></tr>
+        <tr><td><code>mcr_cuenta_pasivo_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>contabilidad.catalogo_cuentas(cc_id)</code> (Obligatorio cuando <code>afecta_presupuesto = false</code> en matrices <code>A3</code> y <code>B4</code>, p. ej. cuenta de retención ISR/IPE o depósito en custodia).</td></tr>
+        <tr><td><code>mcr_tipo_gasto</code></td><td><code>SMALLINT</code></td><td>Cond.</td><td>1 = Gasto Corriente, 2 = Gasto de Capital (En egresos presupuestarios).</td></tr>
         <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Baja lógica (Soft delete).</td></tr>
-        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de alta de la regla.</td></tr>
-        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de actualización.</td></tr>
       </tbody>
     </table>
     <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
-      <em>Gobernanza:</em> Restricción de unicidad compuesta <code>uq_mcr_id_matriz (mcr_id, mcr_matriz_id)</code> y trigger <code>trg_mcr_exigir_borrador</code> que prohíbe modificaciones si la matriz no está en estado <code>BORRADOR</code>.
+      <em>Integridad Jerárquica:</em> La restricción <code>fk_mcr_grupo_procedimiento FOREIGN KEY (matriz_grupo_id, matriz_grupo_procedimiento_id) REFERENCES contabilidad.matriz_grupos_procedimiento (matriz_grupo_id, matriz_grupo_procedimiento_id)</code> impide asociar un procedimiento a un grupo que no le corresponde.
     </div>
 
-    <!-- 5.3 MATRIZ_CONVERSION_MOVIMIENTO -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.3. Movimientos y Asientos (<code>contabilidad.matriz_conversion_movimiento</code>)</h4>
+    <!-- 5.5 MATRIZ_CONVERSION_MOVIMIENTO -->
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.5. Nivel 5: Movimientos y Asientos con Llave Compuesta (<code>contabilidad.matriz_conversion_movimiento</code>)</h4>
     <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
-      Estructura las partidas individuales del asiento contable y presupuestario que se deben generar al dispararse la regla.
+      Último eslabón del árbol. Estructura las partidas individuales de Cargo (<code>D</code>) y Abono (<code>H</code>) contables (<code>C</code>) y presupuestarias (<code>P</code>). Incluye la llave compuesta completa de sus 4 ancestros para lectura directa indexada.
     </p>
     <table class="props-table">
       <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
       <tbody>
-        <tr><td><code>mcm_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del renglón de movimiento.</td></tr>
-        <tr><td><code>mcm_regla_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion_regla(mcr_id)</code>.</td></tr>
-        <tr><td><code>mcm_orden</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Secuencia de asiento dentro de la regla (1, 2, 3...). Unique <code>uq_mcm_orden (mcm_regla_id, mcm_orden)</code>.</td></tr>
+        <tr><td><code>matriz_movimiento_id</code> <small>(antes <code>mcm_id</code>)</small></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del renglón de movimiento.</td></tr>
+        <tr><td><code>matriz_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Parte 1 de la FK compuesta hacia <code>matriz_conversion_regla</code>.</td></tr>
+        <tr><td><code>matriz_grupo_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Parte 2 de la FK compuesta hacia <code>matriz_conversion_regla</code>.</td></tr>
+        <tr><td><code>matriz_grupo_procedimiento_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Parte 3 de la FK compuesta hacia <code>matriz_conversion_regla</code>.</td></tr>
+        <tr><td><code>matriz_regla_id</code> <small>(antes <code>mcm_regla_id</code>)</small></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>Parte 4 de la FK compuesta hacia <code>matriz_conversion_regla</code>.</td></tr>
+        <tr><td><code>mcm_orden</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>Secuencia de asiento dentro de la regla (1, 2, 3, 4...). Unique <code>uq_mcm_orden (matriz_regla_id, mcm_orden)</code>.</td></tr>
         <tr><td><code>mcm_ambito</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>C</code> = Asiento Contable Patrimonial; <code>P</code> = Asiento Presupuestario (Clase 8). Check <code>ck_mcm_ambito</code>.</td></tr>
         <tr><td><code>mcm_naturaleza</code></td><td><code>CHAR(1)</code></td><td>Sí</td><td><code>D</code> = Debe (Cargo); <code>H</code> = Haber (Abono). Check <code>ck_mcm_naturaleza</code>.</td></tr>
         <tr><td><code>mcm_origen_cuenta</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Origen dinámico: <code>FIJA</code> | <code>CUENTA_PRESUPUESTARIA_POR_MOMENTO</code> | <code>TERCERO_INSTITUCIONAL</code> | <code>CHEQUERA</code> | <code>CUENTA_CONTABLE_POR_CRI_COG</code>.</td></tr>
@@ -386,18 +582,16 @@
         <tr><td><code>mcm_momento_id</code></td><td><code>INTEGER (FK)</code></td><td>Cond.</td><td>FK a <code>config.catalogo_momentos(mc_id)</code> (Obligatorio si origen es presupuestario por momento).</td></tr>
         <tr><td><code>mcm_formula_importe</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Fórmula aritmética: <code>TOTAL</code> | <code>DETALLE</code> | <code>SUBTOTAL</code> | <code>IVA</code> | <code>RETENCIONES</code> | <code>NETO_PAGAR</code>.</td></tr>
         <tr><td><code>mcm_descripcion</code></td><td><code>VARCHAR(300)</code></td><td>No</td><td>Leyenda explicativa del cargo o abono contable.</td></tr>
-        <tr><td><code>mcm_es_obligatorio</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Asiento estricto; 0 = Omitible si el resultado aritmético del componente evaluado es cero (ej. IVA en exentos).</td></tr>
+        <tr><td><code>mcm_es_obligatorio</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Asiento estricto; 0 = Omitible si el resultado aritmético del componente evaluado es cero.</td></tr>
         <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Inactivo.</td></tr>
-        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de creación.</td></tr>
-        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(20) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de última modificación.</td></tr>
       </tbody>
     </table>
     <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
-      <em>Seguridad:</em> Gobernado por el trigger <code>trg_mcm_exigir_borrador</code>, que rechaza cualquier adición o cambio de movimiento si la matriz cabecera no se encuentra en estado <code>BORRADOR</code>.
+      <em>Integridad Compuesta y Seguridad:</em> La restricción <code>fk_mcm_regla_arbol FOREIGN KEY (matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id) REFERENCES contabilidad.matriz_conversion_regla (matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id)</code> certifica que todo movimiento coincida exactamente con la matriz, grupo, procedimiento y regla padre. Gobernado además por el trigger <code>trg_mcm_exigir_borrador</code>.
     </div>
 
     <!-- 5.4 MATRIZ_CONVERSION_APLICACION -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.4. Evidencia Forense de Aplicación (<code>contabilidad.matriz_conversion_aplicacion</code>)</h4>
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.6. Evidencia Forense de Aplicación (<code>contabilidad.matriz_conversion_aplicacion</code>)</h4>
     <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
       Tabla de evidencia transaccional e inmutable. Registra cada ejecución automática de conversión efectuada por el motor, preservando la fotografía exacta de los datos procesados y la regla utilizada para trazabilidad de auditoría interna y ORFIS.
     </p>
@@ -424,7 +618,7 @@
     </div>
 
     <!-- 5.5 MATRIZ_CONVERSION_APLICACION_MOVIMIENTO -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.5. Partidas Calculadas de Alta Precisión (<code>contabilidad.matriz_conversion_aplicacion_movimiento</code>)</h4>
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.7. Partidas Calculadas de Alta Precisión (<code>contabilidad.matriz_conversion_aplicacion_movimiento</code>)</h4>
     <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
       Almacena el detalle renglón por renglón de los importes contables y presupuestarios calculados tras evaluar las fórmulas de la regla sobre los datos de entrada, utilizando precisión extendida de 6 decimales para evitar desfasamientos por redondeo intermedio.
     </p>
@@ -446,7 +640,7 @@
     </div>
 
     <!-- 5.6 MATRIZ_CONVERSION_CONFIGURACION -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.6. Gobernanza Anual y Tolerancia de Redondeo (<code>contabilidad.matriz_conversion_configuracion</code>)</h4>
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.8. Gobernanza Anual y Tolerancia de Redondeo (<code>contabilidad.matriz_conversion_configuracion</code>)</h4>
     <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
       Define los parámetros institucionales por ejercicio fiscal para el comportamiento del motor contable, estableciendo la cuenta de ajuste para descuadres ínfimos y el umbral máximo de tolerancia en pesos (Migración 145).
     </p>
@@ -471,7 +665,7 @@
     </div>
 
     <!-- 5.7 MATRIZ_CONVERSION_CANDIDATO -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.7. Buffer Inteligente de Cuentas y Candidatos (<code>contabilidad.matriz_conversion_candidato</code>)</h4>
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.9. Buffer Inteligente de Cuentas y Candidatos (<code>contabilidad.matriz_conversion_candidato</code>)</h4>
     <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
       Inventario inteligente de correlaciones reales detectadas automáticamente entre los catálogos del SIAF-PJEV (subtipos de proveedores, terceros institucionales de retención, chequeras y bancos) y las cuentas de mayor del Plan de Cuentas (SCG). Sirve para auditar y promover reglas sin inventar información contable (Migración 141).
     </p>
@@ -494,74 +688,8 @@
       <em>Alimentación:</em> Poblada periódicamente mediante el Stored Procedure <code>contabilidad.fn_refrescar_candidatos_matriz_conversion()</code> bajo criterio de idempotencia <code>uq_mcc_origen (mcc_tipo_origen, mcc_origen_id, mcc_cuenta_id)</code>.
     </div>
 
-    <!-- 5.8 MAPEO_PROCEDIMIENTO_OPERACION -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.8. Mapeo de Procedimientos CxP a Eventos Contables (<code>contabilidad.mapeo_procedimiento_operacion</code>)</h4>
-    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
-      Establece el puente estricto y desacoplado entre los 12 procedimientos administrativos de Cuentas por Pagar (<code>cxp.catalogo_procedimientos_afectacion</code>) y los eventos de matriz contable (Migración 158).
-    </p>
-    <table class="props-table">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
-      <tbody>
-        <tr><td><code>mpo_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del mapeo normativo.</td></tr>
-        <tr><td><code>f_procedimiento_codigo</code></td><td><code>VARCHAR(40) (FK)</code></td><td>Sí</td><td>FK a <code>cxp.catalogo_procedimientos_afectacion(cpa_codigo)</code> (ej. <code>NOMINA</code>, <code>SUJETOS_COMPROBAR</code>).</td></tr>
-        <tr><td><code>f_evento_codigo</code></td><td><code>VARCHAR(50) (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.catalogo_eventos_matriz(cem_codigo)</code> (ej. <code>ENTREGA_RECURSO</code>, <code>COMPROBACION_ACEPTADA</code>).</td></tr>
-        <tr><td><code>mpo_tipo_operacion</code></td><td><code>VARCHAR(40)</code></td><td>Sí</td><td>Tipo de operación en la matriz de conversión (ej. <code>COMPRA_DIRECTA</code>, <code>TRANSFERENCIA_OTORGADA</code>).</td></tr>
-        <tr><td><code>mpo_estado</code></td><td><code>VARCHAR(15)</code></td><td>Sí</td><td><code>BORRADOR</code> | <code>VALIDADO</code> | <code>INACTIVO</code>. Default <code>BORRADOR</code>.</td></tr>
-        <tr><td><code>mpo_observaciones</code></td><td><code>VARCHAR(1000)</code></td><td>No</td><td>Criterios normativos de aplicación (ej. distinciones entre entrega de viático vs comprobación de gasto).</td></tr>
-        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Inactivo.</td></tr>
-        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de alta del mapeo.</td></tr>
-        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de actualización.</td></tr>
-      </tbody>
-    </table>
-    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
-      <em>Unicidad Operativa:</em> Índice único parcial <code>uq_mpo_activo (f_procedimiento_codigo, f_evento_codigo, mpo_tipo_operacion) WHERE estatus_registro = 1</code>.
-    </div>
-
-    <!-- 5.9 MATRIZ_REGLA_CLASIFICACION_CANDIDATO -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.9. Candidatos de Clasificación y Desempate (<code>contabilidad.matriz_regla_clasificacion_candidato</code>)</h4>
-    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
-      Registra las alternativas de clasificación cuando una regla contable basada en un COG genérico (ej. 33901 o 39901) puede pertenecer a más de un procedimiento administrativo de CxP, documentando el criterio para que un contador decida sin alterar reglas validadas (Migración 159).
-    </p>
-    <table class="props-table">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
-      <tbody>
-        <tr><td><code>mrcc_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador único del candidato de clasificación.</td></tr>
-        <tr><td><code>f_regla_id</code></td><td><code>BIGINT (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.matriz_conversion_regla(mcr_id)</code> sobre la cual existe ambigüedad.</td></tr>
-        <tr><td><code>f_procedimiento_codigo</code></td><td><code>VARCHAR(40) (FK)</code></td><td>Sí</td><td>FK a <code>cxp.catalogo_procedimientos_afectacion(cpa_codigo)</code> candidato.</td></tr>
-        <tr><td><code>f_evento_codigo</code></td><td><code>VARCHAR(50) (FK)</code></td><td>Sí</td><td>FK a <code>contabilidad.catalogo_eventos_matriz(cem_codigo)</code> candidato.</td></tr>
-        <tr><td><code>mrcc_criterio</code></td><td><code>VARCHAR(500)</code></td><td>Sí</td><td>Justificación técnica del porqué este procedimiento aplica como opción válida para la regla.</td></tr>
-        <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>Sí</td><td>1 = Activo, 0 = Descartado.</td></tr>
-        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Auditoría de detección.</td></tr>
-        <tr><td><code>usuario_m</code> / <code>fecha_m</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>No</td><td>Auditoría de resolución.</td></tr>
-      </tbody>
-    </table>
-    <div style="font-size:11px; color:var(--pjev-texto-muted); margin-top:4px; margin-bottom:18px;">
-      <em>Restricción:</em> Índice único <code>uq_mrcc_activo (f_regla_id, f_procedimiento_codigo, f_evento_codigo) WHERE estatus_registro = 1</code>.
-    </div>
-
-    <!-- 5.10 MATRIZ_CLASIFICACION_EJECUCION -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.10. Bitácora Criptográfica y Auditoría de Integridad (<code>contabilidad.matriz_clasificacion_ejecucion</code>)</h4>
-    <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
-      Tabla de certificación forense que registra los resultados globales de las migraciones y clasificaciones de reglas. Calcula y almacena un hash criptográfico MD5 (<code>mce_huella_validadas</code>) que prueba de forma incontrovertible que ninguna matriz o regla validada sufrió alteraciones no autorizadas (Migración 159).
-    </p>
-    <table class="props-table">
-      <thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripción y Regla Operativa</th></tr></thead>
-      <tbody>
-        <tr><td><code>mce_id</code></td><td><code>BIGSERIAL (PK)</code></td><td>Sí</td><td>Identificador secuencial de la corrida de auditoría / migración.</td></tr>
-        <tr><td><code>mce_migracion</code></td><td><code>VARCHAR(20)</code></td><td>Sí</td><td>Identificador del proceso o script ejecutado (ej. <code>MIGRACION_159</code>).</td></tr>
-        <tr><td><code>mce_reglas_borrador</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Total de reglas en estado borrador evaluadas durante la ejecución.</td></tr>
-        <tr><td><code>mce_determinadas</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Reglas clasificadas de manera unívoca y determinista sin intervención manual.</td></tr>
-        <tr><td><code>mce_ambiguas</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Reglas con coincidencia en más de un procedimiento administrativo.</td></tr>
-        <tr><td><code>mce_fuera_alcance</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Reglas excluidas del clasificador de egresos (ej. matrices de ingreso B1/B2/B3).</td></tr>
-        <tr><td><code>mce_reglas_validadas</code></td><td><code>INTEGER</code></td><td>Sí</td><td>Conteo de reglas preexistentes en estado VALIDADA o ACTIVA que debieron permanecer intocadas.</td></tr>
-        <tr><td><code>mce_huella_validadas</code></td><td><code>VARCHAR(32)</code></td><td>Sí</td><td>Hash criptográfico MD5 de las reglas validadas, garantizando inalterabilidad.</td></tr>
-        <tr><td><code>mce_detalle</code></td><td><code>JSONB</code></td><td>Sí</td><td>Estructura JSON completa con el desglose pormenorizado por procedimiento, evento y COG.</td></tr>
-        <tr><td><code>usuario_c</code> / <code>fecha_c</code></td><td><code>VARCHAR(50) / TIMESTAMPTZ(6)</code></td><td>Sí</td><td>Identidad ejecutora y timestamp exacto de la corrida.</td></tr>
-      </tbody>
-    </table>
-
     <!-- 5.11 CATÁLOGO SOPORTE: EVENTOS DE MATRIZ -->
-    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.11. Catálogo Normalizado de Eventos de Matriz (<code>contabilidad.catalogo_eventos_matriz</code>)</h4>
+    <h4 style="color:var(--pjev-verde-oscuro); margin:20px 0 8px;">5.10. Catálogo Normalizado de Eventos de Matriz (<code>contabilidad.catalogo_eventos_matriz</code>)</h4>
     <p style="font-size:12px; color:var(--pjev-texto-muted); margin-bottom:8px;">
       Catálogo institucional de soporte que normaliza los momentos y hechos económicos que disparan afectaciones en matrices de conversión (Migración 158).
     </p>
@@ -784,16 +912,18 @@ BEGIN
         RETURN jsonb_build_object('error', -1, 'mensaje', 'La matriz no existe.', 'data', NULL);
     END IF;
 
-    -- Localizar la regla que coincide unívocamente con la entrada
+    -- Localizar la regla directamente por su llave compuesta jerárquica (Matriz + Grupo + Procedimiento + Clasificador)
     SELECT * INTO v_regla
       FROM contabilidad.matriz_conversion_regla
-     WHERE mcr_matriz_id = p_matriz_id
-       AND mcr_perfil = p_payload->>'perfil'
-       AND mcr_tipo_operacion = p_payload->>'tipo_operacion'
+     WHERE matriz_id = p_matriz_id
+       AND matriz_grupo_id = (p_payload->>'matriz_grupo_id')::BIGINT
+       AND matriz_grupo_procedimiento_id = (p_payload->>'matriz_grupo_procedimiento_id')::BIGINT
        AND (
-         (mcr_perfil = 'EGRESO' AND mcr_cog_id = (p_payload->>'cog_id')::INTEGER AND mcr_tipo_gasto = (p_payload->>'tipo_gasto')::INTEGER)
+         (mcr_cog_id IS NOT NULL AND mcr_cog_id = (p_payload->>'cog_id')::INTEGER)
          OR
-         (mcr_perfil = 'INGRESO' AND mcr_cri_id = (p_payload->>'cri_id')::INTEGER)
+         (mcr_cri_id IS NOT NULL AND mcr_cri_id = (p_payload->>'cri_id')::INTEGER)
+         OR
+         (mcr_cuenta_pasivo_id IS NOT NULL AND mcr_cuenta_pasivo_id = (p_payload->>'cuenta_pasivo_id')::INTEGER)
        )
        AND estatus_registro = 1
      LIMIT 1;
@@ -1603,6 +1733,13 @@ export class MatrizConversionController {
           <td>Servicio <code>remove</code> y SP <code>fn_crud</code></td>
           <td>Conflicto HTTP 409 / Error: <em>"No puede eliminarse una matriz con pólizas asociadas"</em>.</td>
         </tr>
+        <tr>
+          <td><strong>RN-MT-11</strong></td>
+          <td>Integridad de Llave Compuesta del Árbol</td>
+          <td>Toda regla y todo movimiento deben portar la llave compuesta completa <code>(matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id)</code> validada por <code>FOREIGN KEY</code> compuesta hacia <code>matriz_grupos_procedimiento</code> y <code>matriz_conversion_regla</code>.</td>
+          <td>Constraints PostgreSQL <code>fk_mcr_grupo_procedimiento</code> y <code>fk_mcm_regla_arbol</code></td>
+          <td>Rechazo automático en base de datos ante cualquier combinación huérfana o cruzada entre grupos y subprocedimientos.</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -1743,6 +1880,12 @@ export class MatrizConversionController {
           <td>2026-09-08</td>
           <td>2.1</td>
           <td>Implementación de vista dual en interfaz de reglas: selector de modo <strong>Vista Mosaico</strong> (tarjetas completas con submovimientos) y <strong>Vista Detalles</strong> (tabla compacta con columnas: Clave Identificadora, Nombre, Tipo y Subtipo de Procedimiento, Beneficiario, Clasificador COG/CRI, <strong>Cargo Contable (C)</strong>, <strong>Abono Contable (C)</strong>, Tipo de Gasto, Subtipo de Proveedor y Acciones).</td>
+          <td>Julio César Barrales Flores</td>
+        </tr>
+        <tr>
+          <td>2026-11-08</td>
+          <td>3.0</td>
+          <td>Normalización jerárquica de 5 niveles en <code>contabilidad</code>: incorporación de <code>contabilidad.matriz_grupos_tramite</code> (8 grupos maestros: 4 de Egresos y 4 de Ingresos) y <code>contabilidad.matriz_grupos_procedimiento</code> (20 subprocedimientos de Egresos del Manual SRF y 14 subprocedimientos de Ingresos); adopción de llaves foráneas compuestas identificadoras <code>(matriz_id, matriz_grupo_id, matriz_grupo_procedimiento_id, matriz_regla_id)</code> en <code>matriz_conversion_regla</code> y <code>matriz_conversion_movimiento</code>; alta de matrices extrapresupuestarias <code>A3_EGRESO_NO_PRESUPUESTARIO</code> y <code>B4_INGRESO_NO_PRESUPUESTARIO</code>; y depuración de tablas puente y matriz piloto <code>DEV_OBLIGACION_SERVICIOS</code>.</td>
           <td>Julio César Barrales Flores</td>
         </tr>
       </tbody>
