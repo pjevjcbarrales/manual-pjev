@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>05.2.2 Orden de Pago — Manual de Desarrollo SIAF-PJEV</title>
+<title>05.2.2 Solicitud de Pagos No Presupuestales — Manual de Desarrollo SIAF-PJEV</title>
 <link rel="stylesheet" href="../shared.css">
 <style>
   body { padding: 36px 44px 80px; background: var(--pjev-crema); }
@@ -61,21 +61,21 @@
   <!-- BREADCRUMB -->
   <div class="elem-breadcrumb">
     <a href="../index.html">Inicio</a> ›
-    <span>05 · Cuentas por Pagar</span> ›
+    <span>05 · Tesorería</span> ›
     <span>05.2 · Registro</span> ›
-    <span>05.2.2 Orden de pago</span>
+    <span>05.2.2 Solicitud de pagos no presupuestales</span>
   </div>
 
   <!-- ENCABEZADO Y TÍTULO -->
   <div class="elem-header">
     <div>
       <div class="elem-id">05.2.2</div>
-      <h1 class="elem-title">Orden de Pago (Instrucción Ejecutiva de Desembolso y Reclasificación)</h1>
-      <p class="elem-desc">Módulo transaccional de vinculación entre Cuentas por Pagar y Tesorería. Formaliza la instrucción de desembolso bancario para afectaciones aprobadas, calendariza fechas de pago, asigna chequeras pagadoras institucionales, valida cuentas destino CLABE y ejecuta la reclasificación contable (puente 2.1.1.9 a exigible 2.1.1.1 en nómina) previo a la dispersión en Tesorería.</p>
+      <h1 class="elem-title">Solicitud de Pagos No Presupuestales (Grupo 4 y Reclasificación de Nómina)</h1>
+      <p class="elem-desc">Módulo transaccional del Departamento de Tesorería que gobierna el <strong>Grupo 4 (<code>4. No afecta presupuesto</code>, <code>afecta_presupuesto = false</code>)</strong> y sus <strong>4 Subprocedimientos Oficiales (<code>401..404</code>)</strong>: Dispersión de Nómina Neta (Matriz <code>22: A0_RECLASIFICA_ORDEN_PAGO</code>), Entero de Retenciones a Terceros Institucionales, Pago de Pensiones Alimenticias / Devolución de Garantías y Apertura de Fondo Revolvente / Anticipos (Matriz <code>17: A3_EGRESO_NO_PRESUPUESTARIO</code>).</p>
       <div class="mod-header-badges">
-        <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Maestro-Detalle 1:N)</span>
-        <span class="mod-badge badge-s">Fase 2: Ejecución del Gasto</span>
-        <span class="mod-badge badge-w">Reclasificación Contable (Momento OP)</span>
+        <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Maestro-Detalle)</span>
+        <span class="mod-badge badge-s">Grupo 4: No Afecta Presupuesto · 4 Subprocedimientos (401..404)</span>
+        <span class="mod-badge badge-w">Matrices 22 (A.0 Reclasificación) y 17 (A.3 Egreso No Presupuestario)</span>
         <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/cxp/ordenes-pago</code></span>
       </div>
     </div>
@@ -83,17 +83,55 @@
 
   <!-- 1. DESCRIPCIÓN GENERAL -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">1</span> Descripción General y Propósito del Módulo</div>
+    <div class="section-title"><span class="section-num">1</span> Descripción General y los 4 Subprocedimientos del Grupo 4</div>
     <p>
-      El módulo <strong>05.2.2 Orden de Pago</strong> formaliza jurídica y administrativamente la instrucción ejecutiva de desembolso emitida por el área de Cuentas por Pagar hacia la Tesorería General del Poder Judicial del Estado de Veracruz. Su propósito esencial es convertir una obligación previamente autorizada y devengada presupuestalmente (en <code>05.2.1 Afectación del Gasto</code>) en un instrumento líquido de pago calendarizado, asignando la cuenta bancaria pagadora institucional (chequera), la cuenta CLABE del beneficiario y el método de dispersión (Transferencia electrónica SPEI o Cheque nominativo).
+      El módulo <strong>05.2.2 Solicitud de Pagos No Presupuestales</strong> formaliza todas las instrucciones de desembolso que <strong>no generan un nuevo devengo presupuestario</strong> (<code>afecta_presupuesto = false</code>, cero impacto en cuentas <code>8.2.5</code> al momento de la solicitud), ya sea porque su presupuesto ya fue devengado previamente de forma concentrada en <code>05.2.1</code> (como la nómina y las retenciones deducidas en facturas/nómina) o porque constituyen movimientos puros de cuentas de balance patrimonial (aperturas de fondo revolvente, anticipos financieros, pensiones alimenticias o devolución de garantías).
     </p>
     <p>
-      Este módulo garantiza la estricta <strong>separación de funciones de control interno</strong> entre Cuentas por Pagar (quien valida facturas, contratos, retenciones y determina el líquido exigible) y la Tesorería (quien custodia las chequeras, genera los layouts bancarios y ejecuta la dispersión). Administra las dos dinámicas operativas del PJEV:
+      En la jerarquía de 5 niveles de la Matriz de Conversión (<code>03.1.2</code>), este módulo opera exclusivamente el <strong>Grupo 4 (<code>mgt_id = 4</code>, <code>NO_AFECTA_PRESUPUESTO</code>)</strong> de <code>contabilidad.matriz_grupos_tramite</code> y sus <strong>4 Subprocedimientos</strong> en <code>contabilidad.matriz_grupos_procedimiento</code>:
     </p>
-    <ul style="font-size:13px; color:var(--pjev-texto); margin-left:20px; line-height:1.7; margin-bottom:14px;">
-      <li><strong>Modalidad 1 a 1 (Proveedores y Contratos)</strong>: Cada Afectación de Gasto devengada genera una única Orden de Pago por el importe neto de la factura (descontando retenciones fiscales de ISR e IVA).</li>
-      <li><strong>Modalidad 1 a N (Servicios Personales / Nómina Concentrada)</strong>: La nómina quincenal devenga el 100% del gasto bruto en una cuenta puente concentradora (<code>2.1.1.9.1000.0001 Nómina por Liquidar</code>). De esa misma afectación se desprenden múltiples Órdenes de Pago: la dispersión masiva de la Nómina Neta a los trabajadores (reclasificando a <code>2.1.1.1.1000.0001</code>), las Órdenes de Pago para Pensiones Alimenticias judiciales y las correspondientes al entero de retenciones fiscales y sindicales, consumiendo el saldo de la bolsa puente sin fraccionar el devengo presupuestario original.</li>
-    </ul>
+
+    <table class="props-table" style="font-size:11.5px; margin-bottom:14px;">
+      <thead>
+        <tr>
+          <th style="width:18%;">ID y Código<br>(<code>mgp_id</code> · <code>mgp_codigo</code>)</th>
+          <th style="width:24%;">Nombre del Subprocedimiento</th>
+          <th style="width:32%;">Operación Contable y Cuentas de Balance</th>
+          <th style="width:12%;">Beneficiario</th>
+          <th style="width:14%;">Matrices Vinculadas<br>(Inicial ➔ Caja)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:#fdfbf7;">
+          <td><code>401</code><br><code>NOMINA_NETA_DISPERSION</code></td>
+          <td><strong>4.1 Dispersión de Nómina Neta al Personal</strong></td>
+          <td>Vinculado a la afectación de nómina aprobada en <code>05.2.1</code>. Al autorizarse las 3 firmas, reclasifica el pasivo de <code>2.1.1.9.1000.0001</code> (Puente) a <code>2.1.1.1.xxxx</code> (Remuneraciones por Pagar).</td>
+          <td><span class="mod-badge badge-s">EMPLEADO / UA</span></td>
+          <td><code>22 (A.0 DI)</code> ➔ <code>13 (A.2 PE)</code></td>
+        </tr>
+        <tr>
+          <td><code>402</code><br><code>ENTERO_RETENCIONES</code></td>
+          <td><strong>4.2 Entero de Retenciones y Contribuciones</strong></td>
+          <td>Liquidación de pasivos retenidos a favor de terceros institucionales (SAT ISR/IVA, IPE, ISSSTE, FOVISSSTE, Sindicatos, Aseguradoras) en cuentas <code>2.1.1.7.xxxx</code>.</td>
+          <td><span class="mod-badge badge-w">TERCERO_INST</span></td>
+          <td><code>17 (A.3)</code> ➔ <code>17 (A.3 PE)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>403</code><br><code>PENSIONES_Y_GARANTIAS</code></td>
+          <td><strong>4.3 Pensiones Alimenticias y Devolución de Garantías</strong></td>
+          <td>Pago a beneficiarios de pensiones alimenticias descontadas por mandato judicial (<code>2.1.1.9.3000.0001</code>) y reembolso de depósitos en garantía (<code>2.1.6.1.xxxx</code>).</td>
+          <td><span class="mod-badge badge-s">TERCERO / PROV</span></td>
+          <td><code>17 (A.3)</code> ➔ <code>17 (A.3 PE)</code></td>
+        </tr>
+        <tr>
+          <td><code>404</code><br><code>APERTURA_FONDO_ANTICIPO</code></td>
+          <td><strong>4.4 Apertura de Fondo Revolvente y Anticipos</strong></td>
+          <td>Asignación inicial de efectivo para apertura de Caja Chica o anticipo sujeto a comprobar, cargando a Deudores Diversos (<code>1.1.2.3.xxxx</code> / <code>1.1.2.5.xxxx</code>) contra Bancos en Caja.</td>
+          <td><span class="mod-badge badge-s">EMPLEADO / UA</span></td>
+          <td><code>17 (A.3)</code> ➔ <code>17 (A.3 PE)</code></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- 2. MARCO NORMATIVO -->
@@ -261,8 +299,12 @@
         <tr><td><code>op_id</code></td><td>UUID</td><td>NO</td><td>Identificador único global de la Orden de Pago (PK). Generado por <code>gen_random_uuid()</code>.</td></tr>
         <tr><td><code>ejercicio_fiscal</code></td><td>SMALLINT</td><td>NO</td><td>Año presupuestal y contable de la orden (PK y clave de partición, ej. 2026).</td></tr>
         <tr><td><code>folio_op</code></td><td>VARCHAR(20)</td><td>NO</td><td>Folio visible consecutivo anual (ej. <code>OP-2026-00042</code>). Asignado de forma atómica en el alta.</td></tr>
-        <tr><td><code>f_ag_id</code></td><td>UUID</td><td>NO</td><td>Llave foránea a <code>cxp.afectaciones_gasto(ag_id)</code>. Debe estar en estado <code>APROBADA</code>.</td></tr>
-        <tr><td><code>tipo_orden</code></td><td>VARCHAR(30)</td><td>NO</td><td>Tipología de la orden: <code>PROVEEDOR</code>, <code>NOMINA_NETA</code>, <code>PENSION_ALIMENTICIA</code>, <code>TERCERO_RETENCION</code>, <code>FONDO_REVOLVENTE</code>.</td></tr>
+        <tr><td><code>f_matriz_id</code></td><td>BIGINT</td><td>NO</td><td>Matriz contable en <code>contabilidad.matriz_conversion</code>: <code>22 (A0_RECLASIFICA_ORDEN_PAGO)</code> para <code>401</code>, o <code>17 (A3_EGRESO_NO_PRESUPUESTARIO)</code> para <code>402, 403, 404</code>.</td></tr>
+        <tr><td><code>f_matriz_grupo_id</code></td><td>SMALLINT</td><td>NO</td><td>Fijo <code>4</code> (<code>NO_AFECTA_PRESUPUESTO</code> en <code>contabilidad.matriz_grupos_tramite</code>).</td></tr>
+        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td>SMALLINT</td><td>NO</td><td>Subprocedimiento del Grupo 4 en <code>contabilidad.matriz_grupos_procedimiento</code> (<code>401, 402, 403, 404</code>).</td></tr>
+        <tr><td><code>f_matriz_regla_id</code></td><td>BIGINT</td><td>SÍ</td><td>Regla específica de la matriz en <code>contabilidad.matriz_conversion_regla</code> que determina las cuentas de balance (Cargo/Abono) sin hardcodeo.</td></tr>
+        <tr><td><code>f_ag_id</code></td><td>UUID</td><td>SÍ</td><td>Llave foránea a <code>cxp.afectaciones_gasto(ag_id)</code> (obligatoria en <code>401 NOMINA_NETA_DISPERSION</code>; opcional en <code>402..404</code> cuando provienen de saldos de balance o apertura de fondo).</td></tr>
+        <tr><td><code>tipo_orden</code></td><td>VARCHAR(40)</td><td>NO</td><td>Código del subprocedimiento: <code>NOMINA_NETA_DISPERSION</code>, <code>ENTERO_RETENCIONES</code>, <code>PENSIONES_Y_GARANTIAS</code>, <code>APERTURA_FONDO_ANTICIPO</code>.</td></tr>
         <tr><td><code>forma_pago</code></td><td>VARCHAR(1)</td><td>NO</td><td>Modalidad de liquidación: <code>'T'</code> (Transferencia SPEI) o <code>'C'</code> (Cheque nominativo).</td></tr>
         <tr><td><code>f_chequera_id</code></td><td>INTEGER</td><td>NO</td><td>Cuenta bancaria institucional pagadora de Tesorería (FK a <code>config.catalogo_cuentas_bancarias</code>).</td></tr>
         <tr><td><code>f_beneficiario_cta</code></td><td>UUID</td><td>NO</td><td>Cuenta bancaria y CLABE interbancaria (18 dígitos) registrada para el beneficiario.</td></tr>
@@ -296,9 +338,13 @@ CREATE TABLE IF NOT EXISTS cxp.ordenes_pago (
     op_id UUID NOT NULL DEFAULT gen_random_uuid(),
     ejercicio_fiscal SMALLINT NOT NULL,
     folio_op VARCHAR(20) NOT NULL,
-    f_ag_id UUID NOT NULL,
-    tipo_orden VARCHAR(30) NOT NULL DEFAULT 'PROVEEDOR'
-        CHECK (tipo_orden IN ('PROVEEDOR', 'NOMINA_NETA', 'PENSION_ALIMENTICIA', 'TERCERO_RETENCION', 'FONDO_REVOLVENTE')),
+    f_matriz_id BIGINT NOT NULL DEFAULT 17 REFERENCES contabilidad.matriz_conversion(mcv_id),
+    f_matriz_grupo_id SMALLINT NOT NULL DEFAULT 4 CHECK (f_matriz_grupo_id = 4),
+    f_matriz_grupo_procedimiento_id SMALLINT NOT NULL CHECK (f_matriz_grupo_procedimiento_id IN (401, 402, 403, 404)),
+    f_matriz_regla_id BIGINT,
+    f_ag_id UUID,
+    tipo_orden VARCHAR(40) NOT NULL DEFAULT 'ENTERO_RETENCIONES'
+        CHECK (tipo_orden IN ('NOMINA_NETA_DISPERSION', 'ENTERO_RETENCIONES', 'PENSIONES_Y_GARANTIAS', 'APERTURA_FONDO_ANTICIPO')),
     forma_pago VARCHAR(1) NOT NULL CHECK (forma_pago IN ('T', 'C')),
     f_chequera_id INT NOT NULL REFERENCES config.catalogo_cuentas_bancarias(cb_id),
     f_beneficiario_cta UUID NOT NULL,
@@ -969,7 +1015,7 @@ export class OrdenesPagoCxpController {
     <div id="wf-wfop1" class="wf-panel active">
       <div class="wf-box">
         <div class="wf-bar">
-          <span class="wf-bar-label">05.2.2 Pantalla Principal · Bandeja de Órdenes de Pago (SIAF-PJEV)</span>
+          <span class="wf-bar-label">05.2.2 Pantalla Principal · Solicitud de Pagos No Presupuestales (Grupo 4)</span>
           <span style="font-size:10px; color:#15803d; font-weight:bold;">SiafCard Filtros + SiafDataGrid + SiafInfoPanel</span>
         </div>
         <div class="wf-svg-area">
@@ -987,12 +1033,12 @@ export class OrdenesPagoCxpController {
             <text x="885" y="25" font-size="10" fill="#ffffff">Analista CxP</text>
 
             <!-- Breadcrumb & Header de Página -->
-            <text x="20" y="66" font-size="10" fill="#64748b">Finanzas  /  Registro  /  <tspan font-weight="bold" fill="#183125">Orden de Pago</tspan></text>
-            <text x="20" y="88" font-size="16" font-weight="bold" fill="#183125">Órdenes de Pago (Instrucción de Desembolso)</text>
+            <text x="20" y="66" font-size="10" fill="#64748b">05 · Tesorería  /  05.2 Registro  /  <tspan font-weight="bold" fill="#183125">05.2.2 Solicitud de Pagos No Presupuestales</tspan></text>
+            <text x="20" y="88" font-size="16" font-weight="bold" fill="#183125">Solicitud de Pagos No Presupuestales (Grupo 4 · Balance y Nómina)</text>
             
             <!-- Botón Principal + Nueva Orden de Pago -->
             <rect x="765" y="65" width="175" height="32" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="852" y="85" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nueva Orden de Pago</text>
+            <text x="852" y="85" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nueva Solicitud</text>
 
             <!-- Card de Filtros (SiafCard) -->
             <rect x="20" y="105" width="920" height="85" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
@@ -1493,6 +1539,12 @@ export class OrdenesPagoCxpController {
     <table class="props-table">
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Cambios Realizados</th></tr></thead>
       <tbody>
+        <tr>
+          <td><code>2.0.0</code></td>
+          <td>2026-11-08</td>
+          <td>Arquitectura SIAF-PJEV / Dix Consultoría</td>
+          <td>Renombrado institucional a <strong>05.2.2 Solicitud de Pagos No Presupuestales</strong> bajo el módulo <strong>05 · Tesorería</strong>. Incorporación integral del <strong>Grupo 4 (<code>4. No afecta presupuesto</code>)</strong> y sus 4 subprocedimientos (<code>401 NOMINA_NETA_DISPERSION</code> con Matriz <code>22 A.0</code>, y <code>402 ENTERO_RETENCIONES</code>, <code>403 PENSIONES_Y_GARANTIAS</code>, <code>404 APERTURA_FONDO_ANTICIPO</code> con Matriz <code>17 A3_EGRESO_NO_PRESUPUESTARIO</code>), llave compuesta de 5 niveles y articulación directa hacia <code>06.2.1 Registro de Pagos</code>.</td>
+        </tr>
         <tr>
           <td><code>1.0.0</code></td>
           <td>2026-09-02</td>

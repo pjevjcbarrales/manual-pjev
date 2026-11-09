@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>05.2.1 Afectación del Gasto — Manual de Desarrollo SIAF-PJEV</title>
+<title>05.2.1 Solicitud-Comprobación de Recurso (Orden de Pago) — Manual de Desarrollo SIAF-PJEV</title>
 <link rel="stylesheet" href="../shared.css">
 <style>
   body { padding: 36px 44px 80px; background: var(--pjev-crema); }
@@ -65,21 +65,21 @@
   <!-- BREADCRUMB -->
   <div class="elem-breadcrumb">
     <a href="../index.html">Inicio</a> ›
-    <span>05 · Cuentas por Pagar</span> ›
+    <span>05 · Tesorería</span> ›
     <span>05.2 · Registro</span> ›
-    <span>05.2.1 Afectación del gasto</span>
+    <span>05.2.1 Solicitud-comprobación de recurso (Orden de pago)</span>
   </div>
 
   <!-- ENCABEZADO Y TÍTULO -->
   <div class="elem-header">
     <div>
       <div class="elem-id">05.2.1</div>
-      <h1 class="elem-title">Afectación del Gasto (Registro de Trámites y Devengo Contable)</h1>
-      <p class="elem-desc">Módulo transaccional central de Cuentas por Pagar. Gobierna el registro de trámites de gasto en sus 4 Tipos de Pago y 15 Subtipos/Procedimientos canónicos, la extracción fiscal de CFDIs, la clasificación programática presupuestaria, la integración del expediente digital y la generación automatizada de pólizas contables de devengo (Momento A.1 CONAC / Matriz de Conversión).</p>
+      <h1 class="elem-title">Solicitud-Comprobación de Recurso (Orden de Pago)</h1>
+      <p class="elem-desc">Módulo transaccional central del Departamento de Tesorería (antes Afectación del Gasto). Gobierna el registro de trámites presupuestarios en sus <strong>3 Grupos Presupuestales</strong> (<code>1. Pago directo</code>, <code>2. Pago derivado de un pedido (materiales)</code> y <code>3. Gasto a comprobar</code>) y sus <strong>16 Subprocedimientos Oficiales</strong>, la extracción fiscal de CFDIs, la clasificación programática presupuestaria, el expediente digital y la generación automatizada de la póliza de devengo (Matriz <code>12: A1_DEVENGADO_GASTOS</code> mediante llave compuesta jerárquica).</p>
       <div class="mod-header-badges">
-        <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Maestro-Detalle 1:N)</span>
-        <span class="mod-badge badge-s">Fase 2: Ejecución del Gasto</span>
-        <span class="mod-badge badge-w">Póliza Automática de Devengo (CONAC A.1)</span>
+        <span class="mod-badge badge-a">Modo A/B — Formulario Compuesto (Maestro-Detalle 1:N)</span>
+        <span class="mod-badge badge-s">3 Grupos Presupuestales · 16 Subprocedimientos</span>
+        <span class="mod-badge badge-w">Matriz A.1 (mcv_id = 12) · Llave Compuesta 5 Niveles</span>
         <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/cxp/afectaciones</code></span>
       </div>
     </div>
@@ -88,11 +88,12 @@
   <!-- 1. DESCRIPCIÓN GENERAL -->
   <div class="doc-section">
     <div class="section-title"><span class="section-num">1</span> Descripción General</div>
-    <p>El módulo <strong>05.2.1 Afectación del Gasto</strong> es el corazón operativo y transaccional del Departamento de Tesorería del Poder Judicial del Estado de Veracruz. Sustituye integralmente al antiguo esquema analógico basado en el llenado en papel del formato "Anexo 9". Su misión es formalizar el reconocimiento legal de la obligación frente a terceros, proveedores, contratistas, empleados o entes gubernamentales.</p>
-    <p>La operación del módulo se articula en dos fases perfectamente sincronizadas:</p>
+    <p>El módulo <strong>05.2.1 Solicitud-Comprobación de Recurso (Orden de Pago)</strong> —denominación oficial establecida en el Manual Específico de Procedimientos de Tesorería del PJEV (DTE-001 a DTE-018, Anexo 9)— formaliza el reconocimiento jurídico-contable del <strong>Gasto Devengado</strong> y emite la instrucción formal de pago presupuestario.</p>
+    <p>En alineación con la arquitectura de 5 niveles de la <strong>Matriz de Conversión Contable (03.1.2)</strong>, este módulo gestiona exclusivamente los trámites con impacto presupuestario (<code>afecta_presupuesto = true</code>), mientras que las salidas de efectivo de cuentas de balance sin afectación presupuestal (Grupo 4) operan en el módulo hermano <strong>05.2.2 Solicitud de Pagos No Presupuestales</strong>.</p>
+    <p>La operación se articula en dos fases sincronizadas:</p>
     <ol style="font-size:13px; color:var(--pjev-texto); margin-left:20px; line-height:1.6;">
-      <li><strong>Fase 1: Asistente Visual de Clasificación del Trámite (Wizard Modal):</strong> El analista selecciona el <strong>Tipo de Pago Principal</strong> (entre 4 macro-familias) y el <strong>Subtipo / Procedimiento Operativo</strong> (entre 15 opciones). Cada opción despliega icono, título oficial y una <em>breve descripción funcional</em> que guía con certeza al usuario, condicionando automáticamente qué tipo de beneficiario exige el sistema (Proveedor, Empleado, Unidad Administrativa o Tercero Institucional) y si la operación afecta o no presupuesto.</li>
-      <li><strong>Fase 2: Formulario Compuesto (Maestro-Detalle):</strong> Una vez guardada la cabecera en <code>cxp.afectaciones_gasto</code>, el sistema habilita el grid de facturas electrónicas en <code>_cfdi</code> (con validación de timbrado SAT y retenciones), el grid de clasificación presupuestaria en <code>_detalles</code> (estructura programática y COG), el visor de expediente digital (Checklist normativo <code>05.1.1</code>) y la cadena de autorizaciones del workflow oficial de 6 estados. Al alcanzar el estado <code>APROBADA</code>, el motor genera de forma síncrona la póliza de devengo contable y presupuestal.</li>
+      <li><strong>Fase 1: Asistente Visual de Clasificación Presupuestaria (Wizard Paso 0):</strong> El analista selecciona el <strong>Grupo de Trámite Presupuestal</strong> en <code>contabilidad.matriz_grupos_tramite</code> (entre las 3 familias con <code>afecta_presupuesto = true</code>) y el <strong>Subprocedimiento Operativo</strong> en <code>contabilidad.matriz_grupos_procedimiento</code> (entre los 16 subprocedimientos <code>101..303</code>). Esta selección fija de forma determinista la llave compuesta <code>(matriz_id = 12, matriz_grupo_id, matriz_grupo_procedimiento_id)</code>, el tipo de beneficiario exigido y el checklist documental aplicable.</li>
+      <li><strong>Fase 2: Formulario Compuesto Maestro-Detalle y Autorización:</strong> Una vez guardada la cabecera en <code>cxp.afectaciones_gasto</code>, se habilitan las partidas presupuestarias (<code>_detalles</code>), la vinculación de facturas SAT (<code>_cfdi</code>) y el expediente digital (<code>05.1.1</code>). Al aprobarse (estado <code>APROBADA</code>), el sistema detona síncronamente la póliza de devengo (Matriz <code>12: A1_DEVENGADO_GASTOS</code>) y turna la Solicitud-Comprobación de Recurso directamente a <strong>06.2.1 Registro de Pagos</strong> (Oficina de Caja) para su dispersión bancaria (o a <code>05.2.2</code> en el caso de dispersión de nómina neta y entero de retenciones).</li>
     </ol>
   </div>
 
@@ -126,123 +127,134 @@
     </table>
   </div>
 
-  <!-- 3. ARQUITECTURA: LOS 4 TIPOS DE PAGO Y SUS 15 SUBTIPOS -->
+  <!-- 3. ARQUITECTURA: LOS 3 GRUPOS PRESUPUESTALES Y SUS 16 SUBPROCEDIMIENTOS -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">3</span> Estructura y Clasificación Institucional del Trámite (4 Tipos de Pago y 15 Subtipos)</div>
-    <p>Para erradicar la confusión histórica entre capítulos presupuestales y modalidades de pago, el sistema adopta una hegemonía de <strong>4 macro-familias de Tipo de Pago</strong> que gobiernan la afectación presupuestaria y derivan los 15 procedimientos operativos con sus descripciones breves:</p>
+    <div class="section-title"><span class="section-num">3</span> Estructura y Clasificación Institucional (3 Grupos Presupuestales y 16 Subprocedimientos)</div>
+    <p>Los catálogos rectores de clasificación residen ahora en el esquema <code>contabilidad</code> (tablas <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code> con <code>tipo_flujo = 'E'</code>), correlacionados por llave compuesta con la Matriz <code>12: A1_DEVENGADO_GASTOS</code> (momento inicial) y la Matriz <code>13: A2_PAGADO_GASTOS</code> (momento final en Caja):</p>
 
-    <!-- TABLA MAESTRA DE TIPOS Y SUBTIPOS -->
+    <div class="info-box" style="margin-bottom:14px; background:#f0fdf4; border-color:#86efac;">
+      <div class="info-title" style="color:#166534; font-weight:700;">📌 Separación Arquitectónica de Trámites Presupuestales vs. No Presupuestales</div>
+      <p style="font-size:12px; color:#15803d; margin:4px 0 0; line-height:1.5;">
+        • <strong>05.2.1 Solicitud-Comprobación de Recurso (Orden de Pago):</strong> Opera exclusivamente los <strong>Grupos 1, 2 y 3</strong> (<code>afecta_presupuesto = true</code>, 16 subprocedimientos <code>101..303</code>). Exige estructura programática y partida COG, devengando en la Matriz <code>12 (A1_DEVENGADO_GASTOS)</code>.<br>
+        • <strong>05.2.2 Solicitud de Pagos No Presupuestales:</strong> Opera exclusivamente el <strong>Grupo 4 (No afecta presupuesto)</strong> (<code>afecta_presupuesto = false</code>, 4 subprocedimientos <code>401..404</code>: Dispersión de Nómina Neta, Entero de Retenciones, Pensiones Alimenticias/Garantías y Apertura de Fondo Revolvente/Anticipos), gobernado por las Matrices <code>22 (A0_RECLASIFICA_ORDEN_PAGO)</code> y <code>17 (A3_EGRESO_NO_PRESUPUESTARIO)</code>.
+      </p>
+    </div>
+
+    <!-- TABLA MAESTRA DE 3 GRUPOS Y 16 SUBPROCEDIMIENTOS -->
     <table class="props-table" style="font-size:11px;">
       <thead>
         <tr>
-          <th style="width:18%;">Tipo de Pago Principal</th>
-          <th style="width:20%;">Subtipo / Procedimiento</th>
-          <th style="width:38%;">Breve Descripción en Pantalla (Card UI)</th>
-          <th style="width:12%;">Beneficiario</th>
-          <th style="width:12%;">Impacto Presupuestal</th>
+          <th style="width:17%;">Grupo Presupuestal<br>(<code>matriz_grupo_id</code>)</th>
+          <th style="width:21%;">ID y Código del Subprocedimiento<br>(<code>mgp_id</code> · <code>mgp_codigo</code>)</th>
+          <th style="width:34%;">Nombre y Descripción en Pantalla (Card UI)</th>
+          <th style="width:13%;">Beneficiario</th>
+          <th style="width:15%;">Matrices Vinculadas<br>(Inicial ➔ Final)</th>
         </tr>
       </thead>
       <tbody>
-        <!-- GRUPO 1: GASTO DIRECTO -->
+        <!-- GRUPO 1: PAGO DIRECTO (9 SUBPROCEDIMIENTOS) -->
         <tr style="background:#fdfbf7;">
-          <td rowspan="6"><strong>1. Gasto Directo</strong><br><code style="font-size:10px;">DIRECTO</code><br><small style="color:var(--pjev-texto-muted);">Sin pedido ni licitación previa</small></td>
-          <td><code>NOMINA</code><br><strong>Nómina Quincenal</strong></td>
-          <td>Afectación presupuestal de sueldos, compensaciones y prestaciones del personal jurisdiccional y administrativo.</td>
+          <td rowspan="9"><strong>1. Pago directo</strong><br><code style="font-size:10px;">PAGO_DIRECTO</code><br><small style="color:var(--pjev-texto-muted);">ID Grupo: <code>1</code><br>Sin pedido de almacén previo</small></td>
+          <td><code>101</code> · <code>NOMINA_SERVICIOS_PERSONALES</code></td>
+          <td><strong>Nómina Quincenal y Prestaciones (Cap. 1000)</strong><br>Devengo concentrado de sueldos y prestaciones contra pasivo puente <code>2.1.1.9.1000.0001</code> y retenciones <code>2.1.1.7.xxxx</code>.</td>
+          <td><span class="mod-badge badge-s">UNIDAD_ADMIN</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>22 (A.0)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>102</code> · <code>ARRENDAMIENTO_INMUEBLES</code></td>
+          <td><strong>Arrendamiento de Inmuebles (COG 32201)</strong><br>Pago mensual de rentas de edificios y locales para juzgados y sedes judiciales (con retenciones de ISR/IVA si es persona física).</td>
+          <td><span class="mod-badge badge-s">BIEN_INMUEBLE / PROV</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>103</code> · <code>SERVICIOS_BASICOS</code></td>
+          <td><strong>Servicios Básicos (CFE, Agua, Telefonía, Internet)</strong><br>Gasto directo continuo de energía eléctrica, agua potable, telecomunicaciones, peajes y servicio postal (Cap. 3100).</td>
+          <td><span class="mod-badge badge-s">TERCERO_INST / PROV</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>104</code> · <code>HONORARIOS_SERVICIOS_PROF</code></td>
+          <td><strong>Honorarios y Servicios Profesionales (Cap. 3300)</strong><br>Servicios profesionales independientes, peritajes, traducciones, avalúos y capacitación con retención de impuestos.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>105</code> · <code>COMPRA_DIRECTA_MENOR</code></td>
+          <td><strong>Compra Directa / Gastos Menores Urgentes</strong><br>Adquisiciones o servicios menores urgentes autorizados sin proceso licitatorio ni entrada de almacén central.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>106</code> · <code>COMISIONES_BANCARIAS</code></td>
+          <td><strong>Comisiones y Servicios Bancarios (COG 34101)</strong><br>Devengo de comisiones por manejo de cuenta, SPEI, chequeras y servicios financieros cobrados por las instituciones bancarias.</td>
+          <td><span class="mod-badge badge-s">TERCERO_INST</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>107</code> · <code>IMPUESTOS_DERECHOS_ENTIDAD</code></td>
+          <td><strong>Impuestos y Derechos a Cargo del PJEV (3% Nómina / Derechos)</strong><br>Obligaciones fiscales propias del PJEV como contribuyente: Impuesto Estatal 3% sobre Erogaciones (COG 39801) y derechos vehiculares (39201).</td>
+          <td><span class="mod-badge badge-s">TERCERO_INST</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>108</code> · <code>SEGUROS_Y_FIANZAS</code></td>
+          <td><strong>Primas de Seguros Patrimoniales y Fianzas (COG 34501)</strong><br>Aseguramiento de parque vehicular, inmuebles y bienes patrimoniales del Poder Judicial.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>109</code> · <code>LAUDOS_SENTENCIAS_INDEMNIZACIONES</code></td>
+          <td><strong>Laudos Laborales, Sentencias e Indemnizaciones (COG 39401)</strong><br>Cumplimiento de resoluciones jurisdiccionales, laudos ejecutoriados, finiquitos e indemnizaciones legales.</td>
+          <td><span class="mod-badge badge-s">EMPLEADO / TERCERO</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+
+        <!-- GRUPO 2: DERIVADO DE UN PEDIDO (4 SUBPROCEDIMIENTOS) -->
+        <tr>
+          <td rowspan="4"><strong>2. Pago derivado de un pedido (materiales)</strong><br><code style="font-size:10px;">DERIVADO_PEDIDO</code><br><small style="color:var(--pjev-texto-muted);">ID Grupo: <code>2</code><br>Vinculado a Recursos Materiales / Obra</small></td>
+          <td><code>201</code> · <code>PEDIDO_MATERIALES_SUMINISTROS</code></td>
+          <td><strong>Compra por Pedido — Bienes de Consumo Almacén (Cap. 2000)</strong><br>Adquisición de materiales y suministros formalizada mediante pedido y entrada sellada de recepción en Almacén.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr>
+          <td><code>202</code> · <code>PEDIDO_BIENES_MUEBLES_ACTIVO</code></td>
+          <td><strong>Compra por Pedido — Bienes Muebles / Activo Fijo (Cap. 5000)</strong><br>Adquisición de mobiliario, equipo de cómputo, parque vehicular y licencias capitalizables (Activo <code>1.2.4.x</code>) con resguardo patrimonial.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr>
+          <td><code>203</code> · <code>CONTRATO_SERVICIOS_GENERALES</code></td>
+          <td><strong>Contrato de Servicios Generales (Cap. 3000)</strong><br>Servicios plurianuales o anuales contratados mediante licitación o adjudicación (vigilancia, limpieza, fotocopiado, mantenimiento).</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr>
+          <td><code>204</code> · <code>CONTRATO_OBRA_PUBLICA</code></td>
+          <td><strong>Estimaciones de Obra Pública y Mantenimiento Mayor (Cap. 6000)</strong><br>Devengo de estimaciones de obra autorizadas por supervisión técnica, aplicando amortización de anticipo y retención 5 al millar.</td>
+          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+
+        <!-- GRUPO 3: GASTO A COMPROBAR (3 SUBPROCEDIMIENTOS) -->
+        <tr style="background:#fdfbf7;">
+          <td rowspan="3"><strong>3. Gasto a comprobar</strong><br><code style="font-size:10px;">GASTO_COMPROBAR</code><br><small style="color:var(--pjev-texto-muted);">ID Grupo: <code>3</code><br>Comprobación y reembolso presupuestal</small></td>
+          <td><code>301</code> · <code>VIATICOS_COMISIONES</code></td>
+          <td><strong>Viáticos y Gastos de Traslado (Anexo 6 · Cap. 3700)</strong><br>Solicitud y comprobación presupuestal de viáticos nacionales/estatales, pasajes y hospedaje conforme al tabulador <code>05.1.2</code>.</td>
+          <td><span class="mod-badge badge-s">EMPLEADO</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
+        </tr>
+        <tr style="background:#fdfbf7;">
+          <td><code>302</code> · <code>GASTOS_SUJETOS_COMPROBAR</code></td>
+          <td><strong>Gastos Sujetos a Comprobar (Operación Regional · Anexo 15)</strong><br>Comprobación presupuestal de partidas operativas ejercidas por juzgados foráneos y unidades administrativas.</td>
           <td><span class="mod-badge badge-s">EMPLEADO / UA</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
         </tr>
         <tr style="background:#fdfbf7;">
-          <td><code>ARRENDAMIENTO</code><br><strong>Arrendamiento Inmuebles</strong></td>
-          <td>Pago mensual de rentas de bienes inmuebles para juzgados foráneos y sedes judiciales del Estado.</td>
-          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-        <tr style="background:#fdfbf7;">
-          <td><code>SERVICIOS_BASICOS</code><br><strong>Servicios Básicos</strong></td>
-          <td>Pago continuo de energía eléctrica (CFE), agua potable (CAEV/municipales), telefonía e internet institucional.</td>
-          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-        <tr style="background:#fdfbf7;">
-          <td><code>HONORARIOS</code><br><strong>Servicios Profesionales</strong></td>
-          <td>Honorarios profesionales de personas físicas contratadas para asesorías, peritajes o dictámenes especializados.</td>
-          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-        <tr style="background:#fdfbf7;">
-          <td><code>GASTO_DIRECTO_GENERAL</code><br><strong>Compras Menores</strong></td>
-          <td>Adquisiciones o servicios menores urgentes que no requieren proceso licitatorio ni entrega en almacén central.</td>
-          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-        <tr style="background:#fdfbf7;">
-          <td><code>BENEFICIARIOS_EMPLEADOS</code><br><strong>Beneficiarios Empleados</strong></td>
-          <td>Pago de pensiones alimenticias o liquidaciones a favor de terceros vinculados legalmente a un trabajador.</td>
-          <td><span class="mod-badge badge-s">EMPLEADO</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-
-        <!-- GRUPO 2: PEDIDO / CONTRATO -->
-        <tr>
-          <td rowspan="3"><strong>2. Por Pedido / Contrato</strong><br><code style="font-size:10px;">PEDIDO</code><br><small style="color:var(--pjev-texto-muted);">Derivado de adquisiciones/obra</small></td>
-          <td><code>COMPRA_PEDIDO</code><br><strong>Pedido de Adquisiciones</strong></td>
-          <td>Compra de bienes y suministros de almacén formalizada mediante pedido y entrada sellada de recepción.</td>
-          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-        <tr>
-          <td><code>CONTRATO_SERVICIOS</code><br><strong>Contrato de Servicios</strong></td>
-          <td>Servicios generales continuos formalizados bajo contrato (vigilancia, limpieza, pólizas de seguros y sistemas).</td>
-          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-        <tr>
-          <td><code>OBRA_PUBLICA</code><br><strong>Contrato de Obra Pública</strong></td>
-          <td>Anticipos, estimaciones autorizadas por supervisión de infraestructura y finiquitos de ciudades judiciales.</td>
-          <td><span class="mod-badge badge-s">PROVEEDOR</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-
-        <!-- GRUPO 3: GASTOS A COMPROBAR -->
-        <tr style="background:#fdfbf7;">
-          <td rowspan="3"><strong>3. Gastos a Comprobar</strong><br><code style="font-size:10px;">COMPROBAR</code><br><small style="color:var(--pjev-texto-muted);">Anticipos y comisiones</small></td>
-          <td><code>COMPROBACION_VIATICOS</code><br><strong>Comprobación de Viáticos</strong></td>
-          <td>Comprobación oficial de viáticos y pasajes de servidores públicos conforme al tabulador y facturas (Anexo 6).</td>
-          <td><span class="mod-badge badge-s">EMPLEADO</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-        <tr style="background:#fdfbf7;">
-          <td><code>SUJETOS_COMPROBAR</code><br><strong>Sujetos a Comprobar</strong></td>
-          <td>Comprobación de gastos de operación otorgados a titulares de juzgados foráneos y sedes regionales (Anexo 15).</td>
-          <td><span class="mod-badge badge-s">UNIDAD_ADMIN</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-        <tr style="background:#fdfbf7;">
-          <td><code>FONDO_REVOLVENTE</code><br><strong>Reposición Fondo Rotatorio</strong></td>
-          <td>Reposición periódica de caja chica y fondos revolventes amparada con comprobantes fiscales de gastos menores.</td>
-          <td><span class="mod-badge badge-s">UNIDAD_ADMIN</span></td>
-          <td><span class="mod-badge badge-a">Presupuestario</span></td>
-        </tr>
-
-        <!-- GRUPO 4: NO AFECTA PRESUPUESTO -->
-        <tr style="background:#f0fdf4;">
-          <td rowspan="3"><strong>4. No Afecta Presupuesto</strong><br><code style="font-size:10px;">NO_PRESUPUESTARIO</code><br><small style="color:var(--pjev-texto-muted);">Cuentas de balance y fondos ajenos</small></td>
-          <td><code>TERCEROS_INST</code><br><strong>Entero de Retenciones</strong></td>
-          <td>Pago concentrado de retenciones fiscales (SAT ISR quincenal), SEFIPLAN 3%, cuotas IPE, cuotas sindicales y seguros.</td>
-          <td><span class="mod-badge badge-w">TERCERO_INST</span></td>
-          <td><span class="mod-badge badge-s" style="background:#fee2e2; color:#991b1b;">Extrapresupuestal (Balance)</span></td>
-        </tr>
-        <tr style="background:#f0fdf4;">
-          <td><code>DEVOLUCION_GARANTIA</code><br><strong>Devolución de Garantías</strong></td>
-          <td>Reembolso de fondos y depósitos en garantía a licitantes no adjudicados o finiquitos de contratos sin impacto presupuestal.</td>
-          <td><span class="mod-badge badge-w">PROVEEDOR</span></td>
-          <td><span class="mod-badge badge-s" style="background:#fee2e2; color:#991b1b;">Extrapresupuestal (Balance)</span></td>
-        </tr>
-        <tr style="background:#f0fdf4;">
-          <td><code>FONDOS_CUSTODIA</code><br><strong>Fondos en Custodia Judicial</strong></td>
-          <td>Devolución de ingresos indebidos, consignaciones de juzgados o administración de fondos ajenos bajo mandato.</td>
-          <td><span class="mod-badge badge-w">TERCERO</span></td>
-          <td><span class="mod-badge badge-s" style="background:#fee2e2; color:#991b1b;">Extrapresupuestal (Balance)</span></td>
+          <td><code>303</code> · <code>REEMBOLSO_FONDO_REVOLVENTE</code></td>
+          <td><strong>Reposición de Fondo Revolvente / Caja Chica</strong><br>Reembolso periódico de gastos menores comprobados con CFDI, afectando el presupuesto de las partidas ejercidas sin alterar el saldo fijo del fondo.</td>
+          <td><span class="mod-badge badge-s">EMPLEADO / UA</span></td>
+          <td><code>12 (A.1)</code> ➔ <code>13 (A.2)</code></td>
         </tr>
       </tbody>
     </table>
@@ -313,16 +325,16 @@
 
   <!-- 5. MODELO DE DATOS Y DICCIONARIO DE CAMPOS -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">5</span> Modelo de Datos y Diccionario de Campos</div>
-    <p>La persistencia reside en el esquema <code>cxp</code> de PostgreSQL. La cabecera transaccional en <code>afectaciones_gasto</code> particiona por <code>ejercicio_fiscal</code>, vinculándose a las tablas hijas de facturas, partidas y auditoría:</p>
+    <div class="section-title"><span class="section-num">5</span> Modelo de Datos y Diccionario de Campos (Correlación Jerárquica v3.0)</div>
+    <p>La cabecera transaccional reside en <code>cxp.afectaciones_gasto</code> (particionada por <code>ejercicio_fiscal</code>) y se correlaciona directamente mediante llave compuesta con las tablas rectoras <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code>:</p>
 
     <div class="sp-tabs">
       <button class="sp-tab active" onclick="showDBTab('db1',this)">cxp.afectaciones_gasto</button>
       <button class="sp-tab" onclick="showDBTab('db2',this)">cxp.afectaciones_gasto_cfdi</button>
       <button class="sp-tab" onclick="showDBTab('db3',this)">cxp.afectaciones_gasto_detalles</button>
-      <button class="sp-tab" onclick="showDBTab('db4',this)">cxp.catalogo_grupos_tramite</button>
-      <button class="sp-tab" onclick="showDBTab('db5',this)">cxp.catalogo_procedimientos_afectacion</button>
-      <button class="sp-tab" onclick="showDBTab('db6',this)">Script DDL y Poblado SQL</button>
+      <button class="sp-tab" onclick="showDBTab('db4',this)">contabilidad.matriz_grupos_tramite</button>
+      <button class="sp-tab" onclick="showDBTab('db5',this)">contabilidad.matriz_grupos_procedimiento</button>
+      <button class="sp-tab" onclick="showDBTab('db6',this)">Script DDL Correlación v3.0</button>
     </div>
 
     <!-- TAB 1: CABECERA -->
@@ -330,25 +342,24 @@
       <table class="props-table">
         <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción y Regla de Validación</th></tr></thead>
         <tbody>
-          <tr><td><code>ag_id</code></td><td><code>UUID PK</code></td><td>No</td><td>Identificador global único del trámite.</td></tr>
+          <tr><td><code>ag_id</code></td><td><code>UUID PK</code></td><td>No</td><td>Identificador global único de la Solicitud-Comprobación de Recurso.</td></tr>
           <tr><td><code>ejercicio_fiscal</code></td><td><code>INTEGER PK</code></td><td>No</td><td>Ejercicio anual (llave de partición obligatoria).</td></tr>
-          <tr><td><code>folio</code></td><td><code>VARCHAR(20) UNIQUE</code></td><td>No</td><td>Folio secuencial único generado por el sistema (ej. <code>AG-2026-00042</code>).</td></tr>
-          <tr><td><code>fecha_elaboracion</code></td><td><code>DATE</code></td><td>No</td><td>Fecha de captura del trámite.</td></tr>
-          <tr><td><code>f_grupo_codigo</code></td><td><code>VARCHAR(20) FK</code></td><td>No</td><td>Relación con <code>catalogo_grupos_tramite</code> (<code>DIRECTO</code>, <code>PEDIDO</code>, <code>COMPROBAR</code>, <code>NO_PRESUPUESTARIO</code>).</td></tr>
-          <tr><td><code>f_procedimiento_codigo</code></td><td><code>VARCHAR(40) FK</code></td><td>No</td><td>Procedimiento operativo en <code>catalogo_procedimientos_afectacion</code>.</td></tr>
-          <tr><td><code>tipo_pago</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Directo</code>, <code>2 = Pedido</code>, <code>3 = Comprobar</code>, <code>4 = No afecta presupuesto</code>.</td></tr>
-          <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>No</td><td><code>true</code> para tipos 1 a 3; <code>false</code> para tipo 4.</td></tr>
-          <tr><td><code>concepto</code></td><td><code>VARCHAR(500)</code></td><td>No</td><td>Justificación sustantiva del gasto.</td></tr>
-          <tr><td><code>importe_total_pago</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Importe bruto total acumulado de los comprobantes.</td></tr>
-          <tr><td><code>importe_retenciones</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Total acumulado de retenciones fiscales y laborales descontadas.</td></tr>
-          <tr><td><code>f_proveedor_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Beneficiario Proveedor en <code>config.catalogo_proveedores</code>.</td></tr>
-          <tr><td><code>f_empleado_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Beneficiario Servidor Público en <code>config.catalogo_empleados</code>.</td></tr>
-          <tr><td><code>f_ua_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Beneficiario Unidad Administrativa en <code>config.catalogo_ua</code>.</td></tr>
-          <tr><td><code>f_tercero_inst_id</code></td><td><code>BIGINT FK</code></td><td>Sí</td><td>Beneficiario Tercero Institucional en <code>config.catalogo_terceros_inst</code>.</td></tr>
+          <tr><td><code>folio</code></td><td><code>VARCHAR(20) UNIQUE</code></td><td>No</td><td>Folio secuencial anual generado por el sistema (ej. <code>SCR-2026-00142</code> / <code>AG-2026-00142</code>).</td></tr>
+          <tr><td><code>fecha_elaboracion</code></td><td><code>DATE</code></td><td>No</td><td>Fecha de captura del trámite dentro del periodo contable abierto.</td></tr>
+          <tr><td><code>f_matriz_id</code></td><td><code>BIGINT FK</code></td><td>No</td><td>Matriz de conversión inicial en <code>contabilidad.matriz_conversion</code> (Fijo <code>12 = A1_DEVENGADO_GASTOS</code>).</td></tr>
+          <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>No</td><td>Grupo presupuestal en <code>contabilidad.matriz_grupos_tramite</code> (<code>1 = Pago directo</code>, <code>2 = Derivado de pedido</code>, <code>3 = Gasto a comprobar</code>).</td></tr>
+          <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td><code>SMALLINT FK</code></td><td>No</td><td>Subprocedimiento operativo en <code>contabilidad.matriz_grupos_procedimiento</code> (<code>101..303</code>).</td></tr>
+          <tr><td><code>f_grupo_codigo</code></td><td><code>VARCHAR(30)</code></td><td>No</td><td>Código del grupo (<code>PAGO_DIRECTO</code>, <code>DERIVADO_PEDIDO</code>, <code>GASTO_COMPROBAR</code>).</td></tr>
+          <tr><td><code>f_procedimiento_codigo</code></td><td><code>VARCHAR(50)</code></td><td>No</td><td>Código nemotécnico del subprocedimiento (ej. <code>ARRENDAMIENTO_INMUEBLES</code>).</td></tr>
+          <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>No</td><td>En <code>05.2.1</code> siempre es <code>true</code> (CHECK <code>f_matriz_grupo_id IN (1, 2, 3)</code>).</td></tr>
+          <tr><td><code>concepto</code></td><td><code>VARCHAR(500)</code></td><td>No</td><td>Justificación sustantiva del gasto devengado.</td></tr>
+          <tr><td><code>importe_total_pago</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Importe bruto total devengado.</td></tr>
+          <tr><td><code>importe_retenciones</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Total acumulado de retenciones fiscales y laborales descontadas en la solicitud.</td></tr>
+          <tr><td><code>f_proveedor_id / f_empleado_id / f_ua_id / f_tercero_inst_id</code></td><td><code>INTEGER / BIGINT FK</code></td><td>Sí</td><td>Beneficiario según la regla <code>mgp_tipo_beneficiario</code> del subprocedimiento.</td></tr>
           <tr><td><code>f_centro_costo_id</code></td><td><code>INTEGER FK</code></td><td>No</td><td>Centro de costo solicitante en <code>config.catalogo_centros_costos</code>.</td></tr>
           <tr><td><code>estatus_workflow</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td><code>BORRADOR</code>, <code>ENVIADA</code>, <code>APROBADA</code>, <code>REGRESADA</code>, <code>RECHAZADA</code>, <code>CANCELADA</code>.</td></tr>
           <tr><td><code>p_poliza_id</code></td><td><code>BIGINT FK</code></td><td>Sí</td><td>Apuntador a la póliza contable de devengo en <code>contabilidad.poliza</code>.</td></tr>
-          <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Activo</code>, <code>0 = Inactivo</code> (Soft-delete).</td></tr>
+          <tr><td><code>estatus_registro</code></td><td><code>SMALLINT</code></td><td>No</td><td><code>1 = Activo</code>, <code>0 = Inactivo</code> (Soft-delete obligatorio).</td></tr>
         </tbody>
       </table>
     </div>
@@ -358,18 +369,16 @@
       <table class="props-table">
         <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><code>ag_cfdi_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único del registro de factura.</td></tr>
+          <tr><td><code>ag_cfdi_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único del registro de factura vinculada.</td></tr>
           <tr><td><code>f_ag_id</code></td><td><code>UUID FK</code></td><td>No</td><td>Relación con la cabecera en <code>cxp.afectaciones_gasto</code>.</td></tr>
-          <tr><td><code>uuid_cfdi</code></td><td><code>VARCHAR(36) UNIQUE</code></td><td>No</td><td>Folio Fiscal Digital universal SAT.</td></tr>
-          <tr><td><code>rfc_emisor</code></td><td><code>VARCHAR(13)</code></td><td>No</td><td>RFC del emisor de la factura.</td></tr>
+          <tr><td><code>uuid_cfdi</code></td><td><code>VARCHAR(36) UNIQUE</code></td><td>No</td><td>Folio Fiscal Digital universal SAT validado contra Bóveda CFDI (<code>07.1.1</code>).</td></tr>
+          <tr><td><code>rfc_emisor</code></td><td><code>VARCHAR(13)</code></td><td>No</td><td>RFC del proveedor o prestador emisor de la factura.</td></tr>
           <tr><td><code>razon_social_emisor</code></td><td><code>VARCHAR(250)</code></td><td>No</td><td>Nombre o razón social del emisor.</td></tr>
-          <tr><td><code>serie_folio</code></td><td><code>VARCHAR(50)</code></td><td>Sí</td><td>Serie y folio comercial del comprobante.</td></tr>
-          <tr><td><code>fecha_emision</code></td><td><code>TIMESTAMPTZ</code></td><td>No</td><td>Fecha de timbrado fiscal.</td></tr>
           <tr><td><code>subtotal</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Subtotal de la factura antes de impuestos.</td></tr>
           <tr><td><code>iva_trasladado</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>IVA trasladado causado.</td></tr>
-          <tr><td><code>retencion_isr</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Monto retenido de ISR.</td></tr>
-          <tr><td><code>retencion_iva</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Monto retenido de IVA.</td></tr>
-          <tr><td><code>total_factura</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Importe total del comprobante.</td></tr>
+          <tr><td><code>retencion_isr</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Monto retenido de ISR (pasivo automático en <code>2.1.1.7.xxxx</code>).</td></tr>
+          <tr><td><code>retencion_iva</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Monto retenido de IVA (pasivo automático en <code>2.1.1.7.xxxx</code>).</td></tr>
+          <tr><td><code>total_factura</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Importe bruto total del comprobante.</td></tr>
           <tr><td><code>estatus_sat</code></td><td><code>VARCHAR(20)</code></td><td>No</td><td><code>VIGENTE</code>, <code>CANCELADO</code>, <code>NO_ENCONTRADO</code>.</td></tr>
         </tbody>
       </table>
@@ -380,358 +389,77 @@
       <table class="props-table">
         <thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><code>agd_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único de la partida presupuestal.</td></tr>
-          <tr><td><code>f_ag_id</code></td><td><code>UUID FK</code></td><td>No</td><td>Relación con la cabecera.</td></tr>
-          <tr><td><code>f_clave_presupuestal_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Clave presupuestaria completa (Función, Programa, Subprograma, Proyecto, Fuente). Nulo si Tipo 4.</td></tr>
-          <tr><td><code>f_cog_id</code></td><td><code>INTEGER FK</code></td><td>Sí</td><td>Clasificador por Objeto del Gasto (COG a nivel partida). Nulo si Tipo 4.</td></tr>
-          <tr><td><code>cuenta_contable_balance</code></td><td><code>VARCHAR(30)</code></td><td>Sí</td><td>Subcuenta de pasivo circulante (2.1.1.7) o deudores. Requerida si Tipo 4.</td></tr>
-          <tr><td><code>mes_servicio</code></td><td><code>SMALLINT</code></td><td>No</td><td>Mes calendario de devengo del gasto (1 a 12).</td></tr>
-          <tr><td><code>importe_solicitado</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Monto asignado a la partida presupuestal o cuenta.</td></tr>
+          <tr><td><code>agd_id</code></td><td><code>BIGSERIAL PK</code></td><td>No</td><td>Identificador único de la línea presupuestal.</td></tr>
+          <tr><td><code>f_ag_id</code></td><td><code>UUID FK</code></td><td>No</td><td>Relación con la cabecera en <code>cxp.afectaciones_gasto</code>.</td></tr>
+          <tr><td><code>f_clave_presupuestal_id</code></td><td><code>INTEGER FK</code></td><td>No</td><td>Clave presupuestaria completa (Centro de Costo, Función, Programa, Subprograma, Proyecto, Fuente).</td></tr>
+          <tr><td><code>f_cog_id</code></td><td><code>INTEGER FK</code></td><td>No</td><td>Partida específica del Clasificador por Objeto del Gasto (COG nivel 5).</td></tr>
+          <tr><td><code>f_matriz_regla_id</code></td><td><code>BIGINT FK</code></td><td>Sí</td><td>Regla específica determinada en <code>contabilidad.matriz_conversion_regla</code> para la combinación <code>(12, grupo, subprocedimiento, cog)</code>.</td></tr>
+          <tr><td><code>mes_servicio</code></td><td><code>SMALLINT</code></td><td>No</td><td>Mes calendario de afectación presupuestaria (1 a 12).</td></tr>
+          <tr><td><code>importe_solicitado</code></td><td><code>NUMERIC(15,2)</code></td><td>No</td><td>Monto devengado en la partida presupuestal.</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- TAB 4: GRUPOS TRÁMITE -->
+    <!-- TAB 4: GRUPOS TRÁMITE EN CONTABILIDAD -->
     <div id="db-db4" class="sp-panel">
       <table class="props-table">
         <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><code>cgt_codigo</code></td><td><code>VARCHAR(20) PK</code></td><td>Código del grupo (<code>DIRECTO</code>, <code>PEDIDO</code>, <code>COMPROBAR</code>, <code>NO_PRESUPUESTARIO</code>).</td></tr>
-          <tr><td><code>cgt_numero</code></td><td><code>SMALLINT UNIQUE</code></td><td>Número correlativo (1, 2, 3, 4).</td></tr>
-          <tr><td><code>cgt_titulo</code></td><td><code>VARCHAR(100)</code></td><td>Título oficial de la tarjeta (ej. <code>1. Gasto Directo</code>).</td></tr>
-          <tr><td><code>cgt_subtitulo</code></td><td><code>VARCHAR(150)</code></td><td>Subtítulo guía (ej. <code>Sin pedido ni licitación</code>).</td></tr>
-          <tr><td><code>cgt_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>Breve descripción funcional renderizada en el modal.</td></tr>
-          <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td>Indicador booleano de afectación presupuestaria.</td></tr>
+          <tr><td><code>mgt_id</code></td><td><code>SMALLINT PK</code></td><td>Identificador numérico del grupo (<code>1..4</code> para Egresos <code>'E'</code>; <code>11..14</code> para Ingresos <code>'I'</code>).</td></tr>
+          <tr><td><code>mgt_tipo_flujo</code></td><td><code>CHAR(1)</code></td><td><code>'E'</code> = Egresos / Tesorería; <code>'I'</code> = Ingresos.</td></tr>
+          <tr><td><code>mgt_codigo</code></td><td><code>VARCHAR(30) UNIQUE</code></td><td>Código canónico (<code>PAGO_DIRECTO</code>, <code>DERIVADO_PEDIDO</code>, <code>GASTO_COMPROBAR</code>, <code>NO_AFECTA_PRESUPUESTO</code>).</td></tr>
+          <tr><td><code>mgt_titulo</code></td><td><code>VARCHAR(100)</code></td><td>Título oficial en UI (<code>1. Pago directo</code>, <code>2. Pago derivado de un pedido (materiales)</code>, <code>3. Gasto a comprobar</code>).</td></tr>
+          <tr><td><code>afecta_presupuesto</code></td><td><code>BOOLEAN</code></td><td><code>true</code> para Grupos 1, 2 y 3 (operados en <code>05.2.1</code>); <code>false</code> para Grupo 4 (operado en <code>05.2.2</code>).</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- TAB 5: PROCEDIMIENTOS -->
+    <!-- TAB 5: SUBPROCEDIMIENTOS EN CONTABILIDAD -->
     <div id="db-db5" class="sp-panel">
       <table class="props-table">
         <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
         <tbody>
-          <tr><td><code>cpa_codigo</code></td><td><code>VARCHAR(40) PK</code></td><td>Código nemotécnico (<code>NOMINA</code>, <code>ARRENDAMIENTO</code>, <code>COMPRA_PEDIDO</code>, etc.).</td></tr>
-          <tr><td><code>f_grupo_codigo</code></td><td><code>VARCHAR(20) FK</code></td><td>Relación con la macro-familia en <code>catalogo_grupos_tramite</code>.</td></tr>
-          <tr><td><code>cpa_nombre</code></td><td><code>VARCHAR(150)</code></td><td>Nombre completo legible del procedimiento.</td></tr>
-          <tr><td><code>cpa_descripcion</code></td><td><code>VARCHAR(500)</code></td><td>Breve descripción renderizada en la tarjeta inferior de la UI.</td></tr>
-          <tr><td><code>cpa_tipo_beneficiario</code></td><td><code>VARCHAR(30)</code></td><td>Tipo de entidad obligatoria (<code>PROVEEDOR</code>, <code>EMPLEADO</code>, <code>UNIDAD_ADMINISTRATIVA</code>, <code>TERCERO_INST</code>).</td></tr>
-          <tr><td><code>cpa_seleccionable</code></td><td><code>BOOLEAN</code></td><td>Habilita o deshabilita la opción para captura general.</td></tr>
+          <tr><td><code>mgp_id</code></td><td><code>SMALLINT PK</code></td><td>Identificador numérico del subprocedimiento (<code>101..109</code>, <code>201..204</code>, <code>301..303</code>, <code>401..404</code>).</td></tr>
+          <tr><td><code>f_matriz_grupo_id</code></td><td><code>SMALLINT FK</code></td><td>Relación con <code>contabilidad.matriz_grupos_tramite(mgt_id)</code>.</td></tr>
+          <tr><td><code>f_matriz_inicial_id</code></td><td><code>BIGINT FK</code></td><td>Matriz contable del primer momento (<code>12 = A1_DEVENGADO_GASTOS</code> para grupos 1 a 3).</td></tr>
+          <tr><td><code>f_matriz_final_id</code></td><td><code>BIGINT FK</code></td><td>Matriz contable de liquidación en Caja (<code>13 = A2_PAGADO_GASTOS</code>).</td></tr>
+          <tr><td><code>mgp_codigo</code></td><td><code>VARCHAR(50) UNIQUE</code></td><td>Código nemotécnico del subprocedimiento.</td></tr>
+          <tr><td><code>mgp_tipo_beneficiario</code></td><td><code>VARCHAR(30)</code></td><td>Tipo de entidad obligatoria (<code>PROVEEDOR</code>, <code>EMPLEADO</code>, <code>UNIDAD_ADMINISTRATIVA</code>, <code>TERCERO_INSTITUCIONAL</code>, <code>BIEN_INMUEBLE</code>).</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- TAB 6: SCRIPT DDL Y POBLADO SQL -->
+    <!-- TAB 6: SCRIPT DDL CORRELACIÓN V3.0 -->
     <div id="db-db6" class="sp-panel">
-      <div style="background:#f8fafc; border:1px solid var(--pjev-borde); border-radius:6px; padding:14px; margin-bottom:14px;">
-        <strong style="color:var(--pjev-verde-oscuro);">Script Oficial Idempotente de Creación y Poblado (Migración 178)</strong>
-        <p style="font-size:12px; color:var(--pjev-texto-muted); margin:4px 0 0; line-height:1.5;">
-          Este script DDL y de carga semilla se encuentra versionado en el backend del monorepositorio en <code style="font-size:11px;">packages/database/prisma/migrations/178_cxp_poblar_tipos_subtipos_afectacion.sql</code> y en el sitio del manual en <code style="font-size:11px;">sitio_web/05_cuentas_por_pagar/sql/poblar_tipos_subtipos_cxp.sql</code>. Se ejecuta de forma idempotente con <code style="font-size:11px;">psql</code> o mediante Prisma. Crea las tablas, actualiza columnas para textos descriptivos de la UI, retira los constraints obsoletos de 1 y 2, y puebla los 4 tipos y 15 procedimientos con <code style="font-size:11px;">ON CONFLICT DO UPDATE</code>.
-        </p>
-      </div>
-
       <div class="code-wrap">
 <pre><code>-- ============================================================================
--- SCRIPT OFICIAL DE CREACIÓN Y POBLADO IDEMPOTENTE: TIPOS Y SUBTIPOS DE CXP
--- Esquema: cxp
--- Entidades: catalogo_grupos_tramite (4 Tipos) y catalogo_procedimientos_afectacion (15 Subtipos)
+-- CORRELACIÓN JERÁRQUICA DE 5 NIVELES ENTRE CONTABILIDAD Y TESORERÍA (05.2.1)
 -- ============================================================================
+ALTER TABLE cxp.afectaciones_gasto
+    ADD COLUMN IF NOT EXISTS f_matriz_id BIGINT DEFAULT 12,
+    ADD COLUMN IF NOT EXISTS f_matriz_grupo_id SMALLINT,
+    ADD COLUMN IF NOT EXISTS f_matriz_grupo_procedimiento_id SMALLINT;
 
-BEGIN;
+-- En 05.2.1 solo se registran los 3 Grupos Presupuestales (1, 2 y 3)
+ALTER TABLE cxp.afectaciones_gasto
+    DROP CONSTRAINT IF EXISTS ck_ag_grupos_presupuestales,
+    ADD CONSTRAINT ck_ag_grupos_presupuestales
+    CHECK (f_matriz_grupo_id IN (1, 2, 3) AND afecta_presupuesto = true);
 
--- 1. TABLA MAESTRA DE TIPOS DE TRÁMITE (GRUPOS / MACRO-FAMILIAS)
-CREATE TABLE IF NOT EXISTS cxp.catalogo_grupos_tramite (
-    cgt_codigo VARCHAR(20) PRIMARY KEY,
-    cgt_nombre VARCHAR(100) NOT NULL,
-    cgt_numero SMALLINT NOT NULL UNIQUE,
-    cgt_titulo VARCHAR(100) NOT NULL,
-    cgt_subtitulo VARCHAR(150),
-    cgt_descripcion VARCHAR(500) NOT NULL,
-    cgt_icono VARCHAR(50) DEFAULT 'Receipt',
-    cgt_permiso_requerido VARCHAR(50) DEFAULT 'CXP_CAT_GASTO_DIRECTO',
-    afecta_presupuesto BOOLEAN NOT NULL DEFAULT true,
-    cgt_orden SMALLINT NOT NULL,
-    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
-    usuario_c VARCHAR(50) NOT NULL DEFAULT 'MIGRACION_178',
-    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
-    usuario_m VARCHAR(50),
-    fecha_m TIMESTAMPTZ
-);
-
-ALTER TABLE cxp.catalogo_grupos_tramite ADD COLUMN IF NOT EXISTS cgt_nombre VARCHAR(100);
-ALTER TABLE cxp.catalogo_grupos_tramite ADD COLUMN IF NOT EXISTS cgt_numero SMALLINT;
-ALTER TABLE cxp.catalogo_grupos_tramite ADD COLUMN IF NOT EXISTS cgt_titulo VARCHAR(100);
-ALTER TABLE cxp.catalogo_grupos_tramite ADD COLUMN IF NOT EXISTS cgt_subtitulo VARCHAR(150);
-ALTER TABLE cxp.catalogo_grupos_tramite ADD COLUMN IF NOT EXISTS cgt_descripcion VARCHAR(500);
-ALTER TABLE cxp.catalogo_grupos_tramite ADD COLUMN IF NOT EXISTS cgt_icono VARCHAR(50) DEFAULT 'Receipt';
-ALTER TABLE cxp.catalogo_grupos_tramite ADD COLUMN IF NOT EXISTS cgt_permiso_requerido VARCHAR(50) DEFAULT 'CXP_CAT_GASTO_DIRECTO';
-ALTER TABLE cxp.catalogo_grupos_tramite ADD COLUMN IF NOT EXISTS afecta_presupuesto BOOLEAN NOT NULL DEFAULT true;
-
--- Poblado de los 4 Tipos Principales incluyendo cgt_nombre
-INSERT INTO cxp.catalogo_grupos_tramite (
-    cgt_codigo, cgt_nombre, cgt_numero, cgt_titulo, cgt_subtitulo, cgt_descripcion,
-    cgt_icono, cgt_permiso_requerido, afecta_presupuesto, cgt_orden
-) VALUES
-(
-    'DIRECTO', 'Gasto Directo', 1, '1. Gasto Directo', 'Sin pedido ni licitación',
-    'Nómina, servicios básicos, rentas, honorarios y compras menores directas.',
-    'Receipt', 'CXP_CAT_GASTO_DIRECTO', true, 1
-),
-(
-    'PEDIDO', 'Por Pedido / Contrato', 2, '2. Por Pedido / Contrato', 'Derivado de adquisiciones/obra',
-    'Licitaciones, compras de almacén, contratos de servicios y obra pública.',
-    'ShoppingBag', 'CXP_CAT_PEDIDO_CONTRATO', true, 2
-),
-(
-    'COMPROBAR', 'Gastos por Comprobar', 3, '3. Gastos a Comprobar', 'Anticipos y comisiones',
-    'Viáticos oficiales (Anexo 6), sujetos a comprobar y reposición de caja chica.',
-    'Plane', 'CXP_CAT_GASTOS_COMPROBAR', true, 3
-),
-(
-    'NO_PRESUPUESTARIO', 'No Afecta Presupuesto', 4, '4. No Afecta Presupuesto', 'Cuentas de balance y fondos ajenos',
-    'Entero de retenciones fiscales y laborales, devolución de garantías y fondos en custodia.',
-    'Scale', 'CXP_CAT_NO_PRESUPUESTARIO', false, 4
-)
-ON CONFLICT (cgt_codigo) DO UPDATE SET
-    cgt_nombre = EXCLUDED.cgt_nombre,
-    cgt_numero = EXCLUDED.cgt_numero,
-    cgt_titulo = EXCLUDED.cgt_titulo,
-    cgt_subtitulo = EXCLUDED.cgt_subtitulo,
-    cgt_descripcion = EXCLUDED.cgt_descripcion,
-    cgt_icono = EXCLUDED.cgt_icono,
-    cgt_permiso_requerido = EXCLUDED.cgt_permiso_requerido,
-    afecta_presupuesto = EXCLUDED.afecta_presupuesto,
-    cgt_orden = EXCLUDED.cgt_orden,
-    estatus_registro = 1,
-    fecha_m = clock_timestamp(),
-    usuario_m = 'SCRIPT_POBLADO';
-
--- 2. TABLA DE SUBTIPOS / PROCEDIMIENTOS OPERATIVOS
-CREATE TABLE IF NOT EXISTS cxp.catalogo_procedimientos_afectacion (
-    cpa_codigo VARCHAR(40) PRIMARY KEY,
-    f_grupo_codigo VARCHAR(20) NOT NULL REFERENCES cxp.catalogo_grupos_tramite(cgt_codigo),
-    cpa_nombre VARCHAR(150) NOT NULL,
-    cpa_subtitulo VARCHAR(150),
-    cpa_descripcion VARCHAR(500) NOT NULL,
-    cpa_icono VARCHAR(50) DEFAULT 'FileText',
-    cpa_badge VARCHAR(50) DEFAULT 'Recursos Materiales',
-    cpa_tipo_beneficiario VARCHAR(30) NOT NULL DEFAULT 'PROVEEDOR',
-    cpa_tipo_pago SMALLINT NOT NULL CHECK (cpa_tipo_pago IN (1, 2, 3, 4)),
-    cpa_orden SMALLINT NOT NULL,
-    cpa_seleccionable BOOLEAN NOT NULL DEFAULT true,
-    cpa_estado_definicion VARCHAR(20) NOT NULL DEFAULT 'VALIDADO',
-    cpa_observacion_normativa VARCHAR(1000),
-    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
-    usuario_c VARCHAR(50) NOT NULL DEFAULT 'MIGRACION_178',
-    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
-    usuario_m VARCHAR(50),
-    fecha_m TIMESTAMPTZ
-);
-
-ALTER TABLE cxp.catalogo_procedimientos_afectacion ADD COLUMN IF NOT EXISTS cpa_subtitulo VARCHAR(150);
-ALTER TABLE cxp.catalogo_procedimientos_afectacion ADD COLUMN IF NOT EXISTS cpa_icono VARCHAR(50) DEFAULT 'FileText';
-ALTER TABLE cxp.catalogo_procedimientos_afectacion ADD COLUMN IF NOT EXISTS cpa_badge VARCHAR(50) DEFAULT 'Recursos Materiales';
-ALTER TABLE cxp.catalogo_procedimientos_afectacion ADD COLUMN IF NOT EXISTS cpa_tipo_beneficiario VARCHAR(30) DEFAULT 'PROVEEDOR';
-
--- Retirar de forma segura cualquier CHECK previo en cpa_tipo_pago
-DO $do$
-DECLARE r record;
-BEGIN
-  FOR r IN (
-    SELECT conname FROM pg_constraint 
-     WHERE conrelid = 'cxp.catalogo_procedimientos_afectacion'::regclass 
-       AND contype = 'c' 
-       AND pg_get_constraintdef(oid) LIKE '%cpa_tipo_pago%'
-  ) LOOP
-    EXECUTE 'ALTER TABLE cxp.catalogo_procedimientos_afectacion DROP CONSTRAINT ' || quote_ident(r.conname);
-  END LOOP;
-END $do$;
-
-ALTER TABLE cxp.catalogo_procedimientos_afectacion 
-    ADD CONSTRAINT ck_cpa_tipo_pago CHECK (cpa_tipo_pago IN (1, 2, 3, 4));
-
--- Retirar y recrear el constraint de tipo beneficiario alineado con la migración 160
-DO $do$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ck_cpa_tipo_beneficiario') THEN
-    ALTER TABLE cxp.catalogo_procedimientos_afectacion DROP CONSTRAINT ck_cpa_tipo_beneficiario;
-  END IF;
-  ALTER TABLE cxp.catalogo_procedimientos_afectacion
-    ADD CONSTRAINT ck_cpa_tipo_beneficiario CHECK (
-      cpa_tipo_beneficiario IS NULL OR cpa_tipo_beneficiario IN
-      ('PROVEEDOR','EMPLEADO','UNIDAD_ADMINISTRATIVA','TERCERO_EMPLEADO',
-       'TERCERO_INSTITUCIONAL','BIEN_INMUEBLE')
-    );
-END $do$;
-
--- Inserción / Actualización de los 15 Procedimientos
-INSERT INTO cxp.catalogo_procedimientos_afectacion (
-    cpa_codigo, f_grupo_codigo, cpa_nombre, cpa_subtitulo, cpa_descripcion,
-    cpa_icono, cpa_badge, cpa_tipo_beneficiario, cpa_tipo_pago, cpa_orden,
-    cpa_seleccionable, cpa_estado_definicion, cpa_observacion_normativa
-) VALUES
--- ============================================================================
--- GRUPO 1: GASTO DIRECTO (cpa_tipo_pago = 1)
--- ============================================================================
-(
-    'NOMINA', 'DIRECTO', 'Nómina Quincenal / Prestaciones', 'Sueldos y compensaciones',
-    'Afectación presupuestal de sueldos, compensaciones y prestaciones del personal jurisdiccional y administrativo.',
-    'Users', 'Servicios Personales', 'UNIDAD_ADMINISTRATIVA', 1, 1,
-    true, 'VALIDADO', 'Afecta Capítulo 1000 conforme al tabulador de plazas vigente.'
-),
-(
-    'ARRENDAMIENTO', 'DIRECTO', 'Arrendamiento de Inmuebles', 'Rentas de juzgados y sedes',
-    'Pago mensual de rentas de bienes inmuebles para juzgados foráneos y sedes judiciales del Estado.',
-    'Building', 'Recursos Materiales', 'BIEN_INMUEBLE', 1, 2,
-    true, 'VALIDADO', 'Exige CFDI vigente, contrato de arrendamiento y visto bueno de Adquisiciones.'
-),
-(
-    'SERVICIOS_BASICOS', 'DIRECTO', 'Servicios Básicos (CFE, CAEV, Telecom)', 'Energía, agua y telecomunicaciones',
-    'Pago continuo de energía eléctrica, agua potable, telefonía e internet institucional.',
-    'Zap', 'Recursos Materiales', 'TERCERO_INSTITUCIONAL', 1, 3,
-    true, 'VALIDADO', 'No genera orden de compra; se liquida contra aviso-recibo o factura del proveedor.'
-),
-(
-    'HONORARIOS', 'DIRECTO', 'Honorarios / Servicios Profesionales', 'Servicios de personas físicas',
-    'Servicios profesionales independientes de personas físicas para peritajes, asesorías y dictámenes con retención.',
-    'FileText', 'Recursos Materiales', 'PROVEEDOR', 1, 4,
-    true, 'VALIDADO', 'Aplica retención de 10% ISR y dos terceras partes de IVA conforme a ley.'
-),
-(
-    'GASTO_DIRECTO_GENERAL', 'DIRECTO', 'Compra Directa / Gastos Menores', 'Suministros y mostrador urgente',
-    'Adquisiciones o servicios menores urgentes que no requieren proceso licitatorio ni entrega en almacén central.',
-    'Tag', 'Recursos Materiales', 'PROVEEDOR', 1, 5,
-    true, 'VALIDADO', 'Sujeto a techo máximo fijado en los lineamientos de adquisiciones del PJEV.'
-),
-(
-    'BENEFICIARIOS_EMPLEADOS', 'DIRECTO', 'Pago a Beneficiarios de Empleados', 'Pensiones alimenticias judiciales',
-    'Pago a acreedores de pensiones alimenticias o beneficiarios vinculados legalmente a un trabajador.',
-    'UserCheck', 'Servicios Personales', 'TERCERO_EMPLEADO', 1, 6,
-    true, 'VALIDADO', 'Derivado de orden emitida por juez familiar competente sobre la nómina.'
-),
-
--- ============================================================================
--- GRUPO 2: POR PEDIDO / CONTRATO (cpa_tipo_pago = 2)
--- ============================================================================
-(
-    'COMPRA_PEDIDO', 'PEDIDO', 'Pedido de Adquisiciones / Almacén', 'Compras con entrada sellada',
-    'Compra de bienes y suministros formalizada mediante pedido institucional y remisión con entrada sellada de almacén.',
-    'ShoppingCart', 'Recursos Materiales', 'PROVEEDOR', 2, 1,
-    true, 'VALIDADO', 'Exige factura CFDI, pedido formalizado y constancia de alta en inventarios si aplica.'
-),
-(
-    'CONTRATO_SERVICIOS', 'PEDIDO', 'Contrato de Servicios Generales', 'Servicios continuos licitados',
-    'Servicios continuos formalizados bajo contrato (vigilancia, limpieza, aseguramiento patrimonial y licencias de software).',
-    'FileContract', 'Recursos Materiales', 'PROVEEDOR', 2, 2,
-    true, 'VALIDADO', 'Vinculado a contrato plurianual o anual de adquisiciones y acta de recepción de servicios.'
-),
-(
-    'OBRA_PUBLICA', 'PEDIDO', 'Contrato de Obra Pública', 'Infraestructura judicial y mantenimiento',
-    'Anticipos, estimaciones autorizadas por supervisión de infraestructura y finiquitos de ciudades judiciales.',
-    'HardHat', 'Obra y Proyectos', 'PROVEEDOR', 2, 3,
-    true, 'VALIDADO', 'Exige expediente técnico, estimación autorizada por residencia de obra y retención 5 al millar.'
-),
-
--- ============================================================================
--- GRUPO 3: GASTOS A COMPROBAR (cpa_tipo_pago = 3)
--- ============================================================================
-(
-    'COMPROBACION_VIATICOS', 'COMPROBAR', 'Comprobación de Viáticos y Pasajes', 'Comisiones oficiales (Anexo 6)',
-    'Comprobación oficial de viáticos de servidores públicos conforme al tabulador autorizado y facturas fiscales.',
-    'Plane', 'Gastos por Comprobar', 'EMPLEADO', 3, 1,
-    true, 'VALIDADO', 'Sujeto al tabulador oficial (05.1.2) y verificación del Anexo 5 y Anexo 6.'
-),
-(
-    'SUJETOS_COMPROBAR', 'COMPROBAR', 'Sujetos a Comprobar (Gastos Operativos)', 'Operación de juzgados foráneos',
-    'Comprobación de recursos asignados a titulares de juzgados foráneos y áreas jurisdiccionales (Anexo 15).',
-    'FolderCheck', 'Gastos por Comprobar', 'EMPLEADO', 3, 2,
-    true, 'VALIDADO', 'Requiere informe detallado de aplicación del recurso y facturas fiscales a nombre del PJEV.'
-),
-(
-    'FONDO_REVOLVENTE', 'COMPROBAR', 'Reposición de Fondo Revolvente', 'Caja chica institucional',
-    'Reposición periódica de caja chica y fondos revolventes amparada con comprobantes fiscales de gastos menores.',
-    'RotateCcw', 'Fondo Rotatorio', 'EMPLEADO', 3, 3,
-    true, 'VALIDADO', 'Reposición exclusivamente por el importe comprobado; no modifica el saldo del fondo.'
-),
-
--- ============================================================================
--- GRUPO 4: NO AFECTA PRESUPUESTO (cpa_tipo_pago = 4, afecta_presupuesto = false)
--- ============================================================================
-(
-    'TERCEROS_INST', 'NO_PRESUPUESTARIO', 'Entero de Retenciones Fiscales y Laborales', 'SAT, SEFIPLAN, IPE y sindicatos',
-    'Pago y liquidación concentrada de retenciones fiscales (ISR) y laborales (IPE, 3%, cuotas sindicales) sin devengo presupuestario nuevo.',
-    'Landmark', 'Pasivo Circulante 2.1.1.7', 'TERCERO_INSTITUCIONAL', 4, 1,
-    true, 'VALIDADO', 'Operación de balance patrimonial pura. Disminuye pasivo 2.1.1.7 contra salida bancaria; cero afectación presupuestal.'
-),
-(
-    'DEVOLUCION_GARANTIA', 'NO_PRESUPUESTARIO', 'Devolución de Garantías y Fianzas', 'Reembolso a licitantes y contratistas',
-    'Reembolso de depósitos en efectivo entregados por contratistas para sostenimiento de ofertas o vicios ocultos.',
-    'ShieldCheck', 'Fondos en Garantía 2.1.6.1', 'PROVEEDOR', 4, 2,
-    true, 'VALIDADO', 'Disminuye la cuenta de balance 2.1.6.1 Depósitos de Fondos de Terceros en Garantía.'
-),
-(
-    'FONDOS_CUSTODIA', 'NO_PRESUPUESTARIO', 'Fondos en Custodia y Devoluciones', 'Consignaciones judiciales y pagos indebidos',
-    'Devolución de cobros indebidos recibidos en caja y entrega de recursos bajo custodia o consignación judicial.',
-    'Scale', 'Operación de Balance', 'TERCERO_INSTITUCIONAL', 4, 3,
-    true, 'VALIDADO', 'Mandatos judiciales o devoluciones directas de cobros duplicados en caja de ingresos.'
-)
-ON CONFLICT (cpa_codigo) DO UPDATE SET
-    f_grupo_codigo = EXCLUDED.f_grupo_codigo,
-    cpa_nombre = EXCLUDED.cpa_nombre,
-    cpa_subtitulo = EXCLUDED.cpa_subtitulo,
-    cpa_descripcion = EXCLUDED.cpa_descripcion,
-    cpa_icono = EXCLUDED.cpa_icono,
-    cpa_badge = EXCLUDED.cpa_badge,
-    cpa_tipo_beneficiario = EXCLUDED.cpa_tipo_beneficiario,
-    cpa_tipo_pago = EXCLUDED.cpa_tipo_pago,
-    cpa_orden = EXCLUDED.cpa_orden,
-    cpa_seleccionable = EXCLUDED.cpa_seleccionable,
-    cpa_estado_definicion = EXCLUDED.cpa_estado_definicion,
-    cpa_observacion_normativa = EXCLUDED.cpa_observacion_normativa,
-    estatus_registro = 1,
-    fecha_m = clock_timestamp(),
-    usuario_m = 'SCRIPT_POBLADO';
-
--- 3. ALINEACIÓN DE LA TABLA TRANSACCIONAL DE AFECTACIONES
-ALTER TABLE cxp.afectaciones_gasto ADD COLUMN IF NOT EXISTS f_grupo_codigo VARCHAR(20);
-ALTER TABLE cxp.afectaciones_gasto ADD COLUMN IF NOT EXISTS afecta_presupuesto BOOLEAN DEFAULT true;
-
-DO $do$
-DECLARE r record;
-BEGIN
-  FOR r IN (
-    SELECT conname FROM pg_constraint 
-     WHERE conrelid = 'cxp.afectaciones_gasto'::regclass 
-       AND contype = 'c' 
-       AND pg_get_constraintdef(oid) LIKE '%tipo_pago%'
-  ) LOOP
-    EXECUTE 'ALTER TABLE cxp.afectaciones_gasto DROP CONSTRAINT ' || quote_ident(r.conname);
-  END LOOP;
-END $do$;
-
-ALTER TABLE cxp.afectaciones_gasto 
-    ADD CONSTRAINT afectaciones_gasto_tipo_pago_check 
-    CHECK (tipo_pago IN (1, 2, 3, 4));
-
-UPDATE cxp.afectaciones_gasto ag
-   SET f_grupo_codigo = cpa.f_grupo_codigo,
-       tipo_pago = cpa.cpa_tipo_pago,
-       afecta_presupuesto = cgt.afecta_presupuesto
-  FROM cxp.catalogo_procedimientos_afectacion cpa
-  JOIN cxp.catalogo_grupos_tramite cgt ON cgt.cgt_codigo = cpa.f_grupo_codigo
- WHERE ag.f_procedimiento_codigo = cpa.cpa_codigo
-   AND (ag.f_grupo_codigo IS NULL OR ag.tipo_pago <> cpa.cpa_tipo_pago);
-
-COMMIT;</code></pre>
+ALTER TABLE cxp.afectaciones_gasto
+    DROP CONSTRAINT IF EXISTS fk_ag_matriz_procedimiento,
+    ADD CONSTRAINT fk_ag_matriz_procedimiento
+    FOREIGN KEY (f_matriz_inicial_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id)
+    REFERENCES contabilidad.matriz_grupos_procedimiento (f_matriz_inicial_id, f_matriz_grupo_id, mgp_id);</code></pre>
       </div>
     </div>
   </div>
 
   <!-- 6. STORED PROCEDURES (LEER, CRUD, WORKFLOW, POLIZA) -->
   <div class="doc-section">
-    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures)</div>
+    <div class="section-title"><span class="section-num">6</span> Procedimientos Almacenados (Stored Procedures con Llave Compuesta)</div>
     <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
-      Funciones PostgreSQL en esquema <code>cxp</code> bajo estándar institucional, con <code>SECURITY DEFINER</code>, <code>SET search_path</code> y retorno JSONB unificado <code>{ "error": 0, "mensaje": "OK", "data": [...] }</code>:
+      Funciones PostgreSQL en esquema <code>cxp</code> bajo estándar institucional (STD-01), con <code>SECURITY DEFINER</code>, <code>SET search_path = cxp, contabilidad, config, public</code> y retorno JSONB unificado:
     </p>
 
     <div class="sp-tabs">
@@ -749,8 +477,8 @@ COMMIT;</code></pre>
 <pre><code>CREATE OR REPLACE FUNCTION cxp.fn_leer_afectacion_encabezado(
     p_usuario VARCHAR,
     p_ejercicio INTEGER,
-    p_tipo_pago INTEGER DEFAULT NULL,
-    p_procedimiento VARCHAR DEFAULT NULL,
+    p_matriz_grupo_id SMALLINT DEFAULT NULL,
+    p_matriz_procedimiento_id SMALLINT DEFAULT NULL,
     p_estatus_workflow VARCHAR DEFAULT NULL,
     p_buscar VARCHAR DEFAULT NULL,
     p_ag_id UUID DEFAULT NULL
@@ -758,7 +486,7 @@ COMMIT;</code></pre>
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = cxp, config, contabilidad, public
+SET search_path = cxp, contabilidad, config, public
 AS $$
 DECLARE
     v_data JSONB;
@@ -769,11 +497,13 @@ BEGIN
             'ejercicio_fiscal', a.ejercicio_fiscal,
             'folio', a.folio,
             'fecha_elaboracion', a.fecha_elaboracion,
-            'grupo_codigo', a.f_grupo_codigo,
-            'grupo_titulo', g.cgt_titulo,
-            'procedimiento_codigo', a.f_procedimiento_codigo,
-            'procedimiento_nombre', p.cpa_nombre,
-            'tipo_pago', a.tipo_pago,
+            'matriz_id', a.f_matriz_id,
+            'matriz_grupo_id', a.f_matriz_grupo_id,
+            'grupo_codigo', g.mgt_codigo,
+            'grupo_titulo', g.mgt_titulo,
+            'matriz_grupo_procedimiento_id', a.f_matriz_grupo_procedimiento_id,
+            'procedimiento_codigo', p.mgp_codigo,
+            'procedimiento_nombre', p.mgp_nombre,
             'afecta_presupuesto', a.afecta_presupuesto,
             'concepto', a.concepto,
             'importe_total_pago', a.importe_total_pago,
@@ -781,13 +511,13 @@ BEGIN
             'importe_neto_pagar', (a.importe_total_pago - a.importe_retenciones),
             'centro_costo_id', a.f_centro_costo_id,
             'centro_costo_nombre', cc.cc_nombre,
-            'beneficiario_tipo', p.cpa_tipo_beneficiario,
-            'beneficiario_nombre', CASE p.cpa_tipo_beneficiario
+            'beneficiario_tipo', p.mgp_tipo_beneficiario,
+            'beneficiario_nombre', CASE p.mgp_tipo_beneficiario
                 WHEN 'PROVEEDOR' THEN prov.pr_razonsocial
                 WHEN 'EMPLEADO' THEN emp.emp_nombrecompleto
                 WHEN 'UNIDAD_ADMINISTRATIVA' THEN ua.ua_nombre
-                WHEN 'TERCERO_INST' THEN ti.nombre_institucion
-                ELSE 'No asignado' END,
+                WHEN 'TERCERO_INSTITUCIONAL' THEN ti.nombre_institucion
+                ELSE COALESCE(prov.pr_razonsocial, emp.emp_nombrecompleto, 'No asignado') END,
             'estatus_workflow', a.estatus_workflow,
             'poliza_id', a.p_poliza_id,
             'usuario_c', a.usuario_c,
@@ -795,8 +525,10 @@ BEGIN
         ) ORDER BY a.fecha_c DESC
     ) INTO v_data
     FROM cxp.afectaciones_gasto a
-    JOIN cxp.catalogo_grupos_tramite g ON g.cgt_codigo = a.f_grupo_codigo
-    JOIN cxp.catalogo_procedimientos_afectacion p ON p.cpa_codigo = a.f_procedimiento_codigo
+    JOIN contabilidad.matriz_grupos_tramite g ON g.mgt_id = a.f_matriz_grupo_id
+    JOIN contabilidad.matriz_grupos_procedimiento p
+      ON p.f_matriz_grupo_id = a.f_matriz_grupo_id
+     AND p.mgp_id = a.f_matriz_grupo_procedimiento_id
     LEFT JOIN config.catalogo_centros_costos cc ON cc.cc_id = a.f_centro_costo_id
     LEFT JOIN config.catalogo_proveedores prov ON prov.pr_id = a.f_proveedor_id
     LEFT JOIN config.catalogo_empleados emp ON emp.emp_id = a.f_empleado_id
@@ -804,9 +536,10 @@ BEGIN
     LEFT JOIN config.catalogo_terceros_inst ti ON ti.tercero_inst_id = a.f_tercero_inst_id
     WHERE a.ejercicio_fiscal = p_ejercicio
       AND a.estatus_registro = 1
+      AND a.f_matriz_grupo_id IN (1, 2, 3)
       AND (p_ag_id IS NULL OR a.ag_id = p_ag_id)
-      AND (p_tipo_pago IS NULL OR a.tipo_pago = p_tipo_pago)
-      AND (p_procedimiento IS NULL OR a.f_procedimiento_codigo = p_procedimiento)
+      AND (p_matriz_grupo_id IS NULL OR a.f_matriz_grupo_id = p_matriz_grupo_id)
+      AND (p_matriz_procedimiento_id IS NULL OR a.f_matriz_grupo_procedimiento_id = p_matriz_procedimiento_id)
       AND (p_estatus_workflow IS NULL OR a.estatus_workflow = p_estatus_workflow)
       AND (p_buscar IS NULL OR (
           a.folio ILIKE '%' || p_buscar || '%' OR
@@ -835,50 +568,49 @@ $$;</code></pre>
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = cxp, config, contabilidad, public
+SET search_path = cxp, contabilidad, config, public
 AS $$
 DECLARE
     v_id UUID;
     v_folio VARCHAR(20);
-    v_proc VARCHAR(40);
-    v_grupo VARCHAR(20);
-    v_tipo_pago SMALLINT;
+    v_proc_id SMALLINT;
+    v_grupo_id SMALLINT;
+    v_matriz_id BIGINT;
+    v_proc_cod VARCHAR(50);
+    v_grupo_cod VARCHAR(30);
     v_afecta_ppto BOOLEAN;
-    v_tipo_bene VARCHAR(30);
 BEGIN
-    -- 1 = ALTA
+    -- 1 = ALTA DE SOLICITUD-COMPROBACIÓN DE RECURSO (GRUPOS 1, 2 Y 3)
     IF p_accion = 1 THEN
-        v_proc := p_datos->>'procedimiento_codigo';
-        
-        -- Obtener configuración del procedimiento
-        SELECT f_grupo_codigo, cpa_tipo_beneficiario INTO v_grupo, v_tipo_bene
-          FROM cxp.catalogo_procedimientos_afectacion
-         WHERE cpa_codigo = v_proc AND estatus_registro = 1;
+        v_proc_id := (p_datos->>'matriz_grupo_procedimiento_id')::SMALLINT;
 
-        IF NOT FOUND THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'El procedimiento seleccionado no existe o está inactivo.');
+        SELECT p.f_matriz_inicial_id, p.f_matriz_grupo_id, p.mgp_codigo, g.mgt_codigo, g.afecta_presupuesto
+          INTO v_matriz_id, v_grupo_id, v_proc_cod, v_grupo_cod, v_afecta_ppto
+          FROM contabilidad.matriz_grupos_procedimiento p
+          JOIN contabilidad.matriz_grupos_tramite g ON g.mgt_id = p.f_matriz_grupo_id
+         WHERE p.mgp_id = v_proc_id AND p.estatus_registro = 1;
+
+        IF NOT FOUND OR v_afecta_ppto = false OR v_grupo_id NOT IN (1, 2, 3) THEN
+            RETURN jsonb_build_object('error', -1, 'mensaje', 'El subprocedimiento no pertenece a los 3 grupos presupuestales de 05.2.1.');
         END IF;
 
-        -- Obtener grupo y afectación presupuestaria
-        SELECT cgt_numero, afecta_presupuesto INTO v_tipo_pago, v_afecta_ppto
-          FROM cxp.catalogo_grupos_tramite WHERE cgt_codigo = v_grupo;
-
         v_id := gen_random_uuid();
-        
-        -- Generar folio anual AG-YYYY-XXXXX
+
         SELECT 'AG-' || p_ejercicio || '-' || LPAD((COALESCE(MAX(SUBSTRING(folio FROM 9)::INTEGER), 0) + 1)::TEXT, 5, '0')
           INTO v_folio
           FROM cxp.afectaciones_gasto WHERE ejercicio_fiscal = p_ejercicio;
 
         INSERT INTO cxp.afectaciones_gasto (
             ag_id, ejercicio_fiscal, folio, fecha_elaboracion,
+            f_matriz_id, f_matriz_grupo_id, f_matriz_grupo_procedimiento_id,
             f_grupo_codigo, f_procedimiento_codigo, tipo_pago, afecta_presupuesto,
             concepto, f_centro_costo_id, f_proveedor_id, f_empleado_id,
             f_ua_id, f_tercero_inst_id, estatus_workflow, estatus_registro,
             usuario_c, fecha_c
         ) VALUES (
             v_id, p_ejercicio, v_folio, CURRENT_DATE,
-            v_grupo, v_proc, v_tipo_pago, v_afecta_ppto,
+            v_matriz_id, v_grupo_id, v_proc_id,
+            v_grupo_cod, v_proc_cod, v_grupo_id, true,
             TRIM(p_datos->>'concepto'),
             (p_datos->>'centro_costo_id')::INTEGER,
             (p_datos->>'proveedor_id')::INTEGER,
@@ -888,17 +620,16 @@ BEGIN
             'BORRADOR', 1, p_usuario, clock_timestamp()
         );
 
-        -- Registrar en bitácora de auditoría
         INSERT INTO cxp.afectaciones_historial (
             f_ag_id, estado_anterior, estado_nuevo, accion_realizada,
             observaciones, usuario_accion, fecha_accion
         ) VALUES (
-            v_id, NULL, 'BORRADOR', 'CREACION', 'Alta inicial de cabecera de afectación', p_usuario, clock_timestamp()
+            v_id, NULL, 'BORRADOR', 'CREACION', 'Alta inicial de Solicitud-Comprobación de Recurso', p_usuario, clock_timestamp()
         );
 
         RETURN jsonb_build_object(
             'error', 0,
-            'mensaje', 'Afectación guardada exitosamente en borrador.',
+            'mensaje', 'Solicitud-Comprobación de Recurso guardada exitosamente en borrador.',
             'data', jsonb_build_object('ag_id', v_id, 'folio', v_folio)
         );
 
@@ -914,7 +645,7 @@ BEGIN
             usuario_m = p_usuario, fecha_m = clock_timestamp()
         WHERE ag_id = p_ag_id AND estatus_workflow IN ('BORRADOR', 'REGRESADA');
 
-        RETURN jsonb_build_object('error', 0, 'mensaje', 'Encabezado de afectación actualizado.');
+        RETURN jsonb_build_object('error', 0, 'mensaje', 'Encabezado actualizado correctamente.');
 
     -- 3 = CANCELACIÓN FORMAL
     ELSIF p_accion = 3 THEN
@@ -936,7 +667,7 @@ $$;</code></pre>
 
     <!-- SP 3: ABC DETALLES -->
     <div id="sp-spag3" class="sp-panel">
-      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función de Partidas: <code>cxp.fn_abc_afectacion_detalles</code></h4>
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función de Partidas Presupuestarias: <code>cxp.fn_abc_afectacion_detalles</code></h4>
       <div class="code-wrap">
 <pre><code>CREATE OR REPLACE FUNCTION cxp.fn_abc_afectacion_detalles(
     p_accion SMALLINT,
@@ -947,25 +678,23 @@ $$;</code></pre>
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = cxp, config, contabilidad, public
+SET search_path = cxp, contabilidad, config, public
 AS $$
 DECLARE
     v_item JSONB;
     v_total NUMERIC(15,2) := 0.00;
 BEGIN
-    -- 1 = REEMPLAZAR PARTIDAS COMPLETAS (En Borrador o Regresada)
     IF p_accion = 1 THEN
         DELETE FROM cxp.afectaciones_gasto_detalles WHERE f_ag_id = p_ag_id;
 
         FOR v_item IN SELECT * FROM jsonb_array_elements(p_detalles) LOOP
             INSERT INTO cxp.afectaciones_gasto_detalles (
-                f_ag_id, f_clave_presupuestal_id, f_cog_id, cuenta_contable_balance,
+                f_ag_id, f_clave_presupuestal_id, f_cog_id,
                 mes_servicio, importe_solicitado, estatus_registro, usuario_c
             ) VALUES (
                 p_ag_id,
                 (v_item->>'clave_presupuestal_id')::INTEGER,
                 (v_item->>'cog_id')::INTEGER,
-                v_item->>'cuenta_contable_balance',
                 COALESCE((v_item->>'mes_servicio')::SMALLINT, EXTRACT(MONTH FROM CURRENT_DATE)::SMALLINT),
                 (v_item->>'importe_solicitado')::NUMERIC,
                 1, p_usuario
@@ -973,7 +702,6 @@ BEGIN
             v_total := v_total + (v_item->>'importe_solicitado')::NUMERIC;
         END LOOP;
 
-        -- Actualizar importe acumulado en la cabecera
         UPDATE cxp.afectaciones_gasto 
            SET importe_total_pago = v_total, usuario_m = p_usuario, fecha_m = clock_timestamp()
          WHERE ag_id = p_ag_id;
@@ -1002,7 +730,7 @@ $$;</code></pre>
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = cxp, config, contabilidad, public
+SET search_path = cxp, contabilidad, config, public
 AS $$
 DECLARE
     v_ag RECORD;
@@ -1013,18 +741,16 @@ DECLARE
 BEGIN
     SELECT * INTO v_ag FROM cxp.afectaciones_gasto WHERE ag_id = p_ag_id AND estatus_registro = 1;
     IF NOT FOUND THEN
-        RETURN jsonb_build_object('error', -1, 'mensaje', 'Afectación no localizada o inactiva.');
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Solicitud no localizada o inactiva.');
     END IF;
 
     v_estado_ant := v_ag.estatus_workflow;
 
-    -- CASO 1: ENVIAR A REVISIÓN
     IF p_accion = 'ENVIAR' THEN
         IF v_estado_ant NOT IN ('BORRADOR', 'REGRESADA') THEN
             RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en Borrador o Regresada pueden ser enviados.');
         END IF;
 
-        -- Validar Checklist de Expediente Digital Obligatorio (05.1.1)
         v_chk := cxp.fn_validar_checklist_afectacion(p_ag_id, v_ag.ejercicio_fiscal);
         IF (v_chk->>'valido')::BOOLEAN = false THEN
             RETURN jsonb_build_object('error', -1, 'mensaje', v_chk->>'mensaje', 'faltantes', v_chk->'faltantes');
@@ -1032,13 +758,11 @@ BEGIN
 
         v_estado_nue := 'ENVIADA';
 
-    -- CASO 2: APROBAR Y DETONAR DEVENGO CONTABLE
     ELSIF p_accion = 'APROBAR' THEN
         IF v_estado_ant <> 'ENVIADA' THEN
             RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en estado ENVIADA pueden ser aprobados.');
         END IF;
 
-        -- Detonar Generación de Póliza de Devengo (Matriz de Conversión)
         v_poliza := cxp.fn_generar_poliza_afectacion(p_ag_id, p_usuario);
         IF (v_poliza->>'error')::INTEGER <> 0 THEN
             RETURN jsonb_build_object('error', -1, 'mensaje', 'Error al generar la póliza de devengo: ' || (v_poliza->>'mensaje'));
@@ -1046,18 +770,15 @@ BEGIN
 
         v_estado_nue := 'APROBADA';
 
-    -- CASO 3: REGRESAR CON OBSERVACIONES
     ELSIF p_accion = 'REGRESAR' THEN
         IF v_estado_ant <> 'ENVIADA' THEN
             RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo trámites en estado ENVIADA pueden ser regresados.');
         END IF;
         v_estado_nue := 'REGRESADA';
 
-    -- CASO 4: RECHAZAR FORMALMENTE
     ELSIF p_accion = 'RECHAZAR' THEN
         v_estado_nue := 'RECHAZADA';
 
-    -- CASO 5: CANCELAR
     ELSIF p_accion = 'CANCELAR' THEN
         IF v_estado_ant = 'APROBADA' THEN
             RETURN jsonb_build_object('error', -1, 'mensaje', 'Un trámite APROBADO con póliza contable requiere reversa formal en Contabilidad.');
@@ -1067,14 +788,12 @@ BEGIN
         RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción de workflow no reconocida.');
     END IF;
 
-    -- Actualizar estado de la afectación
     UPDATE cxp.afectaciones_gasto 
        SET estatus_workflow = v_estado_nue,
            p_poliza_id = COALESCE((v_poliza->'data'->>'poliza_id')::BIGINT, p_poliza_id),
            usuario_m = p_usuario, fecha_m = clock_timestamp()
      WHERE ag_id = p_ag_id;
 
-    -- Registrar auditoría en historial
     INSERT INTO cxp.afectaciones_historial (
         f_ag_id, estado_anterior, estado_nuevo, accion_realizada,
         observaciones, usuario_accion, fecha_accion
@@ -1094,9 +813,9 @@ $$;</code></pre>
       </div>
     </div>
 
-    <!-- SP 5: GENERADOR POLIZA -->
+    <!-- SP 5: GENERADOR POLIZA POR LLAVE COMPUESTA DE 5 NIVELES -->
     <div id="sp-spag5" class="sp-panel">
-      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Generador de Pólizas: <code>cxp.fn_generar_poliza_afectacion</code></h4>
+      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Generador de Pólizas por Llave Compuesta: <code>cxp.fn_generar_poliza_afectacion</code></h4>
       <div class="code-wrap">
 <pre><code>CREATE OR REPLACE FUNCTION cxp.fn_generar_poliza_afectacion(
     p_ag_id UUID,
@@ -1110,66 +829,75 @@ AS $$
 DECLARE
     v_ag RECORD;
     v_poliza_id BIGINT;
-    v_folio_poliza VARCHAR(10);
+    v_folio_poliza VARCHAR(20);
     v_det RECORD;
-    v_regla RECORD;
+    v_regla_id BIGINT;
     v_mov RECORD;
-    v_cta RECORD;
-    v_orden INTEGER := 0;
+    v_orden INTEGER := 1;
 BEGIN
     SELECT * INTO v_ag FROM cxp.afectaciones_gasto WHERE ag_id = p_ag_id;
     IF NOT FOUND THEN
-        RETURN jsonb_build_object('error', -1, 'mensaje', 'Afectación no localizada.');
+        RETURN jsonb_build_object('error', -1, 'mensaje', 'Solicitud no localizada.');
     END IF;
 
-    -- Generar folio secuencial PE-YYYY-XXXXX
+    -- 1. Generar folio secuencial PE-YYYY-XXXXX
     SELECT 'PE-' || v_ag.ejercicio_fiscal || '-' || LPAD((COALESCE(MAX(SUBSTRING(p_numero FROM 9)::INTEGER), 0) + 1)::TEXT, 5, '0')
       INTO v_folio_poliza
       FROM contabilidad.poliza WHERE p_ejercicio = v_ag.ejercicio_fiscal AND p_tipo = 'PE';
 
-    -- Insertar Cabecera de Póliza en contabilidad.poliza
+    -- 2. Insertar Cabecera de Póliza en contabilidad.poliza
     INSERT INTO contabilidad.poliza (
         p_tipo, p_subtipo, p_numero, p_ejercicio, p_fecha, p_descripcion,
         p_afecta, estatus_registro, usuario_c, fecha_c, p_centro_costo_id
     ) VALUES (
         'PE', 'AG', v_folio_poliza, v_ag.ejercicio_fiscal, v_ag.fecha_elaboracion,
-        'Devengo de gasto por afectación ' || v_ag.folio || ': ' || v_ag.concepto,
+        'Devengo de gasto · Solicitud ' || v_ag.folio || ': ' || v_ag.concepto,
         1, 1, p_usuario, clock_timestamp(), v_ag.f_centro_costo_id
     ) RETURNING p_id INTO v_poliza_id;
 
-    -- BIFURCACIÓN DE CONTABILIZACIÓN
-    -- CASO A: Trámites Presupuestarios (Tipos 1, 2 y 3) -> Disparan Matriz A.1 (Gasto + Presupuesto)
-    IF v_ag.afecta_presupuesto = true THEN
-        FOR v_det IN SELECT * FROM cxp.afectaciones_gasto_detalles WHERE f_ag_id = p_ag_id AND estatus_registro = 1 LOOP
-            -- Asiento Patrimonial Gasto 5.x vs Pasivo Proveedores 2.1.1.2
-            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
-            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 1, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_cri_cog = (SELECT cog_cuentacompleta FROM config.catalogo_cog WHERE cog_id = v_det.f_cog_id) AND cc_nivel1 = '5' LIMIT 1), v_det.importe_solicitado, 0.00, p_usuario);
+    -- 3. Recorrer partidas y resolver la regla en contabilidad.matriz_conversion_regla
+    --    usando la llave compuesta jerárquica (matriz_id = 12, grupo_id, procedimiento_id, cog_id)
+    FOR v_det IN SELECT * FROM cxp.afectaciones_gasto_detalles WHERE f_ag_id = p_ag_id AND estatus_registro = 1 LOOP
+        SELECT mcr.mcr_id INTO v_regla_id
+          FROM contabilidad.matriz_conversion_regla mcr
+         WHERE mcr.mcr_matriz_id = v_ag.f_matriz_id
+           AND mcr.mcr_matriz_grupo_id = v_ag.f_matriz_grupo_id
+           AND mcr.mcr_matriz_grupo_procedimiento_id = v_ag.f_matriz_grupo_procedimiento_id
+           AND mcr.mcr_cog_id = v_det.f_cog_id
+           AND mcr.estatus_registro = 1
+         ORDER BY mcr.mcr_prioridad ASC, mcr.mcr_id ASC
+         LIMIT 1;
 
-            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
-            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 2, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_cuenta = '211210101' LIMIT 1), 0.00, v_det.importe_solicitado, p_usuario);
+        IF v_regla_id IS NULL THEN
+            RAISE EXCEPTION 'No existe regla activa en la Matriz 12 para Grupo %, Subprocedimiento % y COG %',
+                v_ag.f_matriz_grupo_id, v_ag.f_matriz_grupo_procedimiento_id, v_det.f_cog_id;
+        END IF;
 
-            -- Asiento Presupuestario Devengado 8.2.5 vs Comprometido 8.2.4
-            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
-            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 3, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_nivel1 = '8' AND cc_nivel2 = '2' AND cc_nivel3 = '5' LIMIT 1), v_det.importe_solicitado, 0.00, p_usuario);
-
-            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
-            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 4, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_nivel1 = '8' AND cc_nivel2 = '2' AND cc_nivel3 = '4' LIMIT 1), 0.00, v_det.importe_solicitado, p_usuario);
+        -- 4. Generar asientos contables (C) y presupuestales (P) desde contabilidad.matriz_conversion_movimiento
+        FOR v_mov IN
+            SELECT mcm.mcm_naturaleza, mcm.mcm_cuenta_id, mcm.mcm_formula_monto
+              FROM contabilidad.matriz_conversion_movimiento mcm
+             WHERE mcm.mcm_matriz_id = v_ag.f_matriz_id
+               AND mcm.mcm_matriz_grupo_id = v_ag.f_matriz_grupo_id
+               AND mcm.mcm_matriz_grupo_procedimiento_id = v_ag.f_matriz_grupo_procedimiento_id
+               AND mcm.mcm_regla_id = v_regla_id
+               AND mcm.estatus_registro = 1
+             ORDER BY mcm.mcm_orden ASC
+        LOOP
+            INSERT INTO contabilidad.poliza_movtos (
+                pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c
+            ) VALUES (
+                v_poliza_id, v_ag.ejercicio_fiscal, v_orden, v_mov.mcm_cuenta_id,
+                CASE WHEN v_mov.mcm_naturaleza = 'D' THEN v_det.importe_solicitado ELSE 0.00 END,
+                CASE WHEN v_mov.mcm_naturaleza = 'H' THEN v_det.importe_solicitado ELSE 0.00 END,
+                p_usuario
+            );
+            v_orden := v_orden + 1;
         END LOOP;
+    END LOOP;
 
-    -- CASO B: Trámites No Presupuestarios (Tipo 4) -> Operación de Balance Pura (Sin cuentas 8.2.x)
-    ELSE
-        FOR v_det IN SELECT * FROM cxp.afectaciones_gasto_detalles WHERE f_ag_id = p_ag_id AND estatus_registro = 1 LOOP
-            -- Cargo: Pasivo Circulante a disminuir (Retención 2.1.1.7 o Garantía 2.1.6.1)
-            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
-            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 1, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_cuenta = v_det.cuenta_contable_balance LIMIT 1), v_det.importe_solicitado, 0.00, p_usuario);
-
-            -- Abono: Pasivo exigible / Orden de Pago
-            INSERT INTO contabilidad.poliza_movtos (pm_poliza_id, pm_ejercicio, pm_orden, pm_cc_id, pm_debe, pm_haber, usuario_c)
-            VALUES (v_poliza_id, v_ag.ejercicio_fiscal, 2, (SELECT cc_id FROM contabilidad.catalogo_cuentas WHERE cc_cuenta = '211910101' LIMIT 1), 0.00, v_det.importe_solicitado, p_usuario);
-        END LOOP;
-    END IF;
-
-    RETURN jsonb_build_object('error', 0, 'mensaje', 'Póliza generada.', 'data', jsonb_build_object('poliza_id', v_poliza_id, 'folio_poliza', v_folio_poliza));
+    RETURN jsonb_build_object('error', 0, 'mensaje', 'Póliza de devengo A.1 generada exitosamente.',
+        'data', jsonb_build_object('poliza_id', v_poliza_id, 'folio_poliza', v_folio_poliza));
 END;
 $$;</code></pre>
       </div>
@@ -1283,9 +1011,9 @@ export class AfectacionesCxpController {
       </div>
 
       <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-AG-04 · Tratamiento Exclusivo para Tipo 4 (No Afecta Presupuesto)</strong>
+        <strong style="color:var(--pjev-verde-oscuro);">RN-AG-04 · Separación Estricta de Grupos Presupuestales (1, 2 y 3) vs. No Presupuestales (Grupo 4)</strong>
         <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          En trámites con <code>tipo_pago = 4</code> (Entero de retenciones o garantías), el formulario suprime la captura de estructura programática (Función, Programa, Proyecto, Fuente y COG) y solicita únicamente la subcuenta contable de balance a disminuir (<code>2.1.1.7</code> / <code>2.1.6.1</code>), garantizando cero impacto en cuentas `8.2.x`.
+          En <code>05.2.1 Solicitud-Comprobación de Recurso (Orden de Pago)</code> solo se registran trámites con <code>afecta_presupuesto = true</code> (Grupos 1, 2 y 3, subprocedimientos <code>101..303</code>), exigiendo siempre estructura programática y partida COG. Los trámites del Grupo 4 (<code>No afecta presupuesto</code>, subprocedimientos <code>401..404</code>) se gestionan exclusivamente en <code>05.2.2 Solicitud de Pagos No Presupuestales</code>.
         </p>
       </div>
 
@@ -1349,7 +1077,7 @@ export class AfectacionesCxpController {
     <div id="wf-wfag1" class="wf-panel active">
       <div class="wf-box">
         <div class="wf-bar">
-          <span class="wf-bar-label">05.2.1 Pantalla Principal · Bandeja de Entrada de Afectaciones de Gasto</span>
+          <span class="wf-bar-label">05.2.1 Pantalla Principal · Bandeja de Solicitud-Comprobación de Recurso (Orden de Pago)</span>
           <span style="font-size:10px; color:#15803d; font-weight:bold;">SiafCard Filtros + SiafDataGrid + SiafInfoPanel</span>
         </div>
         <div class="wf-svg-area">
@@ -1368,12 +1096,12 @@ export class AfectacionesCxpController {
             <text x="885" y="25" font-size="10" fill="#ffffff">Operador CxP</text>
 
             <!-- Breadcrumb & Header de Página -->
-            <text x="20" y="66" font-size="10" fill="#64748b">Finanzas  /  Registro  /  <tspan font-weight="bold" fill="#183125">Afectación de Gasto</tspan></text>
-            <text x="20" y="88" font-size="16" font-weight="bold" fill="#183125">Afectaciones de Gasto (Devengado)</text>
+            <text x="20" y="66" font-size="10" fill="#64748b">05 · Tesorería  /  05.2 Registro  /  <tspan font-weight="bold" fill="#183125">05.2.1 Solicitud-Comprobación de Recurso (Orden de Pago)</tspan></text>
+            <text x="20" y="88" font-size="16" font-weight="bold" fill="#183125">Solicitud-Comprobación de Recurso (Orden de Pago)</text>
             
             <!-- Botón Principal + Nueva Afectación -->
             <rect x="765" y="65" width="175" height="32" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="852" y="85" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nueva Afectación</text>
+            <text x="852" y="85" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nueva Solicitud</text>
 
             <!-- Card de Filtros (SiafCard) -->
             <rect x="20" y="105" width="920" height="85" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
@@ -1381,7 +1109,7 @@ export class AfectacionesCxpController {
             <!-- Filtro 1: Tipo de Trámite -->
             <text x="35" y="125" font-size="9" font-weight="bold" fill="#475569">TIPO DE TRÁMITE</text>
             <rect x="35" y="132" width="140" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <text x="45" y="149" font-size="10" fill="#1e293b">Todos (4 Tipos) ▼</text>
+            <text x="45" y="149" font-size="10" fill="#1e293b">Todos (3 Grupos) ▼</text>
 
             <!-- Filtro 2: Procedimiento -->
             <text x="185" y="125" font-size="9" font-weight="bold" fill="#475569">PROCEDIMIENTO</text>
@@ -1457,9 +1185,9 @@ export class AfectacionesCxpController {
             <!-- Fila 3: Aprobada (Tipo 4 No Presupuestario) -->
             <text x="35" y="307" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">AG-2026-00140</text>
             <text x="120" y="307" font-size="9" fill="#334155">28/08/2026</text>
-            <text x="185" y="307" font-size="9" font-weight="bold" fill="#166534">🏛 TERCEROS_INST</text>
+            <text x="185" y="307" font-size="9" font-weight="bold" fill="#183125">🏛 107 IMPUESTOS_ENTIDAD</text>
             <text x="350" y="307" font-size="9" fill="#1e293b">SEFIPLAN VERACRUZ</text>
-            <text x="520" y="307" font-size="9" fill="#64748b">Entero retención 3% nómina Q16</text>
+            <text x="520" y="307" font-size="9" fill="#64748b">Impuesto 3% sobre nómina Q16 (COG 39801)</text>
             <text x="670" y="307" font-size="10" font-family="monospace" font-weight="bold" fill="#166534" text-anchor="end">$380,450.00</text>
             <rect x="725" y="295" width="70" height="16" fill="#dcfce7" rx="8"/>
             <text x="760" y="307" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">APROBADA</text>
@@ -1519,7 +1247,7 @@ export class AfectacionesCxpController {
       <div class="wf-box">
         <div class="wf-bar">
           <span class="wf-bar-label">05.2.1 Modal Asistente de Clasificación · Paso 0 Guiado PJEV-UI</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">4 Familias Macro y 15 Subtipos con Iconos y Descripciones</span>
+          <span style="font-size:10px; color:#15803d; font-weight:bold;">3 Grupos Presupuestales y 16 Subprocedimientos (Matriz 12 A.1)</span>
         </div>
         <div class="wf-svg-area">
           <svg viewBox="0 0 920 540" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
@@ -1533,33 +1261,27 @@ export class AfectacionesCxpController {
             <rect x="875" y="14" width="24" height="24" fill="#2d4a3b" rx="4"/>
             <text x="887" y="30" font-size="12" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
 
-            <!-- SECCIÓN 1: TIPO DE TRÁMITE PRINCIPAL -->
-            <text x="25" y="75" font-size="11" font-weight="bold" fill="#334155">1. SELECCIONA EL TIPO DE TRÁMITE PRINCIPAL *</text>
-            <text x="895" y="75" font-size="10" fill="#64748b" text-anchor="end">4 Modalidades Oficiales</text>
+            <!-- SECCIÓN 1: GRUPO DE TRÁMITE PRESUPUESTAL -->
+            <text x="25" y="75" font-size="11" font-weight="bold" fill="#334155">1. SELECCIONA EL GRUPO DE TRÁMITE PRESUPUESTAL (contabilidad.matriz_grupos_tramite) *</text>
+            <text x="895" y="75" font-size="10" fill="#15803d" font-weight="bold" text-anchor="end">3 Grupos Presupuestales · 16 Subprocedimientos</text>
 
-            <!-- Card 1: Gasto Directo (Selected) -->
-            <rect x="25" y="85" width="205" height="75" fill="#fdfbf7" stroke="#183125" stroke-width="2" rx="6"/>
-            <text x="40" y="112" font-size="12" font-weight="bold" fill="#183125">💵 1. Gasto Directo</text>
-            <text x="40" y="130" font-size="9" fill="#64748b">Nómina, servicios básicos, rentas y</text>
-            <text x="40" y="143" font-size="9" fill="#64748b">compras menores directas.</text>
+            <!-- Card 1: 1. Pago directo (Selected) -->
+            <rect x="25" y="85" width="275" height="75" fill="#fdfbf7" stroke="#183125" stroke-width="2" rx="6"/>
+            <text x="40" y="112" font-size="12" font-weight="bold" fill="#183125">💵 1. Pago directo (9 subproc.)</text>
+            <text x="40" y="130" font-size="9" fill="#64748b">Nómina, arrendamientos, servicios básicos,</text>
+            <text x="40" y="143" font-size="9" fill="#64748b">honorarios, 3% nómina, seguros y laudos.</text>
 
-            <!-- Card 2: Por Pedido / Contrato -->
-            <rect x="245" y="85" width="205" height="75" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            <text x="260" y="112" font-size="12" font-weight="bold" fill="#1e293b">📦 2. Pedido / Contrato</text>
-            <text x="260" y="130" font-size="9" fill="#64748b">Licitaciones, compras de almacén y</text>
-            <text x="260" y="143" font-size="9" fill="#64748b">contratos de obra pública.</text>
+            <!-- Card 2: 2. Pago derivado de un pedido (materiales) -->
+            <rect x="320" y="85" width="280" height="75" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <text x="335" y="112" font-size="12" font-weight="bold" fill="#1e293b">📦 2. Derivado de un pedido (4 subproc.)</text>
+            <text x="335" y="130" font-size="9" fill="#64748b">Pedidos de almacén (Cap. 2000), activo fijo</text>
+            <text x="335" y="143" font-size="9" fill="#64748b">(Cap. 5000), contratos y obra pública.</text>
 
-            <!-- Card 3: Gastos a Comprobar -->
-            <rect x="465" y="85" width="205" height="75" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            <text x="480" y="112" font-size="12" font-weight="bold" fill="#1e293b">✈ 3. Gastos a Comprobar</text>
-            <text x="480" y="130" font-size="9" fill="#64748b">Viáticos (Anexo 6), sujetos a</text>
-            <text x="480" y="143" font-size="9" fill="#64748b">comprobar y caja chica.</text>
-
-            <!-- Card 4: No Afecta Presupuesto -->
-            <rect x="685" y="85" width="210" height="75" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" rx="6"/>
-            <text x="700" y="112" font-size="12" font-weight="bold" fill="#166534">🏛 4. No Afecta Ppto.</text>
-            <text x="700" y="130" font-size="9" fill="#15803d">Entero retenciones SAT/IPE, garantías</text>
-            <text x="700" y="143" font-size="9" fill="#15803d">y fondos ajenos en balance.</text>
+            <!-- Card 3: 3. Gasto a comprobar -->
+            <rect x="620" y="85" width="275" height="75" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
+            <text x="635" y="112" font-size="12" font-weight="bold" fill="#1e293b">✈ 3. Gasto a comprobar (3 subproc.)</text>
+            <text x="635" y="130" font-size="9" fill="#64748b">Viáticos (Anexo 6), gastos sujetos a</text>
+            <text x="635" y="143" font-size="9" fill="#64748b">comprobar y reembolso de fondo revolvente.</text>
 
             <!-- SECCIÓN 2: SUBTIPOS / PROCEDIMIENTOS -->
             <text x="25" y="185" font-size="11" font-weight="bold" fill="#334155">2. SELECCIONA EL SUBTIPO / PROCEDIMIENTO *</text>
@@ -1614,10 +1336,10 @@ export class AfectacionesCxpController {
             <rect x="465" y="355" width="430" height="70" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
             <rect x="475" y="367" width="34" height="34" fill="#f1f5f9" rx="4"/>
             <text x="492" y="388" font-size="14" text-anchor="middle">⚖</text>
-            <text x="520" y="378" font-size="11" font-weight="bold" fill="#1e293b">Pago a Beneficiarios de Empleados</text>
-            <text x="520" y="393" font-size="9" fill="#64748b">Pago a acreedores de pensiones alimenticias o terceros del personal.</text>
-            <rect x="520" y="402" width="105" height="15" fill="#f1f5f9" rx="3"/>
-            <text x="572" y="413" font-size="8" fill="#475569" text-anchor="middle">Servicios Personales</text>
+            <text x="520" y="378" font-size="11" font-weight="bold" fill="#1e293b">107 · Impuestos y Derechos Entidad (3% Nómina)</text>
+            <text x="520" y="393" font-size="9" fill="#64748b">Impuesto estatal 3% sobre nómina (COG 39801) y derechos vehiculares.</text>
+            <rect x="520" y="402" width="120" height="15" fill="#f1f5f9" rx="3"/>
+            <text x="580" y="413" font-size="8" fill="#475569" text-anchor="middle">Obligaciones Fiscales</text>
 
             <!-- Footer Bar -->
             <line x1="0" y1="480" x2="920" y2="480" stroke="#e2e8f0"/>
@@ -1978,11 +1700,11 @@ export class AfectacionesCxpController {
     <table class="props-table">
       <thead><tr><th>Módulo / Subsistema</th><th>Relación Técnica</th><th>Efecto de Integración</th></tr></thead>
       <tbody>
-        <tr><td><strong>05.1.1 Requisitos Documentales</strong></td><td>Motor de validación previa</td><td>Inspecciona que el expediente digital cuente con todos los soportes obligatorios antes de autorizar el pase a <code>ENVIADA</code>.</td></tr>
-        <tr><td><strong>05.2.2 Orden de Pago</strong></td><td>Destino operativo de la obligación</td><td>Toma las afectaciones en estado <code>APROBADA</code> y formaliza la instrucción líquida de pago hacia Tesorería.</td></tr>
-        <tr><td><strong>03.1.2 Matriz de Conversión</strong></td><td>Motor contable automatizado</td><td>Traduce los datos del trámite y el COG en asientos de póliza de devengo tipo <code>PE</code> sin captura manual.</td></tr>
-        <tr><td><strong>07.1.1 Bóveda CFDI</strong></td><td>Repositorio y validación SAT</td><td>Verifica vigencia del XML, RFC del emisor y extrae automáticamente impuestos trasladados y retenidos.</td></tr>
-        <tr><td><strong>02.1 Presupuesto de Egresos</strong></td><td>Control de disponibilidad</td><td>Valida en tiempo real que exista saldo suficiente en la clave presupuestaria antes de permitir el registro.</td></tr>
+        <tr><td><strong>03.1.2 Matriz de Conversión (v3.0)</strong></td><td>Motor contable de 5 niveles</td><td>Provee los catálogos <code>contabilidad.matriz_grupos_tramite</code> y <code>matriz_grupos_procedimiento</code> y ejecuta las reglas de devengo en la Matriz <code>12: A1_DEVENGADO_GASTOS</code> mediante llave compuesta.</td></tr>
+        <tr><td><strong>05.1.1 Requisitos Documentales</strong></td><td>Motor de validación previa</td><td>Inspecciona que el expediente digital cuente con todos los soportes obligatorios del subprocedimiento antes de autorizar el pase a <code>ENVIADA</code>.</td></tr>
+        <tr><td><strong>06.2.1 Registro de Pagos (Caja)</strong></td><td>Destino directo de liquidación bancaria</td><td>Recibe las Solicitudes-Comprobaciones de Recurso en estado <code>APROBADA</code> para ejecutar el pago bancario (SPEI/Cheque) y detonar la Matriz <code>13: A2_PAGADO_GASTOS</code>.</td></tr>
+        <tr><td><strong>05.2.2 Solicitud de Pagos No Presupuestales</strong></td><td>Dispersión de nómina y retenciones</td><td>Toma el pasivo puente de nómina (<code>2.1.1.9.1000.0001</code>) y las retenciones acumuladas (<code>2.1.1.7.xxxx</code>) generadas en <code>05.2.1</code> para instruir su dispersión y entero sin duplicar presupuesto.</td></tr>
+        <tr><td><strong>07.1.1 Bóveda CFDI</strong></td><td>Repositorio y validación SAT</td><td>Verifica vigencia del XML, lista 69-B y extrae automáticamente impuestos trasladados y retenidos.</td></tr>
       </tbody>
     </table>
   </div>
@@ -1993,10 +1715,10 @@ export class AfectacionesCxpController {
     <table class="props-table">
       <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Acción / Entrada</th><th>Resultado Esperado</th></tr></thead>
       <tbody>
-        <tr><td><strong>CP-AG-01</strong></td><td>Intento de envío con faltantes en expediente digital</td><td>Trámite en <code>COMPRA_PEDIDO</code> sin adjuntar entrada de almacén sellada.</td><td>La función <code>fn_validar_checklist_afectacion</code> bloquea el envío y retorna listado de faltantes.</td></tr>
+        <tr><td><strong>CP-AG-01</strong></td><td>Intento de envío con faltantes en expediente digital</td><td>Trámite en <code>201 PEDIDO_MATERIALES_SUMINISTROS</code> sin adjuntar entrada de almacén sellada.</td><td>La función <code>fn_validar_checklist_afectacion</code> bloquea el envío y retorna listado de faltantes.</td></tr>
         <tr><td><strong>CP-AG-02</strong></td><td>Discrepancia entre comprobantes y partidas</td><td>CFDIs suman $10,000.00 y las partidas presupuestales suman $9,500.00.</td><td>El sistema bloquea el avance indicando diferencia matemática de $500.00 MXN.</td></tr>
-        <tr><td><strong>CP-AG-03</strong></td><td>Aprobación y generación síncrona de póliza</td><td>Usuario Nivel 2 ejecuta <code>APROBAR</code> sobre trámite en estado <code>ENVIADA</code>.</td><td>Transita a <code>APROBADA</code>, genera póliza <code>PE</code> en <code>contabilidad.poliza</code> y asigna <code>p_poliza_id</code>.</td></tr>
-        <tr><td><strong>CP-AG-04</strong></td><td>Trámite No Presupuestario (Tipo 4: Entero de Retenciones)</td><td>Afectación en <code>TERCEROS_INST</code> para pago de ISR retenido.</td><td>No solicita COG; genera póliza de balance puro (cargo a <code>2.1.1.7</code>) con cero afectación en cuentas `8.2.x`.</td></tr>
+        <tr><td><strong>CP-AG-03</strong></td><td>Aprobación y generación síncrona de póliza por llave compuesta</td><td>Usuario Nivel 2 ejecuta <code>APROBAR</code> sobre trámite en estado <code>ENVIADA</code> (Grupo 1, Subproc. 102, COG 32201).</td><td>Transita a <code>APROBADA</code>, localiza la regla por <code>(12, 1, 102, cog_id)</code>, genera póliza <code>PE</code> en <code>contabilidad.poliza</code> y habilita el trámite en <code>06.2.1 Registro de Pagos</code>.</td></tr>
+        <tr><td><strong>CP-AG-04</strong></td><td>Bloqueo de subprocedimientos no presupuestarios en 05.2.1</td><td>Intento de invocar <code>fn_abc_afectacion_encabezado</code> con <code>mgp_id = 402 (ENTERO_RETENCIONES)</code>.</td><td>El SP rechaza la operación indicando que el Grupo 4 pertenece exclusivamente a <code>05.2.2 Solicitud de Pagos No Presupuestales</code>.</td></tr>
       </tbody>
     </table>
   </div>
@@ -2008,10 +1730,16 @@ export class AfectacionesCxpController {
       <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Cambios Realizados</th></tr></thead>
       <tbody>
         <tr>
+          <td><code>3.0.0</code></td>
+          <td>2026-11-08</td>
+          <td>Arquitectura SIAF-PJEV / Dix Consultoría</td>
+          <td>Renombrado institucional a <strong>05.2.1 Solicitud-Comprobación de Recurso (Orden de Pago)</strong> dentro del módulo <strong>05 · Tesorería</strong>. Alineación con la jerarquía de 5 niveles de la Matriz de Conversión (<code>03.1.2</code>): migración de catálogos a <code>contabilidad.matriz_grupos_tramite</code> y <code>contabilidad.matriz_grupos_procedimiento</code>, acotando <code>05.2.1</code> a los <strong>3 Grupos Presupuestales</strong> y sus <strong>16 Subprocedimientos Oficiales (<code>101..303</code>)</strong> con llave compuesta hacia la Matriz <code>12: A1_DEVENGADO_GASTOS</code>, y trasladando el Grupo 4 (No afecta presupuesto) a <code>05.2.2 Solicitud de Pagos No Presupuestales</code>.</td>
+        </tr>
+        <tr>
           <td><code>2.0.0</code></td>
           <td>2026-09-02</td>
           <td>Equipo SIAF-PJEV / Dix Consultoría</td>
-          <td>Reestructuración canónica bajo estándar DOC-08. Se erradica el hardcodeo de 1 y 2, incorporando los 4 Tipos de Pago y 15 Subtipos/Procedimientos con sus descripciones breves de UI, integración de la modalidad No Afecta Presupuesto, workflow oficial de 6 estados, SPs de devengo y wireframes SVG nativos del wizard de selección.</td>
+          <td>Reestructuración canónica bajo estándar DOC-08 con workflow de 6 estados, SPs de devengo y wireframes SVG nativos.</td>
         </tr>
       </tbody>
     </table>
