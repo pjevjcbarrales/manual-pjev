@@ -1,1589 +1,457 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>05.2.2 Solicitud de Pagos No Presupuestales — Manual de Desarrollo SIAF-PJEV</title>
-<link rel="stylesheet" href="../shared.css">
-<style>
-  body { padding: 36px 44px 80px; background: var(--pjev-crema); }
-  .code-wrap {
-    background: var(--code-bg); color: var(--code-text);
-    border-radius: 8px; font-family: var(--font-mono); font-size: 13px;
-    padding: 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 24px;
-  }
-  .mod-header-badges { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-  .mod-badge { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 10px; }
-  .badge-a { background: var(--pjev-success-bg); color: var(--pjev-success-text); border: 1px solid var(--pjev-success-borde); }
-  .badge-s { background: var(--pjev-info-bg);    color: var(--pjev-info-text);    border: 1px solid var(--pjev-info-borde); }
-  .badge-w { background: var(--pjev-warning-bg); color: var(--pjev-warning-text); border: 1px solid var(--pjev-warning-borde); }
-
-  .method { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); }
-  .method.get    { background: #e8f5e9; color: #1b5e20; }
-  .method.post   { background: #e3f2fd; color: #0d47a1; }
-  .method.put    { background: #fff3e0; color: #e65100; }
-  .method.delete { background: #fdecea; color: #991b1b; }
-  .method.patch  { background: #f3e8ff; color: #6b21a8; }
-
-  .wf-tabs, .sp-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--pjev-borde); margin-bottom: 15px; flex-wrap: wrap; }
-  .wf-tab, .sp-tab { padding: 8px 16px; border: none; background: transparent; cursor: pointer; color: var(--pjev-texto-muted); font-size: 13px; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-  .wf-tab:hover, .sp-tab:hover { color: var(--pjev-verde-oscuro); }
-  .wf-tab.active, .sp-tab.active { color: var(--pjev-verde-oscuro); border-bottom-color: var(--pjev-verde-oscuro); }
-  .wf-panel, .sp-panel { display: none; }
-  .wf-panel.active, .sp-panel.active { display: block; animation: fadeIn 0.3s ease; }
-
-  .wf-box { border: 1px solid var(--pjev-borde); border-radius: 8px; overflow: hidden; background: var(--pjev-blanco); margin-bottom: 20px; }
-  .wf-bar { background: var(--pjev-blanco); border-bottom: 1px solid var(--pjev-borde); padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; }
-  .wf-bar-label { font-size: 11px; font-weight: 600; color: var(--pjev-texto-muted); text-transform: uppercase; letter-spacing: 0.8px; }
-  .wf-svg-area { background: #f9fafb; padding: 16px; overflow-x: auto; text-align: center; }
-
-  .status-pill { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; display: inline-block; }
-  .st-borrador { background: #e2e8f0; color: #334155; }
-  .st-firmas   { background: #fef3c7; color: #b45309; }
-  .st-autorizada { background: #dbeafe; color: #1d4ed8; }
-  .st-pagada   { background: #dcfce7; color: #15803d; }
-  .st-regresada{ background: #fee2e2; color: #991b1b; }
-  .st-cancelada{ background: #f1f5f9; color: #64748b; }
-
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>05.2.2 Solicitud de pagos no presupuestales — Manual de Desarrollo SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 64px; background: var(--pjev-crema); }
+    h3 { margin: 16px 0 8px; color: var(--pjev-verde-oscuro); font-size: 15px; }
+    .table-scroll { overflow-x: auto; margin-bottom: 14px; }
+    .table-scroll .props-table { margin-bottom: 0; }
+    .doc-section p, .props-table td { overflow-wrap: anywhere; }
+    .sp-panel details { margin: 10px 0; }
+    .sp-panel summary { cursor: pointer; color: var(--pjev-verde-oscuro); font-weight: 700; }
+    .sql { padding: 14px; overflow-x: auto; background: var(--code-bg); color: var(--code-text); border-radius: 8px; font-size: 12px; }
+    .method { display: inline-block; padding: 2px 7px; border-radius: 4px; font: 700 11px var(--font-mono); }
+    .method.get { background: #e8f5e9; color: #1b5e20; }
+    .method.post { background: #e3f2fd; color: #0d47a1; }
+    .method.put { background: #fff3e0; color: #9a3412; }
+    .method.delete { background: #fdecea; color: #991b1b; }
+    .method.patch { background: #f3e8ff; color: #6b21a8; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+    .tabs button, .print-action { padding: 7px 12px; border: 1px solid var(--pjev-borde); border-radius: 6px; background: white; color: var(--pjev-verde-oscuro); font: inherit; cursor: pointer; }
+    .tabs [aria-pressed="true"] { background: var(--pjev-verde-oscuro); color: white; }
+    .wf-panel { overflow-x: auto; border: 1px solid var(--pjev-borde); border-radius: 8px; }
+    svg { display: block; width: 100%; height: auto; }
+    .wf-panel svg { min-width: 580px; }
+    .standalone-tools { text-align: right; margin-bottom: 12px; }
+    @media (max-width: 760px) {
+      body { padding: 24px 16px 48px; }
+      body.embedded { padding-top: 72px; }
+    }
+    @media print {
+      body { padding: 0 !important; background: white; }
+      .standalone-tools, .tabs, .shared-tools { display: none !important; }
+      .sp-panel[hidden], .wf-panel[hidden] { display: block !important; }
+      .table-scroll { overflow: visible; }
+      .wf-panel { break-inside: avoid; margin-bottom: 14px; }
+      .wf-panel svg { min-width: 0; }
+    }
+  </style>
 </head>
 <body>
-
-<!-- BOTONES FLOTANTES ACCIÓN -->
-<div style="position: fixed; top: 20px; right: 45px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; z-index: 9999;">
-  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.location.reload()">⟳ Refrescar</button>
-  <button style="padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid rgb(212, 201, 181); border-radius: 6px; background: #ffffff; color: var(--pjev-verde-oscuro); box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="window.print()">🖨 Imprimir</button>
-</div>
-
-<div class="doc-main-inner">
-
-  <!-- BREADCRUMB -->
-  <div class="elem-breadcrumb">
-    <a href="../index.html">Inicio</a> ›
-    <span>05 · Tesorería</span> ›
-    <span>05.2 · Registro</span> ›
-    <span>05.2.2 Solicitud de pagos no presupuestales</span>
-  </div>
-
-  <!-- ENCABEZADO Y TÍTULO -->
-  <div class="elem-header">
+<main class="doc-main-inner">
+  <div class="standalone-tools"><button type="button" class="print-action" onclick="window.print()">Imprimir</button></div>
+  <nav class="elem-breadcrumb" aria-label="Ubicación">
+    <a href="../index.html" target="_top">Inicio</a> › <span>05 · Cuentas por Pagar</span> › <span>05.2 · Registro</span>
+  </nav>
+  <header class="elem-header">
     <div>
       <div class="elem-id">05.2.2</div>
-      <h1 class="elem-title">Solicitud de Pagos No Presupuestales (Grupo 4 y Reclasificación de Nómina)</h1>
-      <p class="elem-desc">Módulo transaccional del Departamento de Tesorería que gobierna el <strong>Grupo 4 (<code>4. No afecta presupuesto</code>, <code>afecta_presupuesto = false</code>)</strong> y sus <strong>4 Subprocedimientos Oficiales (<code>401..404</code>)</strong>: Dispersión de Nómina Neta (Matriz <code>22: A0_RECLASIFICA_ORDEN_PAGO</code>), Entero de Retenciones a Terceros Institucionales, Pago de Pensiones Alimenticias / Devolución de Garantías y Apertura de Fondo Revolvente / Anticipos (Matriz <code>17: A3_EGRESO_NO_PRESUPUESTARIO</code>).</p>
-      <div class="mod-header-badges">
-        <span class="mod-badge badge-a">Modo B — Formulario Compuesto (Maestro-Detalle)</span>
-        <span class="mod-badge badge-s">Grupo 4: No Afecta Presupuesto · 4 Subprocedimientos (401..404)</span>
-        <span class="mod-badge badge-w">Matrices 22 (A.0 Reclasificación) y 17 (A.3 Egreso No Presupuestario)</span>
-        <span class="elem-tag" style="font-size:10px;">Ruta Backend: <code style="font-family:var(--font-mono);font-size:10px;">/api/v1/cxp/ordenes-pago</code></span>
-      </div>
+      <h1 class="elem-title">Solicitud de pagos no presupuestales</h1>
+      <p class="elem-desc">Captura, expediente y aprobación de solicitudes del Grupo 4 de la Matriz de Conversión.</p>
+      <span class="elem-tag">Etapa 2 · Tesorería / Cuentas por Pagar</span>
+      <span class="elem-tag">Modal compuesto</span>
+      <span class="elem-tag">Responsable de desarrollo · Eunice</span>
     </div>
-  </div>
+  </header>
 
-  <!-- 1. DESCRIPCIÓN GENERAL -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">1</span> Descripción General y los 4 Subprocedimientos del Grupo 4</div>
-    <p>
-      El módulo <strong>05.2.2 Solicitud de Pagos No Presupuestales</strong> formaliza todas las instrucciones de desembolso que <strong>no generan un nuevo devengo presupuestario</strong> (<code>afecta_presupuesto = false</code>, cero impacto en cuentas <code>8.2.5</code> al momento de la solicitud), ya sea porque su presupuesto ya fue devengado previamente de forma concentrada en <code>05.2.1</code> (como la nómina y las retenciones deducidas en facturas/nómina) o porque constituyen movimientos puros de cuentas de balance patrimonial (aperturas de fondo revolvente, anticipos financieros, pensiones alimenticias o devolución de garantías).
-    </p>
-    <p>
-      En la jerarquía de 5 niveles de la Matriz de Conversión (<code>03.1.2</code>), este módulo opera exclusivamente el <strong>Grupo 4 (<code>mgt_id = 4</code>, <code>NO_AFECTA_PRESUPUESTO</code>)</strong> de <code>contabilidad.matriz_grupos_tramite</code> y sus <strong>4 Subprocedimientos</strong> en <code>contabilidad.matriz_grupos_procedimiento</code>:
-    </p>
+  <section class="doc-section" id="descripcion" aria-labelledby="descripcion-titulo">
+    <h2 class="section-title" id="descripcion-titulo"><span class="section-num">1</span> Descripción general</h2>
+    <p>Tesorería registra y revisa solicitudes del Grupo 4 de la Matriz de Conversión v3. El formulario reúne la organización, el beneficiario, la cuenta de pasivo u origen, el importe y el expediente de soporte. La aprobación deja la solicitud en <code>APROBADA</code> para la etapa de pago.</p>
+    <p>El módulo opera en <code>/fin/reg/pagos-no-presupuestales</code> y comparte la API de Afectaciones de Gasto. El flujo verificado termina en la aprobación de Tesorería. La dispersión bancaria, la evidencia del desembolso y la póliza de egreso corresponden a Caja. La ficha <a href="../06_pagos/06.2.1-registro-pagos.html">06.2.1 Registro de pagos</a> documenta su diseño.</p>
+  </section>
 
-    <table class="props-table" style="font-size:11.5px; margin-bottom:14px;">
-      <thead>
-        <tr>
-          <th style="width:18%;">ID y Código<br>(<code>mgp_id</code> · <code>mgp_codigo</code>)</th>
-          <th style="width:24%;">Nombre del Subprocedimiento</th>
-          <th style="width:32%;">Operación Contable y Cuentas de Balance</th>
-          <th style="width:12%;">Beneficiario</th>
-          <th style="width:14%;">Matrices Vinculadas<br>(Inicial ➔ Caja)</th>
-        </tr>
-      </thead>
+  <section class="doc-section" id="normativa" aria-labelledby="normativa-titulo">
+    <h2 class="section-title" id="normativa-titulo"><span class="section-num">2</span> Marco normativo</h2>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Instrumento</th><th scope="col">Artículo o punto</th><th scope="col">Aplicación</th></tr></thead>
       <tbody>
-        <tr style="background:#fdfbf7;">
-          <td><code>401</code><br><code>NOMINA_NETA_DISPERSION</code></td>
-          <td><strong>4.1 Dispersión de Nómina Neta al Personal</strong></td>
-          <td>Vinculado a la afectación de nómina aprobada en <code>05.2.1</code>. Al autorizarse las 3 firmas, reclasifica el pasivo de <code>2.1.1.9.1000.0001</code> (Puente) a <code>2.1.1.1.xxxx</code> (Remuneraciones por Pagar).</td>
-          <td><span class="mod-badge badge-s">EMPLEADO / UA</span></td>
-          <td><code>22 (A.0 DI)</code> ➔ <code>13 (A.2 PE)</code></td>
-        </tr>
-        <tr>
-          <td><code>402</code><br><code>ENTERO_RETENCIONES</code></td>
-          <td><strong>4.2 Entero de Retenciones y Contribuciones</strong></td>
-          <td>Liquidación de pasivos retenidos a favor de terceros institucionales (SAT ISR/IVA, IPE, ISSSTE, FOVISSSTE, Sindicatos, Aseguradoras) en cuentas <code>2.1.1.7.xxxx</code>.</td>
-          <td><span class="mod-badge badge-w">TERCERO_INST</span></td>
-          <td><code>17 (A.3)</code> ➔ <code>17 (A.3 PE)</code></td>
-        </tr>
-        <tr style="background:#fdfbf7;">
-          <td><code>403</code><br><code>PENSIONES_Y_GARANTIAS</code></td>
-          <td><strong>4.3 Pensiones Alimenticias y Devolución de Garantías</strong></td>
-          <td>Pago a beneficiarios de pensiones alimenticias descontadas por mandato judicial (<code>2.1.1.9.3000.0001</code>) y reembolso de depósitos en garantía (<code>2.1.6.1.xxxx</code>).</td>
-          <td><span class="mod-badge badge-s">TERCERO / PROV</span></td>
-          <td><code>17 (A.3)</code> ➔ <code>17 (A.3 PE)</code></td>
-        </tr>
-        <tr>
-          <td><code>404</code><br><code>APERTURA_FONDO_ANTICIPO</code></td>
-          <td><strong>4.4 Apertura de Fondo Revolvente y Anticipos</strong></td>
-          <td>Asignación inicial de efectivo para apertura de Caja Chica o anticipo sujeto a comprobar, cargando a Deudores Diversos (<code>1.1.2.3.xxxx</code> / <code>1.1.2.5.xxxx</code>) contra Bancos en Caja.</td>
-          <td><span class="mod-badge badge-s">EMPLEADO / UA</span></td>
-          <td><code>17 (A.3)</code> ➔ <code>17 (A.3 PE)</code></td>
-        </tr>
+        <tr><td>Ley General de Contabilidad Gubernamental</td><td>Arts. 34, 38, 42 y 43</td><td>Registrar las operaciones con base acumulativa, distinguir las etapas presupuestarias cuando apliquen y conservar los soportes justificativos y comprobatorios. <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LGCG.pdf">LGCG</a></td></tr>
+        <tr><td>CONAC · Momentos contables de los egresos</td><td>Apartados IX a XII</td><td>Distinguir el reconocimiento de la obligación, la emisión del documento autorizado y el pago. Los efectos del Grupo 4 se determinan según la naturaleza de cada operación y su matriz. <a href="https://dof.gob.mx/nota_detalle_popup.php?codigo=5106086">Acuerdo CONAC</a></td></tr>
+        <tr><td>Manual Específico de Procedimientos de Recursos Financieros del PJEV</td><td>PDF pp. 136–137, 199–200, 205–206 y 234–235</td><td>Tesorería integra y turna la solicitud con sus soportes y firmas según el trámite. Caja genera el pago, Tesorería lo libera y Caja registra los pagos efectuados con su comprobante. <a href="../../Documentación%20Normatividad/Manuales%20de%20PJE/02_MANUAL.ESPECIFICO.PROCEDIMIENTOS.SUBDIRECCION.RECURSOS_FINANCIEROS_FEB_2023.pdf#page=136">Manual institucional</a></td></tr>
       </tbody>
-    </table>
-  </div>
+    </table></div>
+  </section>
 
-  <!-- 2. MARCO NORMATIVO -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">2</span> Marco Normativo y Fundamento Legal</div>
-    <table class="props-table">
-      <thead><tr><th>Ordenamiento Jurídico</th><th>Artículos / Disposiciones</th><th>Mandato Aplicable a la Orden de Pago</th></tr></thead>
+  <section class="doc-section" id="roles" aria-labelledby="roles-titulo">
+    <h2 class="section-title" id="roles-titulo"><span class="section-num">3</span> Roles que intervienen</h2>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Perfil</th><th scope="col">Acciones</th><th scope="col">Restricción</th></tr></thead>
       <tbody>
-        <tr>
-          <td><strong>Ley General de Contabilidad Gubernamental (LGCG)</strong></td>
-          <td>Arts. 34, 38, 42 y 43</td>
-          <td>Exige que las etapas del egreso estén perfectamente delimitadas. La Orden de Pago constituye el documento comprobatorio que sustenta la fase posterior al devengo y previa a la salida de fondos bancarios.</td>
-        </tr>
-        <tr>
-          <td><strong>Normas y Metodología CONAC para Emisión Financiera</strong></td>
-          <td>Clasificador por Objeto del Gasto y Matrices de Conversión A.1 / A.2</td>
-          <td>Establece que la emisión de la orden de pago no afecta el presupuesto (momento del devengado ya consumado); únicamente instrumenta el pasivo a liquidar y programa la salida de bancos.</td>
-        </tr>
-        <tr>
-          <td><strong>Código Financiero para el Estado de Veracruz</strong></td>
-          <td>Arts. 165, 172 y 180</td>
-          <td>Regula los plazos de exigibilidad de cuentas por pagar, la prelación de pagos del erario judicial y la retención oportuna de impuestos estatales y cuotas del IPE.</td>
-        </tr>
-        <tr>
-          <td><strong>Manual Específico de Tesorería PJEV (DTE-008 / DTE-017)</strong></td>
-          <td>Procedimientos DTE-008 y DTE-017</td>
-          <td>Regula la elaboración y firma mancomunada de la <em>Solicitud-comprobación de recurso (Orden de Pago)</em> en dos tantos físicos/digitales y su integración al expediente soporte para archivo y auditoría.</td>
-        </tr>
+        <tr><td>Consulta</td><td>Consultar bandeja, solicitud, historial y previsualización.</td><td>GET con @MinRol(4), JWT y permiso efectivo.</td></tr>
+        <tr><td>Captura de Tesorería</td><td>Crear, editar, adjuntar, enviar y cancelar según estado.</td><td>Escrituras con @MinRol(3) y permiso por acción. La pantalla habilita captura y transiciones con periodo abierto.</td></tr>
+        <tr><td>Revisión de Tesorería</td><td>Aprobar, regresar o rechazar una solicitud enviada.</td><td>La regla funcional exige nivel 2 o superior y el permiso efectivo de la acción.</td></tr>
+        <tr><td>Caja y Tesorería</td><td>Generar, liberar y registrar el pago según el procedimiento institucional.</td><td>Operación posterior a 05.2.2, con sus propias autorizaciones.</td></tr>
       </tbody>
-    </table>
-  </div>
+    </table></div>
+    <p>NestJS calcula <code>acciones_permitidas</code> según el estado y los permisos. El servicio vuelve a autorizar cada transición y toma el usuario de la sesión.</p>
+  </section>
 
-  <!-- 3. ACTORES Y MATRIZ RACI -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">3</span> Actores y Matriz RACI</div>
-    <table class="props-table">
-      <thead><tr><th>Rol Institucional</th><th>Responsabilidad (RACI)</th><th>Atribución Específica en la Orden de Pago</th></tr></thead>
+  <section class="doc-section" id="datos" aria-labelledby="datos-titulo">
+    <h2 class="section-title" id="datos-titulo"><span class="section-num">4</span> Modelo de datos</h2>
+    <p>El encabezado y el historial usan las tablas compartidas de CxP. Los diccionarios reproducen los nombres físicos conforme al <a href="../inicio/00-estandar-nomenclatura-postgresql.html">estándar de nomenclatura PostgreSQL</a>. El esquema instalado incluye la tabla histórica <code>cxp.ordenes_pago</code>, sin filas en la base local revisada. El flujo de 05.2.2 usa <code>cxp.afectaciones_gasto</code> y <code>cxp.afectaciones_historial</code>.</p>
+    <h3><code>cxp.afectaciones_gasto</code> · Encabezado</h3>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Campo</th><th scope="col">Tipo</th><th scope="col">Nulo</th><th scope="col">Predeterminado</th><th scope="col">Descripción</th></tr></thead>
       <tbody>
-        <tr>
-          <td><strong>Analista de Cuentas por Pagar</strong></td>
-          <td><span class="badge-a" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">R - Responsable</span></td>
-          <td>Selecciona la Afectación Aprobada, valida el saldo neto pendiente de liquidar, precarga los datos del beneficiario y emite el borrador de la OP.</td>
-        </tr>
-        <tr>
-          <td><strong>Jefe del Departamento de Tesorería</strong></td>
-          <td><span class="badge-w" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">A - Aprobador</span></td>
-          <td>Revisa la disponibilidad en chequeras, valida la cuenta CLABE destino, verifica la calendarización y rubrica la primera firma del circuito mancomunado.</td>
-        </tr>
-        <tr>
-          <td><strong>Subdirector de Recursos Financieros</strong></td>
-          <td><span class="badge-w" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">A - Aprobador</span></td>
-          <td>Segunda firma mancomunada. Supervisa la concordancia entre flujo financiero disponible y compromisos devengados.</td>
-        </tr>
-        <tr>
-          <td><strong>Director General de Administración (DGA)</strong></td>
-          <td><span class="badge-w" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">A - Aprobador</span></td>
-          <td>Tercera firma mancomunada ejecutiva. Otorga la autorización final para que la OP transite al estado <code>AUTORIZADA</code> y viaje a la Bandeja de Pagos.</td>
-        </tr>
-        <tr>
-          <td><strong>Cajero / Operador de Pagos (Tesorería)</strong></td>
-          <td><span class="badge-s" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">C - Consultado</span></td>
-          <td>Recibe la orden autorizada en el módulo <code>06.2.1</code> y ejecuta el layout SPEI o imprime el cheque nominativo.</td>
-        </tr>
-        <tr>
-          <td><strong>Órgano Interno de Control / Auditoría</strong></td>
-          <td><span class="st-cancelada" style="padding:2px 8px; border-radius:10px; font-weight:bold; font-size:10px;">I - Informado</span></td>
-          <td>Consulta la trazabilidad inmutable de firmas, fechas y pólizas asociadas a cada folio de pago.</td>
-        </tr>
+        <tr><td><code>ag_id</code></td><td><code>uuid</code></td><td>No</td><td><code>gen_random_uuid()</code></td><td>Identificador de la afectación. PK con el ejercicio.</td></tr>
+        <tr><td><code>ejercicio_fiscal</code></td><td><code>smallint</code></td><td>No</td><td>—</td><td>Ejercicio del trámite. Integra la clave compuesta de referencia al encabezado.</td></tr>
+        <tr><td><code>folio</code></td><td><code>varchar(20)</code></td><td>Sí</td><td>—</td><td>Folio de captura. Único por ejercicio.</td></tr>
+        <tr><td><code>tipo_pago</code></td><td><code>smallint</code></td><td>No</td><td>—</td><td>Clasificación 1–4. El grupo 4 corresponde al flujo 05.2.2.</td></tr>
+        <tr><td><code>afecta_presupuesto</code></td><td><code>boolean</code></td><td>No</td><td>—</td><td>Indica si el procedimiento afecta presupuesto. Lo resuelve la matriz.</td></tr>
+        <tr><td><code>subtipo_pago</code></td><td><code>smallint</code></td><td>Sí</td><td>—</td><td>Subtipo numérico heredado.</td></tr>
+        <tr><td><code>f_centro_costo_id</code></td><td><code>integer</code></td><td>No</td><td>—</td><td>Centro de costos. En el encabezado, FK a config.catalogo_centros_costos.cc_id.</td></tr>
+        <tr><td><code>concepto</code></td><td><code>varchar(500)</code></td><td>No</td><td>—</td><td>Descripción general del trámite.</td></tr>
+        <tr><td><code>fecha_elaboracion</code></td><td><code>date</code></td><td>No</td><td>—</td><td>Fecha de elaboración.</td></tr>
+        <tr><td><code>estatus_workflow</code></td><td><code>varchar(20)</code></td><td>No</td><td><code>'BORRADOR'</code></td><td>Estado operativo del trámite. El CHECK admite los seis estados de la sección Acciones.</td></tr>
+        <tr><td><code>f_pedido_id</code></td><td><code>uuid</code></td><td>Sí</td><td>—</td><td>Referencia UUID del pedido.</td></tr>
+        <tr><td><code>usuario_c</code></td><td><code>varchar(50)</code></td><td>No</td><td>—</td><td>Usuario de creación.</td></tr>
+        <tr><td><code>fecha_c</code></td><td><code>timestamp</code></td><td>No</td><td><code>now()</code></td><td>Fecha y hora de creación.</td></tr>
+        <tr><td><code>usuario_m</code></td><td><code>varchar(50)</code></td><td>Sí</td><td>—</td><td>Usuario de última modificación.</td></tr>
+        <tr><td><code>fecha_m</code></td><td><code>timestamp</code></td><td>Sí</td><td>—</td><td>Fecha y hora de última modificación.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>smallint</code></td><td>No</td><td><code>1</code></td><td>Vigencia del registro. 1 activo, 0 inactivo. En el encabezado tiene CHECK binario.</td></tr>
+        <tr><td><code>f_proveedor_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>FK al proveedor.</td></tr>
+        <tr><td><code>f_empleado_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>FK al empleado.</td></tr>
+        <tr><td><code>f_ua_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>FK a la unidad administrativa.</td></tr>
+        <tr><td><code>f_tercero_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>FK al tercero general.</td></tr>
+        <tr><td><code>f_tercero_inst_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>FK al tercero institucional.</td></tr>
+        <tr><td><code>referencia</code></td><td><code>varchar(50)</code></td><td>Sí</td><td>—</td><td>Referencia del trámite.</td></tr>
+        <tr><td><code>f_bien_inmueble_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>Identificador de bien inmueble seleccionado para el procedimiento.</td></tr>
+        <tr><td><code>cuenta_contable_abono</code></td><td><code>varchar(50)</code></td><td>Sí</td><td>—</td><td>Clave de cuenta de abono cuando corresponde. La captura del grupo 4 la requiere.</td></tr>
+        <tr><td><code>tipo_operacion</code></td><td><code>varchar(50)</code></td><td>Sí</td><td>—</td><td>Código canónico del procedimiento después de aplicar el trigger.</td></tr>
+        <tr><td><code>f_comprobacion_id</code></td><td><code>uuid</code></td><td>Sí</td><td>—</td><td>Referencia UUID de la comprobación.</td></tr>
+        <tr><td><code>f_procedimiento_codigo</code></td><td><code>varchar(40)</code></td><td>Sí</td><td>—</td><td>Código de procedimiento que también consume el checklist.</td></tr>
+        <tr><td><code>importe_total_pago</code></td><td><code>numeric(15,2)</code></td><td>Sí</td><td>—</td><td>Importe declarado en el encabezado. Cuando tiene valor debe ser mayor a cero.</td></tr>
+        <tr><td><code>p_poliza_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>Referencia contable histórica. La póliza de CxP instalada se localiza por su origen.</td></tr>
+        <tr><td><code>f_grupo_codigo</code></td><td><code>varchar(30)</code></td><td>Sí</td><td>—</td><td>Código de grupo resuelto por el trigger.</td></tr>
+        <tr><td><code>matriz_grupo_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>Parte de la FK compuesta al grupo y procedimiento de la matriz.</td></tr>
+        <tr><td><code>matriz_procedimiento_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>Parte de la FK compuesta. Identifica el procedimiento de la matriz.</td></tr>
       </tbody>
-    </table>
-  </div>
-
-  <!-- 4. FLUJO OPERATIVO Y CICLO DE VIDA -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">4</span> Flujo Operativo y Ciclo de Vida del Trámite</div>
-    <p>
-      El ciclo de vida de la Orden de Pago consta de 5 estados oficiales administrados por la máquina de estados <code>cxp.sp_CxpOrdenesPago_Workflow</code>:
-    </p>
-
-    <div style="background:#ffffff; border:1px solid var(--pjev-borde); border-radius:8px; padding:18px 22px; margin-bottom:18px;">
-      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-        <div style="text-align:center;">
-          <span class="status-pill st-borrador">1. BORRADOR</span>
-          <div style="font-size:10.5px; color:var(--pjev-texto-muted); margin-top:4px;">Captura CxP / Edición</div>
-        </div>
-        <div style="font-size:16px; color:var(--pjev-dorado);">➔</div>
-        <div style="text-align:center;">
-          <span class="status-pill st-firmas">2. EN_FIRMAS</span>
-          <div style="font-size:10.5px; color:var(--pjev-texto-muted); margin-top:4px;">Circuito Mancomunado</div>
-        </div>
-        <div style="font-size:16px; color:var(--pjev-dorado);">➔</div>
-        <div style="text-align:center;">
-          <span class="status-pill st-autorizada">3. AUTORIZADA</span>
-          <div style="font-size:10.5px; color:var(--pjev-texto-muted); margin-top:4px;">En Bandeja de Pagos</div>
-        </div>
-        <div style="font-size:16px; color:var(--pjev-dorado);">➔</div>
-        <div style="text-align:center;">
-          <span class="status-pill st-pagada">4. PAGADA</span>
-          <div style="font-size:10.5px; color:var(--pjev-texto-muted); margin-top:4px;">Dispersión / Póliza Egreso</div>
-        </div>
-      </div>
-      <div style="border-top:1px dashed var(--pjev-borde); margin-top:14px; padding-top:10px; font-size:11.5px; color:var(--pjev-texto-muted);">
-        <strong>Flujos Alternos:</strong> Si el revisor detecta inconsistencias bancarias, la OP transita a <span class="status-pill st-firmas">REGRESADA</span>. Si se rechaza definitivamente o se desiste del pago, transita a <span class="status-pill st-cancelada">CANCELADA</span>, reintegrando de forma inmediata el saldo al disponible de la Afectación de Gasto origen.
-      </div>
-    </div>
-  </div>
-
-  <!-- 5. CIRCUITO DE NÓMINA PJEV (CONCENTRACIÓN 2.1.1.9 A 2.1.1.1) -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">5</span> Circuito de Nómina PJEV: Concentración en 2.1.1.9 y Dispersión en 2.1.1.1</div>
-    <p>
-      Para el procedimiento <code>NOMINA</code>, el sistema resuelve la discrepancia histórica entre el gasto devengado total y los pagos líquidos quincenales mediante un <strong>circuito contable en tres tiempos</strong>:
-    </p>
-
-    <table class="props-table" style="font-size:12px;">
-      <thead>
-        <tr>
-          <th style="width:20%;">Tiempo / Módulo</th>
-          <th style="width:25%;">Momento Contable / Presupuestal</th>
-          <th style="width:55%;">Efecto en Cuentas y Asiento Contable</th>
-        </tr>
-      </thead>
+    </table></div>
+    <h3><code>cxp.afectaciones_historial</code> · Historial de transiciones</h3>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Campo</th><th scope="col">Tipo</th><th scope="col">Nulo</th><th scope="col">Predeterminado</th><th scope="col">Descripción</th></tr></thead>
       <tbody>
-        <tr>
-          <td><strong>Tiempo 1: Devengo Concentrado</strong><br><span style="font-size:10px; color:#cbd5e1;">05.2.1 Afectación del Gasto</span></td>
-          <td><strong>Devengado Presupuestario</strong><br>(100% Gasto Bruto)</td>
-          <td>
-            <strong>Gasto:</strong> Cargo a <code>5.1.1.x Sueldos y Remuneraciones</code> ($10,000,000.00)<br>
-            <strong>Pasivo Concentrador:</strong> Abono a <code>2.1.1.9.1000.0001 Otras Ctas por Pagar (Nómina x Liquidar)</code> ($10,000,000.00)<br>
-            <strong>Presupuesto:</strong> Cargo a <code>8.2.5 Presupuesto Devengado</code> y Abono a <code>8.2.4 Presupuesto Comprometido</code>.
-          </td>
-        </tr>
-        <tr>
-          <td><strong>Tiempo 2: Orden de Pago Líquida</strong><br><span style="font-size:10px; color:#cbd5e1;">05.2.2 Orden de Pago</span></td>
-          <td><strong>Reclasificación de Pasivo</strong><br>(Importe Neto Exigible)</td>
-          <td>
-            <strong>Disminuye Bolsa Puente:</strong> Cargo a <code>2.1.1.9.1000.0001 Nómina por Liquidar</code> ($8,000,000.00)<br>
-            <strong>Nace Pasivo Individual:</strong> Abono a <code>2.1.1.1.1000.0001 Remuneraciones por Pagar</code> ($8,000,000.00)<br>
-            <strong>Presupuesto:</strong> CERO afectación presupuestal.
-          </td>
-        </tr>
-        <tr>
-          <td><strong>Tiempo 3: Dispersión Bancaria</strong><br><span style="font-size:10px; color:#cbd5e1;">06.2.1 Bandeja de Pagos</span></td>
-          <td><strong>Pagado Presupuestario</strong><br>(Salida Real de Bancos)</td>
-          <td>
-            <strong>Cancela Pasivo Exigible:</strong> Cargo a <code>2.1.1.1.1000.0001 Remuneraciones por Pagar</code> ($8,000,000.00)<br>
-            <strong>Salida Bancaria:</strong> Abono a <code>1.1.1.2.xxxx Bancos / Chequera Nómina</code> ($8,000,000.00)<br>
-            <strong>Presupuesto:</strong> Cargo a <code>8.2.5 Presupuesto Devengado</code> y Abono a <code>8.2.7 Presupuesto Pagado</code>.
-          </td>
-        </tr>
+        <tr><td><code>ah_id</code></td><td><code>uuid</code></td><td>No</td><td><code>gen_random_uuid()</code></td><td>PK de la transición registrada.</td></tr>
+        <tr><td><code>f_ag_id</code></td><td><code>uuid</code></td><td>No</td><td>—</td><td>UUID del encabezado. FK junto con ejercicio_fiscal.</td></tr>
+        <tr><td><code>ejercicio_fiscal</code></td><td><code>smallint</code></td><td>No</td><td><code>2026</code></td><td>Ejercicio del trámite. Integra la clave compuesta de referencia al encabezado.</td></tr>
+        <tr><td><code>accion</code></td><td><code>varchar(30)</code></td><td>No</td><td>—</td><td>Acción ejecutada.</td></tr>
+        <tr><td><code>estatus_anterior</code></td><td><code>varchar(30)</code></td><td>No</td><td>—</td><td>Estado de origen.</td></tr>
+        <tr><td><code>estatus_nuevo</code></td><td><code>varchar(30)</code></td><td>No</td><td>—</td><td>Estado de destino.</td></tr>
+        <tr><td><code>fecha_envio</code></td><td><code>date</code></td><td>No</td><td><code>CURRENT_DATE</code></td><td>Fecha operativa asociada a la transición.</td></tr>
+        <tr><td><code>fecha_real</code></td><td><code>timestamp</code></td><td>No</td><td><code>clock_timestamp()</code></td><td>Fecha y hora real de registro.</td></tr>
+        <tr><td><code>usuario</code></td><td><code>varchar(50)</code></td><td>No</td><td><code>'SISTEMA'</code></td><td>Usuario autenticado que ejecutó la transición.</td></tr>
+        <tr><td><code>observacion</code></td><td><code>text</code></td><td>Sí</td><td>—</td><td>Nota de la acción.</td></tr>
+        <tr><td><code>estatus_registro</code></td><td><code>smallint</code></td><td>No</td><td><code>1</code></td><td>Vigencia del registro. 1 activo, 0 inactivo. En el encabezado tiene CHECK binario.</td></tr>
       </tbody>
-    </table>
-  </div>
-
-  <!-- 6. MODELO DE DATOS Y DICCIONARIO DE CAMPOS -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">6</span> Modelo de Datos y Diccionario de Campos</div>
-    <p>
-      La persistencia física de la Orden de Pago reside en la tabla particionada por ejercicio <code>cxp.ordenes_pago</code> (ej. <code>cxp.ordenes_pago_2026</code>), asegurando integridad referencial con la afectación devengada y con las cuentas bancarias institucionales:
-    </p>
-
-    <table class="props-table">
-      <thead><tr><th>Campo</th><th>Tipo de Dato</th><th>Nulo</th><th>Descripción y Regla de Negocio</th></tr></thead>
+    </table></div>
+    <p>El encabezado tiene PK <code>(ag_id, ejercicio_fiscal)</code> y folio único por ejercicio. El historial se relaciona por <code>(f_ag_id, ejercicio_fiscal)</code>. El expediente usa <code>config.documentos_soporte</code> con el UUID como referencia. El formulario del Grupo 4 registra un importe de encabezado y una cuenta de pasivo u origen, sin captura de partidas presupuestales.</p>
+    <h3>Grupo 4 activo en la Matriz v3</h3>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">ID y código</th><th scope="col">Beneficiario de la matriz</th><th scope="col">Matriz inicial → final</th></tr></thead>
       <tbody>
-        <tr><td><code>op_id</code></td><td>UUID</td><td>NO</td><td>Identificador único global de la Orden de Pago (PK). Generado por <code>gen_random_uuid()</code>.</td></tr>
-        <tr><td><code>ejercicio_fiscal</code></td><td>SMALLINT</td><td>NO</td><td>Año presupuestal y contable de la orden (PK y clave de partición, ej. 2026).</td></tr>
-        <tr><td><code>folio_op</code></td><td>VARCHAR(20)</td><td>NO</td><td>Folio visible consecutivo anual (ej. <code>OP-2026-00042</code>). Asignado de forma atómica en el alta.</td></tr>
-        <tr><td><code>f_matriz_id</code></td><td>BIGINT</td><td>NO</td><td>Matriz contable en <code>contabilidad.matriz_conversion</code>: <code>22 (A0_RECLASIFICA_ORDEN_PAGO)</code> para <code>401</code>, o <code>17 (A3_EGRESO_NO_PRESUPUESTARIO)</code> para <code>402, 403, 404</code>.</td></tr>
-        <tr><td><code>f_matriz_grupo_id</code></td><td>SMALLINT</td><td>NO</td><td>Fijo <code>4</code> (<code>NO_AFECTA_PRESUPUESTO</code> en <code>contabilidad.matriz_grupos_tramite</code>).</td></tr>
-        <tr><td><code>f_matriz_grupo_procedimiento_id</code></td><td>SMALLINT</td><td>NO</td><td>Subprocedimiento del Grupo 4 en <code>contabilidad.matriz_grupos_procedimiento</code> (<code>401, 402, 403, 404</code>).</td></tr>
-        <tr><td><code>f_matriz_regla_id</code></td><td>BIGINT</td><td>SÍ</td><td>Regla específica de la matriz en <code>contabilidad.matriz_conversion_regla</code> que determina las cuentas de balance (Cargo/Abono) sin hardcodeo.</td></tr>
-        <tr><td><code>f_ag_id</code></td><td>UUID</td><td>SÍ</td><td>Llave foránea a <code>cxp.afectaciones_gasto(ag_id)</code> (obligatoria en <code>401 NOMINA_NETA_DISPERSION</code>; opcional en <code>402..404</code> cuando provienen de saldos de balance o apertura de fondo).</td></tr>
-        <tr><td><code>tipo_orden</code></td><td>VARCHAR(40)</td><td>NO</td><td>Código del subprocedimiento: <code>NOMINA_NETA_DISPERSION</code>, <code>ENTERO_RETENCIONES</code>, <code>PENSIONES_Y_GARANTIAS</code>, <code>APERTURA_FONDO_ANTICIPO</code>.</td></tr>
-        <tr><td><code>forma_pago</code></td><td>VARCHAR(1)</td><td>NO</td><td>Modalidad de liquidación: <code>'T'</code> (Transferencia SPEI) o <code>'C'</code> (Cheque nominativo).</td></tr>
-        <tr><td><code>f_chequera_id</code></td><td>INTEGER</td><td>NO</td><td>Cuenta bancaria institucional pagadora de Tesorería (FK a <code>config.catalogo_cuentas_bancarias</code>).</td></tr>
-        <tr><td><code>f_beneficiario_cta</code></td><td>UUID</td><td>NO</td><td>Cuenta bancaria y CLABE interbancaria (18 dígitos) registrada para el beneficiario.</td></tr>
-        <tr><td><code>cuenta_contable_origen</code></td><td>VARCHAR(30)</td><td>NO</td><td>Subcuenta pasiva de origen (ej. <code>2.1.1.9.1000.0001</code> para nómina o <code>2.1.1.2.0001</code> para proveedores).</td></tr>
-        <tr><td><code>cuenta_contable_pasivo</code></td><td>VARCHAR(30)</td><td>NO</td><td>Subcuenta pasiva destino líquida (ej. <code>2.1.1.1.1000.0001</code> Remuneraciones por Pagar).</td></tr>
-        <tr><td><code>importe_bruto_ag</code></td><td>NUMERIC(18,2)</td><td>NO</td><td>Importe bruto total devengado en la afectación de gasto origen.</td></tr>
-        <tr><td><code>importe_retenciones</code></td><td>NUMERIC(18,2)</td><td>NO</td><td>Monto acumulado de deducciones y retenciones fiscales/laborales asociadas a la orden.</td></tr>
-        <tr><td><code>importe_neto</code></td><td>NUMERIC(18,2)</td><td>NO</td><td>Importe líquido neto a transferir o pagar. Debe ser &gt; 0 y &lt;= al saldo disponible de la afectación.</td></tr>
-        <tr><td><code>fecha_programada</code></td><td>DATE</td><td>NO</td><td>Fecha prevista en la agenda de pagos de Tesorería para ejecutar la dispersión.</td></tr>
-        <tr><td><code>estatus_workflow</code></td><td>VARCHAR(20)</td><td>NO</td><td>Estado actual: <code>BORRADOR</code>, <code>EN_FIRMAS</code>, <code>AUTORIZADA</code>, <code>PAGADA</code>, <code>REGRESADA</code>, <code>CANCELADA</code>.</td></tr>
-        <tr><td><code>f_poliza_devengo_id</code></td><td>INTEGER</td><td>SÍ</td><td>ID de la póliza de devengo previo generada en <code>05.2.1</code> (referencia inmutable).</td></tr>
-        <tr><td><code>f_poliza_reclasificacion_id</code></td><td>INTEGER</td><td>SÍ</td><td>ID de la póliza contable de reclasificación (Tipo Diario <code>DI</code>: <code>2.1.1.9</code> vs <code>2.1.1.1</code>).</td></tr>
-        <tr><td><code>f_poliza_egreso_id</code></td><td>INTEGER</td><td>SÍ</td><td>ID de la póliza de egreso bancario (Tipo Egreso <code>PE</code>) generada en Tesorería al pagar.</td></tr>
-        <tr><td><code>firmas_completadas</code></td><td>SMALLINT</td><td>NO</td><td>Contador de firmas electrónicas recabadas (0 a 3). Requiere 3 para pasar a <code>AUTORIZADA</code>.</td></tr>
-        <tr><td><code>usuario_c / fecha_c</code></td><td>VARCHAR / TIMESTAMP</td><td>NO</td><td>Auditoría obligatoria de inserción.</td></tr>
-        <tr><td><code>usuario_m / fecha_m</code></td><td>VARCHAR / TIMESTAMP</td><td>SÍ</td><td>Auditoría obligatoria de última modificación.</td></tr>
-        <tr><td><code>estatus_registro</code></td><td>SMALLINT</td><td>NO</td><td>Soft-delete obligatorio (1 = Activo, 0 = Inactivo).</td></tr>
+        <tr><td>401 · <code>NOMINA_NETA_DISPERSION</code></td><td><code>UNIDAD_ADMINISTRATIVA</code></td><td>22 → 13</td></tr>
+        <tr><td>402 · <code>ENTERO_RETENCIONES</code></td><td><code>TERCERO_INSTITUCIONAL</code></td><td>17 → 17</td></tr>
+        <tr><td>403 · <code>PENSIONES_Y_GARANTIAS</code></td><td><code>CIUDADANO</code></td><td>17 → 17</td></tr>
+        <tr><td>404 · <code>APERTURA_FONDO_ANTICIPO</code></td><td><code>EMPLEADO</code></td><td>17 → 17</td></tr>
       </tbody>
-    </table>
+    </table></div>
+    <p>Los cuatro procedimientos tienen <code>afecta_presupuesto = false</code>. La matriz inicial y final son referencias de configuración. Los estados verificados en el ejercicio 2026 son 22 <code>ACTIVA</code>, 13 <code>BORRADOR</code> y 17 <code>BORRADOR</code>.</p>
+  </section>
 
-    <div class="sp-tabs" style="margin-top:16px;">
-      <button class="sp-tab active" onclick="showDBTab('dbop1',this)">Script DDL: cxp.ordenes_pago</button>
-      <button class="sp-tab" onclick="showDBTab('dbop2',this)">Historial de Firmas: cxp.ordenes_pago_firmas</button>
+  <section class="doc-section" id="funciones" aria-labelledby="funciones-titulo">
+    <h2 class="section-title" id="funciones-titulo"><span class="section-num">5</span> Funciones PostgreSQL y triggers</h2>
+    <p>Contratos instalados. El estándar conserva las firmas históricas del servicio compartido, incluidos el prefijo <code>p_</code> y los nombres <code>sp_*</code>. La definición SQL completa se consulta en la <a href="05.2.1-afectacion-gastos.html#funciones">ficha de Afectación del Gasto</a>. Aquí se documenta el uso específico del Grupo 4.</p>
+    <div class="tabs" role="group" aria-label="Funciones PostgreSQL">
+      <button type="button" aria-controls="sp-leer" aria-pressed="true" onclick="showSP(this)">LEER</button>
+      <button type="button" aria-controls="sp-abc" aria-pressed="false" onclick="showSP(this)">ABC</button>
+      <button type="button" aria-controls="sp-workflow" aria-pressed="false" onclick="showSP(this)">Workflow y póliza</button>
+      <button type="button" aria-controls="sp-trigger" aria-pressed="false" onclick="showSP(this)">Trigger</button>
     </div>
-
-    <!-- TAB 1: DDL ORDENES DE PAGO -->
-    <div id="db-dbop1" class="sp-panel active">
-      <div class="code-wrap">
-<pre><code>-- ESTRUCTURA OFICIAL DDL: cxp.ordenes_pago
-CREATE TABLE IF NOT EXISTS cxp.ordenes_pago (
-    op_id UUID NOT NULL DEFAULT gen_random_uuid(),
-    ejercicio_fiscal SMALLINT NOT NULL,
-    folio_op VARCHAR(20) NOT NULL,
-    f_matriz_id BIGINT NOT NULL DEFAULT 17 REFERENCES contabilidad.matriz_conversion(mcv_id),
-    f_matriz_grupo_id SMALLINT NOT NULL DEFAULT 4 CHECK (f_matriz_grupo_id = 4),
-    f_matriz_grupo_procedimiento_id SMALLINT NOT NULL CHECK (f_matriz_grupo_procedimiento_id IN (401, 402, 403, 404)),
-    f_matriz_regla_id BIGINT,
-    f_ag_id UUID,
-    tipo_orden VARCHAR(40) NOT NULL DEFAULT 'ENTERO_RETENCIONES'
-        CHECK (tipo_orden IN ('NOMINA_NETA_DISPERSION', 'ENTERO_RETENCIONES', 'PENSIONES_Y_GARANTIAS', 'APERTURA_FONDO_ANTICIPO')),
-    forma_pago VARCHAR(1) NOT NULL CHECK (forma_pago IN ('T', 'C')),
-    f_chequera_id INT NOT NULL REFERENCES config.catalogo_cuentas_bancarias(cb_id),
-    f_beneficiario_cta UUID NOT NULL,
-    cuenta_contable_origen VARCHAR(30) NOT NULL DEFAULT '2.1.1.2.0001',
-    cuenta_contable_pasivo VARCHAR(30) NOT NULL DEFAULT '2.1.1.2.0001',
-    importe_bruto_ag NUMERIC(18,2) NOT NULL,
-    importe_retenciones NUMERIC(18,2) NOT NULL DEFAULT 0.00,
-    importe_neto NUMERIC(18,2) NOT NULL CHECK (importe_neto > 0),
-    fecha_programada DATE NOT NULL,
-    estatus_workflow VARCHAR(20) NOT NULL DEFAULT 'BORRADOR'
-        CHECK (estatus_workflow IN ('BORRADOR', 'EN_FIRMAS', 'AUTORIZADA', 'PAGADA', 'REGRESADA', 'CANCELADA')),
-    f_poliza_devengo_id INT REFERENCES contabilidad.poliza(p_id),
-    f_poliza_reclasificacion_id INT REFERENCES contabilidad.poliza(p_id),
-    f_poliza_egreso_id INT REFERENCES contabilidad.poliza(p_id),
-    firmas_completadas SMALLINT NOT NULL DEFAULT 0 CHECK (firmas_completadas BETWEEN 0 AND 3),
-    estatus_registro SMALLINT NOT NULL DEFAULT 1 CHECK (estatus_registro IN (0, 1)),
-    usuario_c VARCHAR(50) NOT NULL DEFAULT 'SISTEMA',
-    fecha_c TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
-    usuario_m VARCHAR(50),
-    fecha_m TIMESTAMPTZ,
-    CONSTRAINT pk_ordenes_pago PRIMARY KEY (op_id, ejercicio_fiscal),
-    CONSTRAINT fk_op_afectaciones_gasto FOREIGN KEY (f_ag_id, ejercicio_fiscal)
-        REFERENCES cxp.afectaciones_gasto (ag_id, ejercicio_fiscal) ON DELETE RESTRICT,
-    CONSTRAINT uq_ordenes_pago_folio UNIQUE (ejercicio_fiscal, folio_op)
-) PARTITION BY LIST (ejercicio_fiscal);
-
--- Partición 2026
-CREATE TABLE IF NOT EXISTS cxp.ordenes_pago_2026 PARTITION OF cxp.ordenes_pago FOR VALUES IN (2026);
-CREATE INDEX IF NOT EXISTS idx_op_ag_id ON cxp.ordenes_pago(f_ag_id);
-CREATE INDEX IF NOT EXISTS idx_op_estatus ON cxp.ordenes_pago(estatus_workflow);
-CREATE INDEX IF NOT EXISTS idx_op_fecha_prog ON cxp.ordenes_pago(fecha_programada);</code></pre>
-      </div>
-    </div>
-
-    <!-- TAB 2: FIRMAS ELECTRONICAS MANCOMUNADAS -->
-    <div id="db-dbop2" class="sp-panel">
-      <div class="code-wrap">
-<pre><code>-- TABLA DE AUDITORÍA Y FIRMAS MANCOMUNADAS: cxp.ordenes_pago_firmas
-CREATE TABLE IF NOT EXISTS cxp.ordenes_pago_firmas (
-    opf_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    f_op_id UUID NOT NULL,
-    ejercicio_fiscal SMALLINT NOT NULL,
-    orden_firma SMALLINT NOT NULL CHECK (orden_firma IN (1, 2, 3)),
-    rol_firmante VARCHAR(50) NOT NULL, -- 'JEFE_TESORERIA', 'SUBDIRECTOR_RF', 'DGA'
-    usuario_firmante VARCHAR(50) NOT NULL,
-    fecha_firma TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
-    firma_electronica TEXT NOT NULL,
-    certificado_serie VARCHAR(100),
-    ip_origen VARCHAR(45),
-    estatus_firma VARCHAR(20) NOT NULL DEFAULT 'VALIDA',
-    CONSTRAINT fk_opf_orden_pago FOREIGN KEY (f_op_id, ejercicio_fiscal)
-        REFERENCES cxp.ordenes_pago(op_id, ejercicio_fiscal) ON DELETE CASCADE,
-    CONSTRAINT uq_opf_op_orden UNIQUE (f_op_id, orden_firma)
-);</code></pre>
-      </div>
-    </div>
-  </div>
-
-  <!-- 7. STORED PROCEDURES (LEER, ABC, WORKFLOW, POLIZA) -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">7</span> Stored Procedures PostgreSQL (Lógica Transaccional)</div>
-    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:12px;">
-      Todas las operaciones de lectura, alta, autorización de firmas y pólizas de reclasificación se ejecutan exclusivamente mediante Stored Procedures con <code>SECURITY DEFINER</code> y retorno unificado <code>JSONB</code>:
-    </p>
-
-    <div class="sp-tabs">
-      <button class="sp-tab active" onclick="showSP('spop1',this)">1. fn_leer_ordenes_pago</button>
-      <button class="sp-tab" onclick="showSP('spop2',this)">2. fn_abc_orden_pago</button>
-      <button class="sp-tab" onclick="showSP('spop3',this)">3. sp_CxpOrdenesPago_Workflow</button>
-      <button class="sp-tab" onclick="showSP('spop4',this)">4. fn_generar_poliza_reclasificacion_op</button>
-    </div>
-
-    <!-- SP 1: LEER ORDENES DE PAGO -->
-    <div id="sp-spop1" class="sp-panel active">
-      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función de Consulta: <code>cxp.fn_leer_ordenes_pago</code></h4>
-      <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_leer_ordenes_pago(
-    p_ejercicio INTEGER,
-    p_op_id UUID DEFAULT NULL,
-    p_ag_id UUID DEFAULT NULL,
-    p_estatus_workflow VARCHAR DEFAULT NULL,
-    p_chequera_id INTEGER DEFAULT NULL,
-    p_forma_pago VARCHAR DEFAULT NULL,
-    p_buscar VARCHAR DEFAULT NULL
-)
-RETURNS JSONB
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = cxp, config, contabilidad, public
-AS $$
-DECLARE
-    v_data JSONB;
-BEGIN
-    SELECT jsonb_agg(
-        jsonb_build_object(
-            'op_id', op.op_id,
-            'ejercicio_fiscal', op.ejercicio_fiscal,
-            'folio_op', op.folio_op,
-            'ag_id', op.f_ag_id,
-            'ag_folio', ag.folio,
-            'tipo_orden', op.tipo_orden,
-            'forma_pago', op.forma_pago,
-            'forma_pago_desc', CASE op.forma_pago WHEN 'T' THEN 'Transferencia Electrónica (SPEI)' ELSE 'Cheque Nominativo' END,
-            'chequera_id', op.f_chequera_id,
-            'chequera_nombre', cb.cb_nombre_cuenta,
-            'chequera_banco', cb.cb_banco,
-            'chequera_numero', cb.cb_numero_cuenta,
-            'beneficiario_cta_id', op.f_beneficiario_cta,
-            'beneficiario_nombre', CASE ag.f_grupo_codigo
-                WHEN 'DIRECTO' THEN COALESCE(prov.pr_razonsocial, emp.emp_nombrecompleto, ua.ua_nombre, 'Beneficiario Institucional')
-                ELSE COALESCE(prov.pr_razonsocial, emp.emp_nombrecompleto, 'Proveedor Registrado') END,
-            'beneficiario_clabe', bcta.clabe_interbancaria,
-            'cuenta_contable_origen', op.cuenta_contable_origen,
-            'cuenta_contable_pasivo', op.cuenta_contable_pasivo,
-            'importe_bruto_ag', op.importe_bruto_ag,
-            'importe_retenciones', op.importe_retenciones,
-            'importe_neto', op.importe_neto,
-            'fecha_programada', op.fecha_programada,
-            'estatus_workflow', op.estatus_workflow,
-            'poliza_devengo_id', op.f_poliza_devengo_id,
-            'poliza_reclasificacion_id', op.f_poliza_reclasificacion_id,
-            'poliza_egreso_id', op.f_poliza_egreso_id,
-            'firmas_completadas', op.firmas_completadas,
-            'usuario_c', op.usuario_c,
-            'fecha_c', op.fecha_c
-        ) ORDER BY op.fecha_c DESC
-    ) INTO v_data
-    FROM cxp.ordenes_pago op
-    JOIN cxp.afectaciones_gasto ag ON ag.ag_id = op.f_ag_id AND ag.ejercicio_fiscal = op.ejercicio_fiscal
-    JOIN config.catalogo_cuentas_bancarias cb ON cb.cb_id = op.f_chequera_id
-    LEFT JOIN config.beneficiarios_cuentas bcta ON bcta.bcta_id = op.f_beneficiario_cta
-    LEFT JOIN config.catalogo_proveedores prov ON prov.pr_id = ag.f_proveedor_id
-    LEFT JOIN config.catalogo_empleados emp ON emp.emp_id = ag.f_empleado_id
-    LEFT JOIN config.catalogo_ua ua ON ua.ua_id = ag.f_ua_id
-    WHERE op.ejercicio_fiscal = p_ejercicio
-      AND op.estatus_registro = 1
-      AND (p_op_id IS NULL OR op.op_id = p_op_id)
-      AND (p_ag_id IS NULL OR op.f_ag_id = p_ag_id)
-      AND (p_estatus_workflow IS NULL OR op.estatus_workflow = p_estatus_workflow)
-      AND (p_chequera_id IS NULL OR op.f_chequera_id = p_chequera_id)
-      AND (p_forma_pago IS NULL OR op.forma_pago = p_forma_pago)
-      AND (p_buscar IS NULL OR (
-          op.folio_op ILIKE '%' || p_buscar || '%' OR
-          ag.folio ILIKE '%' || p_buscar || '%'
-      ));
-
-    RETURN jsonb_build_object('error', 0, 'mensaje', 'OK', 'data', COALESCE(v_data, '[]'::jsonb));
-EXCEPTION WHEN OTHERS THEN
-    RETURN jsonb_build_object('error', -2, 'mensaje', SQLERRM, 'data', NULL);
-END;
-$$;</code></pre>
-      </div>
-    </div>
-
-    <!-- SP 2: ABC ORDEN DE PAGO -->
-    <div id="sp-spop2" class="sp-panel">
-      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función Transaccional: <code>cxp.fn_abc_orden_pago</code></h4>
-      <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_abc_orden_pago(
-    p_accion SMALLINT, -- 1=Alta, 2=Edición, 3=Baja (Soft-delete)
-    p_usuario VARCHAR,
-    p_ejercicio INTEGER,
-    p_op_id UUID,
-    p_datos JSONB
-)
-RETURNS JSONB
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = cxp, config, contabilidad, public
-AS $$
-DECLARE
-    v_id UUID;
-    v_folio VARCHAR(20);
-    v_ag_id UUID;
-    v_ag_estatus VARCHAR(20);
-    v_ag_neto NUMERIC(18,2);
-    v_ag_devengo_id INT;
-    v_ag_grupo VARCHAR(20);
-    v_ops_previas NUMERIC(18,2);
-    v_saldo_disponible NUMERIC(18,2);
-    v_importe_neto NUMERIC(18,2);
-    v_cuenta_origen VARCHAR(30);
-    v_cuenta_pasivo VARCHAR(30);
-BEGIN
-    -- 1 = ALTA
-    IF p_accion = 1 THEN
-        v_ag_id := (p_datos->>'f_ag_id')::UUID;
-        v_importe_neto := (p_datos->>'importe_neto')::NUMERIC;
-
-        -- Validar existencia y estado de la Afectación de Gasto
-        SELECT estatus_workflow, (importe_total_pago - importe_retenciones), p_poliza_id, f_grupo_codigo
-          INTO v_ag_estatus, v_ag_neto, v_ag_devengo_id, v_ag_grupo
-          FROM cxp.afectaciones_gasto
-         WHERE ag_id = v_ag_id AND ejercicio_fiscal = p_ejercicio AND estatus_registro = 1;
-
-        IF NOT FOUND THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'La Afectación de Gasto especificada no existe.');
-        END IF;
-
-        IF v_ag_estatus <> 'APROBADA' THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo se pueden generar órdenes de pago sobre afectaciones en estado APROBADA.');
-        END IF;
-
-        -- Calcular saldo disponible (Neto de Afectación menos OPs activas previas)
-        SELECT COALESCE(SUM(importe_neto), 0.00) INTO v_ops_previas
-          FROM cxp.ordenes_pago
-         WHERE f_ag_id = v_ag_id AND ejercicio_fiscal = p_ejercicio
-           AND estatus_registro = 1 AND estatus_workflow <> 'CANCELADA';
-
-        v_saldo_disponible := v_ag_neto - v_ops_previas;
-
-        IF v_importe_neto > v_saldo_disponible THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 
-                format('El importe solicitado ($%s) supera el saldo líquido disponible de la afectación ($%s).', v_importe_neto, v_saldo_disponible));
-        END IF;
-
-        -- Determinar cuentas contables según el tipo de trámite
-        IF v_ag_grupo = 'DIRECTO' AND (p_datos->>'tipo_orden') = 'NOMINA_NETA' THEN
-            v_cuenta_origen := '2.1.1.9.1000.0001'; -- Nómina por liquidar (puente)
-            v_cuenta_pasivo := '2.1.1.1.1000.0001'; -- Remuneraciones por pagar a corto plazo
-        ELSE
-            v_cuenta_origen := COALESCE(p_datos->>'cuenta_contable_origen', '2.1.1.2.0001');
-            v_cuenta_pasivo := COALESCE(p_datos->>'cuenta_contable_pasivo', '2.1.1.2.0001');
-        END IF;
-
-        -- Generar Folio Oficial OP-YYYY-XXXXX
-        SELECT 'OP-' || p_ejercicio || '-' || LPAD(COALESCE(MAX(SUBSTRING(folio_op FROM '[0-9]+$')::INTEGER), 0) + 1::TEXT, 5, '0')
-          INTO v_folio
-          FROM cxp.ordenes_pago
-         WHERE ejercicio_fiscal = p_ejercicio;
-
-        v_id := gen_random_uuid();
-
-        INSERT INTO cxp.ordenes_pago (
-            op_id, ejercicio_fiscal, folio_op, f_ag_id, tipo_orden, forma_pago,
-            f_chequera_id, f_beneficiario_cta, cuenta_contable_origen, cuenta_contable_pasivo,
-            importe_bruto_ag, importe_retenciones, importe_neto, fecha_programada,
-            estatus_workflow, f_poliza_devengo_id, usuario_c, estatus_registro
-        ) VALUES (
-            v_id, p_ejercicio, v_folio, v_ag_id,
-            COALESCE(p_datos->>'tipo_orden', 'PROVEEDOR'),
-            p_datos->>'forma_pago',
-            (p_datos->>'f_chequera_id')::INTEGER,
-            (p_datos->>'f_beneficiario_cta')::UUID,
-            v_cuenta_origen, v_cuenta_pasivo,
-            (p_datos->>'importe_bruto_ag')::NUMERIC,
-            COALESCE((p_datos->>'importe_retenciones')::NUMERIC, 0.00),
-            v_importe_neto,
-            (p_datos->>'fecha_programada')::DATE,
-            'BORRADOR', v_ag_devengo_id, p_usuario, 1
-        );
-
-        RETURN jsonb_build_object('error', 0, 'mensaje', 'Orden de Pago creada exitosamente en BORRADOR.', 
-            'data', jsonb_build_object('op_id', v_id, 'folio_op', v_folio, 'saldo_remanente', (v_saldo_disponible - v_importe_neto)));
-
-    -- 2 = EDICIÓN (Solo permitida en BORRADOR o REGRESADA)
-    ELSIF p_accion = 2 THEN
-        UPDATE cxp.ordenes_pago
-           SET forma_pago = COALESCE(p_datos->>'forma_pago', forma_pago),
-               f_chequera_id = COALESCE((p_datos->>'f_chequera_id')::INTEGER, f_chequera_id),
-               f_beneficiario_cta = COALESCE((p_datos->>'f_beneficiario_cta')::UUID, f_beneficiario_cta),
-               fecha_programada = COALESCE((p_datos->>'fecha_programada')::DATE, fecha_programada),
-               usuario_m = p_usuario,
-               fecha_m = clock_timestamp()
-         WHERE op_id = p_op_id AND ejercicio_fiscal = p_ejercicio
-           AND estatus_workflow IN ('BORRADOR', 'REGRESADA');
-
-        IF NOT FOUND THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'La orden de pago no existe o su estatus no permite edición.');
-        END IF;
-
-        RETURN jsonb_build_object('error', 0, 'mensaje', 'Orden de Pago actualizada correctamente.', 'data', jsonb_build_object('op_id', p_op_id));
-
-    -- 3 = CANCELACIÓN
-    ELSIF p_accion = 3 THEN
-        UPDATE cxp.ordenes_pago
-           SET estatus_workflow = 'CANCELADA',
-               estatus_registro = 0,
-               usuario_m = p_usuario,
-               fecha_m = clock_timestamp()
-         WHERE op_id = p_op_id AND ejercicio_fiscal = p_ejercicio
-           AND estatus_workflow NOT IN ('PAGADA', 'CANCELADA');
-
-        IF NOT FOUND THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'No es posible cancelar una orden de pago que ya ha sido PAGADA.');
-        END IF;
-
-        RETURN jsonb_build_object('error', 0, 'mensaje', 'Orden de Pago cancelada. Saldo reintegrado a la afectación de gasto.', 'data', jsonb_build_object('op_id', p_op_id));
-    END IF;
-
-    RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción no reconocida.');
-END;
-$$;</code></pre>
-      </div>
-    </div>
-
-    <!-- SP 3: WORKFLOW DE FIRMAS MANCOMUNADAS -->
-    <div id="sp-spop3" class="sp-panel">
-      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Función de Workflow: <code>cxp.sp_CxpOrdenesPago_Workflow</code></h4>
-      <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION cxp.sp_CxpOrdenesPago_Workflow(
-    p_op_id UUID,
-    p_ejercicio INTEGER,
-    p_accion VARCHAR, -- 'ENVIAR_FIRMAS', 'FIRMAR', 'REGRESAR', 'CANCELAR'
-    p_usuario VARCHAR,
-    p_rol_firmante VARCHAR DEFAULT NULL, -- 'JEFE_TESORERIA', 'SUBDIRECTOR_RF', 'DGA'
-    p_firma_hash TEXT DEFAULT NULL,
-    p_observacion VARCHAR DEFAULT NULL
-)
-RETURNS JSONB
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = cxp, config, contabilidad, public
-AS $$
-DECLARE
-    v_estatus_actual VARCHAR(20);
-    v_firmas_actuales SMALLINT;
-    v_tipo_orden VARCHAR(30);
-    v_poliza_reclasif_id INT;
-BEGIN
-    SELECT estatus_workflow, firmas_completadas, tipo_orden
-      INTO v_estatus_actual, v_firmas_actuales, v_tipo_orden
-      FROM cxp.ordenes_pago
-     WHERE op_id = p_op_id AND ejercicio_fiscal = p_ejercicio AND estatus_registro = 1;
-
-    IF NOT FOUND THEN
-        RETURN jsonb_build_object('error', -1, 'mensaje', 'Orden de Pago no encontrada.');
-    END IF;
-
-    -- Transición 1: Enviar a Circuito de Firmas
-    IF p_accion = 'ENVIAR_FIRMAS' THEN
-        IF v_estatus_actual NOT IN ('BORRADOR', 'REGRESADA') THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'Solo se puede turnar a firmas en estado BORRADOR o REGRESADA.');
-        END IF;
-
-        UPDATE cxp.ordenes_pago
-           SET estatus_workflow = 'EN_FIRMAS', usuario_m = p_usuario, fecha_m = clock_timestamp()
-         WHERE op_id = p_op_id AND ejercicio_fiscal = p_ejercicio;
-
-        RETURN jsonb_build_object('error', 0, 'mensaje', 'Orden de Pago turnada al circuito mancomunado de firmas.');
-
-    -- Transición 2: Firmar Mancomunadamente (1=Tesorería, 2=Recursos Financieros, 3=DGA)
-    ELSIF p_accion = 'FIRMAR' THEN
-        IF v_estatus_actual <> 'EN_FIRMAS' THEN
-            RETURN jsonb_build_object('error', -1, 'mensaje', 'La orden no se encuentra en proceso de firmas.');
-        END IF;
-
-        v_firmas_actuales := v_firmas_actuales + 1;
-
-        INSERT INTO cxp.ordenes_pago_firmas (
-            f_op_id, ejercicio_fiscal, orden_firma, rol_firmante, usuario_firmante, firma_electronica
-        ) VALUES (
-            p_op_id, p_ejercicio, v_firmas_actuales, p_rol_firmante, p_usuario, COALESCE(p_firma_hash, md5(clock_timestamp()::TEXT))
-        );
-
-        -- Si se completan las 3 firmas, la orden transita a AUTORIZADA y viaja a Tesorería
-        IF v_firmas_actuales >= 3 THEN
-            -- Si es Nómina, genera la póliza de reclasificación contable 2.1.1.9 a 2.1.1.1
-            IF v_tipo_orden = 'NOMINA_NETA' THEN
-                SELECT (cxp.fn_generar_poliza_reclasificacion_op(p_op_id, p_ejercicio, p_usuario)->'data'->>'poliza_id')::INT
-                  INTO v_poliza_reclasif_id;
-            END IF;
-
-            UPDATE cxp.ordenes_pago
-               SET estatus_workflow = 'AUTORIZADA',
-                   firmas_completadas = 3,
-                   f_poliza_reclasificacion_id = v_poliza_reclasif_id,
-                   usuario_m = p_usuario,
-                   fecha_m = clock_timestamp()
-             WHERE op_id = p_op_id AND ejercicio_fiscal = p_ejercicio;
-
-            RETURN jsonb_build_object('error', 0, 'mensaje', 'Orden de Pago AUTORIZADA y turnada a la Bandeja de Pagos de Tesorería.',
-                'data', jsonb_build_object('estatus', 'AUTORIZADA', 'poliza_reclasificacion_id', v_poliza_reclasif_id));
-        ELSE
-            UPDATE cxp.ordenes_pago
-               SET firmas_completadas = v_firmas_actuales, usuario_m = p_usuario, fecha_m = clock_timestamp()
-             WHERE op_id = p_op_id AND ejercicio_fiscal = p_ejercicio;
-
-            RETURN jsonb_build_object('error', 0, 'mensaje', format('Firma %s de 3 registrada exitosamente.', v_firmas_actuales));
-        END IF;
-
-    -- Transición 3: Regresar a CxP con Observaciones
-    ELSIF p_accion = 'REGRESAR' THEN
-        UPDATE cxp.ordenes_pago
-           SET estatus_workflow = 'REGRESADA', firmas_completadas = 0, usuario_m = p_usuario, fecha_m = clock_timestamp()
-         WHERE op_id = p_op_id AND ejercicio_fiscal = p_ejercicio;
-
-        DELETE FROM cxp.ordenes_pago_firmas WHERE f_op_id = p_op_id AND ejercicio_fiscal = p_ejercicio;
-
-        RETURN jsonb_build_object('error', 0, 'mensaje', 'Orden devuelta a Cuentas por Pagar con observaciones.');
-    END IF;
-
-    RETURN jsonb_build_object('error', -1, 'mensaje', 'Acción de workflow no válida.');
-END;
-$$;</code></pre>
-      </div>
-    </div>
-
-    <!-- SP 4: PÓLIZA DE RECLASIFICACIÓN CONTABLE (MOTOR MATRIZ A0) -->
-    <div id="sp-spop4" class="sp-panel">
-      <h4 style="color:var(--pjev-verde-oscuro); margin:0 0 8px;">Póliza de Reclasificación: <code>cxp.fn_generar_poliza_reclasificacion_op</code></h4>
-      <div class="code-wrap">
-<pre><code>CREATE OR REPLACE FUNCTION cxp.fn_generar_poliza_reclasificacion_op(
-    p_op_id UUID,
-    p_ejercicio INTEGER,
-    p_usuario VARCHAR
-)
-RETURNS JSONB
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = cxp, config, contabilidad, public
-AS $$
-DECLARE
-    v_op RECORD;
-    v_poliza_id INTEGER;
-    v_folio_poliza VARCHAR(20);
-    v_regla_id BIGINT;
-    v_mov RECORD;
-    v_renglon INTEGER := 1;
-BEGIN
-    SELECT * INTO v_op FROM cxp.ordenes_pago WHERE op_id = p_op_id AND ejercicio_fiscal = p_ejercicio;
-    IF NOT FOUND THEN RETURN jsonb_build_object('error', -1, 'mensaje', 'Orden de pago no encontrada.'); END IF;
-
-    -- 1. Genera Folio Consecutivo de Póliza Diario (DI)
-    SELECT 'DI-' || p_ejercicio || '-' || LPAD(COALESCE(MAX(SUBSTRING(p_folio FROM '[0-9]+$')::INTEGER), 0) + 1::TEXT, 5, '0')
-      INTO v_folio_poliza FROM contabilidad.poliza WHERE p_ejercicio = p_ejercicio;
-
-    -- 2. Inserta Encabezado de Póliza Cuadrada
-    INSERT INTO contabilidad.poliza (
-        p_ejercicio, p_tipo, p_folio, p_fecha, p_concepto, p_total_debe, p_total_haber,
-        p_cuadrada, p_estado, usuario_c
-    ) VALUES (
-        p_ejercicio, 'DI', v_folio_poliza, v_op.fecha_programada,
-        'Reclasificación pasivo Nómina por Liquidar a Remuneraciones por Pagar · Folio ' || v_op.folio_op,
-        v_op.importe_neto, v_op.importe_neto, true, 'APLICADA', p_usuario
-    ) RETURNING p_id INTO v_poliza_id;
-
-    -- 3. Localizar regla activa en la Matriz A0_RECLASIFICA_ORDEN_PAGO (Momento Ejercido)
-    SELECT mcr.mcr_id INTO v_regla_id
-      FROM contabilidad.matriz_conversion_regla mcr
-      JOIN contabilidad.matriz_conversion mcv ON mcv.mcv_id = mcr.mcr_matriz_id
-     WHERE mcv.mcv_clave = 'A0_RECLASIFICA_ORDEN_PAGO'
-       AND mcv.mcv_ejercicio = p_ejercicio
-       AND mcv.mcv_estado = 'ACTIVA'
-       AND mcr.mcr_evento_codigo = 'RECLASIFICACION_OP'
-       AND mcr.estatus_registro = 1
-     ORDER BY mcr.mcr_id ASC
-     LIMIT 1;
-
-    -- 4. Si existe regla parametrizada por el Contador General en 03.1.2, aplicar sus asientos dinámicos
-    IF v_regla_id IS NOT NULL THEN
-        FOR v_mov IN
-            SELECT mcm.mcm_naturaleza, cc.cc_cuentapuntos, mcm.mcm_descripcion
-              FROM contabilidad.matriz_conversion_movimiento mcm
-              JOIN contabilidad.catalogo_cuentas cc ON cc.cc_id = mcm.mcm_cuenta_id
-             WHERE mcm.mcm_regla_id = v_regla_id
-               AND mcm.mcm_ambito = 'C'
-               AND mcm.estatus_registro = 1
-             ORDER BY mcm.mcm_orden ASC
-        LOOP
-            INSERT INTO contabilidad.poliza_detalle (
-                pd_poliza_id, pd_ejercicio, pd_renglon, pd_cuenta, pd_debe, pd_haber, pd_concepto
-            ) VALUES (
-                v_poliza_id, p_ejercicio, v_renglon, v_mov.cc_cuentapuntos,
-                CASE WHEN v_mov.mcm_naturaleza = 'D' THEN v_op.importe_neto ELSE 0.00 END,
-                CASE WHEN v_mov.mcm_naturaleza = 'H' THEN v_op.importe_neto ELSE 0.00 END,
-                v_mov.mcm_descripcion
-            );
-            v_renglon := v_renglon + 1;
-        END LOOP;
-    ELSE
-        -- Fallback estándar institucional
-        INSERT INTO contabilidad.poliza_detalle (pd_poliza_id, pd_ejercicio, pd_renglon, pd_cuenta, pd_debe, pd_haber, pd_concepto)
-        VALUES (v_poliza_id, p_ejercicio, 1, v_op.cuenta_contable_origen, v_op.importe_neto, 0.00, 'Cancelación pasivo concentrador nómina');
-
-        INSERT INTO contabilidad.poliza_detalle (pd_poliza_id, pd_ejercicio, pd_renglon, pd_cuenta, pd_debe, pd_haber, pd_concepto)
-        VALUES (v_poliza_id, p_ejercicio, 2, v_op.cuenta_contable_pasivo, 0.00, v_op.importe_neto, 'Reconocimiento pasivo líquido exigible');
-    END IF;
-
-    RETURN jsonb_build_object('error', 0, 'mensaje', 'Póliza de reclasificación generada exitosamente vía Matriz A0.', 
-        'data', jsonb_build_object('poliza_id', v_poliza_id, 'folio_poliza', v_folio_poliza));
-END;
-$$;</code></pre>
-      </div>
-    </div>
-  </div>
-
-  <!-- 8. SERVICIOS API REST (SWAGGER / NESTJS) -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">8</span> Servicios API REST (Controlador NestJS y Swagger)</div>
-    <p style="font-size:13px; color:var(--pjev-texto-muted); margin-bottom:14px;">
-      Los endpoints son expuestos en <code>OrdenesPagoCxpController</code> comunicándose vía Prisma <code>$queryRaw</code>:
-    </p>
-
-    <table class="props-table" style="margin-bottom:16px;">
-      <thead><tr><th>Método</th><th>Endpoint Swagger</th><th>DTO / Parámetros</th><th>Descripción</th></tr></thead>
+    <div class="sp-panel" id="sp-leer">
+    <h3><code>cxp.fn_leer_afectacion_encabezado</code></h3>
+    <pre class="sql"><code>cxp.fn_leer_afectacion_encabezado(p_ejercicio_fiscal integer, p_ag_id uuid DEFAULT NULL::uuid, p_estatus character varying DEFAULT NULL::character varying, p_tipo_pago integer DEFAULT NULL::integer, p_fecha_desde date DEFAULT NULL::date, p_fecha_hasta date DEFAULT NULL::date, p_page integer DEFAULT 1, p_limit integer DEFAULT 50)</code></pre>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Entrada y acción</th><th scope="col">Salida</th></tr></thead>
       <tbody>
-        <tr><td><code class="method get">GET</code></td><td><code>/api/v1/cxp/ordenes-pago</code></td><td>Query: <code>{ ejercicio, estatus?, chequeraId?, formaPago?, buscar? }</code></td><td>Lista las órdenes de pago con filtros y paginación.</td></tr>
-        <tr><td><code class="method get">GET</code></td><td><code>/api/v1/cxp/ordenes-pago/:id</code></td><td>Param: <code>id: UUID</code></td><td>Detalle integral de la orden, afectación origen y firmas registradas.</td></tr>
-        <tr><td><code class="method get">GET</code></td><td><code>/api/v1/cxp/ordenes-pago/afectaciones-elegibles</code></td><td>Query: <code>{ ejercicio }</code></td><td>Lista afectaciones <code>APROBADA</code> con saldo líquido disponible.</td></tr>
-        <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cxp/ordenes-pago</code></td><td>Body: <code>CrearOrdenPagoDto</code></td><td>Crea una nueva Orden de Pago asignando chequera y cuenta CLABE.</td></tr>
-        <tr><td><code class="method put">PUT</code></td><td><code>/api/v1/cxp/ordenes-pago/:id</code></td><td>Param: <code>id</code>, Body: <code>ActualizarOrdenPagoDto</code></td><td>Modifica fecha programada o chequera pagadora (en Borrador o Regresada).</td></tr>
-        <tr><td><code class="method post">POST</code></td><td><code>/api/v1/cxp/ordenes-pago/:id/workflow</code></td><td>Param: <code>id</code>, Body: <code>WorkflowOrdenPagoDto</code></td><td>Ejecuta transiciones (<code>ENVIAR_FIRMAS</code>, <code>FIRMAR</code>, <code>REGRESAR</code>, <code>CANCELAR</code>).</td></tr>
+        <tr><td>Ejercicio, UUID opcional, estado, tipo de pago, fechas, página y límite. Para el Grupo 4 el listado solicita tipo 4.</td><td>JSONB con código, mensaje, filas y conteo.</td></tr>
       </tbody>
-    </table>
-
-    <h4 style="color:var(--pjev-verde-oscuro); margin:18px 0 8px;">Controlador NestJS: <code>ordenes-pago-cxp.controller.ts</code></h4>
-    <div class="code-wrap">
-<pre><code>import { Controller, Get, Post, Put, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../configuracion/auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../configuracion/auth/guards/roles.guard';
-import { MinRol } from '../configuracion/auth/decorators/min-rol.decorator';
-import { OrdenesPagoCxpService } from './ordenes-pago-cxp.service';
-
-@ApiTags('CxP / Órdenes de Pago')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('cxp/ordenes-pago')
-export class OrdenesPagoCxpController {
-  constructor(private readonly service: OrdenesPagoCxpService) {}
-
-  @Get()
-  @MinRol(4)
-  @ApiOperation({ summary: 'Listar órdenes de pago con filtros' })
-  findAll(@Query() query: FiltrosOrdenPagoDto, @Req() req) {
-    return this.service.findAll(query, req.user);
-  }
-
-  @Get('afectaciones-elegibles')
-  @MinRol(3)
-  @ApiOperation({ summary: 'Consultar afectaciones aprobadas con saldo pendiente' })
-  findAfectacionesElegibles(@Query('ejercicio') ejercicio: number) {
-    return this.service.findAfectacionesElegibles(ejercicio);
-  }
-
-  @Get(':id')
-  @MinRol(4)
-  @ApiOperation({ summary: 'Consultar detalle integral de una orden de pago' })
-  findOne(@Param('id') id: string, @Req() req) {
-    return this.service.findOne(id, req.user);
-  }
-
-  @Post()
-  @MinRol(3)
-  @ApiOperation({ summary: 'Crear nueva orden de pago en BORRADOR' })
-  create(@Body() dto: CrearOrdenPagoDto, @Req() req) {
-    return this.service.create(dto, req.user);
-  }
-
-  @Put(':id')
-  @MinRol(3)
-  @ApiOperation({ summary: 'Actualizar orden de pago en BORRADOR o REGRESADA' })
-  update(@Param('id') id: string, @Body() dto: ActualizarOrdenPagoDto, @Req() req) {
-    return this.service.update(id, dto, req.user);
-  }
-
-  @Post(':id/workflow')
-  @MinRol(2)
-  @ApiOperation({ summary: 'Avanzar workflow de firmas o autorizar orden' })
-  workflow(@Param('id') id: string, @Body() dto: WorkflowOrdenPagoDto, @Req() req) {
-    return this.service.executeWorkflow(id, dto, req.user);
-  }
-}</code></pre>
-    </div>
-  </div>
-
-  <!-- 9. REGLAS DE NEGOCIO ESPECÍFICAS -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">9</span> Reglas de Negocio Específicas</div>
-    <div style="display:flex; flex-direction:column; gap:10px;">
-      
-      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-OP-01 · Exclusividad de Afectaciones Aprobadas con Póliza</strong>
-        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          No se permite emitir órdenes de pago sobre afectaciones en estado BORRADOR, ENVIADA o REGRESADA. La afectación debe contar con <code>estatus_workflow = 'APROBADA'</code> y tener asignada su póliza contable de devengo <code>f_poliza_devengo_id</code>.
-        </p>
-      </div>
-
-      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-OP-02 · Control Aritmético de Techo Líquido Exigible</strong>
-        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          El importe neto de la orden no puede superar el saldo remanente de la afectación origen: <code>Saldo Disponible = (Importe Total - Retenciones) - Σ(OPs Activas)</code>. Si una afectación de nómina de \$10,000,000 tiene \$2,000,000 de retenciones, el techo total de las OPs no podrá exceder \$8,000,000.
-        </p>
-      </div>
-
-      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-OP-03 · Cero Afectación Presupuestaria</strong>
-        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          La emisión y autorización de la Orden de Pago tiene cero impacto en cuentas presupuestales de egresos (Clase <code>8.2.x</code>). El momento del Devengado (<code>8.2.5</code>) ya se perfeccionó en la afectación; los momentos de Ejercido (<code>8.2.6</code>) y Pagado (<code>8.2.7</code>) se detonarán exclusivamente en Tesorería al ejecutar la salida bancaria.
-        </p>
-      </div>
-
-      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:14px 18px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-OP-04 · Reclasificación Contable de Nómina vía Matriz de Conversión A0 (2.1.1.9 a 2.1.1.1)</strong>
-        <p style="font-size:12px; margin:6px 0 8px; color:var(--pjev-texto); line-height:1.6;">
-          Para el procedimiento <code>NOMINA</code>, la autorización formal de la Orden de Pago detona automáticamente una póliza contable de Diario (<code>DI</code>) gobernada por la <strong>Matriz de Conversión A0_RECLASIFICA_ORDEN_PAGO</strong> (Momento Ejercido, <code>mc_id = 5</code>), evitando código duro en la aplicación. La arquitectura opera en tres etapas integradas:
-        </p>
-        <ol style="font-size:12px; color:var(--pjev-texto-muted); margin-left:18px; line-height:1.6; margin-bottom:10px;">
-          <li><strong>Etapa 1 (Devengo de Gasto en 05.2.1 / Matriz A.1)</strong>: Las 103 reglas del Capítulo 1000 devengan el gasto bruto reconociendo el pasivo en la cuenta puente concentradora <code>2.1.1.9.1000.0001 OTRAS CUENTAS POR PAGAR VARIAS (Nómina por Liquidar)</code> [Migración 179].</li>
-          <li><strong>Etapa 2 (Reclasificación en 05.2.2 / Matriz A0)</strong>: Al autorizar la Orden de Pago, el evento <code>RECLASIFICACION_OP</code> traspasa el importe neto exigible disminuyendo la bolsa puente (Cargo a <code>2.1.1.9.1000.0001</code>) y acreditando el pasivo líquido (Abono a <code>2.1.1.1.xxxx</code>) [Migración 180].</li>
-          <li><strong>Etapa 3 (Pagado en 06.2.1 / Matriz A.2)</strong>: Al liquidar en Tesorería, la Matriz A.2 cancela el pasivo <code>2.1.1.1.xxxx</code> contra la chequera bancaria <code>1.1.1.2.xxxx</code> y devenga los momentos presupuestales 8.2.6 y 8.2.7.</li>
-        </ol>
-        <table class="props-table" style="font-size:11px; margin-top:6px;">
-          <thead><tr><th>Regla en Matriz A0</th><th>Cuenta Cargo (Debe)</th><th>Cuenta Abono (Haber)</th><th>Fórmula / Destino</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><code>R_OP_NOMINA_NETA</code></td>
-              <td><code>2.1.1.9.1000.0001</code> (Puente Nómina)</td>
-              <td><code>2.1.1.1.1000.0001</code> (Personal Permanente)</td>
-              <td><code>NETO_PAGAR</code> (Dispersión masiva nómina)</td>
-            </tr>
-            <tr>
-              <td><code>R_OP_NOMINA_TRANSITORIO</code></td>
-              <td><code>2.1.1.9.1000.0001</code> (Puente Nómina)</td>
-              <td><code>2.1.1.1.2000.0001</code> (Personal Eventual)</td>
-              <td><code>NETO_PAGAR</code> (Nómina transitoria)</td>
-            </tr>
-            <tr>
-              <td><code>R_OP_PENSION_ALIMENTICIA</code></td>
-              <td><code>2.1.1.9.1000.0001</code> (Puente Nómina)</td>
-              <td><code>2.1.1.9.3000.0001</code> (Pensión Alimenticia)</td>
-              <td><code>NETO_PAGAR</code> (Cheque/SPEI a acreedora judicial)</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-OP-05 · Validación Algorítmica de Datos Bancarios</strong>
-        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          Si la forma de pago es Transferencia Electrónica (<code>'T'</code>), la CLABE interbancaria debe cumplir estrictamente con la norma bancaria de 18 dígitos y dígito verificador módulo 10 ponderado. La chequera pagadora asignada debe tener estatus <code>ACTIVA</code> en el catálogo de cuentas de Tesorería.
-        </p>
-      </div>
-
-      <div style="background:#fff; border:1px solid var(--pjev-borde); border-radius:6px; padding:12px 16px;">
-        <strong style="color:var(--pjev-verde-oscuro);">RN-OP-06 · Circuito Mancomunado de Tres Firmas Electrónicas</strong>
-        <p style="font-size:12px; margin:4px 0 0; color:var(--pjev-texto-muted);">
-          Para transitar al estado <code>AUTORIZADA</code>, la orden de pago debe recabar obligatoriamente las tres firmas electrónicas consecutivas e inmutables: Firma 1 (Jefe de Tesorería), Firma 2 (Subdirector de Recursos Financieros) y Firma 3 (Director General de Administración).
-        </p>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- 10. PROPUESTA VISUAL (WIREFRAMES NATIVOS) -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">10</span> Propuesta Visual de Interfaz (Wireframes Nativos)</div>
-
-    <!-- DOCTRINA DE INTERFAZ PJEV -->
-    <div class="callout info" style="margin-bottom:20px;">
-      <div class="callout-icon">🏛️</div>
-      <div>
-        <strong>Doctrina de Interfaz PJEV: Pantalla Principal y Modal Complejo de Orden de Pago</strong>
-        <p style="font-size:12.5px; margin:4px 0 0; line-height:1.5;">
-          El módulo 05.2.2 adopta la arquitectura canónica de dos niveles: una <strong>Pantalla de Inicio</strong> para consulta y filtrado global de la cartera de órdenes de pago, y un <strong>Modal Complejo</strong> (ancho extendido <code>1700px</code>) para gestionar los tres modos operativos: <strong>[Nuevo]</strong> (selección de afectación con precarga de líquido y chequera), <strong>[Edición / Firmas]</strong> (circuito mancomunado y póliza de reclasificación) y <strong>[Consulta]</strong> (solo lectura con trazabilidad de la dispersión bancaria).
-        </p>
-      </div>
-    </div>
-
-    <div class="wf-tabs">
-      <button class="wf-tab active" onclick="showWF('wfop1',this)">1. Pantalla de Inicio (Listado Maestro)</button>
-      <button class="wf-tab" onclick="showWF('wfop2',this)">2. Modal Complejo [Nuevo] (Asignación Bancaria)</button>
-      <button class="wf-tab" onclick="showWF('wfop3',this)">3. Modal Complejo [Firmas y Autorización]</button>
-      <button class="wf-tab" onclick="showWF('wfop4',this)">4. Modal Complejo [Consulta / Pagada Tesorería]</button>
-    </div>
-
-    <!-- WF1: PANTALLA DE INICIO (LISTADO MAESTRO DE ÓRDENES DE PAGO) -->
-    <div id="wf-wfop1" class="wf-panel active">
-      <div class="wf-box">
-        <div class="wf-bar">
-          <span class="wf-bar-label">05.2.2 Pantalla Principal · Solicitud de Pagos No Presupuestales (Grupo 4)</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">SiafCard Filtros + SiafDataGrid + SiafInfoPanel</span>
-        </div>
-        <div class="wf-svg-area">
-          <svg viewBox="0 0 960 560" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="960" height="560" fill="#f8fafc" rx="6" stroke="#cbd5e1"/>
-            
-            <!-- App Bar Superior Institucional PJEV -->
-            <rect width="960" height="42" fill="#183125" rx="6"/>
-            <text x="20" y="26" font-size="13" font-weight="bold" fill="#ffffff">SIAF-PJEV</text>
-            <text x="95" y="26" font-size="11" fill="#cbd5e1">| Sistema Integral de Administración Financiera</text>
-            <rect x="730" y="10" width="110" height="22" fill="#2d4a3b" rx="4"/>
-            <text x="785" y="24" font-size="10" fill="#ffffff" text-anchor="middle">Ejercicio: 2026</text>
-            <circle cx="865" cy="21" r="10" fill="#8c6e3d"/>
-            <text x="865" y="25" font-size="10" fill="#ffffff" text-anchor="middle" font-weight="bold">U</text>
-            <text x="885" y="25" font-size="10" fill="#ffffff">Analista CxP</text>
-
-            <!-- Breadcrumb & Header de Página -->
-            <text x="20" y="66" font-size="10" fill="#64748b">05 · Tesorería  /  05.2 Registro  /  <tspan font-weight="bold" fill="#183125">05.2.2 Solicitud de Pagos No Presupuestales</tspan></text>
-            <text x="20" y="88" font-size="16" font-weight="bold" fill="#183125">Solicitud de Pagos No Presupuestales (Grupo 4 · Balance y Nómina)</text>
-            
-            <!-- Botón Principal + Nueva Orden de Pago -->
-            <rect x="765" y="65" width="175" height="32" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="852" y="85" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">+ Nueva Solicitud</text>
-
-            <!-- Card de Filtros (SiafCard) -->
-            <rect x="20" y="105" width="920" height="85" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            
-            <!-- Filtro 1: Chequera Pagadora -->
-            <text x="35" y="125" font-size="9" font-weight="bold" fill="#475569">CUENTA PAGADORA (CHEQUERA)</text>
-            <rect x="35" y="132" width="190" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <text x="45" y="149" font-size="10" fill="#1e293b">Todas las cuentas bancarias ▼</text>
-
-            <!-- Filtro 2: Forma de Pago -->
-            <text x="235" y="125" font-size="9" font-weight="bold" fill="#475569">FORMA DE PAGO</text>
-            <rect x="235" y="132" width="140" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <text x="245" y="149" font-size="10" fill="#1e293b">Todas (SPEI / Cheque) ▼</text>
-
-            <!-- Filtro 3: Estatus Workflow -->
-            <text x="385" y="125" font-size="9" font-weight="bold" fill="#475569">ESTATUS WORKFLOW</text>
-            <rect x="385" y="132" width="130" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <text x="395" y="149" font-size="10" fill="#1e293b">Todos los estatus ▼</text>
-
-            <!-- Filtro 4: Rango Fechas Programadas -->
-            <text x="525" y="125" font-size="9" font-weight="bold" fill="#475569">FECHA PROGRAMADA DESDE / HASTA</text>
-            <rect x="525" y="132" width="105" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="535" y="149" font-size="9" fill="#1e293b">01/09/2026</text>
-            <rect x="635" y="132" width="105" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="645" y="149" font-size="9" fill="#1e293b">30/09/2026</text>
-
-            <!-- Buscador Folio OP o AG -->
-            <text x="750" y="125" font-size="9" font-weight="bold" fill="#475569">BUSCAR POR FOLIO</text>
-            <rect x="750" y="132" width="100" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="760" y="149" font-size="9" fill="#94a3b8">OP- / AG-...</text>
-
-            <!-- Botón Buscar -->
-            <rect x="855" y="132" width="70" height="26" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="890" y="149" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">Buscar</text>
-
-            <!-- Resumen Contadores -->
-            <text x="35" y="178" font-size="10" fill="#64748b">Total: <tspan font-weight="bold" fill="#1e293b">86 órdenes de pago</tspan></text>
-            <text x="925" y="178" font-size="11" font-weight="bold" fill="#15803d" text-anchor="end">Neto Programado: $12,450,890.50 MXN</text>
-
-            <!-- Card DataGrid (SiafDataGrid) -->
-            <rect x="20" y="200" width="920" height="315" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            
-            <!-- Table Header -->
-            <rect x="21" y="201" width="918" height="28" fill="#f1f5f9"/>
-            <text x="35" y="219" font-size="9" font-weight="bold" fill="#475569">FOLIO OP</text>
-            <text x="125" y="219" font-size="9" font-weight="bold" fill="#475569">FECHA PROG.</text>
-            <text x="210" y="219" font-size="9" font-weight="bold" fill="#475569">AFECTACIÓN ORIGEN</text>
-            <text x="345" y="219" font-size="9" font-weight="bold" fill="#475569">BENEFICIARIO / CUENTA DESTINO</text>
-            <text x="560" y="219" font-size="9" font-weight="bold" fill="#475569">CHEQUERA PAGADORA</text>
-            <text x="730" y="219" font-size="9" font-weight="bold" fill="#475569" text-anchor="end">IMPORTE NETO ($)</text>
-            <text x="800" y="219" font-size="9" font-weight="bold" fill="#475569">ESTATUS</text>
-            <text x="885" y="219" font-size="9" font-weight="bold" fill="#475569">ACCIONES</text>
-
-            <!-- Fila 1: Nómina Neta (En Firmas Mancomunadas) -->
-            <text x="35" y="247" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">OP-2026-00042</text>
-            <text x="125" y="247" font-size="9" fill="#334155">15/09/2026</text>
-            <text x="210" y="247" font-size="9" font-family="monospace" fill="#183125">AG-2026-00138 (NOM)</text>
-            <text x="345" y="247" font-size="9" fill="#1e293b">DISPERSIÓN NÓMINA PERSONAL PJEV</text>
-            <text x="560" y="247" font-size="9" fill="#475569">BBVA Cta. 0118274 (Nómina)</text>
-            <text x="730" y="247" font-size="10" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$1,510,000.00</text>
-            <rect x="765" y="235" width="80" height="16" fill="#fef3c7" rx="8"/>
-            <text x="805" y="247" font-size="8" font-weight="bold" fill="#b45309" text-anchor="middle">EN_FIRMAS (2/3)</text>
-            <text x="880" y="247" font-size="11" fill="#0284c7" cursor="pointer">✍️ 👁 📜</text>
-            <line x1="25" y1="258" x2="935" y2="258" stroke="#f1f5f9"/>
-
-            <!-- Fila 2: Proveedor Arrendamiento (Autorizada, Lista para Tesorería) -->
-            <text x="35" y="277" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">OP-2026-00041</text>
-            <text x="125" y="277" font-size="9" fill="#334155">10/09/2026</text>
-            <text x="210" y="277" font-size="9" font-family="monospace" fill="#183125">AG-2026-00142 (ARR)</text>
-            <text x="345" y="277" font-size="9" fill="#1e293b">INMOBILIARIA VERACRUZANA S.A.</text>
-            <text x="560" y="277" font-size="9" fill="#475569">Banamex Cta. 482910 (Gasto Cte.)</text>
-            <text x="730" y="277" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$18,933.33</text>
-            <rect x="765" y="265" width="80" height="16" fill="#dbeafe" rx="8"/>
-            <text x="805" y="277" font-size="8" font-weight="bold" fill="#1d4ed8" text-anchor="middle">AUTORIZADA</text>
-            <text x="880" y="277" font-size="11" fill="#0284c7" cursor="pointer">👁 📜</text>
-            <line x1="25" y1="288" x2="935" y2="288" stroke="#f1f5f9"/>
-
-            <!-- Fila 3: Compra Papelería (Pagada por Tesorería) -->
-            <text x="35" y="307" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">OP-2026-00040</text>
-            <text x="125" y="307" font-size="9" fill="#334155">05/09/2026</text>
-            <text x="210" y="307" font-size="9" font-family="monospace" fill="#183125">AG-2026-00141 (PED)</text>
-            <text x="345" y="307" font-size="9" fill="#1e293b">PAPELERÍA DEL GOLFO S.A.</text>
-            <text x="560" y="307" font-size="9" fill="#475569">Banamex Cta. 482910 (Gasto Cte.)</text>
-            <text x="730" y="307" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$145,800.00</text>
-            <rect x="765" y="295" width="80" height="16" fill="#dcfce7" rx="8"/>
-            <text x="805" y="307" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">PAGADA</text>
-            <text x="880" y="307" font-size="11" fill="#0284c7" cursor="pointer">👁 📖 📜</text>
-            <line x1="25" y1="318" x2="935" y2="318" stroke="#f1f5f9"/>
-
-            <!-- Fila 4: Pensión Alimenticia de Nómina (Autorizada) -->
-            <text x="35" y="337" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">OP-2026-00039</text>
-            <text x="125" y="337" font-size="9" fill="#334155">15/09/2026</text>
-            <text x="210" y="337" font-size="9" font-family="monospace" fill="#183125">AG-2026-00138 (NOM)</text>
-            <text x="345" y="337" font-size="9" fill="#1e293b">MARÍA GUADALUPE SÁNCHEZ (PENSIÓN)</text>
-            <text x="560" y="337" font-size="9" fill="#475569">BBVA Cta. 0118274 (Nómina)</text>
-            <text x="730" y="337" font-size="10" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$12,450.00</text>
-            <rect x="765" y="325" width="80" height="16" fill="#dbeafe" rx="8"/>
-            <text x="805" y="337" font-size="8" font-weight="bold" fill="#1d4ed8" text-anchor="middle">AUTORIZADA</text>
-            <text x="880" y="337" font-size="11" fill="#0284c7" cursor="pointer">👁 📜</text>
-            <line x1="25" y1="348" x2="935" y2="348" stroke="#f1f5f9"/>
-
-            <!-- Fila 5: Retención Fiscal 3% SEFIPLAN (Tipo 4 No Presupuestario Pagada) -->
-            <text x="35" y="367" font-size="10" font-family="monospace" font-weight="bold" fill="#0284c7">OP-2026-00038</text>
-            <text x="125" y="367" font-size="9" fill="#334155">31/08/2026</text>
-            <text x="210" y="367" font-size="9" font-family="monospace" fill="#166534">AG-2026-00140 (TER)</text>
-            <text x="345" y="367" font-size="9" fill="#1e293b">SEFIPLAN VERACRUZ (3% NÓMINA)</text>
-            <text x="560" y="367" font-size="9" fill="#475569">BBVA Cta. 0118274 (Nómina)</text>
-            <text x="730" y="367" font-size="10" font-family="monospace" font-weight="bold" fill="#166534" text-anchor="end">$380,450.00</text>
-            <rect x="765" y="355" width="80" height="16" fill="#dcfce7" rx="8"/>
-            <text x="805" y="367" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">PAGADA</text>
-            <text x="880" y="367" font-size="11" fill="#0284c7" cursor="pointer">👁 📖 📜</text>
-
-            <!-- Paginador -->
-            <rect x="21" y="475" width="918" height="39" fill="#ffffff" rx="6"/>
-            <line x1="21" y1="475" x2="939" y2="475" stroke="#cbd5e1"/>
-            <text x="35" y="499" font-size="10" fill="#64748b">Mostrando 1 a 5 de 86 órdenes de pago</text>
-            <rect x="720" y="483" width="75" height="23" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="757" y="498" font-size="9" fill="#475569" text-anchor="middle">◀ Anterior</text>
-            <rect x="800" y="483" width="24" height="23" fill="#183125" rx="4"/>
-            <text x="812" y="498" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">1</text>
-            <rect x="828" y="483" width="24" height="23" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="840" y="498" font-size="9" fill="#475569" text-anchor="middle">2</text>
-            <rect x="856" y="483" width="75" height="23" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="893" y="498" font-size="9" fill="#475569" text-anchor="middle">Siguiente ▶</text>
-
-            <!-- Nota Informativa Inferior -->
-            <text x="25" y="540" font-size="10" fill="#64748b">💡 Las órdenes en estado <tspan font-weight="bold" fill="#1d4ed8">AUTORIZADA</tspan> pasan automáticamente a la Bandeja de Pagos de Tesorería (06.2.1) para su dispersión bancaria.</text>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- WF2: MODAL COMPLEJO [NUEVO] (SELECCIÓN Y ASIGNACIÓN BANCARIA) -->
-    <div id="wf-wfop2" class="wf-panel">
-      <div class="wf-box">
-        <div class="wf-bar">
-          <span class="wf-bar-label">05.2.2 Modal Complejo · Modo [Nuevo] · Selección de Afectación y Configuración Bancaria</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">SiafModal (1700px) + Control de Techo Líquido</span>
-        </div>
-        <div class="wf-svg-area">
-          <svg viewBox="0 0 940 500" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="940" height="500" fill="#ffffff" rx="8" stroke="#cbd5e1"/>
-            
-            <!-- Modal Header -->
-            <rect width="940" height="46" fill="#183125" rx="8"/>
-            <text x="25" y="28" font-size="13" font-weight="bold" fill="#ffffff">Nueva Orden de Pago</text>
-            <text x="195" y="28" font-size="11" fill="#cbd5e1">— Selección de la Afectación de Gasto aprobada, cuenta pagadora y beneficiario.</text>
-            <rect x="895" y="11" width="24" height="24" fill="#2d4a3b" rx="4"/>
-            <text x="907" y="27" font-size="12" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
-
-            <!-- Bloque 1: Selector de Afectación Aprobada -->
-            <rect x="25" y="60" width="890" height="85" fill="#f8fafc" stroke="#cbd5e1" rx="6"/>
-            <text x="40" y="80" font-size="10" font-weight="bold" fill="#475569">SELECCIONA LA AFECTACIÓN DE GASTO APROBADA (DEVENGADA) *</text>
-            
-            <rect x="40" y="88" width="520" height="28" fill="#ffffff" stroke="#183125" stroke-width="1.5" rx="4"/>
-            <text x="50" y="106" font-size="10" font-weight="bold" fill="#183125">AG-2026-00138 · Nómina 1ra Quincena Agosto 2026 (Servicios Personales)</text>
-
-            <!-- Badge Saldo Disponible en Afectación -->
-            <rect x="580" y="88" width="315" height="46" fill="#f0fdf4" stroke="#86efac" rx="4"/>
-            <text x="595" y="106" font-size="9" fill="#166534">Total Devengado: <tspan font-family="monospace" font-weight="bold">$1,820,000.00</tspan> | Retenciones: <tspan font-family="monospace">-$310,000.00</tspan></text>
-            <text x="595" y="124" font-size="11" font-weight="bold" fill="#15803d">Saldo Líquido Disponible: $1,510,000.00 MXN</text>
-
-            <!-- Bloque 2: Formulario de la Orden de Pago -->
-            <rect x="25" y="160" width="890" height="245" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-
-            <!-- Fila 1: Tipo de Orden & Importe Neto -->
-            <text x="45" y="185" font-size="9.5" font-weight="bold" fill="#475569">TIPO DE ORDEN DE PAGO *</text>
-            <rect x="45" y="193" width="280" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="55" y="211" font-size="10" fill="#1e293b">NOMINA_NETA (Dispersión masiva personal) ▼</text>
-
-            <text x="345" y="185" font-size="9.5" font-weight="bold" fill="#475569">FORMA DE PAGO *</text>
-            <rect x="345" y="193" width="220" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="355" y="211" font-size="10" fill="#1e293b">Transferencia Electrónica (SPEI) ▼</text>
-
-            <text x="585" y="185" font-size="9.5" font-weight="bold" fill="#475569">IMPORTE NETO A PAGAR *</text>
-            <rect x="585" y="193" width="310" height="28" fill="#fdfbf7" stroke="#183125" stroke-width="1.5" rx="4"/>
-            <text x="880" y="212" font-size="13" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$1,510,000.00 MXN</text>
-
-            <!-- Fila 2: Cuentas Contables (Reclasificación) -->
-            <text x="45" y="245" font-size="9.5" font-weight="bold" fill="#475569">CUENTA PASIVO ORIGEN (PUENTE) *</text>
-            <rect x="45" y="253" width="415" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
-            <text x="55" y="271" font-size="9.5" font-family="monospace" fill="#334155">2.1.1.9.1000.0001 Otras Ctas por Pagar (Nómina x Liquidar)</text>
-
-            <text x="480" y="245" font-size="9.5" font-weight="bold" fill="#475569">CUENTA PASIVO DESTINO (EXIGIBLE) *</text>
-            <rect x="480" y="253" width="415" height="28" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
-            <text x="490" y="271" font-size="9.5" font-family="monospace" fill="#183125">2.1.1.1.1000.0001 Remuneraciones por Pagar a Corto Plazo</text>
-
-            <!-- Fila 3: Tesorería y Chequera -->
-            <text x="45" y="305" font-size="9.5" font-weight="bold" fill="#475569">CHEQUERA / CUENTA PAGADORA PJEV *</text>
-            <rect x="45" y="313" width="415" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="55" y="331" font-size="10" fill="#1e293b">🏦 BBVA Bancomer · Cta. 0118274920 (Fondo Nómina General) ▼</text>
-
-            <text x="480" y="305" font-size="9.5" font-weight="bold" fill="#475569">FECHA PROGRAMADA DE PAGO EN TESORERÍA *</text>
-            <rect x="480" y="313" width="180" height="28" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="490" y="331" font-size="10" fill="#1e293b">15/09/2026</text>
-
-            <!-- Fila 4: Cuenta Destino -->
-            <text x="45" y="365" font-size="9.5" font-weight="bold" fill="#475569">BENEFICIARIO / CUENTA DESTINO *</text>
-            <rect x="45" y="373" width="850" height="24" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="55" y="389" font-size="9.5" fill="#0284c7">Dispersión Masiva Nómina Quincenal PJEV · 1,428 Empleados Registrados (Layout TXT Interbancario)</text>
-
-            <!-- Footer Botones -->
-            <line x1="0" y1="430" x2="940" y2="430" stroke="#e2e8f0"/>
-            <text x="25" y="462" font-size="10" fill="#b45309">⚠️ La orden se creará en BORRADOR. Deberá turnarse a firmas mancomunadas para quedar autorizada.</text>
-            
-            <rect x="630" y="445" width="120" height="32" fill="#ffffff" stroke="#cbd5e1" rx="4"/>
-            <text x="690" y="465" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">Cancelar</text>
-
-            <rect x="765" y="445" width="150" height="32" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="840" y="465" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">💾 Crear Orden de Pago</text>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- WF3: MODAL COMPLEJO [FIRMAS Y AUTORIZACIÓN] -->
-    <div id="wf-wfop3" class="wf-panel">
-      <div class="wf-box">
-        <div class="wf-bar">
-          <span class="wf-bar-label">05.2.2 Modal Complejo · Modo [Firmas y Autorización Mancomunada]</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Circuito Mancomunado (3 Firmas) + Reclasificación Contable</span>
-        </div>
-        <div class="wf-svg-area">
-          <svg viewBox="0 0 960 550" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="960" height="550" fill="#ffffff" rx="8" stroke="#cbd5e1"/>
-            
-            <!-- Modal Header -->
-            <rect width="960" height="42" fill="#183125" rx="8"/>
-            <text x="25" y="26" font-size="12" font-weight="bold" fill="#ffffff">Orden de Pago: OP-2026-00042</text>
-            <rect x="250" y="12" width="95" height="18" fill="#fef3c7" rx="9"/>
-            <text x="297" y="25" font-size="8.5" font-weight="bold" fill="#b45309" text-anchor="middle">EN_FIRMAS (2/3)</text>
-            <text x="360" y="26" font-size="10" fill="#cbd5e1">| Nómina Quincenal | Importe Neto: $1,510,000.00</text>
-            <rect x="915" y="10" width="22" height="22" fill="#2d4a3b" rx="4"/>
-            <text x="926" y="25" font-size="11" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
-
-            <!-- Barra de Acciones de Workflow -->
-            <rect x="20" y="52" width="920" height="38" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <rect x="30" y="58" width="130" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
-            <text x="95" y="75" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">📜 Historial Trámite</text>
-
-            <rect x="170" y="58" width="130" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
-            <text x="235" y="75" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle">👁 Ver Afectación</text>
-
-            <rect x="310" y="58" width="130" height="26" fill="#ffffff" stroke="#fca5a5" rx="4" cursor="pointer"/>
-            <text x="375" y="75" font-size="10" font-weight="bold" fill="#991b1b" text-anchor="middle">↩ Regresar a CxP</text>
-
-            <rect x="745" y="58" width="185" height="26" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="837" y="75" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="middle">✍️ Rubricar Firma Final (DGA) ➔</text>
-
-            <!-- Card Resumen de la Orden -->
-            <rect x="20" y="100" width="920" height="85" fill="#fdfbf7" stroke="#8c6e3d" stroke-width="1.5" rx="6"/>
-            <text x="35" y="122" font-size="10" font-weight="bold" fill="#8c6e3d">RESUMEN DE LA ORDEN DE PAGO</text>
-            <text x="35" y="142" font-size="9.5" fill="#1e293b">Afectación Origen: <tspan font-family="monospace" font-weight="bold">AG-2026-00138</tspan> | Concepto: <tspan font-weight="bold">Nómina 1ra Quincena Agosto 2026</tspan></text>
-            <text x="35" y="162" font-size="9.5" fill="#1e293b">Cuenta Pagadora: <tspan font-weight="bold">BBVA Bancomer Cta. 0118274920</tspan> | Fecha Programada: <tspan font-weight="bold">15/09/2026</tspan></text>
-            
-            <text x="915" y="132" font-size="10" fill="#64748b" text-anchor="end">Importe Neto Exigible:</text>
-            <text x="915" y="158" font-size="18" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$1,510,000.00 MXN</text>
-
-            <!-- CIRCUITO MANCOMUNADO DE FIRMAS ELECTRÓNICAS (3 FIRMANTES) -->
-            <rect x="20" y="198" width="920" height="150" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            <rect x="21" y="199" width="918" height="26" fill="#f8fafc" rx="6"/>
-            <text x="35" y="216" font-size="11" font-weight="bold" fill="#183125">Circuito Mancomunado de Firmas Electrónicas (LGCG Art. 43 / DTE-008)</text>
-
-            <!-- Firma 1: Jefe de Tesorería -->
-            <rect x="35" y="235" width="280" height="95" fill="#f0fdf4" stroke="#86efac" rx="6"/>
-            <text x="45" y="255" font-size="10" font-weight="bold" fill="#166534">1. Jefe del Depto. de Tesorería</text>
-            <text x="45" y="272" font-size="9" fill="#15803d">Lic. Roberto Mendoza Morales</text>
-            <text x="45" y="288" font-size="8" font-family="monospace" fill="#64748b">Firma: 9A4F-88BC-1102-ACDE... ✓</text>
-            <text x="45" y="304" font-size="8" fill="#15803d">Firmado: 02/09/2026 11:20 hrs</text>
-            <rect x="235" y="300" width="70" height="18" fill="#dcfce7" rx="3"/>
-            <text x="270" y="312" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">VALIDADA ✓</text>
-
-            <!-- Firma 2: Subdirector de Recursos Financieros -->
-            <rect x="340" y="235" width="280" height="95" fill="#f0fdf4" stroke="#86efac" rx="6"/>
-            <text x="350" y="255" font-size="10" font-weight="bold" fill="#166534">2. Subdirector de Recursos Financieros</text>
-            <text x="350" y="272" font-size="9" fill="#15803d">C.P. Fernando Salgado Ruiz</text>
-            <text x="350" y="288" font-size="8" font-family="monospace" fill="#64748b">Firma: 33BA-7791-0024-DF10... ✓</text>
-            <text x="350" y="304" font-size="8" fill="#15803d">Firmado: 02/09/2026 12:05 hrs</text>
-            <rect x="540" y="300" width="70" height="18" fill="#dcfce7" rx="3"/>
-            <text x="575" y="312" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">VALIDADA ✓</text>
-
-            <!-- Firma 3: Director General de Administración (Pendiente) -->
-            <rect x="645" y="235" width="280" height="95" fill="#fffbeb" stroke="#fcd34d" stroke-dasharray="3,3" rx="6"/>
-            <text x="655" y="255" font-size="10" font-weight="bold" fill="#92400e">3. Director General de Administración (DGA)</text>
-            <text x="655" y="272" font-size="9" fill="#b45309">Mtro. Alejandro Vázquez Ortiz</text>
-            <text x="655" y="288" font-size="8" fill="#92400e">Esperando rúbrica electrónica final...</text>
-            <rect x="830" y="300" width="85" height="20" fill="#183125" rx="3" cursor="pointer"/>
-            <text x="872" y="314" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">✍️ FIRMAR</text>
-
-            <!-- Panel Inferior: Póliza de Reclasificación (DI) -->
-            <rect x="20" y="360" width="920" height="160" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            <rect x="21" y="361" width="918" height="26" fill="#f8fafc" rx="6"/>
-            <text x="35" y="378" font-size="11" font-weight="bold" fill="#183125">Asiento de Reclasificación de Pasivo (Momento de Autorización de la OP)</text>
-
-            <rect x="30" y="395" width="900" height="20" fill="#f1f5f9"/>
-            <text x="40" y="408" font-size="8.5" font-weight="bold" fill="#475569">CUENTA</text>
-            <text x="160" y="408" font-size="8.5" font-weight="bold" fill="#475569">DESCRIPCIÓN DE LA CUENTA</text>
-            <text x="600" y="408" font-size="8.5" font-weight="bold" fill="#475569">NATURALEZA</text>
-            <text x="750" y="408" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="end">DEBE ($)</text>
-            <text x="890" y="408" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="end">HABER ($)</text>
-
-            <text x="40" y="432" font-size="9" font-family="monospace" fill="#0284c7">2.1.1.9.1000.0001</text>
-            <text x="160" y="432" font-size="9" fill="#1e293b">Otras Cuentas por Pagar (Nómina por Liquidar / Puente)</text>
-            <text x="600" y="432" font-size="8.5" fill="#64748b">Cancelación Parcial del Pasivo Concentrador</text>
-            <text x="750" y="432" font-size="9.5" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$1,510,000.00</text>
-            <text x="890" y="432" font-size="9" text-anchor="end">-</text>
-
-            <text x="40" y="456" font-size="9" font-family="monospace" fill="#15803d">2.1.1.1.1000.0001</text>
-            <text x="160" y="456" font-size="9" font-weight="bold" fill="#1e293b">Remuneraciones / Servicios Personales por Pagar a Corto Plazo</text>
-            <text x="600" y="456" font-size="8.5" fill="#15803d">Reconocimiento de la Obligación Líquida Exigible</text>
-            <text x="750" y="456" font-size="9" text-anchor="end">-</text>
-            <text x="890" y="456" font-size="9.5" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$1,510,000.00</text>
-
-            <rect x="30" y="475" width="900" height="26" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <text x="40" y="492" font-size="9.5" font-weight="bold" fill="#183125">SUMAS IGUALES (PÓLIZA DI CUADRADA):</text>
-            <text x="750" y="492" font-size="10" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$1,510,000.00</text>
-            <text x="890" y="492" font-size="10" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$1,510,000.00</text>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- WF4: MODAL COMPLEJO [CONSULTA / PAGADA POR TESORERÍA] -->
-    <div id="wf-wfop4" class="wf-panel">
-      <div class="wf-box">
-        <div class="wf-bar">
-          <span class="wf-bar-label">05.2.2 Modal Complejo · Modo [Consulta] · Orden de Pago PAGADA por Tesorería</span>
-          <span style="font-size:10px; color:#15803d; font-weight:bold;">Solo Lectura + Referencia a Póliza de Egreso Bancario (06.2.1)</span>
-        </div>
-        <div class="wf-svg-area">
-          <svg viewBox="0 0 940 480" xmlns="http://www.w3.org/2000/svg" style="max-width:100%; height:auto; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-            <rect width="940" height="480" fill="#ffffff" rx="8" stroke="#cbd5e1"/>
-            
-            <!-- Modal Header -->
-            <rect width="940" height="42" fill="#183125" rx="8"/>
-            <text x="25" y="26" font-size="12" font-weight="bold" fill="#ffffff">Orden de Pago: OP-2026-00040 (Consulta)</text>
-            <rect x="310" y="12" width="75" height="18" fill="#dcfce7" rx="9"/>
-            <text x="347" y="25" font-size="8.5" font-weight="bold" fill="#15803d" text-anchor="middle">PAGADA</text>
-            <rect x="395" y="12" width="145" height="18" fill="#8c6e3d" rx="4"/>
-            <text x="467" y="24" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EGRESO: PE-2026-00085</text>
-            <rect x="895" y="10" width="22" height="22" fill="#2d4a3b" rx="4"/>
-            <text x="906" y="25" font-size="11" fill="#ffffff" text-anchor="middle" cursor="pointer">✕</text>
-
-            <!-- Barra de Acciones Consulta -->
-            <rect x="20" y="52" width="900" height="36" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <text x="35" y="74" font-size="10" font-weight="bold" fill="#15803d">✓ Dispersión bancaria ejecutada exitosamente por Tesorería el 05/09/2026.</text>
-            <rect x="680" y="57" width="120" height="26" fill="#ffffff" stroke="#cbd5e1" rx="4" cursor="pointer"/>
-            <text x="740" y="74" font-size="9.5" font-weight="bold" fill="#475569" text-anchor="middle">🖨 Imprimir OP</text>
-            <rect x="810" y="57" width="100" height="26" fill="#183125" rx="4" cursor="pointer"/>
-            <text x="860" y="74" font-size="9.5" font-weight="bold" fill="#ffffff" text-anchor="middle">Ver Póliza ➔</text>
-
-            <!-- Bloque Datos de Liquidación Bancaria -->
-            <rect x="20" y="100" width="900" height="140" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            <rect x="21" y="101" width="898" height="26" fill="#f8fafc" rx="6"/>
-            <text x="35" y="118" font-size="11" font-weight="bold" fill="#183125">Datos de la Dispersión Bancaria y Comprobante SPEI (Tesorería)</text>
-
-            <text x="40" y="150" font-size="9.5" font-weight="bold" fill="#475569">BENEFICIARIO:</text>
-            <text x="140" y="150" font-size="10" font-weight="bold" fill="#1e293b">PAPELERÍA DEL GOLFO S.A. DE C.V. (RFC: PGO890101XYZ)</text>
-            
-            <text x="560" y="150" font-size="9.5" font-weight="bold" fill="#475569">IMPORTE PAGADO:</text>
-            <text x="680" y="150" font-size="13" font-family="monospace" font-weight="bold" fill="#15803d">$145,800.00 MXN</text>
-
-            <text x="40" y="180" font-size="9.5" font-weight="bold" fill="#475569">CUENTA EMISORA:</text>
-            <text x="140" y="180" font-size="9.5" fill="#1e293b">Banamex Cta. 482910 · Gasto Corriente Institucional</text>
-
-            <text x="560" y="180" font-size="9.5" font-weight="bold" fill="#475569">CUENTA DESTINO:</text>
-            <text x="680" y="180" font-size="9.5" font-family="monospace" fill="#0284c7">002840011827492019 (BBVA)</text>
-
-            <text x="40" y="210" font-size="9.5" font-weight="bold" fill="#475569">CLAVE RASTREO SPEI:</text>
-            <text x="160" y="210" font-size="9.5" font-family="monospace" fill="#183125">202609050118274819203847192837</text>
-
-            <text x="560" y="210" font-size="9.5" font-weight="bold" fill="#475569">FECHA DE OPERACIÓN:</text>
-            <text x="690" y="210" font-size="9.5" fill="#1e293b">05/09/2026 13:42:15 hrs</text>
-
-            <!-- Bloque Contabilización del Pagado (Matriz CONAC A.2) -->
-            <rect x="20" y="255" width="900" height="200" fill="#ffffff" stroke="#cbd5e1" rx="6"/>
-            <rect x="21" y="256" width="898" height="26" fill="#183125" rx="6"/>
-            <text x="35" y="273" font-size="11" font-weight="bold" fill="#ffffff">Asiento de Liquidación y Pagado (Matriz CONAC A.2 Detonada en Tesorería)</text>
-
-            <rect x="30" y="292" width="880" height="20" fill="#f1f5f9"/>
-            <text x="40" y="305" font-size="8.5" font-weight="bold" fill="#475569">CUENTA</text>
-            <text x="150" y="305" font-size="8.5" font-weight="bold" fill="#475569">DESCRIPCIÓN</text>
-            <text x="550" y="305" font-size="8.5" font-weight="bold" fill="#475569">NATURALEZA</text>
-            <text x="730" y="305" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="end">DEBE ($)</text>
-            <text x="880" y="305" font-size="8.5" font-weight="bold" fill="#475569" text-anchor="end">HABER ($)</text>
-
-            <text x="40" y="328" font-size="9" font-family="monospace" fill="#0284c7">2.1.1.2.0001</text>
-            <text x="150" y="328" font-size="9" font-weight="bold" fill="#1e293b">Proveedores por Pagar a Corto Plazo</text>
-            <text x="550" y="328" font-size="8.5" fill="#64748b">Cancelación de Pasivo Exigible</text>
-            <text x="730" y="328" font-size="9.5" font-family="monospace" font-weight="bold" fill="#1e293b" text-anchor="end">$145,800.00</text>
-            <text x="880" y="328" font-size="9" text-anchor="end">-</text>
-
-            <text x="40" y="352" font-size="9" font-family="monospace" fill="#0284c7">1.1.1.2.0101</text>
-            <text x="150" y="352" font-size="9" fill="#1e293b">Bancos / Banamex Cta. 482910</text>
-            <text x="550" y="352" font-size="8.5" fill="#64748b">Salida Efectiva de Recursos</text>
-            <text x="730" y="352" font-size="9" text-anchor="end">-</text>
-            <text x="880" y="352" font-size="9.5" font-family="monospace" font-weight="bold" fill="#0284c7" text-anchor="end">$145,800.00</text>
-
-            <!-- Presupuestario Pagado -->
-            <line x1="30" y1="366" x2="890" y2="366" stroke="#cbd5e1" stroke-dasharray="2,2"/>
-            <text x="40" y="386" font-size="9" font-family="monospace" fill="#15803d">8.2.5.0.0000</text>
-            <text x="150" y="386" font-size="9" fill="#1e293b">Presupuesto de Egresos Devengado</text>
-            <text x="550" y="386" font-size="8.5" fill="#15803d">Amortización del Devengo</text>
-            <text x="730" y="386" font-size="9.5" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$145,800.00</text>
-            <text x="880" y="386" font-size="9" text-anchor="end">-</text>
-
-            <text x="40" y="408" font-size="9" font-family="monospace" fill="#15803d">8.2.7.0.0000</text>
-            <text x="150" y="408" font-size="9" font-weight="bold" fill="#1e293b">Presupuesto de Egresos Pagado</text>
-            <text x="550" y="408" font-size="8.5" fill="#15803d">Momento Presupuestario Final</text>
-            <text x="730" y="408" font-size="9" text-anchor="end">-</text>
-            <text x="880" y="408" font-size="9.5" font-family="monospace" font-weight="bold" fill="#15803d" text-anchor="end">$145,800.00</text>
-
-            <!-- Sumas Iguales -->
-            <rect x="30" y="422" width="880" height="24" fill="#f8fafc" stroke="#cbd5e1" rx="4"/>
-            <text x="40" y="438" font-size="9" font-weight="bold" fill="#183125">SUMAS IGUALES PÓLIZA DE EGRESO PE-2026-00085:</text>
-            <text x="730" y="438" font-size="9.5" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$291,600.00</text>
-            <text x="880" y="438" font-size="9.5" font-family="monospace" font-weight="bold" fill="#183125" text-anchor="end">$291,600.00</text>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- 11. INTEGRACIONES Y DEPENDENCIAS -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">11</span> Integraciones y Dependencias Inter-módulos</div>
-    <table class="props-table">
-      <thead><tr><th>Módulo / Subsistema</th><th>Relación Técnica</th><th>Efecto de Integración</th></tr></thead>
+    </table></div>
+    <h3><code>cxp.fn_leer_afectacion_historial</code></h3>
+    <pre class="sql"><code>cxp.fn_leer_afectacion_historial(p_ag_id uuid)</code></pre>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Entrada y acción</th><th scope="col">Salida</th></tr></thead>
       <tbody>
-        <tr>
-          <td><strong>05.2.1 Afectación del Gasto</strong></td>
-          <td>Origen Mandatorio del Devengo</td>
-          <td>Provee la obligación jurídica líquida en estatus <code>APROBADA</code> y la póliza de devengo <code>f_poliza_devengo_id</code>.</td>
-        </tr>
-        <tr>
-          <td><strong>06.2.1 Bandeja de Pagos (Tesorería)</strong></td>
-          <td>Destino Operativo de la Orden</td>
-          <td>Al autorizarse la OP, se inserta automáticamente en la bandeja de pagos para la generación del layout SPEI bancario.</td>
-        </tr>
-        <tr>
-          <td><strong>01.1.4 Cuentas Bancarias / Chequeras</strong></td>
-          <td>Catálogo de Fondos Pagadores</td>
-          <td>Valida la existencia de la cuenta pagadora institucional (<code>f_chequera_id</code>) y su estatus activo en Tesorería.</td>
-        </tr>
-        <tr>
-          <td><strong>03.1.2 Matriz de Conversión CONAC</strong></td>
-          <td>Regla Contable del Egreso</td>
-          <td>Controla que la orden de pago no toque el presupuesto y que el pagado (Matriz A.2) se detone al liquidar en bancos.</td>
-        </tr>
+        <tr><td>UUID de la solicitud.</td><td>JSON con las transiciones activas ordenadas por fecha real.</td></tr>
       </tbody>
-    </table>
-  </div>
-
-  <!-- 12. CASOS DE PRUEBA (QA) -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">12</span> Casos de Prueba (Validación QA)</div>
-    <table class="props-table">
-      <thead><tr><th>ID</th><th>Escenario de Prueba</th><th>Acción / Entrada</th><th>Resultado Esperado</th></tr></thead>
+    </table></div>
+    </div>
+    <div class="sp-panel" id="sp-abc" hidden>
+    <h3><code>cxp.fn_abc_afectacion_encabezado</code></h3>
+    <pre class="sql"><code>cxp.fn_abc_afectacion_encabezado(p_accion integer, p_ejercicio_fiscal integer, p_ag_id uuid DEFAULT NULL::uuid, p_tipo_pago integer DEFAULT NULL::integer, p_afecta_presupuesto boolean DEFAULT true, p_f_centro_costo_id integer DEFAULT NULL::integer, p_concepto character varying DEFAULT NULL::character varying, p_fecha_elaboracion date DEFAULT NULL::date, p_f_proveedor_id integer DEFAULT NULL::integer, p_f_empleado_id integer DEFAULT NULL::integer, p_f_ua_id integer DEFAULT NULL::integer, p_f_tercero_id integer DEFAULT NULL::integer, p_f_tercero_inst_id integer DEFAULT NULL::integer, p_referencia character varying DEFAULT NULL::character varying, p_usuario character varying DEFAULT 'SISTEMA'::character varying, p_tipo_operacion character varying DEFAULT NULL::character varying, p_f_pedido_id uuid DEFAULT NULL::uuid, p_f_comprobacion_id uuid DEFAULT NULL::uuid)</code></pre>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Entrada y acción</th><th scope="col">Salida</th></tr></thead>
       <tbody>
-        <tr>
-          <td><strong>CP-OP-01</strong></td>
-          <td>Intento de emitir OP sobre afectación no aprobada</td>
-          <td>Trámite en <code>ENVIADA</code> o <code>BORRADOR</code>.</td>
-          <td>El SP <code>fn_abc_orden_pago</code> rechaza la acción con error: <em>"Solo se pueden generar órdenes sobre afectaciones APROBADAS"</em>.</td>
-        </tr>
-        <tr>
-          <td><strong>CP-OP-02</strong></td>
-          <td>Exceso de saldo líquido disponible</td>
-          <td>Afectación neta de \$10,000 con OP previa de \$8,000. Se intenta crear OP por \$3,000.</td>
-          <td>Rechazado con error: el monto supera el saldo disponible (\$2,000).</td>
-        </tr>
-        <tr>
-          <td><strong>CP-OP-03</strong></td>
-          <td>Reclasificación contable de Nómina Neta</td>
-          <td>Autorización de OP tipo <code>NOMINA_NETA</code> al completar las 3 firmas.</td>
-          <td>Transita a <code>AUTORIZADA</code>, genera póliza <code>DI</code> (cargo a <code>2.1.1.9</code> y abono a <code>2.1.1.1</code>) y viaja a Tesorería.</td>
-        </tr>
-        <tr>
-          <td><strong>CP-OP-04</strong></td>
-          <td>Cancelación de Orden de Pago no cobrada</td>
-          <td>Acción <code>CANCELAR</code> sobre OP en estado <code>AUTORIZADA</code>.</td>
-          <td>Transita a <code>CANCELADA</code> y el saldo se reintegra en tiempo real al disponible de la Afectación de Gasto.</td>
-        </tr>
-        <tr>
-          <td><strong>CP-OP-05</strong></td>
-          <td>Bloqueo de cancelación sobre orden PAGADA</td>
-          <td>Acción <code>CANCELAR</code> sobre OP en estado <code>PAGADA</code>.</td>
-          <td>Bloqueo estricto: no se permite cancelar órdenes cuyos fondos ya salieron de bancos.</td>
-        </tr>
+        <tr><td>1 alta y 2 edición en la API. Se usa la sobrecarga con pedido y comprobación UUID. El usuario proviene de sesión.</td><td>JSONB con identidad, folio y estado. NestJS guarda el importe y la cuenta en la misma transacción y agrega acciones.</td></tr>
       </tbody>
-    </table>
-  </div>
-
-  <!-- 13. HISTORIAL DE VERSIONES -->
-  <div class="doc-section">
-    <div class="section-title"><span class="section-num">13</span> Historial de Versiones</div>
-    <table class="props-table">
-      <thead><tr><th>Versión</th><th>Fecha</th><th>Responsable</th><th>Cambios Realizados</th></tr></thead>
+    </table></div>
+    </div>
+    <div class="sp-panel" id="sp-workflow" hidden>
+    <h3><code>cxp.sp_cxpafectacionesgasto_workflow_v2</code></h3>
+    <pre class="sql"><code>cxp.sp_cxpafectacionesgasto_workflow_v2(p_id character varying, p_accion character varying, p_observacion character varying DEFAULT NULL::character varying, p_fecha_envio date DEFAULT NULL::date, p_idusuario character varying DEFAULT 'SISTEMA'::character varying)</code></pre>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Entrada y acción</th><th scope="col">Salida</th></tr></thead>
       <tbody>
-        <tr>
-          <td><code>2.0.0</code></td>
-          <td>2026-11-08</td>
-          <td>Arquitectura SIAF-PJEV / Dix Consultoría</td>
-          <td>Renombrado institucional a <strong>05.2.2 Solicitud de Pagos No Presupuestales</strong> bajo el módulo <strong>05 · Tesorería</strong>. Incorporación integral del <strong>Grupo 4 (<code>4. No afecta presupuesto</code>)</strong> y sus 4 subprocedimientos (<code>401 NOMINA_NETA_DISPERSION</code> con Matriz <code>22 A.0</code>, y <code>402 ENTERO_RETENCIONES</code>, <code>403 PENSIONES_Y_GARANTIAS</code>, <code>404 APERTURA_FONDO_ANTICIPO</code> con Matriz <code>17 A3_EGRESO_NO_PRESUPUESTARIO</code>), llave compuesta de 5 niveles y articulación directa hacia <code>06.2.1 Registro de Pagos</code>.</td>
-        </tr>
-        <tr>
-          <td><code>1.0.0</code></td>
-          <td>2026-09-02</td>
-          <td>Equipo SIAF-PJEV / Dix Consultoría</td>
-          <td>Liberación canónica inicial bajo estándar DOC-08. Especificación completa de la relación 1 a 1 (proveedores) y 1 a N (nómina concentrada con cuenta puente <code>2.1.1.9</code> a <code>2.1.1.1</code>), DDL de <code>cxp.ordenes_pago</code>, 4 Stored Procedures con <code>SECURITY DEFINER</code>, API NestJS/Swagger, reglas de negocio y 4 wireframes SVG nativos interactivos.</td>
-        </tr>
+        <tr><td>UUID como texto, acción, observación, fecha operativa y usuario.</td><td>JSON con código, mensaje, identidad, ejercicio, acción y estado. En aprobación del Grupo 4, poliza_id es NULL.</td></tr>
       </tbody>
-    </table>
+    </table></div>
+    <h3><code>cxp.fn_generar_poliza_afectacion</code></h3>
+    <pre class="sql"><code>cxp.fn_generar_poliza_afectacion(p_ag_id uuid, p_usuario character varying DEFAULT 'SISTEMA'::character varying)</code></pre>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Entrada y acción</th><th scope="col">Salida</th></tr></thead>
+      <tbody>
+        <tr><td>UUID y usuario.</td><td>En el Grupo 4 devuelve <code>cod_resultado = 0</code> y <code>data</code> con <code>poliza_cxp_id = NULL</code> y <code>tipo = PE_PENDIENTE_DISPERSION</code>. El resultado indica que el egreso sigue pendiente.</td></tr>
+      </tbody>
+    </table></div>
+    </div>
+    <div class="sp-panel" id="sp-trigger" hidden>
+    <h3><code>cxp.fn_validar_procedimiento_afectacion</code></h3>
+    <pre class="sql"><code>cxp.fn_validar_procedimiento_afectacion()</code></pre>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Entrada y acción</th><th scope="col">Salida</th></tr></thead>
+      <tbody>
+        <tr><td>BEFORE INSERT o UPDATE OF tipo_operacion en el encabezado.</td><td>Resuelve el procedimiento activo y normaliza grupo, códigos, tipo de pago y afecta_presupuesto.</td></tr>
+      </tbody>
+    </table></div>
+    </div>
+    <p>En <code>ENVIAR</code>, el workflow llama a <code>cxp.fn_validar_checklist_afectacion(uuid, integer)</code>. El resultado de negocio usa <code>cod_resultado</code>, <code>msg_resultado</code> y <code>data</code> según la operación. La aprobación registra el estado y la transición en la misma operación.</p>
+  </section>
+
+  <section class="doc-section" id="rest" aria-labelledby="rest-titulo">
+    <h2 class="section-title" id="rest-titulo"><span class="section-num">6</span> Servicios REST</h2>
+    <p>Ruta base instalada <code>/api/cxp/afectaciones</code>. El listado de 05.2.2 usa <code>ambito=NO_PRESUPUESTAL</code>. Las operaciones por UUID se resuelven con el ejercicio de sesión donde lo usa el servicio compartido.</p>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Método</th><th scope="col">Ruta</th><th scope="col">Entrada</th><th scope="col">Resultado</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method get">GET</span></td><td><code>/</code></td><td><code>ambito=NO_PRESUPUESTAL</code>, ejercicio, estatus, fechaIni, fechaFin, page y limit.</td><td><code>data.items</code>, <code>rowcount</code> de la página filtrada y acciones efectivas.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/catalogos/procedimientos</code></td><td><code>ambito=NO_PRESUPUESTAL</code>.</td><td>Los cuatro procedimientos activos del Grupo 4 y el tipo de beneficiario.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/catalogos/beneficiarios</code></td><td><code>procedimiento</code>, <code>q</code> y <code>limit</code>.</td><td>Beneficiarios del catálogo correspondiente.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/catalogos/cuentas-pasivo</code></td><td><code>procedimiento</code>.</td><td>Cuentas de pasivo u origen para la selección.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/:id</code></td><td>UUID v4.</td><td>Encabezado y acciones por registro.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/</code></td><td><code>GuardarAfectacionEncabezadoDto</code>.</td><td>Crea la solicitud y asigna folio.</td></tr>
+        <tr><td><span class="method put">PUT</span></td><td><code>/:id</code></td><td>UUID v4 y el mismo DTO.</td><td>Actualiza el encabezado en un estado editable.</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/:id/workflow</code></td><td><code>accion</code>, <code>observacion</code>, <code>fechaEnvio</code>.</td><td>Estado, acciones y resultado de la transición.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/:id/previsualizacion-poliza</code></td><td>UUID v4.</td><td>Proyección de cargo y abono en modo de consulta.</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/:id/historial</code></td><td>UUID v4.</td><td>Historial de transiciones.</td></tr>
+      </tbody>
+    </table></div>
+    <p>El formulario envía <code>tipoOperacion</code>, <code>organizacionId</code>, <code>beneficiarioId</code>, <code>cuentaContableAbono</code>, <code>importeTotalPago</code>, <code>concepto</code>, <code>fechaElaboracion</code> y <code>referencia</code> opcional. La lista de organizaciones se consulta en <code>/api/configuracion/listas/organizaciones</code>. La gestión de adjuntos se realiza mediante el expediente digital compartido.</p>
+  </section>
+
+  <section class="doc-section" id="acciones" aria-labelledby="acciones-titulo">
+    <h2 class="section-title" id="acciones-titulo"><span class="section-num">7</span> Acciones del módulo</h2>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Estado</th><th scope="col">Acción</th><th scope="col">Resultado</th></tr></thead>
+      <tbody>
+        <tr><td>Sin registro</td><td>Crear</td><td>BORRADOR con folio. Se habilita el expediente después de guardar, sujeto al permiso.</td></tr>
+        <tr><td>BORRADOR, REGRESADA o RECHAZADA</td><td>Editar o adjuntar</td><td>Conserva el estado. El backend permite corregir RECHAZADA. El texto del modal que la describe como definitiva queda desalineado con el workflow.</td></tr>
+        <tr><td>BORRADOR, REGRESADA o RECHAZADA</td><td>ENVIAR</td><td>ENVIADA si el importe es positivo y cumple el checklist. La API admite el alias ENVIAR_REVISION.</td></tr>
+        <tr><td>ENVIADA</td><td>APROBAR</td><td>APROBADA. Deja el trámite en condiciones de pasar a la etapa de pago.</td></tr>
+        <tr><td>ENVIADA</td><td>REGRESAR o RECHAZAR</td><td>REGRESADA o RECHAZADA.</td></tr>
+        <tr><td>BORRADOR, REGRESADA, RECHAZADA o ENVIADA</td><td>CANCELAR</td><td>CANCELADA en estatus_workflow. La vigencia estatus_registro se conserva.</td></tr>
+        <tr><td>APROBADA o CANCELADA</td><td>Consultar</td><td>La pantalla permite consultar el trámite, la previsualización y el historial según permisos.</td></tr>
+      </tbody>
+    </table></div>
+    <p>El modal de transición solicita observación y fecha operativa. El formulario exige la observación. El DTO del backend la admite como opcional, con un máximo de 500 caracteres. El botón y el servicio aplican los permisos efectivos. <code>SiafToast</code> muestra advertencias de captura, errores de servicio y confirmaciones.</p>
+  </section>
+
+  <section class="doc-section" id="interfaz" aria-labelledby="interfaz-titulo">
+    <h2 class="section-title" id="interfaz-titulo"><span class="section-num">8</span> Diseño de interfaces</h2>
+    <p>Wireframes de referencia de la bandeja, el formulario, el expediente y la proyección contable. Los folios e importes son ilustrativos. La pantalla usa <code>SiafDataGrid</code>, <code>SiafModal</code>, <code>SiafButton</code> y <code>SiafExpedienteDigitalMin</code>.</p>
+    <div class="tabs" role="group" aria-label="Vistas del módulo">
+      <button type="button" aria-controls="wf-bandeja" aria-pressed="true" onclick="showWF(this)">Bandeja</button>
+      <button type="button" aria-controls="wf-captura" aria-pressed="false" onclick="showWF(this)">Captura</button>
+      <button type="button" aria-controls="wf-expediente" aria-pressed="false" onclick="showWF(this)">Expediente y envío</button>
+      <button type="button" aria-controls="wf-consulta" aria-pressed="false" onclick="showWF(this)">Consulta y proyección</button>
+    </div>
+    <div class="wf-panel" id="wf-bandeja"><svg viewBox="0 0 820 268" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bandeja del Grupo 4 con filtros y una solicitud en borrador"><rect width="820" height="268" fill="#f5f2e9"/><g font-family="system-ui, sans-serif" font-size="14" fill="#172b22">
+
+    <text x="24" y="36" font-size="22" font-weight="700">Solicitud de pagos no presupuestales</text><text x="24" y="60" fill="#52665a">Tesorería · Grupo 4</text>
+    <rect x="652" y="23" width="144" height="34" rx="6" fill="#1b3a2d" stroke="#1b3a2d"/><text x="724" y="45" text-anchor="middle" fill="#fff" font-weight="700">Nueva solicitud</text>
+    <text x="24" y="99" font-size="12" font-weight="700">Ejercicio</text><rect x="24" y="107" width="130" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="34" y="129">2026 ▾</text><text x="168" y="99" font-size="12" font-weight="700">Desde</text><rect x="168" y="107" width="182" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="178" y="129">01/11/2026</text><text x="364" y="99" font-size="12" font-weight="700">Hasta</text><rect x="364" y="107" width="182" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="374" y="129">30/11/2026</text><text x="560" y="99" font-size="12" font-weight="700">Estado</text><rect x="560" y="107" width="236" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="570" y="129">Todos ▾</text>
+    <rect x="24" y="162" width="772" height="81" rx="6" fill="#fff" stroke="#cfc5b0"/><rect x="24" y="162" width="772" height="36" rx="6" fill="#1b3a2d" stroke="#1b3a2d"/>
+    <text x="42" y="186" fill="#fff" font-weight="700">Folio</text>
+    <text x="188" y="186" fill="#fff" font-weight="700">Procedimiento</text>
+    <text x="430" y="186" fill="#fff" font-weight="700">Importe</text>
+    <text x="565" y="186" fill="#fff" font-weight="700">Estado</text>
+    <text x="710" y="186" fill="#fff" font-weight="700">Acción</text>
+    <text x="42" y="225">E-000042</text>
+    <text x="188" y="225">402 · Entero de retenciones</text>
+    <text x="430" y="225">$8,250.00</text>
+    <text x="565" y="225">Borrador</text>
+    <text x="710" y="225">Abrir</text>
+    </g></svg></div>
+    <div class="wf-panel" id="wf-captura" hidden><svg viewBox="0 0 820 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Formulario de una solicitud no presupuestal con cuenta de pasivo y beneficiario"><rect width="820" height="340" fill="#f5f2e9"/><g font-family="system-ui, sans-serif" font-size="14" fill="#172b22">
+
+    <text x="24" y="36" font-size="22" font-weight="700">Nueva solicitud</text><text x="24" y="60" fill="#52665a">402 · Entero de retenciones</text>
+    <text x="24" y="97" font-size="12" font-weight="700">Subprocedimiento</text><rect x="24" y="105" width="372" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="34" y="127">402 · Entero de retenciones ▾</text><text x="412" y="97" font-size="12" font-weight="700">Organización</text><rect x="412" y="105" width="384" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="422" y="127">Organización de ejemplo ▾</text>
+    <text x="24" y="155" font-size="12" font-weight="700">Beneficiario</text><rect x="24" y="163" width="372" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="34" y="185">Tercero institucional ▾</text><text x="412" y="155" font-size="12" font-weight="700">Cuenta de pasivo / origen</text><rect x="412" y="163" width="384" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="422" y="185">Cuenta de registro ▾</text>
+    <text x="24" y="213" font-size="12" font-weight="700">Fecha de elaboración</text><rect x="24" y="221" width="202" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="34" y="243">13/11/2026</text><text x="243" y="213" font-size="12" font-weight="700">Importe a pagar</text><rect x="243" y="221" width="190" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="253" y="243">$8,250.00</text><text x="450" y="213" font-size="12" font-weight="700">Concepto</text><rect x="450" y="221" width="346" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="460" y="243">Entero del periodo</text>
+    <text x="24" y="303" fill="#52665a">Guarde la solicitud para habilitar el expediente.</text><rect x="618" y="279" width="178" height="34" rx="6" fill="#1b3a2d" stroke="#1b3a2d"/><text x="707" y="301" text-anchor="middle" fill="#fff" font-weight="700">Guardar solicitud</text>
+    </g></svg></div>
+    <div class="wf-panel" id="wf-expediente" hidden><svg viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Expediente de entero de retenciones antes de confirmar el envío"><rect width="820" height="300" fill="#f5f2e9"/><g font-family="system-ui, sans-serif" font-size="14" fill="#172b22">
+
+    <text x="24" y="36" font-size="22" font-weight="700">E-000042 · Entero de retenciones</text><text x="24" y="60" fill="#52665a">BORRADOR · Documentación soporte</text>
+    <rect x="24" y="85" width="372" height="153" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="42" y="116" font-weight="700">Documentación soporte</text><text x="42" y="148">Solicitud de pago adjunta</text><text x="42" y="174" fill="#991b1b">Línea de captura pendiente</text>
+    <rect x="412" y="85" width="384" height="153" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="430" y="116" font-weight="700">Confirmar envío a revisión</text><text x="430" y="150" font-size="12" font-weight="700">Observación</text><rect x="430" y="158" width="348" height="34" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="440" y="180">Justificación de la acción</text><text x="430" y="216">Fecha operativa · 13/11/2026</text>
+    <text x="24" y="274" fill="#52665a">Al confirmar, el servidor verifica el importe y el checklist.</text><rect x="648" y="251" width="148" height="34" rx="6" fill="#1b3a2d" stroke="#1b3a2d"/><text x="722" y="273" text-anchor="middle" fill="#fff" font-weight="700">Confirmar envío</text>
+    </g></svg></div>
+    <div class="wf-panel" id="wf-consulta" hidden><svg viewBox="0 0 820 285" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Solicitud aprobada con previsualización de dos movimientos sin póliza registrada"><rect width="820" height="285" fill="#f5f2e9"/><g font-family="system-ui, sans-serif" font-size="14" fill="#172b22">
+
+    <text x="24" y="36" font-size="22" font-weight="700">E-000042 · Entero de retenciones</text><text x="24" y="60" fill="#52665a">APROBADA · Consulta e historial</text>
+    <rect x="598" y="24" width="198" height="34" rx="6" fill="#1b3a2d" stroke="#1b3a2d"/><text x="697" y="46" text-anchor="middle" fill="#fff" font-weight="700">Previsualizar póliza</text>
+    <rect x="24" y="91" width="772" height="129" rx="6" fill="#fff" stroke="#cfc5b0"/>
+    <text x="42" y="121" font-weight="700">Proyección contable · Solo consulta</text>
+    <text x="42" y="151">Cargo · Cuenta de pasivo seleccionada</text><text x="777" y="151" text-anchor="end">$8,250.00</text>
+    <text x="42" y="180">Abono · Bancos de referencia</text><text x="777" y="180" text-anchor="end">$8,250.00</text>
+    <text x="24" y="253" fill="#52665a">Póliza registrada: ninguna en 05.2.2 · El pago corresponde a Caja.</text>
+    </g></svg></div>
+    <p>La pantalla presenta los archivos adjuntos. La evaluación del checklist se realiza en el servidor al enviar. Si el servidor devuelve un error, el modal conserva el estado anterior y <code>useSiafToast()</code> muestra el motivo.</p>
+  </section>
+
+  <section class="doc-section" id="reglas" aria-labelledby="reglas-titulo">
+    <h2 class="section-title" id="reglas-titulo"><span class="section-num">9</span> Reglas de negocio críticas</h2>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Código</th><th scope="col">Regla</th><th scope="col">Consecuencia</th><th scope="col">Dónde se valida</th></tr></thead>
+      <tbody>
+        <tr><td><code>RN-NP-01</code></td><td>Clasificar la solicitud con un procedimiento del Grupo 4.</td><td>Se fija tipo_pago = 4 y afecta_presupuesto = false. El beneficiario debe pertenecer al catálogo aplicable.</td><td>Pantalla, NestJS y trigger del encabezado.</td></tr>
+        <tr><td><code>RN-NP-02</code></td><td>Registrar importe mayor a cero, con dos decimales en la captura, y cuenta de pasivo u origen.</td><td>El formulario selecciona la cuenta desde el catálogo. El guardado del Grupo 4 comprueba que se proporcione la cuenta. La revisión del servicio no encontró una validación de pertenencia de esa cuenta al catálogo filtrado durante el guardado.</td><td>Formulario, DTO, servicio y CHECK de importe en PostgreSQL.</td></tr>
+        <tr><td><code>RN-NP-03</code></td><td>Evaluar el expediente activo al enviar.</td><td>Un obligatorio pendiente o vencido bloquea la transición. Las dos condiciones configuradas en este grupo se reportan como alertas cuando falta el soporte.</td><td>Workflow SQL y validador de 05.1.1.</td></tr>
+        <tr><td><code>RN-NP-04</code></td><td>Aprobar una solicitud enviada con importe positivo y permiso efectivo.</td><td>Registra APROBADA y su transición. El resultado del Grupo 4 carece de póliza asociada.</td><td>NestJS y workflow SQL.</td></tr>
+        <tr><td><code>RN-NP-05</code></td><td>Conservar el historial al regresar, rechazar, reenviar o cancelar.</td><td>El rechazo permite corregir y reenviar según autorización. La cancelación modifica estatus_workflow.</td><td>Autorización, SQL y bitácora.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Requisitos activos del Grupo 4</h3>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Procedimiento</th><th scope="col">Obligatorios</th><th scope="col">Condicionales</th></tr></thead>
+      <tbody>
+        <tr><td>401</td><td><code>DOC-SOL-PAG</code></td><td>—</td></tr>
+        <tr><td>402</td><td><code>DOC-SOL-PAG</code>, <code>DOC-LIN-SAT</code></td><td>—</td></tr>
+        <tr><td>403</td><td><code>DOC-SOL-PAG</code></td><td><code>DOC-CON-TRA</code> (<code>OFICIO_JUZGADO_O_GARANTIA</code>)</td></tr>
+        <tr><td>404</td><td><code>DOC-SOL-PAG</code></td><td><code>DOC-OFI-COM</code> (<code>ANTICIPO_COMISION_OFICIAL</code>)</td></tr>
+      </tbody>
+    </table></div>
+    <p>La lista se verificó el 13 de noviembre de 2026. Las reglas activas se mantienen en <a href="05.1.1-requisitos-documentales.html#datos">05.1.1 Requisitos documentales</a>.</p>
+    <h3>Casos de verificación del diseño funcional</h3>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Escenario</th><th scope="col">Resultado esperado</th></tr></thead>
+      <tbody>
+        <tr><td>402 sin DOC-LIN-SAT</td><td>ENVIAR rechaza la solicitud con el motivo del faltante.</td></tr>
+        <tr><td>Importe cero o cuenta vacía</td><td>Se impide el guardado conforme a la validación aplicable.</td></tr>
+        <tr><td>APROBAR sobre ENVIADA con permiso</td><td>Registra APROBADA e historial, con poliza_id NULL.</td></tr>
+        <tr><td>Consulta de previsualización</td><td>Presenta el cargo y abono estimados y conserva el estado de la solicitud.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="doc-section" id="integraciones" aria-labelledby="integraciones-titulo">
+    <h2 class="section-title" id="integraciones-titulo"><span class="section-num">10</span> Flujos de integración</h2>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Módulo</th><th scope="col">Intercambio</th></tr></thead>
+      <tbody>
+        <tr><td><a href="05.2.1-afectacion-gastos.html">05.2.1 Afectación del Gasto</a></td><td>Comparte encabezado, autorizaciones y workflow. La nómina bruta y otros gastos de origen se registran por sus procedimientos presupuestales.</td></tr>
+        <tr><td><a href="../01_cfg/01.3.4-terceros-inst.html">Terceros institucionales</a> y catálogos de Configuración</td><td>El tipo de beneficiario de la matriz determina su catálogo. El formulario usa la organización del periodo.</td></tr>
+        <tr><td><a href="05.1.1-requisitos-documentales.html">Requisitos documentales</a> y <a href="../09_gestion_documental/09.2.1-administrador-archivos.html">Gestión de Archivos</a></td><td>El checklist usa los soportes vinculados al UUID. La gestión de archivos usa el módulo de referencia AFECTACION_GASTO.</td></tr>
+        <tr><td><a href="../03_contabilidad/03.1.2-matriz-conversion.html">Matriz de Conversión</a></td><td>Provee clasificación, beneficiarios y referencias de matrices. La proyección de Grupo 4 usa dos movimientos de referencia.</td></tr>
+        <tr><td><a href="../06_pagos/06.2.1-registro-pagos.html">06.2.1 Registro de pagos</a></td><td>Entrega institucional prevista con folio, beneficiario, importe y soportes. En el código y PostgreSQL local revisados, 05.2.2 deja el estado APROBADA. La integración técnica con Caja y la PE quedan en el diseño de pago.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Trazabilidad y minería de procesos</h3>
+    <p>La bitácora instalada guarda acción, actor, fechas, estado anterior, estado nuevo y observación por UUID y ejercicio. Una validación rechazada retorna antes de escribir la transición. La <a href="../inicio/00-eventos-mineria-procesos.html">propuesta de eventos</a> contempla registrar la entrega a Caja y el resultado del pago cuando esa integración exista, con el folio y los objetos vinculados.</p>
+  </section>
+
+  <section class="doc-section" id="contabilidad" aria-labelledby="contabilidad-titulo">
+    <h2 class="section-title" id="contabilidad-titulo"><span class="section-num">11</span> Afectación contable</h2>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Momento</th><th scope="col">Tratamiento</th></tr></thead>
+      <tbody>
+        <tr><td>Captura y aprobación de 05.2.2</td><td>El Grupo 4 usa afecta_presupuesto = false. La aprobación registra estado e historial y retorna poliza_id NULL.</td></tr>
+        <tr><td>Previsualización</td><td>Proyecta cargo por el importe capturado a la cuenta seleccionada o de referencia y abono a una cuenta de bancos de referencia. Devuelve soloLectura = true. El identificador de matriz en la vista es informativo.</td></tr>
+        <tr><td>Nómina neta · 401</td><td>La configuración referencia matriz inicial 22 y final 13. La aprobación instalada no ejecuta una reclasificación ni registra una DI.</td></tr>
+        <tr><td>Entero, pensiones, garantías y fondos · 402–404</td><td>La configuración referencia matriz 17. El pago, la cuenta bancaria efectiva y la PE corresponden al flujo posterior.</td></tr>
+      </tbody>
+    </table></div>
+    <p>La previsualización etiqueta la traza como <code>ACTIVA</code> de forma fija. PostgreSQL local registra la matriz 17 en <code>BORRADOR</code>. La vista usa la cuenta capturada como referencia de cargo y la primera cuenta de registro habilitada del rubro 1112 para el abono, con valores de respaldo si la búsqueda queda vacía.</p>
+  </section>
+
+  <section class="doc-section" id="historial" aria-labelledby="historial-titulo">
+    <h2 class="section-title" id="historial-titulo"><span class="section-num">12</span> Historial de cambios</h2>
+    <div class="table-scroll"><table class="props-table">
+      <thead><tr><th scope="col">Fecha</th><th scope="col">Versión</th><th scope="col">Descripción del cambio</th><th scope="col">Autor</th></tr></thead>
+      <tbody>
+        <tr><td>2026-11-13</td><td>2.1.0</td><td>Actualización DOC-08 de datos, workflow, API compartida, PJEV-UI, Matriz v3, integración con Caja y anexos.</td><td>Equipo SIAF-PJEV</td></tr>
+        <tr><td>2026-11-08</td><td>2.0.0</td><td>Renombrado a Solicitud de pagos no presupuestales e incorporación del Grupo 4 en el diseño.</td><td>Arquitectura SIAF-PJEV / Dix Consultoría</td></tr>
+        <tr><td>2026-09-02</td><td>1.0.0</td><td>Ficha inicial de órdenes de pago y propuesta de interfaz.</td><td>Equipo SIAF-PJEV / Dix Consultoría</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <div id="module-flowchart" style="display:none;">
+    <svg viewBox="0 0 820 322" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flujo interfuncional de captura, validación, aprobación y entrega institucional a Caja"><rect width="820" height="322" fill="#f5f2e9"/><g font-family="system-ui, sans-serif" font-size="14" fill="#172b22">
+
+<text x="207" y="31" text-anchor="middle" font-weight="700">Tesorería</text><text x="618" y="31" text-anchor="middle" font-weight="700">SIAF-PJEV</text>
+<path d="M410 0v322" stroke="#d4c9b5"/>
+<rect x="36" y="53" width="330" height="45" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="201" y="80" text-anchor="middle">1 · Registra solicitud y soportes</text>
+<rect x="453" y="101" width="331" height="45" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="618" y="128" text-anchor="middle">2 · Valida importe y checklist al enviar</text>
+<rect x="36" y="153" width="330" height="45" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="201" y="180" text-anchor="middle">3 · Revisa y decide la transición</text>
+<rect x="453" y="204" width="331" height="45" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="618" y="231" text-anchor="middle">4 · Registra APROBADA e historial</text>
+<rect x="36" y="259" width="330" height="45" rx="6" fill="#fff" stroke="#cfc5b0"/><text x="201" y="286" text-anchor="middle">5 · Entrega institucional a Caja</text>
+<path d="M366 75h44v48h43m-7-5 7 5-7 5 M453 123h-35v52h-52m7-5-7 5 7 5 M366 175h44v51h43m-7-5 7 5-7 5 M453 226h-35v55h-52m7-5-7 5 7 5" fill="none" stroke="#1b3a2d" stroke-width="2"/>
+</g></svg>
   </div>
-
-</div>
-
+  <div id="module-process-table" style="display:none;">
+    <div class="table-scroll"><table class="props-table">
+  <thead><tr><th scope="col">Paso</th><th scope="col">Responsable</th><th scope="col">Actividad</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Captura de Tesorería</td><td>Guarda el encabezado y vincula los soportes aplicables.</td></tr>
+    <tr><td>2</td><td>SIAF-PJEV</td><td>Valida el importe y el checklist. En caso de éxito registra ENVIADA.</td></tr>
+    <tr><td>3</td><td>Revisión de Tesorería</td><td>Consulta evidencia y proyección. Aprueba, regresa o rechaza según permiso.</td></tr>
+    <tr><td>4</td><td>SIAF-PJEV</td><td>Al aprobar, registra APROBADA y la transición, con poliza_id NULL.</td></tr>
+    <tr><td>5</td><td>Tesorería / Caja</td><td>La entrega y la liquidación continúan por el procedimiento institucional de pago.</td></tr>
+  </tbody>
+</table></div>
+  </div>
+</main>
+<script src="../shared.js"></script>
 <script>
-  function showWF(wfId, btn) {
-    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.wf-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    const panel = document.getElementById('wf-' + wfId);
-    if (panel) panel.classList.add('active');
+  function showPanel(selectedButton) {
+    const buttons = selectedButton.parentElement.querySelectorAll('button');
+    buttons.forEach(button => {
+      const active = button === selectedButton;
+      button.setAttribute('aria-pressed', String(active));
+      document.getElementById(button.getAttribute('aria-controls')).hidden = !active;
+    });
   }
 
-  function showSP(spId, btn) {
-    document.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    const panel = document.getElementById('sp-' + spId);
-    if (panel) panel.classList.add('active');
+  function showSP(button) {
+    showPanel(button);
   }
 
-  function showDBTab(tabId, btn) {
-    const parent = btn.parentElement;
-    parent.querySelectorAll('.sp-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    const container = parent.parentElement;
-    container.querySelectorAll('.sp-panel').forEach(p => p.classList.remove('active'));
-    const panel = document.getElementById('db-' + tabId);
-    if (panel) panel.classList.add('active');
+  function showWF(button) {
+    showPanel(button);
+  }
+
+  if (inIframe()) {
+    document.body.classList.add('embedded');
+    document.querySelector('.standalone-tools').hidden = true;
+    const sharedTools = Array.from(document.querySelectorAll('body > div')).find(
+      element => element.querySelector('button')?.textContent.includes('Ver Diagrama'),
+    );
+    sharedTools?.classList.add('shared-tools');
   }
 </script>
-
 </body>
 </html>

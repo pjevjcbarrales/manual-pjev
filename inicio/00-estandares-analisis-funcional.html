@@ -62,6 +62,7 @@
 
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">4. Modelo de Datos</h3>
     <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Tabla exhaustiva con los campos físicos en la base de datos (desglosado por Maestro/Detalle si aplica), marcando llaves (PK, FK) y requeridos. Columnas: <strong>Campo</strong>, <strong>Tipo</strong>, <strong>Descripción</strong>.</p>
+    <p>Aplicar el <a href="00-estandar-nomenclatura-postgresql.html">estándar de nomenclatura PostgreSQL</a> al documentar tablas, columnas torales, parámetros de entrada y campos de salida.</p>
 
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">5. Stored Procedures (SPs) y Triggers</h3>
     <p style="font-size: 13px; margin-bottom: 8px; color: var(--pjev-texto-muted);">Debe documentarse la firma de las funciones transaccionales (Ej. <code>fn_leer</code>, <code>fn_crud</code>) y detallar reglas implementadas en Triggers de integridad. La presentación debe estructurarse usando pestañas navegables con <code>showSP()</code> que muestren las tablas de Entrada (IN), Valores Devueltos (OUT) en JSON y la Definición SQL embebida en un bloque formativo.</p>
@@ -80,6 +81,7 @@
 
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">10. Flujos de Integración (Impacto Transversal)</h3>
     <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Explicación clara de cómo las acciones de este módulo detonan efectos en otras áreas del ERP (Ej. Impacto en presupuesto y contabilidad simultáneamente).</p>
+    <p>Para minería de procesos, documentar por actividad el punto de registro, la clave del trámite, la fecha, el rol, los estados y los objetos vinculados. Identificar las consultas que representan una actividad formal de revisión y los historiales que ya producen evidencia. Consultar la <a href="00-eventos-mineria-procesos.html">propuesta de registro transversal de eventos</a>.</p>
 
     <h3 style="color: var(--pjev-verde-oscuro); font-size: 14px; margin-bottom: 8px;">11. Afectación Contable (Reglas CONAC)</h3>
     <p style="font-size: 13px; margin-bottom: 16px; color: var(--pjev-texto-muted);">Describe si la operación genera o no pólizas automáticas, definiendo los momentos contables que impacta y la matriz de conversión implicada. Columnas: <strong>Aplica</strong>, <strong>Descripción Contable</strong>.</p>

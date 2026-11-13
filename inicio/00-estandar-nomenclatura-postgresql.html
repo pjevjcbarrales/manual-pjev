@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nomenclatura PostgreSQL — Manual de Desarrollo SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 24px clamp(16px, 4vw, 44px) 48px; }
+    .doc-section li + li { margin-top: 8px; }
+    .table-scroll { overflow-x: auto; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+  <div class="elem-breadcrumb"><a href="../home.html">Inicio</a> › <span>Nomenclatura PostgreSQL</span></div>
+  <header class="elem-header">
+    <h1 class="elem-title">Estándar de nomenclatura PostgreSQL</h1>
+    <p class="elem-desc">Convenciones para nombrar tablas, columnas, funciones, parámetros y campos de salida. Referencia para desarrollos nuevos y para documentar los contratos existentes.</p>
+  </header>
+
+  <section class="doc-section">
+    <h2 class="section-title">Esquemas, tablas y columnas</h2>
+    <ul class="role-list">
+      <li>Usar el esquema del dominio propietario y nombrar los objetos nuevos en español, en minúsculas y con <code>snake_case</code>, sin espacios ni acentos. En SQL y DOC-08, identificar la tabla como <code>esquema.tabla</code>.</li>
+      <li>Reutilizar la familia de nombres del dominio. En Configuración, un catálogo puede seguir <code>catalogo_&lt;entidad&gt;</code>. En operaciones, nombrar la entidad y distinguir encabezado y detalle mediante el sustantivo del dominio, como <code>poliza</code> y <code>poliza_movtos</code>.</li>
+      <li>Si una tabla usa un prefijo de entidad, aplicarlo de forma consistente a sus columnas de negocio con el patrón <code>&lt;prefijo&gt;_&lt;atributo&gt;</code>. Por ejemplo, <code>doc_codigo</code> y <code>doc_formato_permitido</code> comparten el prefijo <code>doc_</code> en el diseño de un catálogo de documentos. <code>estatus_registro</code> y los campos comunes de auditoría conservan sus nombres compartidos. Las referencias mantienen la convención del dominio, como <code>f_ag_id</code> en CxP.</li>
+      <li>Nombrar una referencia por la entidad a la que apunta, como <code>p_centro_costo_id</code>. Si la clave de destino incluye ejercicio, documentar ambos campos de la relación. El diccionario debe indicar el nombre físico, tipo, nulabilidad, valor por defecto y PK, FK o restricción aplicable.</li>
+    </ul>
+    <p>Conservar la grafía de los objetos existentes. En Transferencias, <code>"TR_ESTATUS"</code> y <code>"USUARIO_C"</code> son identificadores físicos entrecomillados. En tablas nuevas, usar minúsculas conforme a la convención del dominio.</p>
+  </section>
+
+  <section class="doc-section">
+    <h2 class="section-title">Campos torales</h2>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Nombre o patrón</th><th scope="col">Qué identifica</th><th scope="col">Ejemplo</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;prefijo&gt;_id</code> y <code>&lt;prefijo&gt;_ejercicio</code></td><td>Identidad de la fila y ejercicio cuando corresponda al modelo.</td><td><code>p_id</code>, <code>p_ejercicio</code>. En Transferencias, <code>"TR_NO"</code> es <code>bigint</code>.</td></tr>
+          <tr><td><code>&lt;prefijo&gt;_estatus</code> o <code>estatus_workflow</code></td><td>Estado operativo. El diccionario describe el significado de cada valor.</td><td><code>"TR_ESTATUS"</code> es <code>smallint</code> y admite <code>1/2/3/4</code>. CxP usa <code>estatus_workflow</code>.</td></tr>
+          <tr><td><code>estatus_registro</code></td><td>Vigencia del registro. Para un indicador binario nuevo, usar <code>smallint</code> con <code>1</code> activo y <code>0</code> inactivo, restringido a ambos valores.</td><td>En el detalle de póliza se observaron <code>0</code> y <code>1</code>. El encabezado contable tiene una variante histórica que usa también <code>3</code> y se interpreta junto con <code>p_afecta</code>.</td></tr>
+          <tr><td><code>usuario_c</code>, <code>fecha_c</code>, <code>usuario_m</code>, <code>fecha_m</code></td><td>Actor y momento de creación o modificación. El actor se obtiene del contexto autenticado. Los nuevos registros de fecha y hora de auditoría usan <code>timestamptz</code>.</td><td>Pólizas usa <code>varchar(20)</code> y <code>timestamptz</code>. Transferencias conserva los equivalentes en mayúsculas y fechas <code>timestamp</code> sin zona.</td></tr>
+          <tr><td><code>&lt;prefijo&gt;_centro_costo_id</code></td><td>Referencia al centro de costos cuando el registro lo requiere. Documentar nulabilidad y destino.</td><td><code>contabilidad.poliza.p_centro_costo_id</code> es una FK nullable hacia <code>config.catalogo_centros_costos</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Para el actor de auditoría, documentar si el dominio guarda un identificador interno o un nombre de usuario. La longitud y el tipo físico deben corresponder a esa identidad.</p>
+  </section>
+
+  <section class="doc-section">
+    <h2 class="section-title">Funciones y parámetros de entrada</h2>
+    <ul class="role-list">
+      <li>Nombrar las funciones por propósito y entidad. Usar <code>fn_leer_&lt;entidad&gt;</code> para consulta y <code>fn_abc_&lt;entidad&gt;</code> para alta, baja y cambio cuando corresponda. Para actividades de negocio, usar un verbo específico, como <code>fn_contabilizar_transferencias_ppto</code>. Documentar las variantes existentes <code>fn_crud_*</code> y <code>sp_*</code> con su nombre y firma vigentes.</li>
+      <li>Prefijar los parámetros nuevos con <code>p_</code> seguido de su significado. Usar <code>p_id</code> cuando solo haya una entidad principal y nombres explícitos cuando existan referencias distintas, como <code>p_id_transferencia</code> y <code>p_centro_costo_id</code>. Distinguir <code>p_ejercicio</code> del contexto de sesión si ambos intervienen.</li>
+      <li>Reservar <code>p_accion</code> para el selector de una operación. Documentar tipo, valor por defecto y significado por función. Por ejemplo, <code>fn_leer_transferencias_ppto</code> usa <code>1</code> para leer y su ABC usa <code>2/3/4</code>. Esos valores pertenecen a sus firmas.</li>
+      <li>Los nombres y tipos de entrada se verifican contra el catálogo PostgreSQL. Para funciones sobrecargadas, documentar la firma completa que invoca el servicio. El tipo del identificador en una firma existente puede diferir de su columna física y debe quedar visible.</li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2 class="section-title">Campos de salida</h2>
+    <ul class="role-list">
+      <li>En funciones nuevas que devuelvan un objeto de resultado, usar <code>cod_resultado</code>, <code>msg_resultado</code> y <code>data</code>. En <code>data</code>, usar <code>snake_case</code> y nombres de negocio como <code>id_transferencia</code> y <code>folio</code>. Cuando el contexto ya identifica la entidad, <code>id</code> es suficiente. En salidas tabulares, documentar los alias de <code>RETURNS TABLE</code> con el mismo criterio.</li>
+      <li>Documentar los nombres heredados tal como se reciben. El ABC de Transferencias devuelve <code>id_transferencia</code> y <code>TR_FOLIO</code> en el nivel principal. Su LEER devuelve <code>error</code>, <code>mensaje</code>, <code>rowcount</code> y <code>data</code> en la salida normal. Especificar los campos presentes por variante de respuesta.</li>
+      <li>Registrar por función el significado de cada código. En contratos nuevos, <code>0</code> indica éxito, un valor negativo error y un valor positivo advertencia no bloqueante. En el ABC existente de Transferencias, <code>1</code> puede indicar validación rechazada y <code>-2</code> excepción. Si un servicio traduce o renombra campos, documentar el mapeo SQL → API.</li>
+    </ul>
+    <p>La notificación breve de PJEV-UI se llama <strong>toast</strong>. El componente es <code>SiafToast</code> y se invoca con <code>useSiafToast()</code>. Su variante depende del significado del resultado que recibe la pantalla.</p>
+  </section>
+
+  <section class="doc-section">
+    <h2 class="section-title">Cómo verificar la conformidad</h2>
+    <p>Para cada módulo, cotejar el diccionario DOC-08 con PostgreSQL y con el servicio que invoca la función. Registrar el nombre documentado, el nombre físico o alias vigente, su tipo, el consumidor y las diferencias. Las convenciones de objetos nuevos se aplican al diseñarlos. Los objetos existentes conservan sus contratos hasta que se apruebe una migración con compatibilidad comprobada.</p>
+    <p>Ejemplos de la primera etapa. <a href="../01_cfg/01.1.1-entidad.html">Entidad</a> · <a href="../02_presupuesto/02.2.3-transferencias.html">Transferencias</a> · <a href="../03_contabilidad/03.2.1-polizas-diario-manuales.html">Pólizas manuales</a>.</p>
+  </section>
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>

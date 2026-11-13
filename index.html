@@ -84,6 +84,22 @@
   .ley-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--pjev-texto-muted); }
 
   /* Acordeón Sidebar */
+  .sidebar-part { margin: 12px 0; }
+  .sidebar-part-title {
+    margin: 0 12px 4px;
+    padding: 8px 6px 5px;
+    border-top: 1px solid var(--pjev-borde);
+    color: var(--pjev-verde-oscuro);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .sidebar-support-title {
+    padding: 8px 16px 0;
+    color: var(--pjev-verde-oscuro);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .sidebar-owner { margin-left: auto; margin-right: 6px; font-size: 9px; letter-spacing: 0; text-transform: none; }
   .sidebar-group-label { cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; transition: color 0.15s; }
   .sidebar-group-label:hover { color: var(--pjev-verde-oscuro); }
   .sidebar-group-label::after { content: '▼'; font-size: 9px; transition: transform 0.2s; color: var(--pjev-dorado); }
@@ -124,7 +140,7 @@
 
 <div class="shell">
 
-  <nav class="doc-sidebar">
+  <nav class="doc-sidebar" aria-label="Índice del manual">
     <div class="sidebar-group">
       <div class="sidebar-group-label">Inicio</div>
       <a class="sidebar-link active" target="contentFrame" href="home.html">Resumen</a>
@@ -143,330 +159,336 @@
         <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-rep-simples.html">Reportes Simples <span class="sidebar-id">00.8</span></a>
         <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-rest.html">Estándares REST <span class="sidebar-id">00.9</span></a>
         <a class="sidebar-link" target="contentFrame" href="inicio/00-estandares-sp.html">Stored Procedures <span class="sidebar-id">00.10</span></a>
+        <a class="sidebar-link" target="contentFrame" href="inicio/00-eventos-mineria-procesos.html">Minería de procesos <span class="sidebar-id">00.11</span></a>
+        <a class="sidebar-link" target="contentFrame" href="inicio/00-estandar-nomenclatura-postgresql.html">Nomenclatura PostgreSQL <span class="sidebar-id">00.12</span></a>
       </div>
     </div>
-    <div class="sidebar-group">
-      <div class="sidebar-group-label">01 · Configuración Inicial</div>
-      
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">01.1 · Entidad y Ejercicios</div>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.1.1-entidad.html">Entidad <span class="sidebar-id">01.1.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.1.2-ejercicios.html">Ejercicios Fiscales <span class="sidebar-id">01.1.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.1.3-periodos.html">Períodos Contables <span class="sidebar-id">01.1.3</span></a>
-      </div>
-      
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">01.2 · Catálogos Base</div>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.1-unidades-administrativas.html">Unidades Administrativas <span class="sidebar-id">01.2.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.2-cog.html">COG <span class="sidebar-id">01.2.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.3-programas.html">Programas <span class="sidebar-id">01.2.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.4-fuentes-financiamiento.html">Fuentes Financiamiento <span class="sidebar-id">01.2.4</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.5-cucop.html">CUCOP <span class="sidebar-id">01.2.5</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.6-subprogramas.html">Subprogramas <span class="sidebar-id">01.2.6</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.7-cri.html">CRI <span class="sidebar-id">01.2.7</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.8-proyectos.html">Proyectos <span class="sidebar-id">01.2.8</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.9-centros-costos.html">Centros Costos <span class="sidebar-id">01.2.9</span></a>
-      </div>
+    <section class="sidebar-part" aria-labelledby="sidebar-primera">
+      <h2 class="sidebar-part-title" id="sidebar-primera">Primera parte</h2>
+      <div class="sidebar-group">
+        <div class="sidebar-group-label">01 · Configuración Inicial <span class="sidebar-owner">Daryl</span></div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">01.3 · Terceros y Padrón</div>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.1-proveedores.html">Proveedores <span class="sidebar-id">01.3.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.2-subtipo-proveedor.html">Subtipo Proveedor <span class="sidebar-id">01.3.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.3-empleados.html">Empleados <span class="sidebar-id">01.3.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.4-terceros-inst.html">Terceros Inst. <span class="sidebar-id">01.3.4</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.5-terceros.html">Terceros <span class="sidebar-id">01.3.5</span></a>
-      </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">01.1 · Entidad y Ejercicios</div>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.1.1-entidad.html">Entidad <span class="sidebar-id">01.1.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.1.2-ejercicios.html">Ejercicios Fiscales <span class="sidebar-id">01.1.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.1.3-periodos.html">Períodos Contables <span class="sidebar-id">01.1.3</span></a>
+        </div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">01.4 · Bancarios</div>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.4.1-bancos.html">Bancos <span class="sidebar-id">01.4.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.4.2-chequeras.html">Cuentas Bancarias <span class="sidebar-id">01.4.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.4.3-conceptos-bancarios.html">Conceptos Banc. <span class="sidebar-id">01.4.3</span></a>
-      </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">01.2 · Catálogos Base</div>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.1-unidades-administrativas.html">Unidades Administrativas <span class="sidebar-id">01.2.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.2-cog.html">COG <span class="sidebar-id">01.2.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.3-programas.html">Programas <span class="sidebar-id">01.2.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.4-fuentes-financiamiento.html">Fuentes Financiamiento <span class="sidebar-id">01.2.4</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.5-cucop.html">CUCOP <span class="sidebar-id">01.2.5</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.6-subprogramas.html">Subprogramas <span class="sidebar-id">01.2.6</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.7-cri.html">CRI <span class="sidebar-id">01.2.7</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.8-proyectos.html">Proyectos <span class="sidebar-id">01.2.8</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.2.9-centros-costos.html">Centros Costos <span class="sidebar-id">01.2.9</span></a>
+        </div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">01.5 · Sistema y Seguridad</div>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.1-sistemas.html">Sistemas <span class="sidebar-id">01.5.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.2-subsistemas.html">Subsistemas <span class="sidebar-id">01.5.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.3-modulos.html">Módulos <span class="sidebar-id">01.5.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.4-roles.html">Roles de Sistema <span class="sidebar-id">01.5.4</span></a>
-      </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">01.3 · Terceros y Padrón</div>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.1-proveedores.html">Proveedores <span class="sidebar-id">01.3.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.2-subtipo-proveedor.html">Subtipo Proveedor <span class="sidebar-id">01.3.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.3-empleados.html">Empleados <span class="sidebar-id">01.3.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.4-terceros-inst.html">Terceros Inst. <span class="sidebar-id">01.3.4</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.3.5-terceros.html">Terceros <span class="sidebar-id">01.3.5</span></a>
+        </div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">01.6 · Operativos</div>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.1-clasificacion-funcional.html">Clasificación Func. <span class="sidebar-id">01.6.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.2-funcion.html">Función <span class="sidebar-id">01.6.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.3-momentos.html">Momentos <span class="sidebar-id">01.6.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.4-tipo-documento.html">Tipo Documento <span class="sidebar-id">01.6.4</span></a>
-      </div>
-    </div>
-    <div class="sidebar-group">
-      <div class="sidebar-group-label">02 · Presupuesto</div>
-      
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">02.1 · Catálogo</div>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.3-bienes-inmuebles.html">Bienes Inmuebles <span class="sidebar-id">02.1.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.4-registro-contratos.html">Registro de Contratos <span class="sidebar-id">02.1.4</span></a>
-      </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">01.4 · Bancarios</div>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.4.1-bancos.html">Bancos <span class="sidebar-id">01.4.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.4.2-chequeras.html">Cuentas Bancarias <span class="sidebar-id">01.4.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.4.3-conceptos-bancarios.html">Conceptos Banc. <span class="sidebar-id">01.4.3</span></a>
+        </div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">02.1 · Registro</div>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.1-clave-presupuestal.html">Clave Presupuestal <span class="sidebar-id">02.1.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.2-presupuesto-autorizado.html">Presupuesto Autorizado <span class="sidebar-id">02.1.2</span></a>
-      </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">01.5 · Sistema y Seguridad</div>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.1-sistemas.html">Sistemas <span class="sidebar-id">01.5.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.2-subsistemas.html">Subsistemas <span class="sidebar-id">01.5.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.3-modulos.html">Módulos <span class="sidebar-id">01.5.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.5.4-roles.html">Roles de Sistema <span class="sidebar-id">01.5.4</span></a>
+        </div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">02.2 · Proceso</div>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.1-calendarizacion.html">Calendarización <span class="sidebar-id">02.2.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.2-recalendarizacion.html">Recalendarización <span class="sidebar-id">02.2.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.3-transferencias.html">Transferencias <span class="sidebar-id">02.2.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.4-ampliaciones-reducciones.html">Amp. y Red. (Egresos) <span class="sidebar-id">02.2.4</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.5-compromiso-arrendamientos.html">Compromiso Arrend. <span class="sidebar-id">02.2.5</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.6-operaciones-especiales.html">Operaciones especiales presupuestales <span class="sidebar-id">02.2.6</span></a>
-                <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.7-cierre-presupuestal-mensual.html">Cierre presupuestal mensual <span class="sidebar-id">02.2.7</span></a>
-        
-        <div style="height: 1px; background: rgba(0,0,0,0.05); margin: 6px 16px 6px 28px;"></div>
-        <div class="sidebar-subsubgroup-label" style="padding-top: 2px; padding-bottom: 2px; color: #9ca3af; font-size: 8px;">AUTORIZACIONES</div>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.10-autorizacion-reserva.html">Autorización de reserva / suficiencia <span class="sidebar-id">02.2.10</span></a>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">01.6 · Operativos</div>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.1-clasificacion-funcional.html">Clasificación Func. <span class="sidebar-id">01.6.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.2-funcion.html">Función <span class="sidebar-id">01.6.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.3-momentos.html">Momentos <span class="sidebar-id">01.6.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="01_cfg/01.6.4-tipo-documento.html">Tipo Documento <span class="sidebar-id">01.6.4</span></a>
+        </div>
       </div>
+      <div class="sidebar-group">
+        <div class="sidebar-group-label">02 · Presupuesto <span class="sidebar-owner">Eunice</span></div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">02.3 · Imprimir</div>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4-consola-central-reportes.html">Consola Central Reportes <span class="sidebar-id">02.3.4</span></a>
-        
-        <div class="sidebar-subgroup-label" style="margin-top: 8px; color: #9ca3af; font-size: 8px;">SUB-REPORTES (02.3.4.x)</div>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.1-avance-presupuestal.html">Avance presupuestal <span class="sidebar-id">02.3.4.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.2-eaepe-clasif-admin.html">EAepe - Clasif. Admin. <span class="sidebar-id">02.3.4.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.3-eaepe-clasif-eco.html">EAepe - Clasif. Económica <span class="sidebar-id">02.3.4.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.4-eaepe-objeto-gasto.html">EAepe - Objeto del Gasto <span class="sidebar-id">02.3.4.4</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.5-eaepe-clasif-func.html">EAepe - Clasif. Funcional <span class="sidebar-id">02.3.4.5</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.6-edo-analitico-ingresos.html">Edo. Analítico Ingresos <span class="sidebar-id">02.3.4.6</span></a>
-      </div>
-      
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">02.4 — Manuales de Usuario</div>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.4.1-manual-bienes-inmuebles.html">Catálogo de Bienes Inmuebles <span class="sidebar-id">02.4.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.4.2-manual-contratos.html">Registro de Contratos <span class="sidebar-id">02.4.2</span></a>
-      </div>
-    </div>
-    <div class="sidebar-group">
-      <div class="sidebar-group-label">03 · Contabilidad</div>
-      
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">03.1 · Catálogo</div>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.1.1-alta-cuentas.html">Plan de Cuentas <span class="sidebar-id">03.1.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.1.2-matriz-conversion.html">Matriz de Conversión <span class="sidebar-id">03.1.2</span></a>
-      </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">02.1 · Catálogo</div>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.3-bienes-inmuebles.html">Bienes Inmuebles <span class="sidebar-id">02.1.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.4-registro-contratos.html">Registro de Contratos <span class="sidebar-id">02.1.4</span></a>
+        </div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">03.2 · Registro</div>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.1-polizas-diario-manuales.html">Pólizas Manuales <span class="sidebar-id">03.2.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.2-visor-polizas-automaticas.html">Pólizas Automáticas <span class="sidebar-id">03.2.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.3-contabilidad-fideicomisos.html">🚧 Fideicomisos  <span class="sidebar-id">03.2.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.4-modulo-retenciones.html">🚧 Módulo Retenciones  <span class="sidebar-id">03.2.4</span></a>
-      </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">02.1 · Registro</div>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.1-clave-presupuestal.html">Clave Presupuestal <span class="sidebar-id">02.1.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.1.2-presupuesto-autorizado.html">Presupuesto Autorizado <span class="sidebar-id">02.1.2</span></a>
+        </div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">03.3 · Procesos y Cierres</div>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.1-descarga-contable-masiva.html">Descarga Contable Masiva  <span class="sidebar-id">03.3.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.2-conciliacion-bancaria.html">Conciliación Bancaria  <span class="sidebar-id">03.3.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.3-conciliacion-ministraciones.html">Conc. de Ministraciones  <span class="sidebar-id">03.3.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.5-conciliacion-intersistemas.html">🚧 Conc. Inter-Sistemas  <span class="sidebar-id">03.3.5</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.6-conciliacion-obra-publica.html">🚧 Conc. Obra Pública  <span class="sidebar-id">03.3.6</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.6.1-cierre-mensual.html">Cierre Mensual Contable <span class="sidebar-id">03.3.7</span></a>
-      </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">02.2 · Proceso</div>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.1-calendarizacion.html">Calendarización <span class="sidebar-id">02.2.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.2-recalendarizacion.html">Recalendarización <span class="sidebar-id">02.2.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.3-transferencias.html">Transferencias <span class="sidebar-id">02.2.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.4-ampliaciones-reducciones.html">Amp. y Red. (Egresos) <span class="sidebar-id">02.2.4</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.5-compromiso-arrendamientos.html">Compromiso Arrend. <span class="sidebar-id">02.2.5</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.6-operaciones-especiales.html">Operaciones especiales presupuestales <span class="sidebar-id">02.2.6</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.7-cierre-presupuestal-mensual.html">Cierre presupuestal mensual <span class="sidebar-id">02.2.7</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.2.10-autorizacion-reserva.html">Autorización de reserva / suficiencia <span class="sidebar-id">02.2.10</span></a>
+        </div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">03.4 · Imprimir reportes contables</div>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.1.1-libro-auxiliar.html">Libro Auxiliar  <span class="sidebar-id">03.4.1.1</span></a>
-        <a class="sidebar-link active" target="contentFrame" href="03_contabilidad/03.4.1.2-libro-diario.html">Libro Diario  <span class="sidebar-id">03.4.1.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Balanza de Comprobación <span class="sidebar-id">03.4.5</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.4-conciliacion-presupuesto-contable.html">Conciliación de egresos y gastos <span class="sidebar-id">03.4.6</span></a>
-      </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">02.3 · Imprimir</div>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4-consola-central-reportes.html">Consola Central Reportes <span class="sidebar-id">02.3.4</span></a>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">03.5 · Estados financieros y LDF</div>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Estado de Actividades <span class="sidebar-id">03.5.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Situación Financiera <span class="sidebar-id">03.5.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Variación en Hacienda Pública <span class="sidebar-id">03.5.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Cambios en Situación Financiera <span class="sidebar-id">03.5.4</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Flujos de Efectivo <span class="sidebar-id">03.5.5</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Analítico del Activo <span class="sidebar-id">03.5.6</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Analítico de Deuda y Pasivos <span class="sidebar-id">03.5.7</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Pasivos Contingentes <span class="sidebar-id">03.5.8</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.2-notas-estados-financieros.html">Notas a Estados Financieros <span class="sidebar-id">03.5.9</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Formatos LDF 1–8 <span class="sidebar-id">03.5.10–17</span></a>
-      </div>
+          <div class="sidebar-subgroup-label" style="margin-top: 8px; color: #9ca3af; font-size: 8px;">SUB-REPORTES (02.3.4.x)</div>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.1-avance-presupuestal.html">Avance presupuestal <span class="sidebar-id">02.3.4.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.2-eaepe-clasif-admin.html">EAepe - Clasif. Admin. <span class="sidebar-id">02.3.4.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.3-eaepe-clasif-eco.html">EAepe - Clasif. Económica <span class="sidebar-id">02.3.4.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.4-eaepe-objeto-gasto.html">EAepe - Objeto del Gasto <span class="sidebar-id">02.3.4.4</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.5-eaepe-clasif-func.html">EAepe - Clasif. Funcional <span class="sidebar-id">02.3.4.5</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.3.4.6-edo-analitico-ingresos.html">Edo. Analítico Ingresos <span class="sidebar-id">02.3.4.6</span></a>
+        </div>
 
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">03.6 · Concentradores de informes</div>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Panel de Reportes Financieros <span class="sidebar-id">03.6.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Panel de Estados CONAC <span class="sidebar-id">03.6.2</span></a>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">02.4 — Manuales de Usuario</div>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.4.1-manual-bienes-inmuebles.html">Catálogo de Bienes Inmuebles <span class="sidebar-id">02.4.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="02_presupuesto/02.4.2-manual-contratos.html">Registro de Contratos <span class="sidebar-id">02.4.2</span></a>
+        </div>
       </div>
-    </div>
-    <div class="sidebar-group">
-      <div class="sidebar-group-label">04 · Ingresos (Caja)</div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">04.1 · Catálogos</div>
-        <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.1.2-motivos-ajuste-cancelacion.html">Motivos de ajuste o cancelación <span class="sidebar-id">04.1.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.1.3-claves-sefiplan.html">Claves SEFIPLAN y carteras <span class="sidebar-id">04.1.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.1.1-conceptos-ingreso.html" style="opacity:0.65;">Trámites de ingreso (Centralizado 03.1.2) <span class="sidebar-id">04.1.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.1.4-cuentas-recaudadoras.html" style="opacity:0.65;">Cuentas recaudadoras (Centralizado 01.4.2) <span class="sidebar-id">04.1.4</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">04.2 · Registro</div>
-        <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.2.1-registro-ingresos.html">Registro de ingresos <span class="sidebar-id">04.2.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.2.2-validacion-depositos.html">Registro de pagos <span class="sidebar-id">04.2.2</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">04.3 · Procesos</div>
-        <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.3.1-conciliacion-ingresos.html">Conciliación de ingresos <span class="sidebar-id">04.3.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.3.2-cierre-mensual-ingresos.html">Cierre mensual de ingresos <span class="sidebar-id">04.3.2</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">04.4 · Informes</div>
-        <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.4.1-informes-control-ingresos.html">Informes y control de ingresos <span class="sidebar-id">04.4.1</span></a>
-      </div>
-    </div>
+      <div class="sidebar-group">
+        <div class="sidebar-group-label">03 · Contabilidad <span class="sidebar-owner">Christian</span></div>
 
-    <div class="sidebar-group">
-      <div class="sidebar-group-label">05 · Tesorería</div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">05.1 · Catálogos</div>
-        <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.1.1-requisitos-documentales.html">Requisitos documentales <span class="sidebar-id">05.1.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.1.2-tarifas-zonas-viaticos.html">Tarifas y zonas de viáticos <span class="sidebar-id">05.1.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.1.3-conceptos-retencion-deduccion.html">Conceptos de retención y deducción <span class="sidebar-id">05.1.3</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">05.2 · Registro</div>
-        <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.2.1-afectacion-gastos.html">Solicitud-comprobación de recurso (Orden de pago) <span class="sidebar-id">05.2.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.2.2-orden-pago.html">Solicitud de pagos no presupuestales <span class="sidebar-id">05.2.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Comprobación de gastos <span class="sidebar-id">05.2.3</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">05.3 · Procesos</div>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Pre-pólizas <span class="sidebar-id">05.3.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Programación de pagos <span class="sidebar-id">05.3.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 DIOT <span class="sidebar-id">05.3.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Movimientos de fideicomisos <span class="sidebar-id">05.3.4</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">05.4 · Informes</div>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Informes de Tesorería <span class="sidebar-id">05.4.1</span></a>
-      </div>
-    </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">03.1 · Catálogo</div>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.1.1-alta-cuentas.html">Plan de Cuentas <span class="sidebar-id">03.1.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.1.2-matriz-conversion.html">Matriz de Conversión <span class="sidebar-id">03.1.2</span></a>
+        </div>
 
-    <div class="sidebar-group">
-      <div class="sidebar-group-label">06 · Pagos</div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">06.1 · Catálogos</div>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Medios de pago <span class="sidebar-id">06.1.1</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">06.2 · Registro</div>
-        <a class="sidebar-link" target="contentFrame" href="06_pagos/06.2.1-registro-pagos.html">Registro de pagos <span class="sidebar-id">06.2.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Traspasos entre cuentas <span class="sidebar-id">06.2.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Inversiones y rendimientos <span class="sidebar-id">06.2.3</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">06.3 · Procesos</div>
-        <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.2-conciliacion-bancaria.html">🚧 Conciliación bancaria <span class="sidebar-id">06.3.1</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">06.4 · Informes</div>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Informes de pagos y bancos <span class="sidebar-id">06.4.1</span></a>
-      </div>
-    </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">03.2 · Registro</div>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.1-polizas-diario-manuales.html">Pólizas Manuales <span class="sidebar-id">03.2.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.2-visor-polizas-automaticas.html">Pólizas Automáticas <span class="sidebar-id">03.2.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.3-contabilidad-fideicomisos.html">🚧 Fideicomisos  <span class="sidebar-id">03.2.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.2.4-modulo-retenciones.html">🚧 Módulo Retenciones  <span class="sidebar-id">03.2.4</span></a>
+        </div>
 
-    <div class="sidebar-group">
-      <div class="sidebar-group-label">07 · Repositorio CFDI · segunda etapa</div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">07.1 · Registro</div>
-        <a class="sidebar-link" target="contentFrame" href="07_repositorio_cfdi/07.1.1-boveda-cfdi.html">Bóveda CFDI (Administrador XML) <span class="sidebar-id">07.1.1</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">07.2 · Procesos</div>
-        <a class="sidebar-link" target="contentFrame" href="07_repositorio_cfdi/07.2.1-validacion-vinculacion-fiscal.html">Validación y vinculación fiscal <span class="sidebar-id">07.2.1</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">07.3 · Informes</div>
-        <a class="sidebar-link" target="contentFrame" href="07_repositorio_cfdi/07.3.1-control-auditoria-cfdi.html">Control y auditoría CFDI <span class="sidebar-id">07.3.1</span></a>
-      </div>
-    </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">03.3 · Procesos y Cierres</div>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.1-descarga-contable-masiva.html">Descarga Contable Masiva  <span class="sidebar-id">03.3.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.2-conciliacion-bancaria.html">Conciliación Bancaria  <span class="sidebar-id">03.3.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.3-conciliacion-ministraciones.html">Conc. de Ministraciones  <span class="sidebar-id">03.3.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.5-conciliacion-intersistemas.html">🚧 Conc. Inter-Sistemas  <span class="sidebar-id">03.3.5</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.6-conciliacion-obra-publica.html">🚧 Conc. Obra Pública  <span class="sidebar-id">03.3.6</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.6.1-cierre-mensual.html">Cierre Mensual Contable <span class="sidebar-id">03.3.7</span></a>
+        </div>
 
-    <div class="sidebar-group">
-      <div class="sidebar-group-label">08 · Materiales</div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">08.1 · Catálogos de Adquisiciones</div>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.1.5-documentos-requisito.html">Documentos requisito <span class="sidebar-id">08.1.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.1.6-matriz-checklist.html">Matriz checklist <span class="sidebar-id">08.1.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.1.4-modalidades.html">Modalidades <span class="sidebar-id">08.1.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Procedimientos de contratacion <span class="sidebar-id">08.1.4</span></a>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.1.2-cucop.html">CUCOP <span class="sidebar-id">08.1.5</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">08.2 · Requerimientos</div>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.2.1-requerimientos-adquisiciones.html">Requerimientos de adquisiciones <span class="sidebar-id">08.2.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.2.2-suficiencia.html">Suficiencia presupuestal <span class="sidebar-id">08.2.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Expediente de compra <span class="sidebar-id">08.2.3</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">08.3 · Procedimientos de Contratación</div>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.3.1-adjudicacion-directa.html">Adjudicacion directa <span class="sidebar-id">08.3.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.3.2-invitacion-tres.html">Invitacion a cuando menos tres <span class="sidebar-id">08.3.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.3.3-licitacion-publica.html">Licitacion publica <span class="sidebar-id">08.3.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Formalizacion, recepcion y devengado <span class="sidebar-id">08.3.4</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">08.4 · Reportes e Informes</div>
-        <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Seguimiento de adquisiciones <span class="sidebar-id">08.4.1</span></a>
-      </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">08.5 — Manuales de Usuario</div>
-        <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.5.1-manual-suficiencia.html">Manual de Suficiencia Presupuestal <span class="sidebar-id">08.5.1</span></a>
-      </div>
-    </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">03.4 · Imprimir reportes contables</div>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.1.1-libro-auxiliar.html">Libro Auxiliar  <span class="sidebar-id">03.4.1.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.1.2-libro-diario.html">Libro Diario  <span class="sidebar-id">03.4.1.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">Balanza de Comprobación <span class="sidebar-id">03.4.5</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.4-conciliacion-presupuesto-contable.html">Conciliación de egresos y gastos <span class="sidebar-id">03.4.6</span></a>
+        </div>
 
-    <div class="sidebar-group">
-      <div class="sidebar-group-label">09 · Gestión Documental y Archivo</div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">09.1 · Catálogos Archivísticos</div>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.1-cgca.html">Cuadro de Clasificación (CGCA) <span class="sidebar-id">09.1.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.2-cadido.html">Disposición Documental (CADIDO) <span class="sidebar-id">09.1.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.3-tipos-documentales.html">Tipos Documentales y Metadatos <span class="sidebar-id">09.1.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.4-sellos-digitales.html">Sellos Digitales Institucionales <span class="sidebar-id">09.1.4</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.5-permisos-carpetas-acl.html">Permisos de Carpetas (ACL) <span class="sidebar-id">09.1.5</span></a>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">03.5 · Estados financieros y LDF</div>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Estado de Actividades <span class="sidebar-id">03.5.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Situación Financiera <span class="sidebar-id">03.5.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Variación en Hacienda Pública <span class="sidebar-id">03.5.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Cambios en Situación Financiera <span class="sidebar-id">03.5.4</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Flujos de Efectivo <span class="sidebar-id">03.5.5</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Analítico del Activo <span class="sidebar-id">03.5.6</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Analítico de Deuda y Pasivos <span class="sidebar-id">03.5.7</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Pasivos Contingentes <span class="sidebar-id">03.5.8</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.2-notas-estados-financieros.html">Notas a Estados Financieros <span class="sidebar-id">03.5.9</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Formatos LDF 1–8 <span class="sidebar-id">03.5.10–17</span></a>
+        </div>
+
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">03.6 · Concentradores de informes</div>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Panel de Reportes Financieros <span class="sidebar-id">03.6.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.4.3-estados-financieros-trimestrales.html">Panel de Estados CONAC <span class="sidebar-id">03.6.2</span></a>
+        </div>
       </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">09.2 · Registro y Operación</div>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.2.1-administrador-archivos.html">Administrador General de Archivos <span class="sidebar-id">09.2.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.2.2-bandeja-entrada-grapado.html">Bandeja de Entrada y Grapado <span class="sidebar-id">09.2.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.2.3-visor-sellado-testado.html">Visor, Sellado y Testado IVAI <span class="sidebar-id">09.2.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.2.4-control-archivo.html">Control de Archivo · Registro y Digitalización <span class="sidebar-id">09.2.4</span></a>
+    </section>
+    <section class="sidebar-part" aria-labelledby="sidebar-segunda">
+      <h2 class="sidebar-part-title" id="sidebar-segunda">Segunda parte</h2>
+      <div class="sidebar-group">
+        <div class="sidebar-group-label">05 · Tesorería <span class="sidebar-owner">Eunice</span></div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">05.1 · Catálogos</div>
+          <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.1.1-requisitos-documentales.html">Requisitos documentales <span class="sidebar-id">05.1.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.1.2-tarifas-zonas-viaticos.html">Tarifas y zonas de viáticos <span class="sidebar-id">05.1.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.1.3-conceptos-retencion-deduccion.html">Conceptos de retención y deducción <span class="sidebar-id">05.1.3</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">05.2 · Registro</div>
+          <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.2.1-afectacion-gastos.html">Solicitud-comprobación de recurso (Orden de pago) <span class="sidebar-id">05.2.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="05_cuentas_por_pagar/05.2.2-orden-pago.html">Solicitud de pagos no presupuestales <span class="sidebar-id">05.2.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Comprobación de gastos <span class="sidebar-id">05.2.3</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">05.3 · Procesos</div>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Pre-pólizas <span class="sidebar-id">05.3.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Programación de pagos <span class="sidebar-id">05.3.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 DIOT <span class="sidebar-id">05.3.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Movimientos de fideicomisos <span class="sidebar-id">05.3.4</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">05.4 · Informes</div>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Informes de Tesorería <span class="sidebar-id">05.4.1</span></a>
+        </div>
       </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">09.3 · Procesos y Ciclo de Vida</div>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.3.1-certificacion-nom151.html">Certificación NOM-151 y PSC <span class="sidebar-id">09.3.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.3.2-transferencias-documentales.html">Transferencias a Concentración <span class="sidebar-id">09.3.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.3.3-bajas-documentales.html">Bajas Documentales y Destino Final <span class="sidebar-id">09.3.3</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.3.4-depuracion-temporales.html">Depuración de Temporales <span class="sidebar-id">09.3.4</span></a>
+      <div class="sidebar-group">
+        <div class="sidebar-group-label">04 · Caja <span class="sidebar-owner">Daryl</span></div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">04.1 · Catálogos</div>
+          <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.1.2-motivos-ajuste-cancelacion.html">Motivos de ajuste o cancelación <span class="sidebar-id">04.1.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.1.3-claves-sefiplan.html">Claves SEFIPLAN y carteras <span class="sidebar-id">04.1.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.1.1-conceptos-ingreso.html" style="opacity:0.65;">Trámites de ingreso (Centralizado 03.1.2) <span class="sidebar-id">04.1.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.1.4-cuentas-recaudadoras.html" style="opacity:0.65;">Cuentas recaudadoras (Centralizado 01.4.2) <span class="sidebar-id">04.1.4</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">04.2 · Registro</div>
+          <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.2.1-registro-ingresos.html">Registro de ingresos <span class="sidebar-id">04.2.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.2.2-validacion-depositos.html">Registro de pagos (flujo) <span class="sidebar-id">04.2.2</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">04.3 · Procesos</div>
+          <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.3.1-conciliacion-ingresos.html">Conciliación de ingresos <span class="sidebar-id">04.3.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.3.2-cierre-mensual-ingresos.html">Cierre mensual de ingresos <span class="sidebar-id">04.3.2</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">04.4 · Informes</div>
+          <a class="sidebar-link" target="contentFrame" href="04_ingresos/04.4.1-informes-control-ingresos.html">Informes y control de ingresos <span class="sidebar-id">04.4.1</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">06 · Operación de pagos</div>
+          <div class="sidebar-subsubgroup">
+            <div class="sidebar-subsubgroup-label">06.1 · Catálogos</div>
+            <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Medios de pago <span class="sidebar-id">06.1.1</span></a>
+          </div>
+          <div class="sidebar-subsubgroup">
+            <div class="sidebar-subsubgroup-label">06.2 · Registro</div>
+            <a class="sidebar-link" target="contentFrame" href="06_pagos/06.2.1-registro-pagos.html">Registro de pagos (diseño técnico) <span class="sidebar-id">06.2.1</span></a>
+            <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Traspasos entre cuentas <span class="sidebar-id">06.2.2</span></a>
+            <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Inversiones y rendimientos <span class="sidebar-id">06.2.3</span></a>
+          </div>
+          <div class="sidebar-subsubgroup">
+            <div class="sidebar-subsubgroup-label">06.3 · Procesos</div>
+            <a class="sidebar-link" target="contentFrame" href="03_contabilidad/03.3.2-conciliacion-bancaria.html">🚧 Conciliación bancaria <span class="sidebar-id">06.3.1</span></a>
+          </div>
+          <div class="sidebar-subsubgroup">
+            <div class="sidebar-subsubgroup-label">06.4 · Informes</div>
+            <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Informes de pagos y bancos <span class="sidebar-id">06.4.1</span></a>
+          </div>
+        </div>
       </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">09.4 · Informes y Auditoría</div>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.4.1-inventarios-documentales.html">Inventarios Documentales AGN <span class="sidebar-id">09.4.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.4.2-vigencias-cadido.html">Vigencias y Vencimientos CADIDO <span class="sidebar-id">09.4.2</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.4.3-bitacora-cadena-custodia.html">Cadena de Custodia y Bitácora LGA <span class="sidebar-id">09.4.3</span></a>
+      <section aria-labelledby="sidebar-soporte">
+        <h3 class="sidebar-support-title" id="sidebar-soporte">Sistemas de soporte documental</h3>
+        <div class="sidebar-group">
+          <div class="sidebar-group-label">09 · Gestión de Archivos <span class="sidebar-owner">Christian</span></div>
+          <div class="sidebar-subgroup">
+            <div class="sidebar-subgroup-label">09.1 · Catálogos Archivísticos</div>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.1-cgca.html">Cuadro de Clasificación (CGCA) <span class="sidebar-id">09.1.1</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.2-cadido.html">Disposición Documental (CADIDO) <span class="sidebar-id">09.1.2</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.3-tipos-documentales.html">Tipos Documentales y Metadatos <span class="sidebar-id">09.1.3</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.4-sellos-digitales.html">Sellos Digitales Institucionales <span class="sidebar-id">09.1.4</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.1.5-permisos-carpetas-acl.html">Permisos de Carpetas (ACL) <span class="sidebar-id">09.1.5</span></a>
+          </div>
+          <div class="sidebar-subgroup">
+            <div class="sidebar-subgroup-label">09.2 · Registro y Operación</div>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.2.1-administrador-archivos.html">Administrador General de Archivos <span class="sidebar-id">09.2.1</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.2.2-bandeja-entrada-grapado.html">Bandeja de Entrada y Grapado <span class="sidebar-id">09.2.2</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.2.3-visor-sellado-testado.html">Visor, Sellado y Testado IVAI <span class="sidebar-id">09.2.3</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.2.4-control-archivo.html">Control de Archivo · Registro y Digitalización <span class="sidebar-id">09.2.4</span></a>
+          </div>
+          <div class="sidebar-subgroup">
+            <div class="sidebar-subgroup-label">09.3 · Procesos y Ciclo de Vida</div>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.3.1-certificacion-nom151.html">Certificación NOM-151 y PSC <span class="sidebar-id">09.3.1</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.3.2-transferencias-documentales.html">Transferencias a Concentración <span class="sidebar-id">09.3.2</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.3.3-bajas-documentales.html">Bajas Documentales y Destino Final <span class="sidebar-id">09.3.3</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.3.4-depuracion-temporales.html">Depuración de Temporales <span class="sidebar-id">09.3.4</span></a>
+          </div>
+          <div class="sidebar-subgroup">
+            <div class="sidebar-subgroup-label">09.4 · Informes y Auditoría</div>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.4.1-inventarios-documentales.html">Inventarios Documentales AGN <span class="sidebar-id">09.4.1</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.4.2-vigencias-cadido.html">Vigencias y Vencimientos CADIDO <span class="sidebar-id">09.4.2</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.4.3-bitacora-cadena-custodia.html">Cadena de Custodia y Bitácora LGA <span class="sidebar-id">09.4.3</span></a>
+          </div>
+          <div class="sidebar-subgroup">
+            <div class="sidebar-subgroup-label">09.5 · Integración y Componentes</div>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.5.1-configuracion-server-side.html">Configuración Server-Side <span class="sidebar-id">09.5.1</span></a>
+            <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.5.2-plugins-controles-formulario.html">Plugins y Controles UI <span class="sidebar-id">09.5.2</span></a>
+          </div>
+        </div>
+        <div class="sidebar-group">
+          <div class="sidebar-group-label">07 · Repositorio CFDI <span class="sidebar-owner">Christian</span></div>
+          <div class="sidebar-subgroup">
+            <div class="sidebar-subgroup-label">07.1 · Registro</div>
+            <a class="sidebar-link" target="contentFrame" href="07_repositorio_cfdi/07.1.1-boveda-cfdi.html">Bóveda CFDI (Administrador XML) <span class="sidebar-id">07.1.1</span></a>
+          </div>
+          <div class="sidebar-subgroup">
+            <div class="sidebar-subgroup-label">07.2 · Procesos</div>
+            <a class="sidebar-link" target="contentFrame" href="07_repositorio_cfdi/07.2.1-validacion-vinculacion-fiscal.html">Validación y vinculación fiscal <span class="sidebar-id">07.2.1</span></a>
+          </div>
+          <div class="sidebar-subgroup">
+            <div class="sidebar-subgroup-label">07.3 · Informes</div>
+            <a class="sidebar-link" target="contentFrame" href="07_repositorio_cfdi/07.3.1-control-auditoria-cfdi.html">Control y auditoría CFDI <span class="sidebar-id">07.3.1</span></a>
+          </div>
+        </div>
+      </section>
+    </section>
+    <section class="sidebar-part" aria-labelledby="sidebar-referencia">
+      <h2 class="sidebar-part-title" id="sidebar-referencia">Documentación complementaria</h2>
+      <div class="sidebar-group">
+        <div class="sidebar-group-label">08 · Recursos Materiales</div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">08.1 · Catálogos de Adquisiciones</div>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.1.5-documentos-requisito.html">Documentos requisito <span class="sidebar-id">08.1.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.1.6-matriz-checklist.html">Matriz checklist <span class="sidebar-id">08.1.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.1.4-modalidades.html">Modalidades <span class="sidebar-id">08.1.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Procedimientos de contratacion <span class="sidebar-id">08.1.4</span></a>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.1.2-cucop.html">CUCOP <span class="sidebar-id">08.1.5</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">08.2 · Requerimientos</div>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.2.1-requerimientos-adquisiciones.html">Requerimientos de adquisiciones <span class="sidebar-id">08.2.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.2.2-suficiencia.html">Suficiencia presupuestal <span class="sidebar-id">08.2.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Expediente de compra <span class="sidebar-id">08.2.3</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">08.3 · Procedimientos de Contratación</div>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.3.1-adjudicacion-directa.html">Adjudicacion directa <span class="sidebar-id">08.3.1</span></a>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.3.2-invitacion-tres.html">Invitacion a cuando menos tres <span class="sidebar-id">08.3.2</span></a>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.3.3-licitacion-publica.html">Licitacion publica <span class="sidebar-id">08.3.3</span></a>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Formalizacion, recepcion y devengado <span class="sidebar-id">08.3.4</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">08.4 · Reportes e Informes</div>
+          <a class="sidebar-link" target="contentFrame" href="en_construccion.html">🚧 Seguimiento de adquisiciones <span class="sidebar-id">08.4.1</span></a>
+        </div>
+        <div class="sidebar-subgroup">
+          <div class="sidebar-subgroup-label">08.5 — Manuales de Usuario</div>
+          <a class="sidebar-link" target="contentFrame" href="07_recursos_materiales/07.5.1-manual-suficiencia.html">Manual de Suficiencia Presupuestal <span class="sidebar-id">08.5.1</span></a>
+        </div>
       </div>
-      <div class="sidebar-subgroup">
-        <div class="sidebar-subgroup-label">09.5 · Integración y Componentes</div>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.5.1-configuracion-server-side.html">Configuración Server-Side <span class="sidebar-id">09.5.1</span></a>
-        <a class="sidebar-link" target="contentFrame" href="09_gestion_documental/09.5.2-plugins-controles-formulario.html">Plugins y Controles UI <span class="sidebar-id">09.5.2</span></a>
-      </div>
-    </div>
+    </section>
   </nav>
 
   <main class="doc-main" style="padding: 0; display: flex; flex-direction: column; overflow: hidden; height: 100vh;">
-  <iframe name="contentFrame" src="home.html" style="flex: 1; width: 100%; height: 100%; border: none;"></iframe>
+  <iframe name="contentFrame" title="Contenido del manual de desarrollo" src="home.html" style="flex: 1; width: 100%; height: 100%; border: none;"></iframe>
 </main>
 </div>
 <script src="shared.js"></script>

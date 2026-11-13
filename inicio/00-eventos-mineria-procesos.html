@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minería de procesos — Manual de Desarrollo SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 24px clamp(16px, 4vw, 44px) 48px; }
+    .doc-section li + li { margin-top: 8px; }
+    .props-table { margin-top: 12px; }
+  </style>
+</head>
+<body>
+<div class="doc-main-inner">
+  <div class="elem-breadcrumb"><a href="../home.html">Inicio</a> › <span>Minería de procesos</span></div>
+  <header class="elem-header">
+    <h1 class="elem-title">Registro de eventos para minería de procesos</h1>
+    <p class="elem-desc">Propuesta técnica transversal para reconstruir el recorrido real de un trámite, medir tiempos de espera e identificar devoluciones y retrabajos.</p>
+  </header>
+
+  <section class="doc-section">
+    <h2 class="section-title">Función común y puntos de registro</h2>
+    <p><code>auditoria.fn_registrar_evento_proceso(...)</code> es el nombre propuesto para la función interna de PostgreSQL. Recibe la actividad y su contexto desde el procedimiento o servicio que conoce el resultado de la operación. Cada módulo conserva sus firmas <code>LEER</code>, <code>ABC</code> y de workflow, sus códigos de acción y el contrato de respuesta de sus consumidores.</p>
+    <table class="props-table">
+      <thead><tr><th scope="col">Operación</th><th scope="col">Punto de registro</th></tr></thead>
+      <tbody>
+        <tr><td>ABC y transiciones</td><td>Emitir la actividad de negocio después de aplicar la operación y antes de confirmar la misma transacción. Si la transacción se revierte, también se revierte el evento. Registrar actividades con significado propio como <em>solicitud enviada</em>, <em>devuelta</em> o <em>aprobada</em>.</td></tr>
+        <tr><td>LEER de rutina</td><td>Listar, paginar, buscar, refrescar o cargar catálogos conserva su comportamiento de consulta. Si se necesita medir ese uso, el servicio puede registrarlo como telemetría fuera de la transacción de lectura.</td></tr>
+        <tr><td>LEER como actividad formal</td><td>Si abrir un expediente es un hito definido del procedimiento, registrar la actividad desde NestJS después de una lectura exitosa, en una operación aparte. Si el hito exige una decisión o confirmación, registrarlo en la acción que la confirma. Una transacción PostgreSQL de solo lectura impide insertar en una tabla persistente.</td></tr>
+        <tr><td>Resultado de negocio y fallos técnicos</td><td>Una devolución o un rechazo confirmado por el área es una actividad del expediente. Los errores de validación, intentos técnicos y fallos del registrador se monitorean como incidencias operativas.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="doc-section">
+    <h2 class="section-title">Datos que identifica cada evento</h2>
+    <ul class="role-list">
+      <li><strong>Evento.</strong> Identificador único, código de actividad de negocio, módulo de origen y clave estable de idempotencia para la misma operación lógica.</li>
+      <li><strong>Tiempo y secuencia.</strong> Fecha y hora del hecho con zona horaria, fecha de registro y secuencia o versión del objeto cuando exista.</li>
+      <li><strong>Trámite y objetos.</strong> Tipo de entidad, identificador, ejercicio cuando forme parte de la clave y referencias a los objetos relacionados. La clave del trámite analizado se obtiene de sus vínculos persistidos. El <code>correlation_id</code> permite seguir una petición o ejecución técnica.</li>
+      <li><strong>Contexto de la actividad.</strong> Identificador interno del actor, rol y unidad cuando apliquen, estados anterior y nuevo, resultado y referencia a la evidencia. El contexto de identidad proviene de la sesión validada. Para análisis se exportan los atributos necesarios y referencias, con acceso acotado.</li>
+    </ul>
+    <p>Una solicitud de Tesorería puede vincularse con una orden, uno o varios desembolsos de Caja, pólizas contables y el expediente de soporte. Cada objeto conserva su identificador. Así se puede reconstruir el proceso desde la solicitud o desde el pago, incluyendo sus CFDI cuando correspondan.</p>
+  </section>
+
+  <section class="doc-section">
+    <h2 class="section-title">Incorporación a lo que ya funciona</h2>
+    <ol class="role-list">
+      <li><strong>Reutilizar evidencia.</strong> Probar primero una proyección de solo lectura de los historiales de afectaciones y de los eventos de ingresos. Evaluar la bitácora general para los cambios que pueda identificar de manera inequívoca. Registrar el origen de cada evento y declarar las fechas o vínculos ausentes en el histórico.</li>
+      <li><strong>Completar los huecos.</strong> Añadir llamadas internas a la función común solo donde falte el evento. Si una acción ya escribe su historial en la transacción, ese historial puede alimentar la proyección. Para operaciones que se ejecutan en Prisma, invocar la función con el mismo cliente transaccional. Usar una única fuente por actividad para evitar duplicados.</li>
+      <li><strong>Probar compatibilidad.</strong> Verificar en una copia aislada que firmas, respuestas, permisos y lecturas de solo lectura conservan su comportamiento. Probar un reintento, una reversión y el vínculo entre trámites. Medir latencia y definir antes de activar cada integración qué ocurre si el registro falla. Si la actividad ya deja historial transaccional, la proyección puede reintentarse sin bloquear el trámite.</li>
+    </ol>
+    <p>En DOC-08 se documenta por actividad el punto que la registra, su fuente, la clave del trámite y la evidencia. El primer recorrido para validar la propuesta es Tesorería → Caja → Contabilidad, con Gestión de Archivos y Repositorio CFDI como fuentes de evidencia. Los eventos sirven al análisis del proceso. Los momentos contables siguen vinculados a los actos y validaciones que corresponden a cada trámite.</p>
+  </section>
+
+  <section class="doc-section">
+    <h2 class="section-title">Referencias técnicas</h2>
+    <ul class="role-list">
+      <li><a href="https://www.postgresql.org/docs/17/sql-set-transaction.html">PostgreSQL 17 · Transacciones de solo lectura</a></li>
+      <li><a href="https://www.ocel-standard.org/">OCEL · Eventos, objetos y relaciones para minería de procesos</a></li>
+      <li><a href="00-estandares-analisis-funcional.html">DOC-08 · Estándar de análisis funcional</a></li>
+    </ul>
+  </section>
+</div>
+<script src="../shared.js"></script>
+</body>
+</html>
