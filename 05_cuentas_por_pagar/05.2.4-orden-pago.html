@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>05.2.4 Orden de pago · Manual de Desarrollo SIAF-PJEV</title>
+  <link rel="stylesheet" href="../shared.css">
+  <style>
+    body { padding: 36px 44px 64px; background: var(--pjev-crema); }
+    h3 { margin: 16px 0 8px; font-size: 15px; color: var(--pjev-verde-oscuro); }
+    .table-scroll, .wf-panel { overflow-x: auto; }
+    .props-table td { overflow-wrap: anywhere; }
+    pre { padding: 14px; overflow-x: auto; color: var(--code-text); background: var(--code-bg); border-radius: 6px; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .tabs button { padding: 7px 10px; border: 1px solid var(--pjev-borde); border-radius: 5px; background: white; color: var(--pjev-verde-oscuro); cursor: pointer; }
+    .tabs [aria-pressed="true"] { color: white; background: var(--pjev-verde-oscuro); }
+    .sp-panel[hidden], .wf-panel[hidden] { display: none; }
+    svg { display: block; width: 100%; height: auto; font: 12px system-ui, sans-serif; }
+    .wf-panel { border: 1px solid var(--pjev-borde); border-radius: 6px; }
+    .wf-panel svg { min-width: 690px; }
+    svg text { fill: var(--pjev-verde-oscuro); }
+    svg .heading { font-size: 17px; font-weight: 700; }
+    svg .label, svg .white { font-weight: 600; }
+    svg .white { fill: white; }
+    svg .cream { fill: var(--pjev-crema); }
+    svg .field { fill: white; stroke: var(--pjev-borde); }
+    svg .stripe { fill: #f5f2e9; stroke: var(--pjev-borde); }
+    svg .green { fill: var(--pjev-verde-oscuro); }
+    svg .connector { fill: none; stroke: var(--pjev-verde-oscuro); stroke-width: 1.3; }
+    .method { display: inline-block; padding: 2px 7px; border-radius: 4px; font: 700 11px var(--font-mono); }
+    .method.get { color: #1e40af; background: #dbeafe; }
+    .method.post { color: #166534; background: #dcfce7; }
+    .method.patch { color: #854d0e; background: #fef3c7; }
+    .method.delete { color: #991b1b; background: #fee2e2; }
+    @media (max-width: 760px) {
+      body { padding: 24px 16px 48px; }
+      body.embedded { padding-top: 72px; }
+    }
+    @media print {
+      body { padding: 0; }
+      .tabs { display: none !important; }
+      .sp-panel[hidden], .wf-panel[hidden] { display: block; }
+      .wf-panel { margin-bottom: 10px; break-inside: avoid; }
+      .wf-panel svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+<main class="doc-main-inner">
+  <nav class="elem-breadcrumb" aria-label="Ubicación">
+    <a href="../index.html" target="_top">Inicio</a> › <span>05 · Tesorería</span> › <span>05.2 · Registro</span>
+  </nav>
+  <header class="elem-header">
+    <div>
+      <div class="elem-id">05.2.4</div>
+      <h1 class="elem-title">Orden de pago</h1>
+      <p class="elem-desc">Preparación, autorización y turno de la orden de Tesorería a Caja.</p>
+      <span class="elem-tag">Responsable de desarrollo · Eunice</span>
+      <span class="elem-tag">Diseño funcional</span>
+    </div>
+  </header>
+
+  <section class="doc-section" id="descripcion" aria-labelledby="descripcion-titulo">
+    <h2 class="section-title" id="descripcion-titulo"><span class="section-num">1</span> Descripción general</h2>
+    <p>Tesorería prepara la orden desde una solicitud de gasto presupuestal o de pago no presupuestal autorizada. Registra folio, importes y beneficiarios y conserva el vínculo con el expediente de origen. El documento institucional que se entrega a Caja se denomina <strong>Solicitud-comprobación de recurso (orden de pago)</strong>.</p>
+    <p>La aprobación de la solicitud habilita la preparación de la orden. Para ambos orígenes, la orden aparece en 06.2.1 cuando Tesorería confirma <strong>Enviar a pago</strong> y se registra el turno. Caja consulta la orden en estado <code>2</code> con saldo pendiente. El asiento de turno depende del procedimiento.</p>
+    <p>En la revisión local del 17/11/2026, <code>cxp.ordenes_pago</code> existía y tenía cero filas. El enlace de esta ficha con la bandeja de Caja está en fase de diseño. <a href="#decisiones-integracion">Decisiones técnicas pendientes</a></p>
+  </section>
+
+  <section class="doc-section" id="normativa" aria-labelledby="normativa-titulo">
+    <h2 class="section-title" id="normativa-titulo"><span class="section-num">2</span> Marco normativo</h2>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Norma o procedimiento</th><th scope="col">Apartado</th><th scope="col">Aplicación</th></tr></thead>
+        <tbody>
+          <tr><td>Manual Específico de Procedimientos de Recursos Financieros del PJEV</td><td>Recepción y revisión de gastos y Registro de Solicitudes-comprobación de recursos. PDF pp. 98–99 y 199–206.</td><td>Tesorería reúne las autorizaciones y turna la orden con soporte. Caja prepara el pago, Tesorería lo libera y Caja registra el desembolso con su comprobante. <a href="https://www.pjeveracruz.gob.mx/pjev/archivos/archivos/transparencia/Ley875/I/2023/293/MANUAL.ESPECIFICO.PROCEDIMIENTOS.SUBDIRECCION.RECURSOS_FINANCIEROS_FEB_2023.pdf#page=199">Manual del PJEV</a></td></tr>
+          <tr><td>CONAC · Momentos contables de los egresos</td><td>Apartados XI y XII.</td><td>El Ejercido corresponde a la emisión del documento de pago autorizado por la autoridad competente. El Pagado se reconoce con el desembolso. <a href="https://dof.gob.mx/nota_detalle_popup.php?codigo=5106086">Normas y metodología del CONAC</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="doc-section" id="roles" aria-labelledby="roles-titulo">
+    <h2 class="section-title" id="roles-titulo"><span class="section-num">3</span> Roles que intervienen</h2>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Área</th><th scope="col">Acción</th><th scope="col">Control</th></tr></thead>
+        <tbody>
+          <tr><td>Tesorería / Cuentas por Pagar</td><td>Consulta solicitudes elegibles, prepara la orden, valida el desglose y reúne los soportes.</td><td>Permiso efectivo sobre el trámite y el ejercicio.</td></tr>
+          <tr><td>Autoridad competente</td><td>Firma o autoriza la orden según el procedimiento institucional.</td><td>La evidencia y la autoridad requerida dependen del procedimiento.</td></tr>
+          <tr><td>Tesorería con permiso de turno</td><td>Confirma Enviar a pago cuando se acreditan las autorizaciones.</td><td>Verifica el expediente y la programación aplicable.</td></tr>
+          <tr><td>Oficina de Caja</td><td>Consulta órdenes turnadas, prepara la operación bancaria y registra el desembolso comprobado.</td><td>Actúa desde 06.2.1 con sus permisos.</td></tr>
+          <tr><td>Titular de Tesorería</td><td>Valida y libera la operación bancaria preparada por Caja, cuando corresponde.</td><td>La liberación se realiza conforme al procedimiento y a los permisos bancarios.</td></tr>
+          <tr><td>Contabilidad</td><td>Define la regla contable por procedimiento y revisa la relación entre los asientos.</td><td>La Matriz de Conversión determina la póliza y las cuentas aplicables.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="doc-section" id="datos" aria-labelledby="datos-titulo">
+    <h2 class="section-title" id="datos-titulo"><span class="section-num">4</span> Modelo de datos</h2>
+    <p>El diseño propone aprovechar <code>cxp.ordenes_pago</code> y mantener su identidad <code>uuid</code> y ejercicio <code>smallint</code>. La tabla de renglones y las columnas siguientes representan el diseño final propuesto. <a href="../inicio/00-estandar-nomenclatura-postgresql.html">Estándar de nomenclatura</a></p>
+    <h3><code>cxp.ordenes_pago</code> · Encabezado</h3>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Campo</th><th scope="col">Tipo</th><th scope="col">Admite NULL</th><th scope="col">Predeterminado</th><th scope="col">Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>op_id</code></td><td><code>uuid</code></td><td>No</td><td><code>gen_random_uuid()</code></td><td>PK con el ejercicio. Generado con <code>gen_random_uuid()</code>.</td></tr>
+          <tr><td><code>op_ejercicio</code></td><td><code>smallint</code></td><td>No</td><td>—</td><td>PK con <code>op_id</code>. Ejercicio de la orden y de la solicitud que la origina.</td></tr>
+          <tr><td><code>op_afectacion_id</code></td><td><code>uuid</code></td><td>No</td><td>—</td><td>FK compuesta con <code>op_ejercicio</code> a <code>cxp.afectaciones_gasto(ag_id, ag_ejercicio)</code>.</td></tr>
+          <tr><td><code>op_folio</code></td><td><code>varchar(20)</code></td><td>Sí</td><td>—</td><td>Folio propio. Único por ejercicio cuando se asigna.</td></tr>
+          <tr><td><code>op_fecha_programada</code></td><td><code>date</code></td><td>Sí</td><td>—</td><td>Fecha prevista de pago, cuando corresponda.</td></tr>
+          <tr><td><code>op_forma_pago</code></td><td><code>varchar(1)</code></td><td>Sí</td><td>—</td><td>Medio previsto, cuando se define en Tesorería. <code>CHECK (op_forma_pago IN ('C', 'T'))</code>. <code>C</code> cheque y <code>T</code> transferencia.</td></tr>
+          <tr><td><code>op_importe_total</code></td><td><code>numeric(18,2)</code></td><td>No</td><td><code>0</code></td><td>Suma de los renglones activos, calculada al guardar sus cambios. <code>CHECK (op_importe_total &gt;= 0)</code>. Debe ser mayor que cero al turnar.</td></tr>
+          <tr><td><code>op_poliza_devengo_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>FK con <code>op_ejercicio</code> a <code>contabilidad.poliza(p_id, p_ejercicio)</code> cuando existe la póliza contable de origen. Se conserva la referencia sin generar otra PD.</td></tr>
+          <tr><td><code>op_poliza_turno_id</code></td><td><code>integer</code></td><td>Sí</td><td>—</td><td>Referencia al asiento de turno, cuando la Matriz de Conversión lo requiere. Su destino depende del contrato contable.</td></tr>
+          <tr><td><code>op_fecha_turno</code></td><td><code>timestamptz</code></td><td>Sí</td><td>—</td><td>Fecha y hora del envío confirmado a Caja.</td></tr>
+          <tr><td><code>estatus_registro</code></td><td><code>smallint</code></td><td>No</td><td><code>1</code></td><td><code>CHECK (estatus_registro IN (1, 2, 4))</code>. <code>1</code> En preparación, <code>2</code> Turnada a Caja y <code>4</code> Cancelada por baja lógica.</td></tr>
+          <tr><td><code>usuario_c</code></td><td><code>varchar(50)</code></td><td>No</td><td>—</td><td>Usuario de sesión que crea la orden.</td></tr>
+          <tr><td><code>fecha_c</code></td><td><code>timestamptz</code></td><td>No</td><td><code>now()</code></td><td>Fecha y hora de creación. Predeterminado <code>now()</code>.</td></tr>
+          <tr><td><code>usuario_m</code></td><td><code>varchar(50)</code></td><td>Sí</td><td>—</td><td>Usuario de sesión de la última modificación. Admite nulo al crear.</td></tr>
+          <tr><td><code>fecha_m</code></td><td><code>timestamptz</code></td><td>Sí</td><td>—</td><td>Fecha y hora de la última modificación. Admite nulo al crear.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3><code>cxp.ordenes_pago_movtos</code> · Renglones</h3>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Campo</th><th scope="col">Tipo</th><th scope="col">Admite NULL</th><th scope="col">Predeterminado</th><th scope="col">Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>opd_id</code></td><td><code>uuid</code></td><td>No</td><td><code>gen_random_uuid()</code></td><td>PK con <code>opd_orden_id</code> y <code>opd_ejercicio</code>. Generado con <code>gen_random_uuid()</code>.</td></tr>
+          <tr><td><code>opd_orden_id</code></td><td><code>uuid</code></td><td>No</td><td>—</td><td>Parte de la PK. Integra la FK con <code>opd_ejercicio</code> a <code>cxp.ordenes_pago(op_id, op_ejercicio)</code>.</td></tr>
+          <tr><td><code>opd_ejercicio</code></td><td><code>smallint</code></td><td>No</td><td>—</td><td>Parte de la PK y de la FK a la orden. Primera columna del índice anual.</td></tr>
+          <tr><td><code>opd_procedimiento_codigo</code></td><td><code>varchar(40)</code></td><td>No</td><td>—</td><td>Código de la Matriz de Conversión que aplica al renglón, como <code>NOMINA_NETA_DISPERSION</code> o <code>ENTERO_RETENCIONES</code>.</td></tr>
+          <tr><td><code>opd_concepto</code></td><td><code>varchar(500)</code></td><td>No</td><td>—</td><td>Concepto del importe que se ordena pagar.</td></tr>
+          <tr><td><code>opd_beneficiario_tipo</code></td><td><code>varchar(30)</code></td><td>No</td><td>—</td><td>Tipo de beneficiario según el catálogo que determine el procedimiento.</td></tr>
+          <tr><td><code>opd_beneficiario_id</code></td><td><code>bigint</code></td><td>No</td><td>—</td><td>Referencia lógica al catálogo identificado por <code>opd_beneficiario_tipo</code>, validada al grabar y turnar. El tipo físico queda por confirmar con los catálogos aplicables.</td></tr>
+          <tr><td><code>opd_importe</code></td><td><code>numeric(18,2)</code></td><td>No</td><td>—</td><td>Importe del renglón. <code>CHECK (opd_importe &gt; 0)</code>.</td></tr>
+          <tr><td><code>opd_fecha_vencimiento</code></td><td><code>date</code></td><td>Sí</td><td>—</td><td>Vencimiento, cuando corresponda. Permite distinguir las fechas de dispersión y de entero.</td></tr>
+          <tr><td><code>estatus_registro</code></td><td><code>smallint</code></td><td>No</td><td><code>1</code></td><td><code>CHECK (estatus_registro IN (0, 1))</code>. <code>1</code> activo y <code>0</code> baja lógica.</td></tr>
+          <tr><td><code>usuario_c</code></td><td><code>varchar(50)</code></td><td>No</td><td>—</td><td>Usuario de sesión que crea el renglón.</td></tr>
+          <tr><td><code>fecha_c</code></td><td><code>timestamptz</code></td><td>No</td><td><code>now()</code></td><td>Fecha y hora de creación. Predeterminado <code>now()</code>.</td></tr>
+          <tr><td><code>usuario_m</code></td><td><code>varchar(50)</code></td><td>Sí</td><td>—</td><td>Usuario de sesión de la última modificación. Admite nulo al crear.</td></tr>
+          <tr><td><code>fecha_m</code></td><td><code>timestamptz</code></td><td>Sí</td><td>—</td><td>Fecha y hora de la última modificación. Admite nulo al crear.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>PK del encabezado <code>(op_id, op_ejercicio)</code> e índice único <code>(op_ejercicio, op_folio)</code> sobre folios asignados. PK de renglones <code>(opd_id, opd_orden_id, opd_ejercicio)</code> e índice <code>(opd_ejercicio, opd_orden_id)</code>. La auditoría guarda el nombre del usuario autenticado. El historial identifica la orden por UUID y ejercicio.</p>
+    <details>
+      <summary>Referencia del esquema instalado</summary>
+      <p>La PK instalada es <code>(op_id, ejercicio_fiscal)</code>. <code>(f_ag_id, ejercicio_fiscal)</code> referencia <code>cxp.afectaciones_gasto(ag_id, ejercicio_fiscal)</code>. El encabezado incluye <code>folio_op</code>, <code>forma_pago</code>, <code>f_chequera_id</code>, <code>f_beneficiario_cta</code>, <code>importe_neto</code>, <code>fecha_programada</code>, <code>estatus_workflow</code>, <code>f_poliza_devengo_id</code>, <code>f_poliza_egreso_id</code>, <code>estatus_registro</code>, <code>usuario_c</code> y <code>fecha_c</code>.</p>
+      <p>Para la migración hay que cotejar las dependencias de Caja sobre chequera, cuenta del beneficiario y póliza de egreso, así como su obligatoriedad en cada etapa. Deben conciliarse <code>importe_neto</code> con el total por renglones y los valores de <code>estatus_workflow</code> con las transiciones del diseño antes de homologar campos.</p>
+    </details>
+  </section>
+
+  <section class="doc-section" id="funciones" aria-labelledby="funciones-titulo">
+    <h2 class="section-title" id="funciones-titulo"><span class="section-num">5</span> Funciones PostgreSQL e integridad</h2>
+    <p>Firmas de diseño. NestJS obtiene el ejercicio y el actor de la sesión autenticada. Las funciones aplican los permisos y el alcance del registro. La edición de encabezado y renglones usa los cuatro contratos del formulario compuesto. El turno tiene su propia operación transaccional.</p>
+    <div class="tabs" role="group" aria-label="Contratos de funciones">
+      <button type="button" data-panel="sp-leer" aria-controls="sp-leer" aria-pressed="true">LEER encabezado</button>
+      <button type="button" data-panel="sp-abc" aria-controls="sp-abc" aria-pressed="false">ABC encabezado</button>
+      <button type="button" data-panel="sp-leer-movtos" aria-controls="sp-leer-movtos" aria-pressed="false">LEER renglones</button>
+      <button type="button" data-panel="sp-abc-movtos" aria-controls="sp-abc-movtos" aria-pressed="false">ABC renglones</button>
+      <button type="button" data-panel="sp-turno" aria-controls="sp-turno" aria-pressed="false">Enviar a pago</button>
+    </div>
+    <p>Cada función devuelve el objeto JSON <code>{cod_resultado, msg_resultado, data}</code>. <code>cod_resultado</code> es <code>integer</code> y <code>msg_resultado</code> es <code>varchar</code>. <code>0</code> confirma la operación, <code>-1</code> indica validación o regla de negocio y <code>-2</code> una excepción técnica. <code>data</code> contiene el objeto descrito en cada contrato en éxito y es <code>null</code> en error.</p>
+    <div class="sp-panel" id="sp-leer">
+      <h3>Entrada (IN)</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Parámetro</th><th scope="col">Tipo</th><th scope="col">Predeterminado</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_ejercicio</code></td><td><code>smallint</code></td><td>—</td><td>Ejercicio autorizado de sesión.</td></tr>
+            <tr><td><code>p_usuario</code></td><td><code>varchar</code></td><td>—</td><td>Usuario autenticado para verificar el alcance de consulta.</td></tr>
+            <tr><td><code>p_accion</code></td><td><code>smallint</code></td><td><code>1</code></td><td>1 consulta (lista sin UUID o detalle por UUID). 2 devuelve la plantilla de alta. 3 consulta la bandeja de Caja según RN-OP-05.</td></tr>
+            <tr><td><code>p_id</code></td><td><code>uuid</code></td><td><code>NULL</code></td><td>Identificador de la orden para consultar su encabezado.</td></tr>
+            <tr><td><code>p_afectacion_id</code></td><td><code>uuid</code></td><td><code>NULL</code></td><td>Identificador de solicitud elegible. Obligatorio para la plantilla.</td></tr>
+            <tr><td><code>p_folio</code></td><td><code>varchar</code></td><td><code>NULL</code></td><td>Filtro por folio de la orden.</td></tr>
+            <tr><td><code>p_estatus_registro</code></td><td><code>smallint</code></td><td><code>NULL</code></td><td>Filtro de la consulta general. En acción 3 la función fija el estado 2.</td></tr>
+            <tr><td><code>p_fecha_desde</code></td><td><code>date</code></td><td><code>NULL</code></td><td>Inicio inclusivo del rango de fecha programada.</td></tr>
+            <tr><td><code>p_fecha_hasta</code></td><td><code>date</code></td><td><code>NULL</code></td><td>Fin inclusivo del rango. Debe ser igual o posterior al inicio.</td></tr>
+            <tr><td><code>p_pagina</code></td><td><code>integer</code></td><td><code>1</code></td><td>Página, a partir de 1.</td></tr>
+            <tr><td><code>p_limite</code></td><td><code>integer</code></td><td><code>50</code></td><td>Tamaño de página entre 1 y 100.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Salida (OUT) JSON · Datos en éxito</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Campo</th><th scope="col">Tipo</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>data.filas</code>, <code>data.total</code>, <code>data.pagina</code></td><td><code>array</code>, <code>integer</code>, <code>integer</code></td><td>Listado ordenado por fecha de creación descendente y UUID como desempate. Cada fila incluye <code>op_id</code>, <code>op_ejercicio</code>, <code>op_folio</code>, <code>solicitud_folio</code>, <code>procedimientos</code>, <code>op_importe_total</code>, <code>estatus_registro</code> y <code>acciones_permitidas</code>. La bandeja de Caja incluye el saldo pendiente.</td></tr>
+            <tr><td><code>data.encabezado</code></td><td><code>object</code></td><td>Detalle por UUID y ejercicio, con expediente, autorizaciones, historial y referencias de pago que el usuario pueda consultar.</td></tr>
+            <tr><td><code>data.encabezado</code></td><td><code>object</code></td><td>Plantilla con la solicitud elegible, estado 1, total inicial 0 y valores iniciales del formulario.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Firma SQL propuesta</h3>
+      <pre><code>cxp.fn_leer_ordenes_pago(
+  p_ejercicio smallint,
+  p_usuario varchar,
+  p_accion smallint DEFAULT 1,
+  p_id uuid DEFAULT NULL,
+  p_afectacion_id uuid DEFAULT NULL,
+  p_folio varchar DEFAULT NULL,
+  p_estatus_registro smallint DEFAULT NULL,
+  p_fecha_desde date DEFAULT NULL,
+  p_fecha_hasta date DEFAULT NULL,
+  p_pagina integer DEFAULT 1,
+  p_limite integer DEFAULT 50
+) RETURNS jsonb</code></pre>
+      <p>Verifica permiso y ejercicio en todos los modos. La acción 2 obtiene una plantilla sin escribir datos. La acción 3 exige el permiso de Caja y aplica la condición de saldo antes de paginar y calcular el total. Una consulta sin coincidencias en lista devuelve total 0.</p>
+    </div>
+    <div class="sp-panel" id="sp-abc" hidden>
+      <h3>Entrada (IN)</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Parámetro</th><th scope="col">Tipo</th><th scope="col">Predeterminado</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_accion</code></td><td><code>smallint</code></td><td>—</td><td>1 alta, 2 cambio, 3 cancelación con baja lógica.</td></tr>
+            <tr><td><code>p_ejercicio</code></td><td><code>smallint</code></td><td>—</td><td>Ejercicio autorizado de sesión.</td></tr>
+            <tr><td><code>p_usuario</code></td><td><code>varchar</code></td><td>—</td><td>Usuario autenticado que ejecuta la acción.</td></tr>
+            <tr><td><code>p_datos</code></td><td><code>jsonb</code></td><td>—</td><td>Alta: op_afectacion_id y campos de captura. Cambio: sólo op_fecha_programada y op_forma_pago. Cancelación: motivo requerido.</td></tr>
+            <tr><td><code>p_id</code></td><td><code>uuid</code></td><td><code>NULL</code></td><td>UUID de la orden. Obligatorio para cambio y cancelación.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Salida (OUT) JSON · Datos en éxito</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Campo</th><th scope="col">Tipo</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>data.op_id</code>, <code>data.op_ejercicio</code>, <code>data.op_folio</code>, <code>data.estatus_registro</code></td><td><code>uuid</code>, <code>smallint</code>, <code>varchar</code>, <code>smallint</code></td><td>Identidad y estado resultante. El folio puede estar pendiente durante la preparación.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Firma SQL propuesta</h3>
+      <pre><code>cxp.fn_abc_orden_pago(
+  p_accion smallint,
+  p_ejercicio smallint,
+  p_usuario varchar,
+  p_datos jsonb,
+  p_id uuid DEFAULT NULL
+) RETURNS jsonb</code></pre>
+      <p>En alta coteja la elegibilidad del origen. En cambio y cancelación bloquea el encabezado y exige estado 1. La cancelación registra 1 → 4 con el motivo. El folio, las referencias contables, el importe calculado y los campos base los administra el servidor.</p>
+    </div>
+    <div class="sp-panel" id="sp-leer-movtos" hidden>
+      <h3>Entrada (IN)</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Parámetro</th><th scope="col">Tipo</th><th scope="col">Predeterminado</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_orden_id</code></td><td><code>uuid</code></td><td>—</td><td>UUID del encabezado de la orden.</td></tr>
+            <tr><td><code>p_ejercicio</code></td><td><code>smallint</code></td><td>—</td><td>Ejercicio autorizado de sesión.</td></tr>
+            <tr><td><code>p_usuario</code></td><td><code>varchar</code></td><td>—</td><td>Usuario autenticado para verificar el acceso a la orden.</td></tr>
+            <tr><td><code>p_accion</code></td><td><code>smallint</code></td><td><code>1</code></td><td>1 consulta (lista o detalle por UUID). 2 devuelve una plantilla de renglón para una orden editable.</td></tr>
+            <tr><td><code>p_id</code></td><td><code>uuid</code></td><td><code>NULL</code></td><td>UUID del renglón para detalle.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Salida (OUT) JSON · Datos en éxito</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Campo</th><th scope="col">Tipo</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>data.filas</code>, <code>data.total</code></td><td><code>array</code>, <code>integer</code></td><td>Renglones activos asociados a la orden y cantidad devuelta.</td></tr>
+            <tr><td><code>data.renglon</code></td><td><code>object</code></td><td>Detalle o plantilla. Incluye los campos de renglón que corresponden al modo y al permiso.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Firma SQL propuesta</h3>
+      <pre><code>cxp.fn_leer_orden_pago_movtos(
+  p_orden_id uuid,
+  p_ejercicio smallint,
+  p_usuario varchar,
+  p_accion smallint DEFAULT 1,
+  p_id uuid DEFAULT NULL
+) RETURNS jsonb</code></pre>
+      <p>Aplica los permisos de la orden. En modo detalle busca el renglón por su PK compuesta. El modo plantilla conserva la referencia a la orden y su ejercicio.</p>
+    </div>
+    <div class="sp-panel" id="sp-abc-movtos" hidden>
+      <h3>Entrada (IN)</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Parámetro</th><th scope="col">Tipo</th><th scope="col">Predeterminado</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_accion</code></td><td><code>smallint</code></td><td>—</td><td>1 alta, 2 cambio, 3 baja lógica del renglón.</td></tr>
+            <tr><td><code>p_orden_id</code></td><td><code>uuid</code></td><td>—</td><td>UUID del encabezado.</td></tr>
+            <tr><td><code>p_ejercicio</code></td><td><code>smallint</code></td><td>—</td><td>Ejercicio autorizado de sesión.</td></tr>
+            <tr><td><code>p_usuario</code></td><td><code>varchar</code></td><td>—</td><td>Usuario autenticado que ejecuta la acción.</td></tr>
+            <tr><td><code>p_id</code></td><td><code>uuid</code></td><td><code>NULL</code></td><td>UUID del renglón. Obligatorio para cambio y baja lógica.</td></tr>
+            <tr><td><code>p_datos</code></td><td><code>jsonb</code></td><td><code>NULL</code></td><td>Alta y cambio: opd_procedimiento_codigo, opd_concepto, opd_beneficiario_tipo, opd_beneficiario_id, opd_importe y opd_fecha_vencimiento. Baja lógica: sin datos de captura.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Salida (OUT) JSON · Datos en éxito</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Campo</th><th scope="col">Tipo</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>data.op_id</code>, <code>data.op_ejercicio</code>, <code>data.opd_id</code>, <code>data.estatus_registro</code>, <code>data.op_importe_total</code></td><td><code>uuid</code>, <code>smallint</code>, <code>uuid</code>, <code>smallint</code>, <code>numeric</code></td><td>Identidades, vigencia del renglón y nuevo total de la orden.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Firma SQL propuesta</h3>
+      <pre><code>cxp.fn_abc_orden_pago_movtos(
+  p_accion smallint,
+  p_orden_id uuid,
+  p_ejercicio smallint,
+  p_usuario varchar,
+  p_id uuid DEFAULT NULL,
+  p_datos jsonb DEFAULT NULL
+) RETURNS jsonb</code></pre>
+      <p>Bloquea la orden y verifica estado 1, permiso, beneficiario y procedimiento. Aplica baja 1 → 0 en el detalle. Actualiza el total del encabezado en la misma transacción.</p>
+    </div>
+    <div class="sp-panel" id="sp-turno" hidden>
+      <h3>Entrada (IN)</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Parámetro</th><th scope="col">Tipo</th><th scope="col">Predeterminado</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>p_id</code></td><td><code>uuid</code></td><td>—</td><td>UUID de la orden a turnar.</td></tr>
+            <tr><td><code>p_ejercicio</code></td><td><code>smallint</code></td><td>—</td><td>Ejercicio autorizado de sesión.</td></tr>
+            <tr><td><code>p_usuario</code></td><td><code>varchar</code></td><td>—</td><td>Usuario autenticado con permiso de turno.</td></tr>
+            <tr><td><code>p_observacion</code></td><td><code>varchar</code></td><td><code>NULL</code></td><td>Observación del turno, cuando proceda.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Salida (OUT) JSON · Datos en éxito</h3>
+      <div class="table-scroll">
+        <table class="props-table">
+          <thead><tr><th scope="col">Campo</th><th scope="col">Tipo</th><th scope="col">Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>data.op_id</code>, <code>data.op_ejercicio</code>, <code>data.op_folio</code>, <code>data.estatus_registro</code>, <code>data.op_fecha_turno</code>, <code>data.op_poliza_turno_id</code></td><td><code>uuid</code>, <code>smallint</code>, <code>varchar</code>, <code>smallint</code>, <code>timestamptz</code>, <code>integer</code></td><td>Identidad, turno registrado en estado 2 y referencia del asiento cuando corresponda.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Firma SQL propuesta</h3>
+      <pre><code>cxp.fn_turnar_orden_pago(
+  p_id uuid,
+  p_ejercicio smallint,
+  p_usuario varchar,
+  p_observacion varchar DEFAULT NULL
+) RETURNS jsonb</code></pre>
+      <p>Bloquea la orden y valida el origen, la evidencia de autorizaciones en el expediente, el detalle y el cuadre. Registra el turno y, cuando corresponde, vincula el asiento en la misma transacción. Un reintento sobre el turno ya confirmado devuelve su resultado persistido.</p>
+    </div>
+    <p>La PK, las FK y los CHECK del modelo preservan la integridad básica. La configuración de triggers y las definiciones SQL completas quedan pendientes de implementación junto con la migración documentada.</p>
+  </section>
+
+  <section class="doc-section" id="rest" aria-labelledby="rest-titulo">
+    <h2 class="section-title" id="rest-titulo"><span class="section-num">6</span> Servicios REST propuestos</h2>
+    <p>NestJS valida los permisos y toma usuario y ejercicio de sesión. Las rutas usan <code>:id</code> para la orden y <code>:renglon_id</code> para el renglón. Cada operación conserva <code>cod_resultado</code>, <code>msg_resultado</code> y <code>data</code> para la pantalla. Usa 200 en consultas y cambios, 201 en altas, 400 ante entrada inválida, 403 ante falta de permiso, 404 ante registro fuera del ámbito de consulta, 409 ante conflicto de negocio y 500 ante excepción técnica.</p>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Método</th><th scope="col">Ruta</th><th scope="col">Entrada</th><th scope="col">Resultado</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method get">GET</span></td><td><code>/api/cxp/ordenes-pago</code></td><td>Query opcional <code>folio</code>, <code>estatus_registro</code>, <code>fecha_desde</code>, <code>fecha_hasta</code>, <code>pagina</code> y <code>limite</code>.</td><td>LEER encabezado con acción 1 y los filtros correspondientes.</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/api/cxp/ordenes-pago/solicitudes-elegibles</code></td><td>Ejercicio de sesión.</td><td>Consulta los expedientes del origen con autorización efectiva según RN-OP-01. Devuelve UUID, folio y procedimiento visibles al usuario.</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/api/cxp/ordenes-pago/plantilla</code></td><td>Query <code>afectacion_id</code> de la solicitud seleccionada.</td><td>LEER encabezado con acción 2 y <code>p_afectacion_id</code>.</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/api/cxp/ordenes-pago/:id</code></td><td>UUID de la orden.</td><td>LEER encabezado y renglones. En éxito, <code>data.encabezado</code> y <code>data.renglones</code>.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/cxp/ordenes-pago</code></td><td><code>op_afectacion_id</code>, <code>op_fecha_programada</code> y <code>op_forma_pago</code>.</td><td>ABC encabezado con acción 1. Crea una orden en preparación.</td></tr>
+          <tr><td><span class="method patch">PATCH</span></td><td><code>/api/cxp/ordenes-pago/:id</code></td><td><code>op_fecha_programada</code> y <code>op_forma_pago</code>.</td><td>ABC encabezado con acción 2. Guarda los campos editados.</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/api/cxp/ordenes-pago/:id/renglones/plantilla</code></td><td>UUID de la orden.</td><td>LEER renglones con acción 2.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/cxp/ordenes-pago/:id/renglones</code></td><td>Campos de captura definidos en <code>p_datos</code> de ABC renglones.</td><td>ABC renglones con acción 1 y <code>p_orden_id</code>.</td></tr>
+          <tr><td><span class="method patch">PATCH</span></td><td><code>/api/cxp/ordenes-pago/:id/renglones/:renglon_id</code></td><td>Campos editados del renglón.</td><td>ABC renglones con acción 2 y las dos identidades.</td></tr>
+          <tr><td><span class="method delete">DELETE</span></td><td><code>/api/cxp/ordenes-pago/:id/renglones/:renglon_id</code></td><td>UUID de la orden y del renglón.</td><td>ABC renglones con acción 3. Aplica baja lógica.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/cxp/ordenes-pago/:id/enviar-a-pago</code></td><td>Observación opcional <code>observacion</code>.</td><td><code>fn_turnar_orden_pago</code>. Coteja la evidencia de autorizaciones del expediente desde el servidor.</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/cxp/ordenes-pago/:id/cancelar</code></td><td><code>motivo</code> requerido.</td><td>ABC encabezado con acción 3 y <code>p_datos.motivo</code>.</td></tr>
+          <tr><td><span class="method get">GET</span></td><td><code>/api/cxp/ordenes-pago/turnadas</code></td><td>Permiso de Caja. Query opcional <code>pagina</code> y <code>limite</code>.</td><td>LEER encabezado con acción 3. Aplica RN-OP-05 antes de paginar y calcular el total.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="doc-section" id="acciones" aria-labelledby="acciones-titulo">
+    <h2 class="section-title" id="acciones-titulo"><span class="section-num">7</span> Acciones del módulo</h2>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Acción</th><th scope="col">Rol requerido</th><th scope="col">Estado de la orden</th><th scope="col">Efecto</th></tr></thead>
+        <tbody>
+          <tr><td>Preparar orden</td><td>Tesorería con permiso de captura</td><td>Alta → 1 En preparación</td><td>Selecciona una solicitud autorizada de 05.2.1 o 05.2.2 y crea el encabezado al guardar.</td></tr>
+          <tr><td>Guardar orden</td><td>Tesorería con permiso de edición</td><td>1 → 1</td><td>Guarda el encabezado. Agregar, editar y quitar renglones actualiza el total mediante las operaciones de detalle.</td></tr>
+          <tr><td>Enviar a pago</td><td>Tesorería con permiso de turno</td><td>1 → 2 Turnada a Caja</td><td>Registra el turno y el asiento aplicable en una misma transacción. Para 05.2.1, está pendiente definir si la PD debe estar ya contabilizada para completar esta acción.</td></tr>
+          <tr><td>Cancelar</td><td>Tesorería con permiso de cancelación</td><td>1 → 4 Cancelada</td><td>Aplica baja lógica con motivo. El retiro de órdenes turnadas y su eventual reversión quedan sujetos a definición con Caja y Contabilidad.</td></tr>
+          <tr><td>Consultar</td><td>Usuario con permiso efectivo de lectura</td><td>Sin cambio</td><td>Muestra la solicitud, el expediente, el historial y el resultado de pago que el usuario puede consultar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="doc-section" id="interfaz" aria-labelledby="interfaz-titulo">
+    <h2 class="section-title" id="interfaz-titulo"><span class="section-num">8</span> Diseño de interfaces</h2>
+    <p>La bandeja permite preparar órdenes desde solicitudes elegibles y consultar las ya registradas. El formulario muestra encabezado, renglones, total, autorizaciones y expediente. <code>@p_campo</code> indica un parámetro de consulta, <code>@campo</code> un campo de captura y <code>{campo}</code> un dato de salida. El ejercicio se muestra desde la sesión. Los importes y folios son ilustrativos.</p>
+    <div class="tabs" role="group" aria-label="Vistas de Orden de pago">
+      <button type="button" data-panel="wf-lista-parametros" aria-controls="wf-lista-parametros" aria-pressed="true">Bandeja · Parámetros</button>
+      <button type="button" data-panel="wf-lista-valores" aria-controls="wf-lista-valores" aria-pressed="false">Bandeja · Valores</button>
+      <button type="button" data-panel="wf-orden-parametros" aria-controls="wf-orden-parametros" aria-pressed="false">Orden · Parámetros</button>
+      <button type="button" data-panel="wf-orden-valores" aria-controls="wf-orden-valores" aria-pressed="false">Orden · Valores</button>
+      <button type="button" data-panel="wf-confirmacion-turno" aria-controls="wf-confirmacion-turno" aria-pressed="false">Confirmación de turno</button>
+    </div>
+    <div class="wf-panel" id="wf-lista-parametros">
+    <svg viewBox="0 0 820 321" role="img" aria-labelledby="lista-parametros-tit">
+    <title id="lista-parametros-tit">Bandeja de órdenes de pago</title>
+    <rect x="0" y="0" width="820" height="321" rx="4" class="cream"/>
+    <text x="24" y="36" class="heading">Órdenes de pago · Tesorería</text>
+    <rect x="645" y="15" width="151" height="28" rx="4" class="green"/><text x="655" y="33" class="white">Preparar orden</text>
+    <rect x="24" y="55" width="772" height="107" rx="4" class="field"/>
+    <text x="37" y="78" class="label">Ejercicio</text><rect x="37" y="85" width="132" height="28" rx="4" class="field"/><text x="46" y="103" class="">@p_ejercicio</text>
+    <text x="182" y="78" class="label">Folio</text><rect x="182" y="85" width="147" height="28" rx="4" class="field"/><text x="191" y="103" class="">@p_folio</text>
+    <text x="342" y="78" class="label">Estado</text><rect x="342" y="85" width="174" height="28" rx="4" class="field"/><text x="351" y="103" class="">@p_estatus_registro</text>
+    <text x="529" y="78" class="label">Fecha programada</text><rect x="529" y="85" width="254" height="28" rx="4" class="field"/><text x="538" y="103" class="">@p_fecha_desde / @p_fecha_hasta</text>
+    <rect x="37" y="122" width="84" height="28" rx="4" class="green"/><text x="47" y="140" class="white">Consultar</text>
+    <text x="140" y="140" class="">Limpiar filtros</text>
+    <text x="24" y="188" class="heading">Órdenes registradas</text>
+    <rect x="24" y="199" width="772" height="29" rx="4" class="green"/><text x="32" y="218" class="white">Orden</text><text x="134" y="218" class="white">Solicitud</text><text x="259" y="218" class="white">Procedimiento</text><text x="431" y="218" class="white">Importe</text><text x="541" y="218" class="white">Estado</text><text x="654" y="218" class="white">Acción</text><rect x="24" y="228" width="772" height="35" rx="4" class="field"/><text x="32" y="249" class="">{op_folio}</text><text x="134" y="249" class="">{solicitud_folio}</text><text x="259" y="249" class="">{procedimientos}</text><text x="431" y="249" class="">{op_importe_total}</text><text x="541" y="249" class="">{estatus_registro}</text><text x="654" y="249" class="">{acciones_permitidas}</text>
+    <text x="611" y="310" class="">{total} · {pagina}</text>
+    </svg>
+    </div>
+    <div class="wf-panel" id="wf-lista-valores" hidden>
+    <svg viewBox="0 0 820 321" role="img" aria-labelledby="lista-valores-tit">
+    <title id="lista-valores-tit">Bandeja de órdenes de pago</title>
+    <rect x="0" y="0" width="820" height="321" rx="4" class="cream"/>
+    <text x="24" y="36" class="heading">Órdenes de pago · Tesorería</text>
+    <rect x="645" y="15" width="151" height="28" rx="4" class="green"/><text x="655" y="33" class="white">Preparar orden</text>
+    <rect x="24" y="55" width="772" height="107" rx="4" class="field"/>
+    <text x="37" y="78" class="label">Ejercicio</text><rect x="37" y="85" width="132" height="28" rx="4" class="field"/><text x="46" y="103" class="">2026</text>
+    <text x="182" y="78" class="label">Folio</text><rect x="182" y="85" width="147" height="28" rx="4" class="field"/><text x="191" y="103" class="">Todos</text>
+    <text x="342" y="78" class="label">Estado</text><rect x="342" y="85" width="174" height="28" rx="4" class="field"/><text x="351" y="103" class="">Todos</text>
+    <text x="529" y="78" class="label">Fecha programada</text><rect x="529" y="85" width="254" height="28" rx="4" class="field"/><text x="538" y="103" class="">Noviembre 2026</text>
+    <rect x="37" y="122" width="84" height="28" rx="4" class="green"/><text x="47" y="140" class="white">Consultar</text>
+    <text x="140" y="140" class="">Limpiar filtros</text>
+    <text x="24" y="188" class="heading">Órdenes registradas</text>
+    <rect x="24" y="199" width="772" height="29" rx="4" class="green"/><text x="32" y="218" class="white">Orden</text><text x="134" y="218" class="white">Solicitud</text><text x="259" y="218" class="white">Procedimiento</text><text x="431" y="218" class="white">Importe</text><text x="541" y="218" class="white">Estado</text><text x="654" y="218" class="white">Acción</text><rect x="24" y="228" width="772" height="35" rx="4" class="field"/><text x="32" y="249" class="">OP-00042</text><text x="134" y="249" class="">E-000051</text><text x="259" y="249" class="">401 · Nómina neta</text><text x="431" y="249" class="">$80,000.00</text><text x="541" y="249" class="">En preparación</text><text x="654" y="249" class="">Abrir</text>
+    <rect x="24" y="263" width="772" height="35" rx="4" class="stripe"/><text x="32" y="284" class="">OP-00043</text><text x="134" y="284" class="">E-000052</text><text x="259" y="284" class="">402 · Entero de retenciones</text><text x="431" y="284" class="">$20,000.00</text><text x="541" y="284" class="">Turnada a Caja</text><text x="654" y="284" class="">Consultar</text>
+    <text x="611" y="310" class="">2 resultados · Página 1</text>
+    </svg>
+    </div>
+    <div class="wf-panel" id="wf-orden-parametros" hidden>
+    <svg viewBox="0 0 820 465" role="img" aria-labelledby="orden-parametros-tit">
+    <title id="orden-parametros-tit">Formulario compuesto de orden de pago</title>
+    <rect x="0" y="0" width="820" height="465" rx="4" class="cream"/>
+    <text x="24" y="35" class="heading">Orden {op_folio}</text>
+    <text x="620" y="34" class="">{estatus_registro}</text>
+    <rect x="24" y="50" width="772" height="134" rx="4" class="field"/>
+    <text x="37" y="72" class="heading">Encabezado de la orden</text>
+    <text x="37" y="99" class="label">Solicitud autorizada</text><rect x="37" y="106" width="236" height="28" rx="4" class="field"/><text x="46" y="124" class="">@op_afectacion_id</text>
+    <text x="286" y="99" class="label">Fecha programada</text><rect x="286" y="106" width="236" height="28" rx="4" class="field"/><text x="295" y="124" class="">@op_fecha_programada</text>
+    <text x="535" y="99" class="label">Medio previsto</text><rect x="535" y="106" width="248" height="28" rx="4" class="field"/><text x="544" y="124" class="">@op_forma_pago</text>
+    <text x="37" y="163" class="">{expediente} · {op_poliza_devengo_id}</text>
+    <text x="24" y="216" class="heading">Desglose de la orden</text>
+    <rect x="645" y="196" width="151" height="28" rx="4" class="green"/><text x="655" y="214" class="white">Agregar renglón</text>
+    <rect x="24" y="231" width="772" height="29" rx="4" class="green"/><text x="32" y="250" class="white">Procedimiento</text><text x="225" y="250" class="white">Beneficiario</text><text x="415" y="250" class="white">Vencimiento</text><text x="589" y="250" class="white">Importe</text><text x="714" y="250" class="white">Acción</text><rect x="24" y="260" width="772" height="35" rx="4" class="field"/><text x="32" y="281" class="">@opd_procedimiento_codigo</text><text x="225" y="281" class="">@opd_beneficiario_id</text><text x="415" y="281" class="">@opd_fecha_vencimiento</text><text x="589" y="281" class="">@opd_importe</text><text x="714" y="281" class="">Editar</text>
+    <text x="510" y="320" class="label">Total de la orden · {op_importe_total}</text>
+    <rect x="24" y="335" width="772" height="64" rx="4" class="field"/>
+    <text x="37" y="358" class="heading">Autorizaciones y expediente</text>
+    <text x="37" y="380" class="">{autorizaciones} · {documentos_soporte}</text>
+    <rect x="24" y="420" width="125" height="28" rx="4" class="green"/><text x="34" y="438" class="white">Guardar orden</text>
+    <rect x="161" y="420" width="139" height="28" rx="4" class="green"/><text x="171" y="438" class="white">Enviar a pago</text>
+    <text x="319" y="438" class="">Consultar historial</text>
+    </svg>
+    </div>
+    <div class="wf-panel" id="wf-orden-valores" hidden>
+    <svg viewBox="0 0 820 465" role="img" aria-labelledby="orden-valores-tit">
+    <title id="orden-valores-tit">Formulario compuesto de orden de pago</title>
+    <rect x="0" y="0" width="820" height="465" rx="4" class="cream"/>
+    <text x="24" y="35" class="heading">Orden OP-00042</text>
+    <text x="620" y="34" class="">1 · En preparación</text>
+    <rect x="24" y="50" width="772" height="134" rx="4" class="field"/>
+    <text x="37" y="72" class="heading">Encabezado de la orden</text>
+    <text x="37" y="99" class="label">Solicitud autorizada</text><rect x="37" y="106" width="236" height="28" rx="4" class="field"/><text x="46" y="124" class="">E-000051 · Nómina quincenal</text>
+    <text x="286" y="99" class="label">Fecha programada</text><rect x="286" y="106" width="236" height="28" rx="4" class="field"/><text x="295" y="124" class="">30/11/2026</text>
+    <text x="535" y="99" class="label">Medio previsto</text><rect x="535" y="106" width="248" height="28" rx="4" class="field"/><text x="544" y="124" class="">Transferencia</text>
+    <text x="37" y="163" class="">Expediente integrado · Póliza de origen vinculada</text>
+    <text x="24" y="216" class="heading">Desglose de la orden</text>
+    <rect x="645" y="196" width="151" height="28" rx="4" class="green"/><text x="655" y="214" class="white">Agregar renglón</text>
+    <rect x="24" y="231" width="772" height="29" rx="4" class="green"/><text x="32" y="250" class="white">Procedimiento</text><text x="225" y="250" class="white">Beneficiario</text><text x="415" y="250" class="white">Vencimiento</text><text x="589" y="250" class="white">Importe</text><text x="714" y="250" class="white">Acción</text><rect x="24" y="260" width="772" height="35" rx="4" class="field"/><text x="32" y="281" class="">401 · Nómina neta</text><text x="225" y="281" class="">Unidad de Nómina</text><text x="415" y="281" class="">30/11/2026</text><text x="589" y="281" class="">$80,000.00</text><text x="714" y="281" class="">Editar</text>
+    <text x="510" y="320" class="label">Total de la orden · $80,000.00</text>
+    <rect x="24" y="335" width="772" height="64" rx="4" class="field"/>
+    <text x="37" y="358" class="heading">Autorizaciones y expediente</text>
+    <text x="37" y="380" class="">Autorizaciones verificadas · Soporte disponible</text>
+    <rect x="24" y="420" width="125" height="28" rx="4" class="green"/><text x="34" y="438" class="white">Guardar orden</text>
+    <rect x="161" y="420" width="139" height="28" rx="4" class="green"/><text x="171" y="438" class="white">Enviar a pago</text>
+    <text x="319" y="438" class="">Consultar historial</text>
+    </svg>
+    </div>
+    <div class="wf-panel" id="wf-confirmacion-turno" hidden>
+      <svg viewBox="0 0 820 310" role="img" aria-labelledby="confirmacion-turno-tit">
+        <title id="confirmacion-turno-tit">Confirmación de envío a Caja</title>
+        <rect width="820" height="310" class="cream"/>
+        <rect x="170" y="30" width="480" height="250" rx="6" class="field"/>
+        <text x="194" y="64" class="heading">Confirmar envío a pago</text>
+        <text x="194" y="96" class="label">Orden OP-00042</text>
+        <text x="194" y="123">Importe $80,000.00 · Destino Oficina de Caja</text>
+        <text x="194" y="159" class="label">Observación opcional</text>
+        <rect x="194" y="170" width="432" height="42" rx="4" class="field"/>
+        <text x="205" y="194">Nómina de la segunda quincena</text>
+        <rect x="406" y="230" width="78" height="29" rx="4" class="stripe"/>
+        <text x="420" y="249" class="label">Volver</text>
+        <rect x="494" y="230" width="132" height="29" rx="4" class="green"/>
+        <text x="508" y="249" class="white">Enviar a pago</text>
+      </svg>
+    </div>
+    <p>La confirmación de <strong>Enviar a pago</strong> usa <code>SiafModal</code> y muestra folio, importe y destino. La pantalla evita un segundo envío mientras se procesa la petición. <code>useSiafToast()</code> comunica <code>msg_resultado</code> con <code>success</code> para <code>0</code>, <code>warning</code> para <code>-1</code> y <code>error</code> para <code>-2</code>. Si falla, la orden conserva su estado y los datos capturados. Los errores de captura se muestran también junto a los campos correspondientes.</p>
+  </section>
+
+  <section class="doc-section" id="reglas" aria-labelledby="reglas-titulo">
+    <h2 class="section-title" id="reglas-titulo"><span class="section-num">9</span> Reglas de negocio críticas</h2>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Código</th><th scope="col">Regla</th><th scope="col">Consecuencia</th><th scope="col">Dónde se valida</th></tr></thead>
+        <tbody>
+          <tr><td>RN-OP-01</td><td>La preparación parte de una solicitud vigente y autorizada. En 05.2.1, el estado 2 requiere la acción <code>APROBAR</code> vigente en el historial. El estado 3 conserva esa evidencia y acredita que Contabilidad afectó la PD. Para 05.2.2 se exige <code>APROBADA</code> según el contrato de origen.</td><td>Quedan fuera las solicitudes en revisión, devueltas, rechazadas o canceladas. La autorización se coteja en el alta y el turno. El requisito contable para turnar 05.2.1 queda sujeto a la <a href="#decisiones-integracion">decisión de integración</a>.</td><td>Consulta de elegibilidad y funciones transaccionales.</td></tr>
+          <tr><td>RN-OP-02</td><td>Cada renglón corresponde a una obligación acreditada en el expediente de la solicitud. El detalle conserva procedimiento, beneficiario, importe y vencimiento aplicable.</td><td>Si nómina neta y enteros se autorizan en solicitudes distintas, cada orden conserva exclusivamente su solicitud de origen.</td><td>Funciones de renglones y Matriz de Conversión.</td></tr>
+          <tr><td>RN-OP-03</td><td>Enviar a pago comprueba autorizaciones, documentación, detalle y cuadre.</td><td>Si falla una validación o el asiento requerido, la orden conserva su estado.</td><td>Servicio y transacción de turno.</td></tr>
+          <tr><td>RN-OP-04</td><td>El turno se registra una sola vez por orden.</td><td>Los reintentos devuelven el resultado del turno ya registrado sin duplicar póliza ni publicación.</td><td>Bloqueo y comprobación de estado dentro de la transacción.</td></tr>
+          <tr><td>RN-OP-05</td><td>La bandeja de Caja consulta órdenes turnadas con saldo pendiente según los pagos confirmados en 06.2.1, por UUID y ejercicio. Si el procedimiento admite pago parcial, se controla el saldo por obligación.</td><td>Una orden liquidada sale de la bandeja de pendientes y sigue en consulta histórica. Caja crea los registros de pago y los vincula a la orden.</td><td>Consulta de Caja y registro del pago.</td></tr>
+          <tr><td>RN-OP-06</td><td>El pago se registra al acreditar el desembolso.</td><td>El folio y el comprobante bancario identifican la liquidación y sus movimientos.</td><td>Registro de Pagos 06.2.1.</td></tr>
+          <tr><td>RN-OP-07</td><td>Al turnar, se bloquea la solicitud y se coteja el saldo autorizado de cada obligación con los turnos vigentes, incluidos los ya pagados.</td><td>Dos órdenes concurrentes no pueden comprometer el mismo importe. El esquema de asignación para pagos parciales queda sujeto al procedimiento aprobado.</td><td>Función de turno e integración con Caja.</td></tr>
+          <tr><td>RN-OP-08</td><td>Antes de desembolsar, Caja verifica que la orden siga habilitada y que la solicitud de origen conserve su autorización. Una solicitud cancelada bloquea el pago.</td><td>Si ya se emitió el cheque o se ejecutó la transferencia, el retiro requiere conciliar primero el estado bancario, el pago de Caja y los asientos. La secuencia de reversa queda por acordar.</td><td>Validación de 06.2.1 y procedimiento de reversa.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>En nómina, Tesorería distingue <code>401 NOMINA_NETA_DISPERSION</code>, <code>402 ENTERO_RETENCIONES</code> y las obligaciones patronales aplicables. La nómina neta y los enteros pueden tener distintos beneficiarios y vencimientos. Se concilian contra su origen sin duplicar el gasto reconocido.</p>
+  </section>
+
+  <section class="doc-section" id="integraciones" aria-labelledby="integraciones-titulo">
+    <h2 class="section-title" id="integraciones-titulo"><span class="section-num">10</span> Flujos de integración</h2>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Módulo</th><th scope="col">Intercambio</th></tr></thead>
+        <tbody>
+          <tr><td><a href="05.2.1-afectacion-gastos.html">05.2.1 · Solicitud de gasto presupuestal</a> y <a href="05.2.2-orden-pago.html">05.2.2 · Solicitud de pagos no presupuestales</a></td><td>Aportan la identidad de origen, ejercicio, procedimiento, expediente y autorización. Cuando existe una póliza previa, la orden conserva su referencia.</td></tr>
+          <tr><td><a href="05.1.1-requisitos-documentales.html">05.1.1 · Requisitos documentales</a></td><td>La orden conserva la referencia al expediente de la solicitud y la evidencia de autorización y turno. Las rutas y permisos de consulta de Caja y Contabilidad quedan por confirmar.</td></tr>
+          <tr><td><a href="../03_contabilidad/03.1.2-matriz-conversion.html">03.1.2 · Matriz de Conversión</a></td><td>Resuelve, según el procedimiento y el evento, si hay asiento, cuentas puente y afectación presupuestal.</td></tr>
+          <tr><td><a href="../06_pagos/06.2.1-registro-pagos.html">06.2.1 · Registro de pagos</a></td><td>Integración propuesta. Caja consulta la orden por UUID y ejercicio y vincula los pagos que registra. El turno actualiza la orden en Tesorería y deja su estado disponible para consulta. Las escrituras de pagos quedan a cargo de 06.2.1.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3 id="decisiones-integracion">Decisiones técnicas pendientes para conectar Tesorería y Caja</h3>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Tema</th><th scope="col">Responsables</th><th scope="col">Qué falta acordar o verificar</th></tr></thead>
+        <tbody>
+          <tr><td>PD de 05.2.1</td><td>Eunice y Christian</td><td>Definir si <strong>Enviar a pago</strong> admite la PD generada o exige la PD contabilizada. Verificar las rutas de afectación y reversa de pólizas CxP, su efecto sobre la referencia de la póliza y el estado de la solicitud, y el evento que debe conservar el historial.</td></tr>
+          <tr><td>Entrada de Caja</td><td>Eunice y Daryl</td><td>Confirmar la proyección que consultará 06.2.1 desde la orden. Debe cubrir folios y ejercicio, origen y procedimiento, concepto e importes, beneficiario y datos bancarios según permisos, expediente y referencia contable aplicable. La identidad de intercambio es <code>(op_id, op_ejercicio)</code>; la cardinalidad por solicitud depende de cómo se autoricen sus obligaciones.</td></tr>
+          <tr><td>Resultado y reversa del pago</td><td>Daryl y Eunice, con Christian para los asientos</td><td>Definir el contrato de consulta por orden y ejercicio. Documentar estado del pago, fecha y medio, cuenta pagadora, referencia de cheque o transferencia, importe, comprobante y PE cuando aplique. Acordar el retiro de una orden turnada, las devoluciones y la reversa de pagos emitidos. El evento de pago se vincula desde el registro de Caja.</td></tr>
+          <tr><td>Firmas y programación</td><td>Tesorería y Eunice</td><td>Identificar la evidencia de cada autorización, las condiciones de programación y si la última firma coincide con el turno.</td></tr>
+          <tr><td>Matrices y cuentas por procedimiento</td><td>Christian y Eunice</td><td>Validar la regla efectiva de turno y de egreso para 401 a 404, la cuenta de cargo y la cuenta bancaria de abono. Confirmar cuándo corresponde Ejercido o Pagado y cómo evitar duplicar un momento ya registrado.</td></tr>
+          <tr><td>Expediente y CFDI</td><td>Christian y Daryl</td><td>Confirmar si 06.2.1 y Contabilidad consultarán los soportes con <code>modulo = 'AFECTACION_GASTO'</code> y <code>referencia_uuid = ag_id</code>, y qué rutas y perfiles podrán consultar PDF y XML del ejercicio autorizado.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Evidencia para minería de procesos</h3>
+    <p>La evidencia se correlaciona por UUID y ejercicio de la orden y por su solicitud de origen. Cada actividad registra acción, actor, rol efectivo, fecha y hora reales, resultado, estados anterior y nuevo cuando hay transición, y referencias del expediente, renglón, póliza o comprobante que correspondan.</p>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Actividad</th><th scope="col">Punto y responsable del registro</th><th scope="col">Transición y evidencia</th></tr></thead>
+        <tbody>
+          <tr><td>Autorizar la solicitud</td><td>Historial de 05.2.1 o 05.2.2. Autorizador del origen.</td><td>Acción <code>APROBAR</code>, expediente y póliza de origen cuando aplica.</td></tr>
+          <tr><td>Preparar y guardar</td><td>ABC de encabezado y renglones. Operador de Tesorería.</td><td>Alta → 1 o edición en 1. Identificador de solicitud y renglones afectados.</td></tr>
+          <tr><td>Autorizar la orden</td><td>Evidencia de la autoridad competente en el expediente. Mecanismo de registro por confirmar.</td><td>Referencia de firma o autorización de la orden.</td></tr>
+          <tr><td>Turnar o cancelar</td><td>Función de turno o ABC de encabezado. Usuario con permiso de Tesorería.</td><td>1 → 2 con evidencia de autorización y asiento aplicable, o 1 → 4 con motivo.</td></tr>
+          <tr><td>Preparar, liberar y registrar el pago</td><td>06.2.1 y evidencia bancaria. Caja prepara y registra, Tesorería libera.</td><td>Identidad de orden, operación bancaria, comprobante y póliza de egreso según corresponda.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Consultar bandeja, detalle o plantilla mediante LEER es lectura ordinaria. Una recepción o revisión formal en Caja requiere evidencia de la actividad en 06.2.1. La función común de eventos para LEER y ABC conserva su carácter de propuesta. <a href="../inicio/00-eventos-mineria-procesos.html">Diseño de minería de procesos</a></p>
+  </section>
+
+  <section class="doc-section" id="contabilidad" aria-labelledby="contabilidad-titulo">
+    <h2 class="section-title" id="contabilidad-titulo"><span class="section-num">11</span> Afectación contable</h2>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Evento</th><th scope="col">Tratamiento</th></tr></thead>
+        <tbody>
+          <tr><td>Autorizar la solicitud</td><td>En 05.2.1, la autorización genera la PD de Comprometido y Devengado. La afectación de esa póliza por Contabilidad lleva la solicitud a Contabilizada. La orden conserva la referencia disponible. La autorización de los trámites de 05.2.2 no genera la PD de devengo.</td></tr>
+          <tr><td>Emitir y autorizar la orden</td><td>El documento de pago autorizado acredita el Ejercido cuando corresponde. Se verifica si la obligación ya tiene ese momento registrado para evitar duplicarlo.</td></tr>
+          <tr><td>Enviar a pago</td><td>Para 401, la Matriz de Conversión documenta <code>22 A0_RECLASIFICA_ORDEN_PAGO</code> como referencia de reclasificación y la matriz 13 para el pago. Para 402 a 404, documenta la matriz 17. La migración versionada <code>186_matriz_12_nomina_devengado_a_ejercido.sql</code> incorpora Devengado → Ejercido en reglas de nómina. Contabilidad debe confirmar qué reglas están vigentes y cuál aplica a cada evento.</td></tr>
+          <tr><td>Registrar el pago</td><td>Caja acredita el desembolso con el comprobante. La póliza de egreso aplica la matriz del procedimiento y registra el momento Pagado cuando corresponda.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>La condición contable para turnar solicitudes presupuestales, las reversas y las reglas por procedimiento se detallan en las <a href="#decisiones-integracion">decisiones técnicas de integración</a>.</p>
+  </section>
+
+  <section class="doc-section" id="historial" aria-labelledby="historial-titulo">
+    <h2 class="section-title" id="historial-titulo"><span class="section-num">12</span> Historial de cambios</h2>
+    <div class="table-scroll">
+      <table class="props-table">
+        <thead><tr><th scope="col">Fecha</th><th scope="col">Versión</th><th scope="col">Cambio</th><th scope="col">Autor</th></tr></thead>
+        <tbody>
+          <tr><td>17/11/2026</td><td>0.1</td><td>Diseño inicial de Orden de pago y su entrega a Caja.</td><td>Equipo SIAF-PJEV</td></tr>
+          <tr><td>17/11/2026</td><td>0.2</td><td>Revisión DOC-08. Modelo, contratos, elegibilidad, turno, límites de integración y trazabilidad.</td><td>Equipo SIAF-PJEV</td></tr>
+          <tr><td>17/11/2026</td><td>0.3</td><td>Condiciones de recepción en Caja y decisiones pendientes sobre PD, pagos, reversas, matrices y expediente.</td><td>Equipo SIAF-PJEV</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div id="module-flowchart" style="display:none;"><svg viewBox="0 0 820 365" role="img" aria-labelledby="flujo-tit">
+<title id="flujo-tit">Diagrama del turno de Tesorería y registro en Caja</title>
+<rect width="820" height="365" rx="4" class="cream"/>
+<text x="139" y="29" text-anchor="middle" class="heading">Tesorería / Cuentas por Pagar</text>
+<text x="410" y="29" text-anchor="middle" class="heading">SIAF-PJEV</text>
+<text x="681" y="29" text-anchor="middle" class="heading">Oficina de Caja</text>
+<path class="connector" d="M274 38v318 M546 38v318" opacity=".25"/>
+<path class="connector" d="M139 84v12m-4-6 4 6 4-6 M262 115h18v53h8m-6-4 6 4-6 4 M532 168h14v54h14m-6-4 6 4-6 4 M682 241v35H262m6-4-6 4 6 4 M139 295v35h421m-6-4 6 4-6 4"/>
+<rect x="16" y="47" width="246" height="37" rx="4" class="field"/>
+<text x="28" y="70">1. Autoriza la solicitud y su expediente</text>
+<rect x="16" y="96" width="246" height="38" rx="4" class="field"/>
+<text x="28" y="119">2. Prepara la orden y reúne firmas</text>
+<rect x="288" y="149" width="244" height="38" rx="4" class="field"/>
+<text x="300" y="172">3. Valida y registra el turno a Caja</text>
+<rect x="560" y="203" width="244" height="38" rx="4" class="field"/>
+<text x="572" y="226">4. Coteja saldo y prepara la operación</text>
+<rect x="16" y="257" width="246" height="38" rx="4" class="field"/>
+<text x="28" y="280">5. Valida y libera la operación bancaria</text>
+<rect x="560" y="311" width="244" height="38" rx="4" class="field"/>
+<text x="572" y="334">6. Registra desembolso y comprobante</text>
+</svg></div>
+  <div id="module-process-table" style="display:none;"><div class="table-scroll">
+  <table class="props-table">
+    <thead><tr><th scope="col">Paso</th><th scope="col">Responsable</th><th scope="col">Actividad</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Tesorería / CxP</td><td>Autoriza la solicitud con su expediente y habilita la preparación de la orden.</td></tr>
+      <tr><td>2</td><td>Tesorería / CxP</td><td>Prepara la orden, coteja los importes y reúne las firmas.</td></tr>
+      <tr><td>3</td><td>SIAF-PJEV</td><td>Valida y registra el turno a Caja y el asiento cuando corresponda.</td></tr>
+      <tr><td>4</td><td>Caja</td><td>Revisa la orden y el saldo y prepara la operación bancaria.</td></tr>
+      <tr><td>5</td><td>Titular de Tesorería</td><td>Valida y libera la operación en el portal bancario cuando corresponde.</td></tr>
+      <tr><td>6</td><td>Caja</td><td>Registra el desembolso, el comprobante y su vínculo con la orden.</td></tr>
+    </tbody>
+  </table>
+</div></div>
+</main>
+<script src="../shared.js"></script>
+<script>
+  function showPanel(selected) {
+    const buttons = selected.closest('[role="group"]').querySelectorAll('[data-panel]');
+    for (const button of buttons) {
+      const active = button === selected;
+      button.setAttribute('aria-pressed', String(active));
+      document.getElementById(button.dataset.panel).hidden = !active;
+    }
+  }
+
+  function showSP(button) {
+    showPanel(button);
+  }
+
+  function showWF(button) {
+    showPanel(button);
+  }
+
+  for (const button of document.querySelectorAll('[data-panel]')) {
+    button.addEventListener('click', () => {
+      if (button.dataset.panel.startsWith('sp-')) showSP(button);
+      else showWF(button);
+    });
+  }
+
+  if (inIframe()) document.body.classList.add('embedded');
+</script>
+</body>
+</html>

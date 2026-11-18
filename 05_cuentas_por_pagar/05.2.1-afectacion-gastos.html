@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>05.2.1 Solicitud-comprobación de recurso (Orden de pago) — Manual de Desarrollo SIAF-PJEV</title>
+  <title>05.2.1 Solicitud de gasto presupuestal — Manual de Desarrollo SIAF-PJEV</title>
   <link rel="stylesheet" href="../shared.css">
   <style>
     body { padding: 36px 44px 64px; background: var(--pjev-crema); }
@@ -95,7 +95,7 @@
   <header class="elem-header">
     <div>
       <div class="elem-id">05.2.1</div>
-      <h1 class="elem-title">Solicitud-comprobación de recurso (Orden de pago)</h1>
+      <h1 class="elem-title">Solicitud de gasto presupuestal</h1>
       <p class="elem-desc">Captura y revisión de trámites presupuestales, partidas, expediente y póliza de devengo.</p>
       <span class="elem-tag">Etapa 2 · Tesorería / Cuentas por Pagar</span>
       <span class="elem-tag">Modal compuesto</span>
@@ -112,8 +112,8 @@
 
   <section class="doc-section" id="descripcion" aria-labelledby="descripcion-titulo">
     <h2 class="section-title" id="descripcion-titulo"><span class="section-num">1</span> Descripción general</h2>
-    <p>La Solicitud-comprobación de recurso registra un trámite presupuestal de Tesorería. El capturista selecciona el procedimiento, guarda el encabezado, captura las partidas y reúne el expediente digital. El revisor consulta los soportes y la previsualización contable antes de resolver el trámite.</p>
-    <p>La pantalla 05.2.1 consulta los grupos presupuestales 1 a 3. El grupo 4 se opera en 05.2.2 mediante servicios CxP compartidos. La autorización presupuestal genera o recupera la póliza de devengo en CxP. En el diseño, el estado Contabilizada requiere confirmar la afectación de esa póliza. La autorización y ejecución del pago continúan en sus procesos correspondientes.</p>
+    <p>La solicitud registra un trámite presupuestal de Tesorería. El capturista selecciona el procedimiento, guarda el encabezado, captura las partidas y reúne el expediente digital. El revisor consulta los soportes y la previsualización contable antes de resolver el trámite.</p>
+    <p>La pantalla 05.2.1 consulta los grupos presupuestales 1 a 3. El grupo 4 se opera en 05.2.2 mediante servicios CxP compartidos. La autorización presupuestal efectiva se acredita con <code>APROBAR</code> en el historial y genera o recupera la PD en CxP. Cuando Contabilidad afecta esa póliza, la solicitud pasa a Contabilizada. La aprobación habilita la preparación en <a href="05.2.4-orden-pago.html">05.2.4 · Orden de pago</a>. Queda por definir si para <strong>Enviar a pago</strong> se exige la PD contabilizada. <a href="05.2.4-orden-pago.html#decisiones-integracion">Decisiones de integración</a></p>
   </section>
 
   <section class="doc-section" id="normativa" aria-labelledby="normativa-titulo">
@@ -2009,7 +2009,7 @@ RETURNS trigger</code></pre>
     <div class="wf-panel mock-panel" id="wf-bandeja" aria-labelledby="wf-bandeja-titulo">
       <h3 id="wf-bandeja-titulo">Bandeja de afectaciones · Parámetros</h3>
       <div class="mock-screen">
-        <div class="mock-title"><h4>Solicitud-comprobación de recurso</h4><div class="mock-actions"><span class="mock-button mock-primary">+ Nueva afectación</span></div></div>
+        <div class="mock-title"><h4>Solicitud de gasto presupuestal</h4><div class="mock-actions"><span class="mock-button mock-primary">+ Nueva afectación</span></div></div>
         <div class="mock-card">
         <div class="mock-title"><h4>Filtros</h4></div>
         <div class="mock-grid">
@@ -2037,7 +2037,7 @@ RETURNS trigger</code></pre>
     <div class="wf-panel mock-panel" id="wf-bandeja-valores" aria-labelledby="wf-bandeja-valores-titulo" hidden>
       <h3 id="wf-bandeja-valores-titulo">Bandeja de afectaciones · Valores</h3>
       <div class="mock-screen">
-        <div class="mock-title"><h4>Solicitud-comprobación de recurso</h4><div class="mock-actions"><span class="mock-button mock-primary">+ Nueva afectación</span></div></div>
+        <div class="mock-title"><h4>Solicitud de gasto presupuestal</h4><div class="mock-actions"><span class="mock-button mock-primary">+ Nueva afectación</span></div></div>
         <div class="mock-card">
         <div class="mock-title"><h4>Filtros</h4></div>
         <div class="mock-grid">

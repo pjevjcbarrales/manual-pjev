@@ -74,6 +74,11 @@
     </div>
   </div>
 
+  <aside class="callout-box" aria-label="Origen de las órdenes de pago">
+    <p><strong>Integración propuesta con Tesorería.</strong> La bandeja de Caja consulta las órdenes de <a href="../05_cuentas_por_pagar/05.2.4-orden-pago.html">05.2.4 · Orden de pago</a> turnadas con <strong>Enviar a pago</strong> y con saldo pendiente. Aplica a ambos orígenes y usa UUID de orden, ejercicio y referencia al expediente. Antes del desembolso, Caja vuelve a verificar que la orden siga habilitada y que la solicitud conserve su autorización.</p>
+    <p>Caja registra el desembolso con su comprobante y lo vincula a la orden. La liquidación completa retira la orden de la bandeja de pendientes. Los ejemplos de esta ficha que consultan directamente la solicitud o escriben <code>estatus_workflow = 'PAGADA'</code> corresponden al diseño anterior. El contrato de consulta del resultado, los permisos documentales y la reversa quedan por acordar. <a href="../05_cuentas_por_pagar/05.2.4-orden-pago.html#decisiones-integracion">Decisiones de integración</a></p>
+  </aside>
+
   <!-- CALLOUT ARQUITECTÓNICO PARA DARYL -->
   <div class="callout-box">
     <div class="callout-title">📌 Simetría Arquitectónica en Caja (Esquema <code>ingresos</code>: Ingresos vs. Pagos)</div>
